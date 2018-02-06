@@ -1,0 +1,29 @@
+{
+  "name": "x5gon",
+  "version": "0.0.1",
+  "description": "connecting OER repositories",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JozefStefanInstitute/x5gon.git"
+  },
+  "author": "Erik Novak, Jasna Urbančič",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/JozefStefanInstitute/x5gon/issues"
+  },
+  "homepage": "https://github.com/JozefStefanInstitute/x5gon#readme",
+  "dependencies": {
+    "async": "^2.6.0",
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "minimist": "^1.2.0",
+    "pg": "^7.4.1",
+    "pg-cursor": "^1.3.0",
+    "winston": "^2.4.0",
+    "winston-daily-rotate-file": "^1.7.2"
+  }
+}
