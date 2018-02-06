@@ -28,7 +28,7 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 
 
 // TODO: set the API routes
-// require('./routes/route.handler')(app, pg);
+require('./routes/route.handler')(app, pg, logger);
 
 // start the server
 app.listen(PORT, () => logger.info(`server listening on port ${PORT}`));
