@@ -6,6 +6,9 @@
   "scripts": {
     "start:server": "cd src/server && node server.js",
     "start:serverDebug": "cd src/server && node --debug server.js",
+    "minify:snippet": "cd src/scripts && node minify-snippet.js",
+    "postgres:create": "cd src/load && node create-postgres-tables.js",
+
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

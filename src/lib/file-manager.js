@@ -4,14 +4,14 @@ const path = require('path');
 
 /**
  * Removes the file.
- * @param {String} filename - Name of the file to be removed.
+ * @param {String} fileName - Name of the file to be removed.
  */
-exports.removeFile = function(filename) {
+exports.removeFile = function(fileName) {
     // check if file exists
-    if (fs.existsSync(filename)) {
-        fs.unlinkSync(filename);
+    if (fs.existsSync(fileName)) {
+        fs.unlinkSync(fileName);
     } else {
-        console.warn(`File does not exist: ${filename}`);
+        console.warn(`File does not exist: ${fileName}`);
     }
 };
 
@@ -26,14 +26,14 @@ exports.removeFolder = function (sourcePath) {
         // get all file names in the directory and iterate through them
         let files = fs.readdirSync(source);
         for (let file of files) {
-            let filename = path.join(source, file);
-            let stat = fs.lstatSync(filename);
+            let fileName = path.join(source, file);
+            let stat = fs.lstatSync(fileName);
             // check if file is a directory
             if (stat.isDirectory()) {
                 // recursively remove folder
-                exports.removeFolder(filename);
+                exports.removeFolder(fileName);
             } else {
-                exports.removeFile(filename);
+                exports.removeFile(fileName);
             }
         }
         // remove the folder
@@ -58,16 +58,16 @@ exports.copyFolder = function(source, destination) {
     // get all file names in the directory and iterate through them
     let files = fs.readdirSync(source);
     for (let file of files) {
-        let filename = path.join(source, file);
-        let destinationfilename = path.join(destination, file);
-        let stat = fs.lstatSync(filename);
+        let fileName = path.join(source, file);
+        let destinationFileName = path.join(destination, file);
+        let stat = fs.lstatSync(fileName);
         // check if file is a directory
         if (stat.isDirectory()) {
             // recursive check if it contains files
-            exports.copyFolder(filename, destinationfilename);
+            exports.copyFolder(fileName, destinationFileName);
         } else {
-            let readFile = fs.createReadStream(filename);
-            let writeFile = fs.createWriteStream(destinationfilename);
+            let readFile = fs.createReadStream(fileName);
+            let writeFile = fs.createWriteStream(destinationFileName);
             readFile.pipe(writeFile);
         }
     }
