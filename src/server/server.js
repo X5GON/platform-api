@@ -4,14 +4,14 @@ const bodyParser = require('body-parser');
 
 // internal modules
 const pg  = require('../lib/postgresQL')(require('../config/pgconfig'));
-const Logger = require('../lib/loggingHandler')();
+const Logger = require('../lib/logging-handler')();
 
 
 // parameters given to the process
 const argv = require('minimist')(process.argv.slice(2));
 
 // create a logger instance for logging API requests
-const logger = Logger.createGroupInstance('api_requests', 'api');
+const logger = Logger.createGroupInstance('api-requests', 'api');
 
 
 // parameters used on the express app
@@ -26,6 +26,8 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
     extended: true
 }));
 
+
+app.use(express.static(__dirname + '/public/'));
 
 // TODO: set the API routes
 require('./routes/route.handler')(app, pg, logger);

@@ -1,6 +1,6 @@
-var x5gonActivityTracker = function() {
+var x5gonActivityTracker = function () {
 
-  function x5gonGetDomain() {
+  function x5gonGetDomain () {
     domain = document.domain;
     domain_part = domain.split(".");
     domain_parts = domain_part.length;
@@ -8,16 +8,16 @@ var x5gonActivityTracker = function() {
     return domain;
   }
 
-  function x5gonGetCookie(a) {
+  function x5gonGetCookie(cookieName) {
     if(document.cookie.length > 0) {
-      var CStart = document.cookie.indexOf(a + "=");
+      var CStart = document.cookie.indexOf(cookieName + "=");
       if (CStart != -1) {
-        CStart = CStart + a.toString().length + 1;
+        CStart = CStart + cookieName.toString().length + 1;
         var CEnd = document.cookie.indexOf("; ", CStart);
         if (CEnd == -1) { CEnd = document.cookie.length; }
         var StrLen = CEnd - CStart;
         if (StrLen > 20) { CEnd = CStart + 20; }
-        if(CEnd <= document.cookie.length){
+        if (CEnd <= document.cookie.length) {
           return decodeURIComponent(document.cookie.substring(CStart, CEnd));
         }
       }
@@ -25,10 +25,10 @@ var x5gonActivityTracker = function() {
     return"";
   }
 
-  function x5gonSetCookie(b, a) {
-    var c = new Date();
-    c.setDate(c.getDate() + 256);
-    document.cookie = b + "=" + encodeURIComponent(a) + "; expires=" + c.toGMTString() + "; path=/" + "; domain=" + x5gonGetDomain();
+  function x5gonSetCookie(cookieName, userId) {
+    var expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + 256);
+    document.cookie = cookieName + "=" + encodeURIComponent(userId) + "; expires=" + expirationDate.toGMTString() + "; path=/" + "; domain=" + x5gonGetDomain();
   }
 
   function x5gonCheckCookie() {
@@ -47,7 +47,7 @@ var x5gonActivityTracker = function() {
     return a;
   }
 
-  function x5gonGetReturnString(a, cid) {
+  function x5gonGetReturnString(userId, providerToken) {
     var Dat = new Date();
     var Dt = Dat.getFullYear() + "-" + x5gonCheckTime(Dat.getMonth() + 1) + "-" +
       x5gonCheckTime(Dat.getDate()) + " " + x5gonCheckTime(Dat.getHours()) + ":" +
@@ -56,19 +56,19 @@ var x5gonActivityTracker = function() {
     var CURL = document.URL;
     var PURL = document.referrer;
 
-    var b = 'http://log4.quintelligence.com/api/v1/log?uid=';
-    b += encodeURIComponent(a);
+    var b = 'http://localhost:7110/api/v1/log?uid=';
+    b += encodeURIComponent(userId);
     b += "&dt=" + encodeURIComponent(Dt);
     b += "&rq=" + encodeURIComponent(CURL);
     b += "&rf=" + encodeURIComponent(PURL);
-    b += "&cid=" + encodeURIComponent(cid);
+    b += "&cid=" + encodeURIComponent(providerToken);
     return b;
   }
 
-  return function(cid) {
+  return function(providerToken) {
     try {
       var img = document.createElement('img');
-      img.setAttribute('src', x5gonGetReturnString(x5gonCheckCookie(), cid));
+      img.setAttribute('src', x5gonGetReturnString(x5gonCheckCookie(), providerToken));
       document.body.appendChild(img);
     } catch(err) { }
   };

@@ -10,6 +10,5 @@ module.exports = function (app, pg, logger) {
     // API Routes
     ////////////////////////////////////////
 
-    require('./v1/recommendation')(app, pg, logger);
     require('./v1/activity-logging')(app, pg, logger);
 };

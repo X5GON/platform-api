@@ -1,3 +1,6 @@
+// external modules 
+const path = require('path');
+
 /**
  * Adds API routes for the recommendations.
  * @param {Object} app - Express app.
@@ -6,38 +9,55 @@
  */
 module.exports = function (app, pg, logger) {
 
-    // POST client activity
-    app.post('/api/v1/client_activity', (req, res) => {
+    // GET client activity
+    app.get('/api/v1/log', (req, res) => {
         // log client activity
-        logger.info('client requested to post activity',
+        logger.info('client requested activity logging',
             logger.formatRequest(req)
         );
 
-        // get the body of the request
-        const body = req.body;
+        // return a transparent image - the beacon 
+        let beaconPath = path.join(__dirname + '../../../public/images/beacon.png');
 
-        // TODO: check post schema
-        if (true /* && !isValid(body) */) {
-            // log postgres error
-            logger.error('error [route_body]: client request to post activity failed',
-                logger.formatRequest(req, { error: 'The body of the request is not in valid schema' })
-            );
-            // send error to client
-            return req.send({ errors: { msg: 'The body of the request is not in valid schema' } });
-        }
+        // get query parameters
+        let query = req.query;
+
+        // validate query schema
+        // if (/* && !isValid(query) */) {
+        //     // log postgres error
+        //     logger.error('error [route_body]: client activity logging failed',
+        //         logger.formatRequest(req, { error: 'The body of the request is not in valid schema' })
+        //     );
+        //     // send error to client
+        //     return res.sendFile(beaconPath);
+        // }
+
+        // prepare the acitivity object
+        let activity = {
+            uuid: query.uid, 
+            provider: query.cid, 
+            url: query.rq, 
+            referrer: query.rf, 
+            visitedOn: query.dt
+        };
 
         // TODO: store the client activity into postgres
-        pg.insert({ /* client activity data */ }, 'client_activity', (error) => {
+        pg.insert(activity, 'client_activity', (error) => {
             if (error) {
                 // log postgres error
-                logger.error('error [postgres.insert]: client request to post activity failed',
+                logger.error('error [postgres.insert]: client activity logging failed',
                     logger.formatRequest(req, { error: error.message })
                 );
                 // send error to client
-                return res.send({ errors: { msg: error.message } });
+                return res.sendFile(beaconPath);
             }
-            // TODO: send response to client
-            return res.send('ping');
+            // log postgres error
+            logger.info('client activity logging successful',
+                logger.formatRequest(req)
+            );
+
+            // send response to client
+            return res.sendFile(beaconPath);
         });
     });
 
