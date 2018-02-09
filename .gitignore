@@ -57,3 +57,8 @@ typings/
 # dotenv environment variables file
 .env
 
+# ignore additional files
+data
+
+# ignore minified files
+src/server/**/*.min.js
