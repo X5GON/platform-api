@@ -2,7 +2,7 @@
 const path = require('path');
 // internal modules
 const validator = require('../../../lib/schema-validator')({
-    activitySchema: require('../../../schemas/activity-schema')
+    userActivitySchema: require('../../../schemas/user-activity-schema')
 });
 
 /**
@@ -28,7 +28,7 @@ module.exports = function (app, pg, logger) {
 
         // validate query schema
         if (!Object.keys(userParameters).length ||
-            !validator.validateSchema(userParameters, validator.schemas.activitySchema)) {
+            !validator.validateSchema(userParameters, validator.schemas.userActivitySchema)) {
             // the user parameters object is either empty or is not in correct schema
 
             // log postgres error
