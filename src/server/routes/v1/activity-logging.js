@@ -21,7 +21,7 @@ module.exports = function (app, pg, logger) {
         );
 
         // return a transparent image - the beacon
-        let beaconPath = path.join(__dirname, '../../../public/images/beacon.png');
+        let beaconPath = path.join(__dirname, '../../public/images/beacon.png');
         // get query parameters
         let userParameters = req.query;
 
