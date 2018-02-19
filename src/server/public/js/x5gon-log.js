@@ -22,7 +22,7 @@ var x5gonActivityTracker = function () {
         }
       }
     }
-    return"";
+    return "";
   }
 
   function x5gonSetCookie(cookieName, userId) {
@@ -56,7 +56,7 @@ var x5gonActivityTracker = function () {
     var CURL = document.URL;
     var PURL = document.referrer;
 
-    var b = 'http://localhost:7110/api/v1/log?uid=';
+    var b = 'http://pankretas.ijs.si:7110/api/v1/log?uid=';
     b += encodeURIComponent(userId);
     b += "&dt=" + encodeURIComponent(Dt);
     b += "&rq=" + encodeURIComponent(CURL);
