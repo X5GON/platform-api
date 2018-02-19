@@ -50,9 +50,8 @@ var x5gonActivityTracker = function () {
   function x5gonGetReturnString(userId, providerToken) {
     var Dat = new Date();
     var Dt = Dat.getFullYear() + "-" + x5gonCheckTime(Dat.getMonth() + 1) + "-" +
-      x5gonCheckTime(Dat.getDate()) + " " + x5gonCheckTime(Dat.getHours()) + ":" +
-      x5gonCheckTime(Dat.getMinutes()) + ":" + x5gonCheckTime(Dat.getSeconds()) +
-      "." + Dat.getMilliseconds();
+      x5gonCheckTime(Dat.getDate()) + "T" + x5gonCheckTime(Dat.getHours()) + ":" +
+      x5gonCheckTime(Dat.getMinutes()) + ":" + x5gonCheckTime(Dat.getSeconds()) + "Z";
     var CURL = document.URL;
     var PURL = document.referrer;
 
