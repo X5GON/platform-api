@@ -2,7 +2,7 @@
 const async = require('async');
 
 // prepare postgresql connection to the database
-const pg = require('../lib/postgresQL')(require('../config/pgconfig'));
+const pg = require('../lib/utils/postgresQL')(require('../config/pgconfig'));
 
 // prepare commands we want to execute
 let commands = [

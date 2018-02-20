@@ -28,7 +28,7 @@ var x5gonActivityTracker = function () {
   function x5gonSetCookie(cookieName, userId) {
     var expirationDate = new Date();
     expirationDate.setDate(expirationDate.getDate() + 256);
-    document.cookie = cookieName + "=" + encodeURIComponent(userId) + "; expires=" + expirationDate.toGMTString() + "; path=/" + "; domain=" + x5gonGetDomain();
+    document.cookie = cookieName + "=" + encodeURIComponent(userId) + "; expires=" + expirationDate.toGMTString() + "; path=/" + "; domain=pankretas.ijs.si";// + x5gonGetDomain();
   }
 
   function x5gonCheckCookie() {

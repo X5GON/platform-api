@@ -1,7 +1,7 @@
 // external modules
 const path = require('path');
 // internal modules
-const validator = require('../../../lib/schema-validator')({
+const validator = require('../../../lib/utils/schema-validator')({
     userActivitySchema: require('../../../schemas/user-activity-schema')
 });
 

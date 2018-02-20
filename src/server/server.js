@@ -3,8 +3,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 // internal modules
-const pg  = require('../lib/postgresQL')(require('../config/pgconfig'));
-const Logger = require('../lib/logging-handler')();
+const pg  = require('../lib/utils/postgresQL')(require('../config/pgconfig'));
+const Logger = require('../lib/utils/logging-handler')();
 
 
 // parameters given to the process
