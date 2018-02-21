@@ -1,5 +1,9 @@
-// external modules 
+// external modules
 const path = require('path');
+// internal modules
+const validator = require('../../../lib/utils/schema-validator')({
+    userActivitySchema: require('../../../schemas/user-activity-schema')
+});
 
 /**
  * Adds API routes for the recommendations.
@@ -16,47 +20,49 @@ module.exports = function (app, pg, logger) {
             logger.formatRequest(req)
         );
 
-        // return a transparent image - the beacon 
-        let beaconPath = path.join(__dirname + '../../../public/images/beacon.png');
-
+        // return a transparent image - the beacon
+        let beaconPath = path.join(__dirname, '../../public/images/beacon.png');
         // get query parameters
-        let query = req.query;
+        let userParameters = req.query;
+
 
         // validate query schema
-        // if (/* && !isValid(query) */) {
-        //     // log postgres error
-        //     logger.error('error [route_body]: client activity logging failed',
-        //         logger.formatRequest(req, { error: 'The body of the request is not in valid schema' })
-        //     );
-        //     // send error to client
-        //     return res.sendFile(beaconPath);
-        // }
+        if (!Object.keys(userParameters).length ||
+            !validator.validateSchema(userParameters, validator.schemas.userActivitySchema)) {
+            // the user parameters object is either empty or is not in correct schema
+
+            // log postgres error
+            logger.error('error [route_body]: client activity logging failed',
+                logger.formatRequest(req, { error: 'The body of the request is not in valid schema' })
+            );
+            // send beacon image to user
+            return res.sendFile(beaconPath);
+        }
+
 
         // prepare the acitivity object
         let activity = {
-            uuid: query.uid, 
-            provider: query.cid, 
-            url: query.rq, 
-            referrer: query.rf, 
-            visitedOn: query.dt
+            uuid: userParameters.uid,
+            provider: userParameters.cid,
+            url: userParameters.rq,
+            referrer: userParameters.rf,
+            visitedOn: userParameters.dt
         };
 
-        // TODO: store the client activity into postgres
+        // store the client activity into postgres
         pg.insert(activity, 'client_activity', (error) => {
             if (error) {
                 // log postgres error
                 logger.error('error [postgres.insert]: client activity logging failed',
                     logger.formatRequest(req, { error: error.message })
                 );
-                // send error to client
-                return res.sendFile(beaconPath);
+            } else {
+                // log postgres success
+                logger.info('client activity logging successful',
+                    logger.formatRequest(req)
+                );
             }
-            // log postgres error
-            logger.info('client activity logging successful',
-                logger.formatRequest(req)
-            );
-
-            // send response to client
+            // send beacon image to user
             return res.sendFile(beaconPath);
         });
     });

@@ -2,20 +2,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-// internal modules
-const pg  = require('../lib/utils/postgresQL')(require('../config/pgconfig'));
-const Logger = require('../lib/utils/logging-handler')();
-
-
 // parameters given to the process
 const argv = require('minimist')(process.argv.slice(2));
-
-// create a logger instance for logging API requests
-const logger = Logger.createGroupInstance('api-requests', 'api');
-
-
 // parameters used on the express app
-const PORT = argv.PORT || 7110;
+const PORT = argv.PORT || 7111;
 
 // create express app
 let app = express();
@@ -29,8 +19,9 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 
 app.use(express.static(__dirname + '/public/'));
 
-// TODO: set the API routes
-require('./routes/route.handler')(app, pg, logger);
+app.get('/', (req, res) => {
+    return res.send('/public/index.html');
+});
 
 // start the server
-app.listen(PORT, () => logger.info(`server listening on port ${PORT}`));
+app.listen(PORT, () => console.log(`server listening on port ${PORT}`));
