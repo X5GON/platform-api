@@ -1,0 +1,48 @@
+[{
+    "name": "Content",
+    "fields": [
+        { "name": "link", "type": "string", "primary": true },
+        { "name": "type", "type": "string", "shortstring": true },
+        { "name": "title", "type": "string" },
+        { "name": "description", "type": "string", "null": true },
+        { "name": "created", "type": "datetime", "null": true },
+        { "name": "author", "type": "string", "null": true },
+        { "name": "provider", "type": "string" },
+        { "name": "language", "type": "string", "shortstring": true }
+    ],
+    "joins": [
+        { "name": "concepts", "type": "index", "store": "Wikipedia", "inverse": "foundInContent" }
+        { "name": "predecessor", "type": "field", "store": "Content", "inverse": "successor" },
+        { "name": "successor", "type": "field", "store": "Content", "inverse": "predecessor" }
+        { "name": "wasVisited", "type": "index", "store": "Activity", "inverse": "content" }
+    ]
+}, {
+    "name": "Users",
+    "fields": [
+        { "name": "token", "type": "string", "primary": true }
+    ],
+    "joins": [
+        { "name": "viewed", "type": "index", "store": "Activity", "inverse": "user" },
+        { "name": "lastViewed", "type": "field", "store": "Activity" }
+
+    ]
+}, {
+    "name": "Activity",
+    "fields": [
+        { "name": "time", "type": "datetime" }
+    ],
+    "joins": [
+        { "name": "user", "type": "field", "store": "Users", "inverse": "viewed" }
+        { "name": "content", "type": "field", "store": "Content", "inverse": "wasVisited" }
+    ]
+}, {
+    "name": "Wikipedia",
+    "fields": [
+        { "name": "uri", "type": "string", "primary": true },
+        { "name": "concept", "type": "string" },
+        { "name": "originalConcept", "type": "string", "null": true }
+    ],
+    "joins": [
+        { "name": "foundInContent", "type": "index", "store": "Content", "inverse": "concepts" }
+    ]
+}]
