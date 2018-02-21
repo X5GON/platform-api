@@ -28,7 +28,9 @@ var x5gonActivityTracker = function () {
   function x5gonSetCookie(cookieName, userId) {
     var expirationDate = new Date();
     expirationDate.setDate(expirationDate.getDate() + 256);
-    document.cookie = cookieName + "=" + encodeURIComponent(userId) + "; expires=" + expirationDate.toGMTString() + "; path=/" + "; domain=pankretas.ijs.si"; // TODO: figure out cookie domain; + x5gonGetDomain();
+    document.cookie = cookieName + "=" + encodeURIComponent(userId) +
+      "; expires=" + expirationDate.toGMTString() + "; path=/" +
+      "; domain=pankretas.ijs.si"; // TODO: figure out cookie domain; + x5gonGetDomain();
   }
 
   function x5gonCheckCookie() {
@@ -55,13 +57,13 @@ var x5gonActivityTracker = function () {
     var CURL = document.URL;
     var PURL = document.referrer;
 
-    var b = 'http://pankretas.ijs.si:7110/api/v1/log?uid=';
-    b += encodeURIComponent(userId);
-    b += "&dt=" + encodeURIComponent(Dt);
-    b += "&rq=" + encodeURIComponent(CURL);
-    b += "&rf=" + encodeURIComponent(PURL);
-    b += "&cid=" + encodeURIComponent(providerToken);
-    return b;
+    var request = 'http://pankretas.ijs.si:7110/api/v1/log?uid=';
+    request += encodeURIComponent(userId);
+    request += "&dt=" + encodeURIComponent(Dt);
+    request += "&rq=" + encodeURIComponent(CURL);
+    request += "&rf=" + encodeURIComponent(PURL);
+    request += "&cid=" + encodeURIComponent(providerToken);
+    return request;
   }
 
   return function(providerToken) {
