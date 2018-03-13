@@ -6,14 +6,14 @@
         { "name": "title", "type": "string" },
         { "name": "description", "type": "string", "null": true },
         { "name": "created", "type": "datetime", "null": true },
-        { "name": "author", "type": "string", "null": true },
+        { "name": "authors", "type": "string_v", "null": true },
         { "name": "provider", "type": "string" },
-        { "name": "language", "type": "string", "shortstring": true }
+        { "name": "languages", "type": "string_v", "shortstring": true }
     ],
     "joins": [
-        { "name": "concepts", "type": "index", "store": "Wikipedia", "inverse": "foundInContent" }
+        { "name": "concepts", "type": "index", "store": "Wikipedia", "inverse": "inContent" },
         { "name": "predecessor", "type": "field", "store": "Content", "inverse": "successor" },
-        { "name": "successor", "type": "field", "store": "Content", "inverse": "predecessor" }
+        { "name": "successor", "type": "field", "store": "Content", "inverse": "predecessor" },
         { "name": "wasVisited", "type": "index", "store": "Activity", "inverse": "content" }
     ]
 }, {
@@ -32,17 +32,18 @@
         { "name": "time", "type": "datetime" }
     ],
     "joins": [
-        { "name": "user", "type": "field", "store": "Users", "inverse": "viewed" }
+        { "name": "user", "type": "field", "store": "Users", "inverse": "viewed" },
         { "name": "content", "type": "field", "store": "Content", "inverse": "wasVisited" }
     ]
 }, {
     "name": "Wikipedia",
     "fields": [
         { "name": "uri", "type": "string", "primary": true },
-        { "name": "concept", "type": "string" },
-        { "name": "originalConcept", "type": "string", "null": true }
+        { "name": "name", "type": "string" },
+        { "name": "secUri", "type": "string", "null": true },
+        { "name": "secName", "type": "string", "null": true }
     ],
     "joins": [
-        { "name": "foundInContent", "type": "index", "store": "Content", "inverse": "concepts" }
+        { "name": "inContent", "type": "index", "store": "Content", "inverse": "concepts" }
     ]
 }]
