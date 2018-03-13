@@ -6,7 +6,9 @@ const pg = require('../lib/utils/postgresQL')(require('../config/pgconfig'));
 
 // prepare commands we want to execute
 let commands = [
-    'CREATE TABLE IF NOT EXISTS client_activity (id serial PRIMARY KEY, uuid varchar NOT NULL, provider varchar NOT NULL, url varchar NOT NULL, referrer varchar NOT NULL, visitedOn timestamp with time zone NOT NULL);',
+    `CREATE TABLE IF NOT EXISTS client_activity (id serial PRIMARY KEY, uuid varchar NOT NULL, 
+        provider varchar NOT NULL, url varchar NOT NULL, visitedOn timestamp with time zone NOT NULL, 
+        referrer varchar NOT NULL, userAgent varchar NOT NULL, language varchar NOT NULL);`,
     'CREATE INDEX IF NOT EXISTS client_activity_id ON client_activity(id);',
     'CREATE INDEX IF NOT EXISTS client_activity_userid ON client_activity(uuid);',
     'CREATE INDEX IF NOT EXISTS client_activity_provider ON client_activity(provider);',
