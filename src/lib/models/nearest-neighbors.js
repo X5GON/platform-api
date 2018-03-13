@@ -1,3 +1,9 @@
+/************************************************
+ * The Nearest Neighbor recommendation model.
+ * It returns documents similar to the query 
+ * parameter.
+ */
+
 // external modules
 const qm = require("qminer");
 
@@ -24,10 +30,10 @@ class NearestNeighbors {
         // initialize instance based on mode
         if (self.params.mode === 'load') {
             // load model from a file
-            loadModel(self.params.base, self.params.modelPath);
+            self._loadModel(self.params.base, self.params.modelPath);
         } else if (self.params.mode === 'create') {
             // create the model from scratch
-            createModel(self.params.base, self.params.modelPath,
+            self._createModel(self.params.base, self.params.modelPath,
                 self.params.store, self.params.features);
         } else {
             throw `Value of parameter 'mode' is not supported: ${self.params.mode}`;
@@ -41,17 +47,21 @@ class NearestNeighbors {
      * @param {Object} store - The store containing the records of interest.
      * @param {Object[]} features - Array of qminer features used in feature
      * space creation.
+     * @private
      */
-    createModel(base, modelPath, store, features) {
+    _createModel(base, modelPath, store, features) {
         let self = this;
         // create feature space for nearest neighbors
-        self.featureSpace = new qm.FeatureSpace(self.base, features);
+        self.featureSpace = new qm.FeatureSpace(base, features);
         // update the feature space and extract record matrix
         self.featureSpace.updateRecords(store.allRecords);
         self.matrix = this.featureSpace.extractSparseMatrix(store.allRecords);
 
         // save the model in the `modelPath` file
+        console.log(modelPath);
         let fout = qm.fs.openWrite(modelPath);
+        console.log(fout);
+        
         self.featureSpace.save(fout); self.matrix.save(fout); fout.close();
     }
 
@@ -59,8 +69,9 @@ class NearestNeighbors {
      * @description Loads the Nearest Neighbors model.
      * @param {Object} base - The qminer base containing the data.
      * @param {String} modelPath - The Nearest Neighbors model file name.
+     * @private
      */
-    loadModel(base, modelPath) {
+    _loadModel(base, modelPath) {
         let self = this;
         // load Nearest Neighbor feature space and matrix
         const fin = qm.fs.openRead(modelPath);
@@ -70,17 +81,28 @@ class NearestNeighbors {
 
     /**
      * @description Gets Nearest Neighbors of the query object.
-     * @param {Object} queryJson - The query object.
+     * @param {Object|String} query - The query object. Can be object containing the `title` and
+     * `description` attributes or an url string.
      * @param {Object} store - The qminer store used for creating record(s).
      * @param {Number} [maxCount=100] - The maximal neighbor count.
      * @param {Number} [minSim=0.01] - Minimal similarity treshold.
      * @return {Array.<Object>} An array where the first element is a record set
      * of relevant solutions and the second element is an array of similarity measures.
      */
-    search(queryJson, store, maxCount=100, minSim=0.05) {
+    search(query, store, maxCount=100, minSim=0.05) {
         let self = this;
         // transform the query json into a sparse vector
-        let queryRec = store.newRecord(queryJson);
+        let queryRec = typeof query === 'string' ? 
+            store.recordByName(query) :
+            store.newRecord(query);
+
+        if (!queryRec) { 
+            // there is no record in the record set containing the url
+            // return an empty record set with weights
+            // TODO: tell the user of the missing record
+            return [store.newRecordSet(), []]; 
+        }
+
         let vector = self.featureSpace.extractSparseVector(queryRec);
         // calculate similarities between query vector and content
         let sim = self.matrix.multiplyT(vector);
@@ -106,6 +128,7 @@ class NearestNeighbors {
         // return the record set and their similarities
         return [store.newRecordSet(idVec), simVec];
     }
+
 }
 
 module.exports = NearestNeighbors;
