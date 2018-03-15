@@ -132,10 +132,7 @@ class x5recommend {
             modelPath: path.join(self.params.path, '/contentNN.dat'),
             store: self.content,
             features: [{
-                type: 'text', source: 'Content', field: 'title',
-                ngrams: 2, hashDimension: 200000
-            }, {
-                type: 'text', source: 'Content', field: 'description',
+                type: 'text', source: 'Content', field: ['title', 'description'],
                 ngrams: 2, hashDimension: 200000
             }]
         });
@@ -152,9 +149,7 @@ class x5recommend {
     /**
      * Get content based recommendations.
      * @param {Object} queryObject - The object containing the required query parameters.
-     * @param {String} [queryObject.title] - The title parameter. Finds material containing similar title.
-     * @param {String} [queryObject.description] - The description parameter. Finds material containing 
-     * similar description.
+     * @param {String} [queryObject.text] - The text parameter. Finds material containing similar text.
      * @param {String} [queryObject.url] - The url parameter. Finds the material found using the url and 
      * returns material similar to it.
      * @returns {Array.<Object>} An array of recommended learning material.
@@ -164,14 +159,9 @@ class x5recommend {
         // distinguish between the url and title & description query methods
         let recommendations;
 
-        if (queryObject.url || queryObject.title || queryObject.description) {
-            // specify the query type
-            let query = queryObject.url ? 
-                queryObject.url :   // search by record url - has bigger priority before others
-                queryObject;        // search by title and/or description
-
+        if (queryObject.url || queryObject.text) {
             // return the recommendation based on the query
-            recommendations = self.contentNN.search(query, self.content);
+            recommendations = self.contentNN.search(queryObject, self.content);
         } else {
             let errorMessage = 'Unsupported recommendation parameters';
             logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, { 

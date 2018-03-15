@@ -81,8 +81,8 @@ class NearestNeighbors {
 
     /**
      * @description Gets Nearest Neighbors of the query object.
-     * @param {Object|String} query - The query object. Can be object containing the `title` and
-     * `description` attributes or an url string.
+     * @param {Object} query - The query object. Can be object containing the text or url 
+     * attributes. When url is present it searches for the material with that url.
      * @param {Object} store - The qminer store used for creating record(s).
      * @param {Number} [maxCount=100] - The maximal neighbor count.
      * @param {Number} [minSim=0.01] - Minimal similarity treshold.
@@ -92,9 +92,9 @@ class NearestNeighbors {
     search(query, store, maxCount=100, minSim=0.05) {
         let self = this;
         // transform the query json into a sparse vector
-        let queryRec = typeof query === 'string' ? 
-            store.recordByName(query) :
-            store.newRecord(query);
+        let queryRec = query.url ? 
+            store.recordByName(query.url) :
+            store.newRecord({ description: query.text });
 
         if (!queryRec) { 
             // there is no record in the record set containing the url
