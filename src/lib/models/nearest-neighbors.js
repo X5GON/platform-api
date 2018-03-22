@@ -14,10 +14,10 @@ class NearestNeighbors {
     /**
      * @description Creates the Nearest Neighbors model class.
      * @param {Object} params - The qminer base containing the data.
-     * @param {String} params.mode - The modal creation mode. Possible options
+     * @param {String} params.mode - The model creation mode. Possible options
      * `create` and `load`.
      * @param {Object} params.base - The qminer base containing the data.
-     * @param {String} params.modelPath - The model file name.
+     * @param {String} params.modelPath - The model file path.
      * @param {Object} [params.store] - The store containing the records of interest.
      * Required for creating the model from scratch.
      * @param {Object[]} [params.features] - Array of qminer features used in feature
