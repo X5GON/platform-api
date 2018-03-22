@@ -106,30 +106,17 @@ class x5recommend {
      *******************************************/
 
     /**
-     * @description Loads the recommendation models.
+     * @description Create the Nearest Neighbor model for Content store based on 
+     * text.
      * @private
      */
-    _loadModels() {
-        let self = this;
-        // load the nearest neighbor model used for content recommendation
-        self.contentNN = new NearestNeighbor({
-            mode: 'load',
-            base: self.base,
-            modelPath: path.join(self.params.path, '/contentNN.dat')
-        });
-    }
-
-    /**
-     * @description Create the Nearest Neighbor model for Content store.
-     * @private
-     */
-    _createContentNNModel() {
+    _createContentTextNNModel() {
         let self = this;
         // create the content nearest neighbor model
-        self.contentNN = new NearestNeighbor({
+        self.contentTextNN = new NearestNeighbor({
             mode: 'create',
             base: self.base,
-            modelPath: path.join(self.params.path, '/contentNN.dat'),
+            modelPath: path.join(self.params.path, '/contentTextNN.dat'),
             store: self.content,
             features: [{
                 type: 'text', source: 'Content', field: ['title', 'description'],
@@ -139,11 +126,75 @@ class x5recommend {
     }
 
     /**
+     * @description Loads the Nearest Neighbor model for Content store based on 
+     * text.
+     * @private
+     */
+    _loadContentTextNNModel() {
+        let self = this;
+        // load the nearest neighbor model used for content recommendation
+        self.contentTextNN = new NearestNeighbor({
+            mode: 'load',
+            base: self.base,
+            modelPath: path.join(self.params.path, '/contentTextNN.dat')
+        });
+    }
+
+
+    /**
+     * @description Create the Nearest Neighbor model for Content store based on 
+     * Wikipedia concepts.
+     * @private
+     */
+    _createContentWikiNNModel() {
+        let self = this;
+        // create the content nearest neighbor model
+        self.contentWikiNN = new NearestNeighbor({
+            mode: 'create',
+            base: self.base,
+            modelPath: path.join(self.params.path, '/contentWikiNN.dat'),
+            store: self.content,
+            features: [{
+                type: 'multinomial', source: { store: "Content", join: "concepts" }, 
+                field: 'secUri'
+            }]
+        });
+    }
+
+    /**
+     * @description Loads the Nearest Neighbor model for Content store based on 
+     * Wikipedia concepts.
+     * @private
+     */
+    _loadContentWikiNNModel() {
+        let self = this;
+        // load the nearest neighbor model used for content recommendation
+        self.contentWikiNN = new NearestNeighbor({
+            mode: 'load',
+            base: self.base,
+            modelPath: path.join(self.params.path, '/contentWikiNN.dat')
+        });
+    }
+
+
+    /**
      * @description Create the recommendation models.
      */
     createModels() {
         let self = this;
-        self._createContentNNModel();
+        self._createContentTextNNModel();
+        self._createContentWikiNNModel();
+
+    }
+
+    /**
+     * @description Loads the recommendation models.
+     * @private
+     */
+    _loadModels() {
+        let self = this;
+        self._loadContentTextNNModel();
+        self._loadContentWikiNNModel();
     }
 
     /**
@@ -161,7 +212,7 @@ class x5recommend {
 
         if (queryObject.url || queryObject.text) {
             // return the recommendation based on the query
-            recommendations = self.contentNN.search(queryObject, self.content);
+            recommendations = self.contentTextNN.search(queryObject, self.content);
         } else {
             let errorMessage = 'Unsupported recommendation parameters';
             logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, { 
@@ -181,7 +232,6 @@ class x5recommend {
                 provider: material.provider
             };
         });
-
     }
 
 }
