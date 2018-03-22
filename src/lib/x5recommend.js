@@ -233,7 +233,5 @@ class x5recommend {
             };
         });
     }
-
 }
-
 module.exports = x5recommend;
