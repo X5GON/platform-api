@@ -1,6 +1,6 @@
 {
     "general": {
-        "name": "X5GON Material Pre-processing",
+        "name": "X5GON Material Pre-processing Pipeline",
         "heartbeat": 1000
     },
     "spouts": [
