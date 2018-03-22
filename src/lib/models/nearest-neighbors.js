@@ -58,10 +58,8 @@ class NearestNeighbors {
         self.matrix = this.featureSpace.extractSparseMatrix(store.allRecords);
 
         // save the model in the `modelPath` file
-        console.log(modelPath);
         let fout = qm.fs.openWrite(modelPath);
-        console.log(fout);
-        
+        // save the feature space and feature matrix of the content        
         self.featureSpace.save(fout); self.matrix.save(fout); fout.close();
     }
 
@@ -80,9 +78,11 @@ class NearestNeighbors {
     }
 
     /**
-     * @description Gets Nearest Neighbors of the query object.
+     * @description Gets Nearest Neighbors of the query.
      * @param {Object} query - The query object. Can be object containing the text or url 
      * attributes. When url is present it searches for the material with that url.
+     * @param {Object} [query.url] - The url of the material.
+     * @param {Object} [query.text] - The text used to find similar content.
      * @param {Object} store - The qminer store used for creating record(s).
      * @param {Number} [maxCount=100] - The maximal neighbor count.
      * @param {Number} [minSim=0.01] - Minimal similarity treshold.
