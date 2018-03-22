@@ -3,7 +3,9 @@
 This folder contains models that are used for the purpose of creating a recommendation engine.
 
 ## Nearest Neighbour Model
-The `nearest-neighbour.js` file contains the QMiner Nearest Neighbour implementation class and it's corresponding methods. To create an instance of the model we must provide a JavaScript Object containing the following attributes:
+The `nearest-neighbour.js` file contains the QMiner Nearest Neighbour implementation class and it's corresponding methods. The model is used to find similar OER material based on extracted Wikipedia concepts but can be also be used for other distance based searches. 
+
+To create an instance of the model we must provide a JavaScript Object containing the following attributes:
 
 | Attribute   | Optional | Description | 
 | ---------   | -------- | ----------- |
@@ -15,7 +17,9 @@ The `nearest-neighbour.js` file contains the QMiner Nearest Neighbour implementa
 
 ## User Model
 
-The `user-model.js` file contains the implementation of the User Model and its corresponding methods. To create an instance of the model we must provide a JavaScript Object containing the following attributes:
+The `user-model.js` file contains the implementation of the User Model and its corresponding methods. The model is used to wrap the user information extraction process, making it easier to check what the user viewed and what are his or her interests. It does not store any user information which could be used to backtrack to the user - following the General Data Protection Regulation (GDPR).
+
+To create an instance of the model we must provide a JavaScript Object containing the following attributes:
 
 | Attribute | Optional | Description | 
 | --------- | -------- | ----------- |
