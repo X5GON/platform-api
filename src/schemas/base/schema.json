@@ -7,7 +7,8 @@
         { "name": "description", "type": "string", "null": true },
         { "name": "created", "type": "datetime", "null": true },
         { "name": "authors", "type": "string_v", "null": true },
-        { "name": "provider", "type": "string" },
+        { "name": "provider", "type": "string", "shortstring": true },
+        { "name": "metadata", "type": "json", "null": true },
         { "name": "languages", "type": "string_v", "shortstring": true }
     ],
     "joins": [
@@ -19,7 +20,7 @@
 }, {
     "name": "Users",
     "fields": [
-        { "name": "token", "type": "string", "primary": true }
+        { "name": "token", "type": "string", "shortstring": true, "primary": true }
     ],
     "joins": [
         { "name": "viewed", "type": "index", "store": "Activity", "inverse": "user" },
