@@ -44,7 +44,7 @@ function _wikipediaRequest(text) {
             'jsonForEval': 'true',
             'userKey': wikiConfig.userKey
         };
-        request(`http://185.49.3.16/be/annotate-article?${querystring.stringify(options)}`, 
+        request(`${wikiConfig.wikifierUrl}/annotate-article?${querystring.stringify(options)}`, 
             (error, response, body) => {
                 // handle error on request
                 if (error) { return reject(error); }
@@ -113,13 +113,10 @@ function enrichLecture(lecture, callback) {
                 // prepare wiki concept object
                 let obj = {
                     uri: concept.url,
-                    name: concept.title
+                    name: concept.title,
+                    secName: concept.secTitle,
+                    secUri: concept.secUrl
                 };
-                // if second language detected add it to the concept list
-                if (annotations.secLang != annotations.lang) {
-                    obj.secName = concept.secTitle;
-                    obj.secUri = concept.secUrl;
-                }
                 return obj;
             });
             
