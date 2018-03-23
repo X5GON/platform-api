@@ -1,5 +1,6 @@
 // external modules
 const router = require('express').Router();
+const geoip = require('geoip-lite');
 const path = require('path');
 // internal modules
 const validator = require('../../../lib/utils/schema-validator')({
@@ -25,6 +26,9 @@ module.exports = function (pg, logger) {
         // get query parameters
         let userParameters = req.query;
 
+        // TODO: use ip to gather user geolocation
+        let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        console.log(ip);
 
         // validate query schema
         if (!Object.keys(userParameters).length ||
@@ -38,7 +42,6 @@ module.exports = function (pg, logger) {
             // send beacon image to user
             return res.sendFile(beaconPath);
         }
-
 
         // prepare the acitivity object
         let activity = {
