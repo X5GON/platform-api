@@ -27,7 +27,7 @@ module.exports = function (pg, logger) {
 
         if (Object.keys(query).length === 0) {
             // no query parameters were given
-            let errorMessage = 'user did not provide any of the query parameters: title, description, url';
+            let errorMessage = 'user did not provide any of the query parameters: text, url';
             logger.warn('warning [query_parameters]: client requested for recommendation failed',
                 logger.formatRequest(req, { error: errorMessage })
             );
