@@ -38,11 +38,5 @@
   },
   "devDependencies": {
     "node-minify": "^2.4.1"
-  },
-  "engines": {
-    "node": "9.5.0"
-  },
-  "os": [
-    "linux"
-  ]
+  }
 }
