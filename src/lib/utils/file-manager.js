@@ -91,11 +91,11 @@ exports.createDirectoryPath = function(dirPath) {
     // resolve path
     let resolvedPath = path.resolve(dirPath);
     // split to get it's directories
-    let directories = resolvedPath.split('\\');
-    let currentDir = directories[0];
+    let directories = resolvedPath.split(/[\/\\]/g);
+    let currentDir = directories[0].length ? directories[0] : '/';
     // add and create directories in path
     for (let i = 1; i < directories.length; i++) {
-        currentDir += `\\${directories[i]}`;
+        currentDir = path.join(currentDir,directories[i]);
         exports.createFolder(currentDir);
     }
 };

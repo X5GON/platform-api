@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
     extended: true
 }));
 
-
+// add the public folder
 app.use(express.static(__dirname + '/public/'));
 
 // TODO: set the API routes

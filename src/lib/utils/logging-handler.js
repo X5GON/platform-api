@@ -14,7 +14,7 @@ class Logger {
      */
     constructor() {
         // set log folder path
-        this.folder = path.join(__dirname, '../../logs');
+        this.folder = path.join(__dirname, '../../../logs/');
         // create log folder
         fileManager.createDirectoryPath(this.folder);
         // prepare level colorization
@@ -29,9 +29,9 @@ class Logger {
      * @returns {Object} The Daily-rotate-file transport.
      * @private
      */
-    _transportCreator(fileName, path, level) {
+    _transportCreator(fileName, folderPath, level) {
         return new (winston.transports.DailyRotateFile)({
-            filename: `${path}/${fileName}`,
+            filename: path.join(folderPath, fileName),
             datePattern: '.yyyy-MM-dd',
             name: fileName,
             level: level,
@@ -49,7 +49,7 @@ class Logger {
     createInstance(fileName, level='info', subFolder='', consoleFlag=true) {
         let logger_transports = [];
         // initialize folder path and create it
-        let folderPath = `${this.folder}/${subFolder}`;
+        let folderPath = path.join(this.folder, subFolder);
         fileManager.createDirectoryPath(folderPath);
         // add console logging transport to the instance
         if (consoleFlag) { logger_transports.push(new (winston.transports.Console)({ level, colorize: true })); }
@@ -87,7 +87,7 @@ class Logger {
     createGroupInstance(fileName, subFolder='', consoleFlag=true) {
         let logger_transports = [];
         // initialize folder path and create it
-        let folderPath = `${this.folder}/${subFolder}`;
+        let folderPath = path.join(this.folder, subFolder);
         fileManager.createDirectoryPath(folderPath);
         // add console logging transport to the instance
         if (consoleFlag) { logger_transports.push(new (winston.transports.Console)({ level: 'info', colorize: true })); }

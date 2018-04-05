@@ -1,4 +1,6 @@
 // external modules
+const router = require('express').Router();
+const geoip = require('geoip-lite');
 const path = require('path');
 // internal modules
 const validator = require('../../../lib/utils/schema-validator')({
@@ -6,15 +8,14 @@ const validator = require('../../../lib/utils/schema-validator')({
 });
 
 /**
- * Adds API routes for the recommendations.
- * @param {Object} app - Express app.
+ * Adds API routes for logging user activity.
  * @param {Object} pg - Postgres connection wrapper.
  * @param {Object} logger - The logger object.
  */
-module.exports = function (app, pg, logger) {
+module.exports = function (pg, logger) {
 
     // GET client activity
-    app.get('/api/v1/log', (req, res) => {
+    router.get('/log', (req, res) => {
         // log client activity
         logger.info('client requested activity logging',
             logger.formatRequest(req)
@@ -25,6 +26,9 @@ module.exports = function (app, pg, logger) {
         // get query parameters
         let userParameters = req.query;
 
+        // TODO: use ip to gather user geolocation
+        let ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        console.log(ip);
 
         // validate query schema
         if (!Object.keys(userParameters).length ||
@@ -39,14 +43,15 @@ module.exports = function (app, pg, logger) {
             return res.sendFile(beaconPath);
         }
 
-
         // prepare the acitivity object
         let activity = {
             uuid: userParameters.uid,
             provider: userParameters.cid,
             url: userParameters.rq,
             referrer: userParameters.rf,
-            visitedOn: userParameters.dt
+            visitedOn: userParameters.dt,
+            userAgent: req.get('user-agent'),
+            language: req.get('accept-language')
         };
 
         // store the client activity into postgres
@@ -67,4 +72,6 @@ module.exports = function (app, pg, logger) {
         });
     });
 
+
+    return router;
 };
