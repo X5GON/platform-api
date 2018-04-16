@@ -15,7 +15,7 @@ const logger = Logger.createGroupInstance('api-requests', 'api');
 
 
 // parameters used on the express app
-const PORT = argv.PORT || 80;
+const PORT = argv.PORT || 8080;
 
 // create express app
 let app = express();
