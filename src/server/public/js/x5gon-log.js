@@ -22,7 +22,7 @@ var x5gonActivityTracker = function () {
     expirationDate.setDate(expirationDate.getDate() + (10*365));
     document.cookie = cookieName + "=" + encodeURIComponent(userId) +
       "; expires=" + expirationDate.toGMTString() + "; path=/" +
-      "; domain=145.14.12.31";
+      "; domain=platform.x5gon.org";
   }
 
   function x5gonCheckCookie() {
@@ -30,7 +30,7 @@ var x5gonActivityTracker = function () {
     if (uuid !== null && uuid !== ""){
       return uuid;
     } else {
-      uuid = Math.random().toString().substr(2);
+      uuid = Math.random().toString().substr(2) + "$" + Date.now();
       x5gonSetCookie("x5gonTrack", uuid);
       return uuid;
     }
@@ -49,7 +49,7 @@ var x5gonActivityTracker = function () {
     var CURL = document.URL;
     var PURL = document.referrer;
 
-    var request = 'http://145.14.12.31:8080/api/v1/log?uid=';
+    var request = 'http://platform.x5gon.org/api/v1/log?uid=';
     request += encodeURIComponent(userId);
     request += "&dt=" + encodeURIComponent(Dt);
     request += "&rq=" + encodeURIComponent(CURL);
