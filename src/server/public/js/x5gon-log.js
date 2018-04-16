@@ -1,13 +1,5 @@
 var x5gonActivityTracker = function () {
 
-  function x5gonGetDomain () {
-    domain = document.domain;
-    domain_part = domain.split(".");
-    domain_parts = domain_part.length;
-    if (domain_parts > 2) { domain = domain_part[domain_parts - 2] + "." + domain_part[domain_parts - 1]; }
-    return domain;
-  }
-
   function x5gonGetCookie(cookieName) {
     if(document.cookie.length > 0) {
       var CStart = document.cookie.indexOf(cookieName + "=");
@@ -27,10 +19,10 @@ var x5gonActivityTracker = function () {
 
   function x5gonSetCookie(cookieName, userId) {
     var expirationDate = new Date();
-    expirationDate.setDate(expirationDate.getDate() + 256);
+    expirationDate.setDate(expirationDate.getDate() + (10*365));
     document.cookie = cookieName + "=" + encodeURIComponent(userId) +
       "; expires=" + expirationDate.toGMTString() + "; path=/" +
-      "; domain=pankretas.ijs.si"; // TODO: figure out cookie domain; + x5gonGetDomain();
+      "; domain=145.14.12.31";
   }
 
   function x5gonCheckCookie() {
@@ -57,7 +49,7 @@ var x5gonActivityTracker = function () {
     var CURL = document.URL;
     var PURL = document.referrer;
 
-    var request = 'http://pankretas.ijs.si:7110/api/v1/log?uid=';
+    var request = 'http://145.14.12.31:8080/api/v1/log?uid=';
     request += encodeURIComponent(userId);
     request += "&dt=" + encodeURIComponent(Dt);
     request += "&rq=" + encodeURIComponent(CURL);
