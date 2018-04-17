@@ -1,8 +1,6 @@
 <html>
   <head></head>
-
   <body>
-
     <script>
       function x5gonGetCookie(cookieName) {
         if(document.cookie.length > 0) {
@@ -23,10 +21,10 @@
 
       function x5gonSetCookie(cookieName, userId) {
         var expirationDate = new Date();
-        expirationDate.setDate(expirationDate.getDate() + (10*365));
+        expirationDate.setDate(expirationDate.getDate() + 3650);
         var cookieAttributes = cookieName + "=" + encodeURIComponent(userId) +
-          "; expires=" + expirationDate.toGMTString() + "; path=/" +
-          "; domain=x5gon.org";
+          ";path=/;domain=x5gon.org" +
+          ";expires=" + expirationDate.toGMTString();
         console.log(cookieAttributes);
         document.cookie = cookieAttributes;
         console.log(document.cookie);

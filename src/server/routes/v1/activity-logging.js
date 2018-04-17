@@ -41,7 +41,6 @@ module.exports = function (pg, logger) {
         // get query parameters
         let userParameters = req.query;
 
-
         // validate query schema
         if (!Object.keys(userParameters).length ||
             !validator.validateSchema(userParameters, validator.schemas.userActivitySchema)) {
@@ -55,10 +54,12 @@ module.exports = function (pg, logger) {
             return res.sendFile(beaconPath);
         }
 
+        // get the user id from the X5GON tracker
+        let uuid = req.cookies.x5gonTrack;
 
         // prepare the acitivity object
         let activity = {
-            uuid: userParameters.uid,
+            uuid: uuid,
             provider: userParameters.cid,
             url: userParameters.rq,
             referrer: userParameters.rf,

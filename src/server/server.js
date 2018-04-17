@@ -1,7 +1,7 @@
 // external modules
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const cookieParser = require('cookie-parser');
 // internal modules
 const pg  = require('../lib/utils/postgresQL')(require('../config/pgconfig'));
 const Logger = require('../lib/utils/logging-handler')();
@@ -25,6 +25,8 @@ app.use(bodyParser.json());     // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
     extended: true
 }));
+// cookie parser
+app.use(cookieParser());
 
 // add the public folder
 app.use(express.static(__dirname + '/public/'));
