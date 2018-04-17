@@ -24,7 +24,7 @@ module.exports = function (pg, logger) {
         let activityTracker = fs.readFileSync(path.join(__dirname, '../../templates/activity-tracker.hbs'));
         let hbs = handlebars.compile(activityTracker.toString('utf-8'));
 
-        // send the user website
+        // send the website with cookie generation
         return res.send(hbs({ callbackURL: query.callbackURL }));
 
     });
