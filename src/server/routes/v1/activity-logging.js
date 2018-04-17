@@ -1,6 +1,8 @@
 // external modules
 const router = require('express').Router();
+const handlebars = require('handlebars');
 const path = require('path');
+const fs = require('fs');
 // internal modules
 const validator = require('../../../lib/utils/schema-validator')({
     userActivitySchema: require('../../../schemas/user-activity-schema')
@@ -12,6 +14,20 @@ const validator = require('../../../lib/utils/schema-validator')({
  * @param {Object} logger - The logger object.
  */
 module.exports = function (pg, logger) {
+
+    // set user activity tracker
+    router.get('/activity-tracker', (req, res) => {
+
+        // get query parameters
+        let query = req.query;
+        // create a handlebars compiler
+        let activityTracker = fs.readFileSync(path.join(__dirname, '../../templates/activity-tracker.hbs'));
+        let hbs = handlebars.compile(activityTracker.toString('utf-8'));
+
+        // send the user website
+        return res.send(hbs({ callbackURL: query.callbackURL }));
+
+    });
 
     // GET client activity
     router.get('/log', (req, res) => {

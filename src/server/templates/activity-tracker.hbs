@@ -1,0 +1,44 @@
+<script>
+  function x5gonGetCookie(cookieName) {
+    if(document.cookie.length > 0) {
+      var CStart = document.cookie.indexOf(cookieName + "=");
+      if (CStart != -1) {
+        CStart = CStart + cookieName.toString().length + 1;
+        var CEnd = document.cookie.indexOf("; ", CStart);
+        if (CEnd == -1) { CEnd = document.cookie.length; }
+        var StrLen = CEnd - CStart;
+        if (StrLen > 20) { CEnd = CStart + 20; }
+        if (CEnd <= document.cookie.length) {
+          return decodeURIComponent(document.cookie.substring(CStart, CEnd));
+        }
+      }
+    }
+    return "";
+  }
+
+  function x5gonSetCookie(cookieName, userId) {
+    var expirationDate = new Date();
+    expirationDate.setDate(expirationDate.getDate() + (10*365));
+    var cookieAttributes = cookieName + "=" + encodeURIComponent(userId) +
+      "; expires=" + expirationDate.toGMTString() + "; path=/" +
+      "; domain=x5gon.org";
+    console.log(cookieAttributes);
+    document.cookie = cookieAttributes;
+  }
+
+  function x5gonCheckCookie() {
+    var uuid = x5gonGetCookie("x5gonTrack");
+    if (uuid !== null && uuid !== ""){
+      return uuid;
+    } else {
+      uuid = Math.random().toString().substr(2) + "$" + Date.now();
+      x5gonSetCookie("x5gonTrack", uuid);
+      return uuid;
+    }
+  }
+
+  x5gonCheckCookie();
+  {{#if callbackURL}}
+    window.location.href="{{callbackURL}}";
+  {{/if}}
+</script>
