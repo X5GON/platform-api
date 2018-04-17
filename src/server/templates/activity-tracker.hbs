@@ -1,5 +1,7 @@
 <html>
-  <head>
+  <head></head>
+
+  <body>
 
     <script>
       function x5gonGetCookie(cookieName) {
@@ -27,6 +29,7 @@
           "; domain=x5gon.org";
         console.log(cookieAttributes);
         document.cookie = cookieAttributes;
+        console.log(document.cookie);
       }
 
       function x5gonCheckCookie() {
@@ -42,7 +45,5 @@
       }
 
     </script>
-  </head>
-
-  <body onload="x5gonCheckCookie()"></body>
+  </body>
 </html>
