@@ -55,7 +55,10 @@ module.exports = function (pg, logger) {
         }
 
         // get the user id from the X5GON tracker
-        let uuid = req.cookies.x5gonTrack;
+        let uuid = req.cookies.x5gonTrack ?
+            req.cookies.x5gonTrack :
+            'unknown-not-tracking';
+
 
         // prepare the acitivity object
         let activity = {

@@ -2,6 +2,7 @@
   <head></head>
   <body>
     <script>
+
       function x5gonGetCookie(cookieName) {
         if(document.cookie.length > 0) {
           var CStart = document.cookie.indexOf(cookieName + "=");
@@ -22,18 +23,14 @@
       function x5gonSetCookie(cookieName, userId) {
         var expirationDate = new Date();
         expirationDate.setDate(expirationDate.getDate() + 3650);
-        var cookieAttributes = cookieName + "=" + encodeURIComponent(userId) +
-          ";path=/;domain=x5gon.org" +
-          ";expires=" + expirationDate.toGMTString();
-        console.log(cookieAttributes);
-        document.cookie = cookieAttributes;
-        console.log(document.cookie);
+        document.cookie = cookieName + "=" + encodeURIComponent(userId) +
+          "; expires=" + expirationDate.toGMTString() +
+          "; path=/; domain=x5gon.org";
       }
 
       function x5gonCheckCookie() {
         var uuid = x5gonGetCookie("x5gonTrack");
-        if (uuid !== null && uuid !== ""){
-        } else {
+        if (uuid === null || uuid === "") {
           uuid = Math.random().toString().substr(2) + "X" + Date.now();
           x5gonSetCookie("x5gonTrack", uuid);
         }

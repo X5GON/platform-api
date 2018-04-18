@@ -5,10 +5,10 @@
  */
 function x5gonGetCookie(cookieName) {
   if(document.cookie.length > 0) {
-    var CStart = document.cookie.indexOf(cookieName + "=");
+    var CStart = document.cookie.indexOf(cookieName + '=');
     if (CStart != -1) {
       CStart = CStart + cookieName.toString().length + 1;
-      var CEnd = document.cookie.indexOf("; ", CStart);
+      var CEnd = document.cookie.indexOf('; ', CStart);
       if (CEnd == -1) { CEnd = document.cookie.length; }
       var StrLen = CEnd - CStart;
       if (StrLen > 20) { CEnd = CStart + 20; }
@@ -17,7 +17,7 @@ function x5gonGetCookie(cookieName) {
       }
     }
   }
-  return "";
+  return '';
 }
 
 /**
@@ -26,10 +26,10 @@ function x5gonGetCookie(cookieName) {
  */
 function x5gonGetDomain() {
   domain = document.domain;
-  domain_part = domain.split(".");
+  domain_part = domain.split('.');
   domain_parts = domain_part.length;
   if (domain_parts > 2) {
-    domain = domain_part[domain_parts - 2] + "." + domain_part[domain_parts - 1];
+    domain = domain_part[domain_parts - 2] + '.' + domain_part[domain_parts - 1];
   }
   return domain;
 }
@@ -42,9 +42,9 @@ function x5gonGetDomain() {
 function x5gonSetCookie(cookieName, cookieValue) {
   var expirationDate = new Date();
   expirationDate.setDate(expirationDate.getDate() + 30);
-  document.cookie = cookieName + "=" + encodeURIComponent(userId) +
-    "; expires=" + expirationDate.toGMTString() + "; path=/" +
-    "; domain=" + x5gonGetDomain();
+  document.cookie = cookieName + '=' + encodeURIComponent(cookieValue) +
+    '; expires=' + expirationDate.toGMTString() + '; path=/' +
+    '; domain=' + x5gonGetDomain();
 }
 
 /**
@@ -52,13 +52,11 @@ function x5gonSetCookie(cookieName, cookieValue) {
  * @returns {String|Null} The value of the cookie or null (redirection to the activity-tracker).
  */
 function x5gonCheckCookie() {
-  var uuid = x5gonGetCookie("x5gonValidated");
-  if (uuid !== null && uuid !== ""){
-    return uuid;
+  var validation = x5gonGetCookie('x5gonValidated');
+  if (validation !== null && validation !== ''){
+    return validation;
   } else {
-    x5gonSetCookie('x5gonValidated', "true");
-    window.location.href="http://platform.x5gon.org/api/v1/activity-tracker?callbackURL=" +
-      document.URL;
+    return 'false';
   }
 }
 
@@ -69,37 +67,59 @@ function x5gonCheckCookie() {
  */
 var x5gonActivityTracker = function () {
 
-  function x5gonCheckTime(a) {
-    if(a < 10) { a = "0" + a; }
-    return a;
+  /**
+   * Checks and changes the number to be part of time format.
+   * @param {Number} num - The number used to compose time.
+   * @returns {String} Part of time format.
+   */
+  function x5gonCheckTime(num) {
+    if(num < 10) { num = '0' + num; }
+    return num;
   }
 
-  function x5gonGetReturnString(validationFlag, providerToken) {
+  /**
+   * Creates the request string.
+   * @param {Boolean|String} validationFlag - If the user already validated X5GON.
+   * @param {String} providerToken - The OER provider token used for identification.
+   */
+  function x5gonGetRequestString(validationFlag, providerToken) {
     var Dat = new Date();
-    var Dt = Dat.getFullYear() + "-" + x5gonCheckTime(Dat.getMonth() + 1) + "-" +
-      x5gonCheckTime(Dat.getDate()) + "T" + x5gonCheckTime(Dat.getHours()) + ":" +
-      x5gonCheckTime(Dat.getMinutes()) + ":" + x5gonCheckTime(Dat.getSeconds()) + "Z";
+    var Dt = Dat.getFullYear() + '-' + x5gonCheckTime(Dat.getMonth() + 1) + '-' +
+      x5gonCheckTime(Dat.getDate()) + 'T' + x5gonCheckTime(Dat.getHours()) + ':' +
+      x5gonCheckTime(Dat.getMinutes()) + ':' + x5gonCheckTime(Dat.getSeconds()) + 'Z';
     var CURL = document.URL;
     var PURL = document.referrer;
 
     var request = 'http://platform.x5gon.org/api/v1/log?x5gonValidated=';
     request += encodeURIComponent(validationFlag);
-    request += "&dt=" + encodeURIComponent(Dt);
-    request += "&rq=" + encodeURIComponent(CURL);
-    request += "&rf=" + encodeURIComponent(PURL);
-    request += "&cid=" + encodeURIComponent(providerToken);
+    request += '&dt=' + encodeURIComponent(Dt);
+    request += '&rq=' + encodeURIComponent(CURL);
+    request += '&rf=' + encodeURIComponent(PURL);
+    request += '&cid=' + encodeURIComponent(providerToken);
     return request;
   }
 
   return function(providerToken) {
     try {
       var img = document.createElement('img');
-      img.setAttribute('src', x5gonGetReturnString(x5gonCheckCookie(), providerToken));
+      img.setAttribute('src', x5gonGetRequestString(x5gonCheckCookie(), providerToken));
       document.body.appendChild(img);
     } catch(err) { }
   };
 
 }();
 
-// check and set the x5gonValidated cookie
-x5gonCheckCookie();
+/**
+ * Checks and fetches the x5gon validation.
+ */
+function checkX5GONValidation() {
+  var validation = x5gonGetCookie('x5gonValidated')
+  if (validation === null || validation === '') {
+    x5gonSetCookie('x5gonValidated', 'true');
+    window.location.href='http://platform.x5gon.org/api/v1/activity-tracker?callbackURL=' +
+      document.URL;
+  }
+}
+
+// set the x5gonValidated cookie
+checkX5GONValidation();

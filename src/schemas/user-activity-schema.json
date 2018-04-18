@@ -2,7 +2,7 @@
     "description": "The user activity log",
     "type": "object",
     "properties": {
-        "uid": {
+        "x5gonValidated": {
             "description": "The user token identification",
             "type": "string"
         },
