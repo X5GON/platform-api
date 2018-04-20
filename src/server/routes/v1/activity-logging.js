@@ -102,7 +102,7 @@ module.exports = function (pg, logger) {
         let originalUrl = req.originalUrl.split('/');
         const file = originalUrl[originalUrl.length - 1];
         // create the file path
-        const filePath = path.join(__dirname, `../../public/snippet/${version}/${file}`);
+        const filePath = path.join(__dirname, `../../public/snippet/global/${version}/${file}`);
 
         // generate a the tracker cookie - if not exists
         if (!req.cookies[x5gonCookieName]) {
