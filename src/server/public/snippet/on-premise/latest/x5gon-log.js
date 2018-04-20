@@ -90,7 +90,7 @@ var x5gonActivityTracker = function () {
     var CURL = document.URL;
     var PURL = document.referrer;
 
-    var request = 'http://platform.x5gon.org/api/v1/log?x5gonValidated=';
+    var request = 'http://platform.x5gon.org/api/v1/snippet/log?x5gonValidated=';
     request += encodeURIComponent(validationFlag);
     request += '&dt=' + encodeURIComponent(Dt);
     request += '&rq=' + encodeURIComponent(CURL);
@@ -112,14 +112,19 @@ var x5gonActivityTracker = function () {
 /**
  * Checks and fetches the x5gon validation.
  */
-function checkX5GONValidation() {
-  var validation = x5gonGetCookie('x5gonValidated')
-  if (validation === null || validation === '') {
+function x5gonValidate() {
+  if (document.referrer.indexOf('platform.x5gon.org/api/v1/snippet/tracker')) {
+    // the user has already been validated
     x5gonSetCookie('x5gonValidated', 'true');
-    window.location.href='http://platform.x5gon.org/api/v1/activity-tracker?callbackURL=' +
-      document.URL;
+  } else {
+    // check if the user has been validated
+    var validation = x5gonGetCookie('x5gonValidated');
+    if (validation === null || validation === '') {
+      window.location.href='http://platform.x5gon.org/api/v1/snippet/tracker?callbackURL=' +
+        document.URL;
+    }
   }
 }
 
 // set the x5gonValidated cookie
-checkX5GONValidation();
+x5gonValidate();

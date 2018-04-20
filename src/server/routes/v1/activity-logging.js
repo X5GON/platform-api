@@ -14,23 +14,25 @@ const validator = require('../../../lib/utils/schema-validator')({
  * @param {Object} logger - The logger object.
  */
 module.exports = function (pg, logger) {
+    // parameters used within the routes
+    const x5gonCookieName = 'x5gonTrack';
 
     // set user activity tracker
-    router.get('/activity-tracker', (req, res) => {
+    router.get('/snippet/tracker', (req, res) => {
+        // TODO: validate the parameters
 
         // get query parameters
         let query = req.query;
         // create a handlebars compiler
-        let activityTracker = fs.readFileSync(path.join(__dirname, '../../templates/activity-tracker.hbs'));
+        let activityTracker = fs.readFileSync(path.join(__dirname, '../../templates/tracker.hbs'));
         let hbs = handlebars.compile(activityTracker.toString('utf-8'));
 
         // send the website with cookie generation
-        return res.send(hbs({ callbackURL: query.callbackURL }));
-
+        return res.send(hbs({ callbackURL: query.callbackURL, x5gonCookieName }));
     });
 
-    // GET client activity
-    router.get('/log', (req, res) => {
+    // get client activity from the repository
+    router.get('/snippet/log', (req, res) => {
         // log client activity
         logger.info('client requested activity logging',
             logger.formatRequest(req)
@@ -55,9 +57,9 @@ module.exports = function (pg, logger) {
         }
 
         // get the user id from the X5GON tracker
-        let uuid = req.cookies.x5gonTrack ?
-            req.cookies.x5gonTrack :
-            'unknown-not-tracking';
+        let uuid = req.cookies[x5gonCookieName] ?
+            req.cookies[x5gonCookieName] :
+            'unknown:not-tracking';
 
 
         // prepare the acitivity object
@@ -89,6 +91,33 @@ module.exports = function (pg, logger) {
         });
     });
 
+    // sends the snippet of the given version
+    router.get('/snippet/:version/x5gon-log(.min)?.js', (req, res) => {
+        // TODO: check if the parameters are valid
+
+        // get the version parameter
+        const version = req.params.version;
+
+        // get the file name
+        let originalUrl = req.originalUrl.split('/');
+        const file = originalUrl[originalUrl.length - 1];
+        // create the file path
+        const filePath = path.join(__dirname, `../../public/snippet/${version}/${file}`);
+
+        // generate a the tracker cookie - if not exists
+        if (!req.cookies[x5gonCookieName]) {
+            // generate the cookie value
+            let cookieValue = Math.random().toString().substr(2) + "X" + Date.now();
+            // set expiration date for the cookie
+            let expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 3650);
+            // set the cookie for the user
+            res.cookie(x5gonCookieName, cookieValue, { expires: expirationDate, httpOnly: true });
+        }
+
+        // send the file of the appropriate version
+        res.sendFile(filePath);
+    });
 
     return router;
 };

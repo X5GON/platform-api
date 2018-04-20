@@ -2,8 +2,12 @@
   <head></head>
   <body>
     <script>
-
       (function () {
+        /**
+         * Sets a new cookie for the current domain. The expiration date is 30 days.
+         * @param {String} cookieName - The cookie name.
+         * @param {String} cookieValue - The cookie value.
+         */
         function x5gonSetCookie(cookieName, userId) {
           var expirationDate = new Date();
           expirationDate.setDate(expirationDate.getDate() + 3650);
@@ -11,6 +15,11 @@
             "; expires=" + expirationDate.toGMTString() +
             "; path=/; domain=x5gon.org";
         }
+        /**
+         * Gets the cookie value.
+         * @param {String} cookieName - The cookie name.
+         * @returns {String} The cookieName value, empty string if the cookie not found.
+         */
         function x5gonGetCookie(cookieName) {
           if(document.cookie.length > 0) {
             var CStart = document.cookie.indexOf(cookieName + "=");
@@ -27,10 +36,11 @@
           }
           return "";
         }
-        var uuid = x5gonGetCookie("x5gonTrack");
+        // get the cookie tracker
+        var uuid = x5gonGetCookie("{{x5gonCookieName}}");
         if (uuid === null || uuid === "") {
           uuid = Math.random().toString().substr(2) + "X" + Date.now();
-          x5gonSetCookie("x5gonTrack", uuid);
+          x5gonSetCookie("{{x5gonCookieName}}", uuid);
         }
         {{#if callbackURL}}
           window.location.href="{{callbackURL}}";
