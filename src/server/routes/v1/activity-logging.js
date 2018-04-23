@@ -112,7 +112,7 @@ module.exports = function (pg, logger) {
             let expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 3650);
             // set the cookie for the user
-            res.cookie(x5gonCookieName, cookieValue, { expires: expirationDate, httpOnly: true });
+            res.cookie(x5gonCookieName, cookieValue, { domain: '.x5gon.org', expires: expirationDate, httpOnly: true });
         }
 
         // send the file of the appropriate version

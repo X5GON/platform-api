@@ -11,5 +11,5 @@ module.exports = function (app, pg, logger) {
     ////////////////////////////////////////
     
     app.use('/api/v1', require('./v1/activity-logging')(pg, logger));
-    app.use('/api/v1', require('./v1/recommendations')(pg, logger));
+    // app.use('/api/v1', require('./v1/recommendations')(pg, logger));
 };
