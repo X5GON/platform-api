@@ -3,9 +3,10 @@ const router = require('express').Router();
 const handlebars = require('handlebars');
 const path = require('path');
 const fs = require('fs');
+
 // internal modules
-const validator = require('../../../lib/utils/schema-validator')({
-    userActivitySchema: require('../../../schemas/user-activity-schema')
+const validator = require('../../../../lib/schema-validator')({
+    userActivitySchema: require('../../schemas/user-activity-schema')
 });
 
 /**
@@ -38,7 +39,7 @@ module.exports = function (pg, logger) {
             logger.formatRequest(req)
         );
 
-        // return a transparent image - the beacon
+        // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, '../../public/images/beacon.png');
         // get query parameters
         let userParameters = req.query;
@@ -47,10 +48,14 @@ module.exports = function (pg, logger) {
         if (!Object.keys(userParameters).length ||
             !validator.validateSchema(userParameters, validator.schemas.userActivitySchema)) {
             // the user parameters object is either empty or is not in correct schema
-
+            const provider = userParameters.cid ? userParameters.cid : 'unknown';
             // log postgres error
             logger.error('error [route_body]: client activity logging failed',
-                logger.formatRequest(req, { error: 'The body of the request is not in valid schema' })
+                logger.formatRequest(req, { 
+                    error: 'The body of the request is not in valid schema',
+                    provider 
+
+                })
             );
             // send beacon image to user
             return res.sendFile(beaconPath);
@@ -60,7 +65,6 @@ module.exports = function (pg, logger) {
         let uuid = req.cookies[x5gonCookieName] ?
             req.cookies[x5gonCookieName] :
             'unknown:not-tracking';
-
 
         // prepare the acitivity object
         let activity = {
@@ -112,7 +116,7 @@ module.exports = function (pg, logger) {
             let expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 3650);
             // set the cookie for the user
-            res.cookie(x5gonCookieName, cookieValue, { domain: '.x5gon.org', expires: expirationDate, httpOnly: true });
+            res.cookie(x5gonCookieName, cookieValue, { expires: expirationDate, httpOnly: true });
         }
 
         // send the file of the appropriate version

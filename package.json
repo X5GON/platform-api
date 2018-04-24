@@ -4,10 +4,17 @@
   "description": "connecting OER repositories",
   "main": "index.js",
   "scripts": {
-    "start:server": "cd src/server && node server.js",
-    "start:serverDebug": "cd src/server && node --debug server.js",
-    "start:serverInspect": "cd src/server && node --inspect server.js",
-    "minify:snippet": "cd src/scripts && node minify-snippet.js",
+
+    "start:platform": "cd src/server/platform && node platform.js",
+    "start:platformDebug": "cd src/server/patform && node --debug platform.js",
+    "start:platformInspect": "cd src/server/platform && node --inspect platform.js",
+
+
+    "start:recsys": "cd src/server/recsys && node recsys.js",
+    "start:recsysDebug": "cd src/server/patform && node --debug recsys.js",
+    "start:recsysInspect": "cd src/server/platform && node --inspect recsys.js",
+
+    "minify:snippet": "cd src/server/platform/scripts && node minify-snippet.js",
     "postgres:create": "cd src/load && node create-postgres-tables.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

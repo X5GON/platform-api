@@ -3,9 +3,9 @@ const router = require('express').Router();
 const path = require('path');
 
 // internal modules - recommendation base & models
-const x5recommend = new (require(path.join(__dirname, '../../../lib/x5recommend')))({
+const x5recommend = new (require(path.join(__dirname, '../models/x5recommend')))({
     mode: 'readOnly',
-    path: path.join(__dirname, '../../../../data/x5recommend')
+    path: path.join(__dirname, '../../../../data/recsys')
 });
 
 

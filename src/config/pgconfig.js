@@ -1,7 +1,7 @@
 module.exports = {
     user: 'postgres',
     database: 'x5gon',
-    password: 'postgresadmin',
+    password: 'postgres-burger',
     host: 'localhost',
     port: 5432,
     max: 10,

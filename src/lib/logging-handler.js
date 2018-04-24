@@ -69,8 +69,7 @@ class Logger {
                 url:      request.originalUrl,
                 query:    request.query,
                 body:     request.body,
-                params:   request.params,
-                username: request.user ? request.user.username : 'unknown'
+                params:   request.params
             }, additionalParams);
         };
 
@@ -109,8 +108,7 @@ class Logger {
                 url:      request.originalUrl,
                 query:    request.query,
                 body:     request.body,
-                params:   request.params,
-                username: request.user ? request.user.username : 'unknown'
+                params:   request.params
             }, additionalParams);
         };
 

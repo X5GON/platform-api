@@ -9,7 +9,7 @@ const qm = require('qminer');
 
 // internal modules
 const NearestNeighbor = require('./models/nearest-neighbors');
-const Logger = require('../lib/utils/logging-handler')();
+const Logger = require('../../lib/logging-handler')();
 
 // create a logger instance for logging recommendation requests
 const logger = Logger.createGroupInstance('recommendation-requests', 'x5recommend');
@@ -56,7 +56,7 @@ class x5recommend {
         if (self.params.mode === 'create' || self.params.mode === 'createClean') {
             // open database in create mode - create the database from scratch
             baseParams.mode = self.params.mode;
-            baseParams.schema = require(path.join(__dirname, '../schemas/base/schema'));
+            baseParams.schema = require(path.join(__dirname, '/schemas/schema'));
         } else if (self.params.mode === 'open') {
             // open database in open mode - allowing records to be pushed to stores
             baseParams.mode = 'open';
