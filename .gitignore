@@ -61,5 +61,7 @@ typings/
 data
 backup
 
+**/config
+
 # ignore minified files
 src/server/**/*.min.js
