@@ -39,17 +39,12 @@
     "pg": "^7.4.1",
     "pg-cursor": "^1.3.0",
     "qminer": "^9.1.2",
+    "qtopology": "^2.0.4",
     "request": "^2.85.0",
     "winston": "^2.4.0",
     "winston-daily-rotate-file": "^1.7.2"
   },
   "devDependencies": {
     "node-minify": "^2.4.1"
-  },
-  "engines": {
-    "node": "9.5.0"
-  },
-  "os": [
-    "linux"
-  ]
+  }
 }

@@ -210,9 +210,12 @@ class x5recommend {
         // distinguish between the url and title & description query methods
         let recommendations;
 
-        if (queryObject.url || queryObject.text) {
+        if (queryObject.text) {
             // return the recommendation based on the query
             recommendations = self.contentTextNN.search(queryObject, self.content);
+        } else if (queryObject.url) {
+            // return the recommendation based on the query
+            recommendations = self.contentWikiNN.search(queryObject, self.content);
         } else {
             let errorMessage = 'Unsupported recommendation parameters';
             logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, { 
@@ -233,7 +236,5 @@ class x5recommend {
             };
         });
     }
-
 }
-
 module.exports = x5recommend;

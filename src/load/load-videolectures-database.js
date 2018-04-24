@@ -112,23 +112,23 @@ function enrichLecture(lecture, callback) {
             let concepts = annotations.map(concept => {
                 // prepare wiki concept object
                 let obj = {
-                    uri: concept.url,
-                    name: concept.title,
-                    secName: concept.secTitle,
-                    secUri: concept.secUrl
+                    uri: concept.url.toString(),
+                    name: concept.title.toString(),
+                    secUri: concept.secUrl || null,
+                    secName: concept.secTitle || null
                 };
                 return obj;
             });
             
             lecture.concepts = concepts;
-            callback(null, lecture);
+            return callback(null, lecture);
         })
         .catch(error => {
             // TODO: log error and cleanup lecture object
             logger.error('error [wikipedia.concepts]: unable to prepare concepts', 
                 { error: error.message }
             );
-            callback(error);
+            return callback(error);
         });
 }
 

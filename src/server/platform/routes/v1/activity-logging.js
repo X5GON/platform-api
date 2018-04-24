@@ -49,7 +49,7 @@ module.exports = function (pg, logger) {
             !validator.validateSchema(userParameters, validator.schemas.userActivitySchema)) {
             // the user parameters object is either empty or is not in correct schema
             const provider = userParameters.cid ? userParameters.cid : 'unknown';
-            // log postgres error
+            // log user parameters error
             logger.error('error [route_body]: client activity logging failed',
                 logger.formatRequest(req, { 
                     error: 'The body of the request is not in valid schema',

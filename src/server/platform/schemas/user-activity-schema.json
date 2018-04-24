@@ -21,14 +21,6 @@
         "dt": {
             "description": "The timestamp showing the visit time",
             "format": "date-time"
-        },
-        "userAgent": {
-            "description": "The user agent the user is using",
-            "format": "string"
-        },
-        "language": {
-            "description": "The user preferred language",
-            "format": "string"
         }
     }
 }
