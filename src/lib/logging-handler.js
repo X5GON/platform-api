@@ -14,7 +14,7 @@ class Logger {
      */
     constructor() {
         // set log folder path
-        this.folder = path.join(__dirname, '../../../logs/');
+        this.folder = path.join(__dirname, '../../logs/');
         // create log folder
         fileManager.createDirectoryPath(this.folder);
         // prepare level colorization
