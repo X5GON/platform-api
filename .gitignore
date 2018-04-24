@@ -59,6 +59,7 @@ typings/
 
 # ignore additional files
 data
+backup
 
 # ignore minified files
 src/server/**/*.min.js
