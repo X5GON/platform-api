@@ -29,7 +29,7 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 app.use(cookieParser()); // cookie parser
 
 // sets the API routes
-app.use('api/v1/', require('./routes/recommendations')(pg, logger));
+app.use('/api/v1/', require('./routes/recommendations')(pg, logger));
 
 // parameters used on the express app
 const PORT = argv.PORT || 3000;
