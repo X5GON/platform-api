@@ -1,0 +1,26 @@
+{
+    "description": "The user activity log",
+    "type": "object",
+    "properties": {
+        "x5gonValidated": {
+            "description": "The user token identification",
+            "type": "string"
+        },
+        "cid": {
+            "description": "The repository provider indentification",
+            "type": "string"
+        },
+        "rq": {
+            "description": "The URL which triggered the activity log - user has visited",
+            "type": "string"
+        },
+        "rf": {
+            "description": "The referrer of the visited domain - where did the user come from",
+            "type": "string"
+        },
+        "dt": {
+            "description": "The timestamp showing the visit time",
+            "format": "date-time"
+        }
+    }
+}
