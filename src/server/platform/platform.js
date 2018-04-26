@@ -17,6 +17,8 @@ const logger = Logger.createGroupInstance('api-requests', 'api');
 
 // parameters given to the process
 const argv = require('minimist')(process.argv.slice(2));
+// log process parameters
+logger.info('accepted process parameters', { argv });
 
 // create express app
 let app = express();
