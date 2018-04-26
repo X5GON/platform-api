@@ -3,6 +3,7 @@ module.exports = {
         name: 'X5GON_platform',
         script: 'platform.js',
         cwd: './src/server/platform/',
+        args: '--session-secret=keyboard cat',
         instances: '4',
         exec_mode: 'cluster',
         autorestart: true
