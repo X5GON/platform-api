@@ -113,7 +113,7 @@ var x5gonActivityTracker = function () {
  * Checks and fetches the x5gon validation.
  */
 function x5gonValidate() {
-  if (document.referrer.indexOf('platform.x5gon.org/api/v1/snippet/tracker')) {
+  if (document.referrer.indexOf('platform.x5gon.org/api/v1/snippet/tracker') > -1) {
     // the user has already been validated
     x5gonSetCookie('x5gonValidated', 'true');
   } else {
