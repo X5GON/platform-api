@@ -4,16 +4,12 @@
   "description": "connecting OER repositories",
   "main": "index.js",
   "scripts": {
-
     "start:platform": "cd src/server/platform && node platform.js",
     "start:platformDebug": "cd src/server/patform && node --debug platform.js",
     "start:platformInspect": "cd src/server/platform && node --inspect platform.js",
-
-
     "start:recsys": "cd src/server/recsys && node recsys.js",
     "start:recsysDebug": "cd src/server/patform && node --debug recsys.js",
     "start:recsysInspect": "cd src/server/platform && node --inspect recsys.js",
-
     "minify:snippet": "cd src/server/platform/scripts && node minify-snippet.js",
     "postgres:create": "cd src/load && node create-postgres-tables.js",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -33,6 +29,7 @@
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
+    "express-session": "^1.15.6",
     "handlebars": "^4.0.11",
     "jsonschema": "^1.2.2",
     "minimist": "^1.2.0",
