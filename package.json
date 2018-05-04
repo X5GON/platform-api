@@ -4,9 +4,9 @@
   "description": "connecting OER repositories",
   "main": "index.js",
   "scripts": {
-    "start:platform": "cd src/server/platform && node platform.js",
-    "start:platformDebug": "cd src/server/patform && node --debug platform.js",
-    "start:platformInspect": "cd src/server/platform && node --inspect platform.js",
+    "start:platform": "cd src/server/platform && node platform.js --session-secret=keyboardcat",
+    "start:platformDebug": "cd src/server/patform && node --debug platform.js --session-secret=keyboardcat",
+    "start:platformInspect": "cd src/server/platform && node --inspect platform.js --session-secret=keyboardcat",
     "start:recsys": "cd src/server/recsys && node recsys.js",
     "start:recsysDebug": "cd src/server/patform && node --debug recsys.js",
     "start:recsysInspect": "cd src/server/platform && node --inspect recsys.js",
