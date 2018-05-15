@@ -33,6 +33,7 @@
     "qminer": "^9.1.2",
     "qtopology": "^2.0.4",
     "request": "^2.85.0",
+    "textract": "^2.2.0",
     "winston": "^2.4.0",
     "winston-daily-rotate-file": "^1.7.2"
   },
