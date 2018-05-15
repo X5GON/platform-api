@@ -1,11 +1,11 @@
 {
     "general": {
-        "name": "X5GON Material Pre-processing Pipeline",
+        "name": "X5GON material pre-processing pipeline",
         "heartbeat": 1000
     },
     "spouts": [
         {
-            "name": "crawler_input",
+            "name": "crawler-input",
             "working_dir": "./spouts",
             "type": "sys",
             "cmd": "rest",
@@ -16,28 +16,28 @@
     ],
     "bolts": [
         {
-            "name": "format_material",
-            "working_dir": "./bolts",
+            "name": "material-format",
+            "working_dir": "./components",
             "type": "inproc",
-            "cmd": "format-material.js",
+            "cmd": "material-format.js",
             "inputs": [
-                { "source": "crawler_input" }
+                { "source": "crawler-input" }
             ],
             "init": {}
         },
         {
             "name": "wikification",
-            "working_dir": "./bolts",
+            "working_dir": "./components",
             "type": "inproc",
             "cmd": "wikification.js",
             "inputs": [
-                { "source": "format_material" }
+                { "source": "material-format" }
             ],
             "init": {}
         },
         {
-            "name": "material_validator",
-            "working_dir": "./bolts",
+            "name": "material-validator",
+            "working_dir": "./components",
             "type": "inproc",
             "cmd": "material-validator.js",
             "inputs": [
@@ -46,12 +46,12 @@
             "init": {}
         },
         {
-            "name": "postgresql_storage",
-            "working_dir": "./bolts",
+            "name": "postgresql-storage",
+            "working_dir": "./components",
             "type": "inproc",
             "cmd": "postgresql-storage.js",
             "inputs": [
-                { "source": "material_validator" }
+                { "source": "material-validator" }
             ],
             "init": {}
         }
