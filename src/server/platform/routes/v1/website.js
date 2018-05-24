@@ -62,8 +62,13 @@ function _generateToken(seed) {
  */
 module.exports = function (pg, logger) {
 
-    // send application form page
     router.get('/', (req, res) => {
+        // currently redirect to form page
+        res.redirect('/form');
+    });
+
+    // send application form page
+    router.get('/form', (req, res) => {
         // check if the user was successfully validated by google captcha
         // this is used only when redirected from POST /repository
         const invalid = req.query.invalid ? req.query.invalid == 'true' : false;
@@ -88,7 +93,7 @@ module.exports = function (pg, logger) {
             .then(validation => {
 
                 // if not validated - redirect to application form
-                if (!validation.success) { return res.redirect('/?invalid=true'); }
+                if (!validation.success) { return res.redirect('/form?invalid=true'); }
 
                 // check if the repository already exists - return existing token
                 pg.select({ name, domain, contact }, 'repositories', (error, results) => {
