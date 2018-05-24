@@ -1,0 +1,74 @@
+<div class="row">
+  <div class="col">
+    <h1>OER Repository Information</h1>
+
+    <div class="row">
+      <div class="col-lg-3">
+        
+        <div class="repo-information">
+          <h6>Repository Name</h6>
+          <p>
+            {{name}}
+          </p>        
+        </div>{{! .repo-information }}
+
+        <div class="repo-information">
+          <h6>Domain URL</h6>
+          <p>
+            <a href="{{domain}}">{{domain}}</a>
+          </p>        
+        </div>{{! .repo-information }}
+
+        <div class="repo-information">
+        <h6>Contact</h6>
+          <p>
+            <a href="mailto:{{contact}}">{{contact}}</a>
+          </p>
+        </div>{{! .repo-information }}
+        
+      </div>{{! .col-lg-3 }}
+
+      <div class="col-lg-9">
+        {{! OER provider generated token }}
+        <div id="oer-provider-token">
+          <h6>Your X5GON Token</h6>
+          <pre>
+            <code class="language-handlebars">
+              {{ token }}
+            </code>
+          </pre>
+        </div>{{! #oer-provider-token }}
+
+        {{! OER provider generated hash number }}
+        <div id="oer-provider-library">
+          <h6>X5GON Library</h6>
+          <pre>
+            <code class="language-handlebars">
+              &lt;script type="text/javascript" src="http://platform.x5gon.org:8080/api/v1/snippet/latest/x5gon-log.min.js"&gt;&lt;/script&gt; 
+            </code>
+          </pre>
+        </div>{{! #oer-provider-library }}
+
+        {{! OER provider generated snippet }}
+        <div id="oer-provider-snippet">
+          <h6>X5GON User Activity Tracker Snippet</h6>
+          <pre>
+            <code class="language-javascript">
+              // snippet code for sending user activity data
+              $(document).ready(function () {
+                // send user activity to x5gon server
+                x5gonActivityTracker('{{ token }}');
+              });
+            </code>
+          </pre>
+        </div>{{! #oer-provider-snippet }}
+
+        <p>
+          Download the X5GON library documentation <a href="#" target="_blank">HERE</a>
+        </p>
+
+      </div>{{! .col }}
+    </div>{{! .row }}
+
+  </div>{{! .col }}
+</div>{{! .row }}

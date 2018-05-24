@@ -1,0 +1,93 @@
+<div class="row">
+
+  <div class="col">
+    <h1>X5GON OER Network</h1>
+    
+    <div class="row">
+      
+      <div class="col-md">
+        <h4>Application Form</h4>
+
+        <p class="text-justify">
+          This form is used for OER providers to registrate their repository and retrieve
+          their token and snippet used to connect their repository with the OER network.
+        </p>
+
+        {{! form for submiting OER credentials and retrieving the hash and snippet }}
+        <form action="/repository" method="post">
+          <h5>Repository Information</h5>
+          
+          <div class="form-group">
+            <label for="oer-repository-name">OER Repository Name</label>
+            <input type="text" class="form-control" id="oer-repository-name"
+              name="name" aria-describedby="oer-repository-name-help" 
+              placeholder="Enter repository name" required>
+            <small id="oer-repository-name-help" class="form-text text-muted">
+              Name of the repository (ex. X5GON Platform)
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="oer-repository-domain">Repository Domain</label>
+            <input type="url" class="form-control" id="oer-repository-domain" 
+              name="domain" aria-describedby="oer-repository-domain-help" 
+              placeholder="Enter repository domain" required>
+            <small id="oer-repository-domain-help" class="form-text text-muted">
+              Domain where the repository resides (ex. http://platform.x5gon.org/)
+            </small>
+          </div>
+
+          <hr>
+
+          <h5>Maintainer Information</h5>
+          <div class="form-group">
+            <label for="contact-email">Contact Email</label>
+            <input type="email" class="form-control" id="contact-email" 
+              name="contact" aria-describedby="contact-email-help" 
+              placeholder="Enter email" required>
+            <small id="contact-email-help" class="form-text text-muted">
+              Person responsible for snippet integration
+            </small>
+          </div>
+
+          {{! recaptcha }}
+          <div id="g-recaptcha" aria-describedby="recaptcha-help"></div>
+
+          {{#if invalid}}
+            <small id="recaptcha-help" class="form-text">
+              You need to activate reCAPTCHA to validate you are not a robot!
+            </small>
+
+          {{/if}}
+          <button type="submit" class="btn btn-primary float-right">Submit</button>
+
+          
+        </form>
+
+      </div>{{! .col-md }}
+
+      {{! additional information about the OER Network }}
+      <div class="col-md">
+        <h5>About the Network</h5>
+        <p class="text-justify">
+          We at X5GON wish to connect different OER repositories located around 
+          the world. Our approach is to give recommendations
+        </p>
+
+      </div>
+
+    </div>{{! .row }}
+  </div>{{! .col }}
+  
+
+</div>{{! .row }}
+
+{{! google recaptcha initialization }}
+<script type="text/javascript">
+  var onloadCallback = function() {
+    grecaptcha.render('g-recaptcha', {
+      'sitekey' : '{{ recaptchaSiteKey }}'
+    });
+  };
+</script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>

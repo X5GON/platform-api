@@ -1,0 +1,67 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    padding-top: 4.5rem;
+    height: 100%;
+    font-size: 14px;
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Roboto,Arial,sans-serif;
+    color: #323232;
+}
+
+body > main {
+    height: 100%;
+    padding-bottom: 400px;
+}
+
+header .navbar { 
+    background-color: #eaeaea;
+}
+
+header .navbar .navbar-brand img {
+    max-height: 33px;
+    margin-left: 0;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+
+    background-color: #5b95a5;
+    color: white;
+    font-size: 14px;
+}
+
+footer .contact a { 
+    color: white; 
+    text-decoration: underline;
+}
+footer .contact a:hover { color: #e5e5e5; }
+
+footer .funding { 
+    font-size: 12px; 
+    background-color: #eaeaea;
+    color: black;
+    padding: 16px 0 13px 0; 
+}
+footer .funding .col { margin: 0px; }
+footer .funding p { 
+    margin-bottom: 1rem; 
+    line-height: 1.6;
+}
+
+footer .content { 
+    padding: 16px 0 13px 0; 
+}
+
+footer .copyright { 
+    font-size: 12px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #5b95a5;
+}
+
+h1 { margin-bottom: 30px; }
