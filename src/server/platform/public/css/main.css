@@ -4,7 +4,7 @@ html {
 }
 
 body {
-    padding-top: 4.5rem;
+    padding-top: 5.5rem;
     height: 100%;
     font-size: 14px;
     font-family: "Open Sans","Helvetica Neue",Helvetica,Roboto,Arial,sans-serif;
@@ -13,7 +13,7 @@ body {
 
 body > main {
     height: 100%;
-    padding-bottom: 400px;
+    padding-bottom: 450px;
 }
 
 header .navbar { 
@@ -23,6 +23,15 @@ header .navbar {
 header .navbar .navbar-brand img {
     max-height: 33px;
     margin-left: 0;
+}
+
+header .navbar .nav-item { 
+    background-color: white;
+    font-weight: 600;    
+}
+
+header .navbar .nav-item a {
+    color: #5b95a5;
 }
 
 footer {
@@ -59,6 +68,16 @@ footer .content {
 footer .copyright { 
     font-size: 12px;
 }
+
+footer h1,
+footer h2,
+footer h3,
+footer h4,
+footer h5,
+footer h6 {
+    color: white;
+}
+
 
 h1, h2, h3, h4, h5, h6 {
     color: #5b95a5;
