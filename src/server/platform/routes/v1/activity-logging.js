@@ -25,7 +25,7 @@ module.exports = function (pg, logger) {
         // get query parameters
         let query = req.query;
         // create a handlebars compiler
-        let activityTracker = fs.readFileSync(path.join(__dirname, '../../templates/tracker.hbs'));
+        let activityTracker = fs.readFileSync(path.join(__dirname, '../../snippet/templates/tracker.hbs'));
         let hbs = handlebars.compile(activityTracker.toString('utf-8'));
 
         // send the website with cookie generation
@@ -40,7 +40,7 @@ module.exports = function (pg, logger) {
         );
 
         // the beacon used to acquire user activity data
-        let beaconPath = path.join(__dirname, '../../public/images/beacon.png');
+        let beaconPath = path.join(__dirname, '../../snippet/images/beacon.png');
         // get query parameters
         let userParameters = req.query;
 
@@ -106,7 +106,7 @@ module.exports = function (pg, logger) {
         let originalUrl = req.originalUrl.split('/');
         const file = originalUrl[originalUrl.length - 1];
         // create the file path
-        const filePath = path.join(__dirname, `../../public/snippet/global/${version}/${file}`);
+        const filePath = path.join(__dirname, `../../snippet/global/${version}/${file}`);
 
         // generate a the tracker cookie - if not exists
         if (!req.cookies[x5gonCookieName]) {
