@@ -31,16 +31,18 @@ const wikiConfig = require('../config/wikiconfig');
 function _wikipediaRequest(text) {
     // create a request promise
     return new Promise((resolve, reject) => {
-        // set request options
-        const options = {
-            text: text,
-            lang: 'auto',
-            out: 'extendedJson',
-            jsonForEval: 'true',
-            userKey: wikiConfig.userKey
-        };
-        request(`${wikiConfig.wikifierUrl}/annotate-article?${querystring.stringify(options)}`, 
-            (error, response, body) => {
+        request.post({
+            url: `${wikiConfig.wikifierUrl}/annotate-article`, 
+            form: {
+                text: text,
+                lang: 'auto',
+                support: false,
+                ranges: false,
+                includeCosines: false,
+                userKey: wikiConfig.userKey,
+            },
+            timeout: 5 * 60 * 1000 // five minutes
+        }, (error, response, body) => {
                 // handle error on request
                 if (error) { return reject(error); }
                 // otherwise return the request body
@@ -65,6 +67,8 @@ function enrichMaterial(text, weight, callback) {
                 // needed to handle strange parsing patterns
                 data = JSON.parse(data);
             } catch (error) {
+                console.log(data);
+                console.log(text);
                 // error when parsing response
                 logger.error('error [wikification.parsing]: unable to parse response', 
                     { error: error.message }
@@ -153,7 +157,6 @@ class Wikification {
     receive(material, stream_id, callback) {
         // TODO: get the raw text from the material 
         const fullText = material.metadata.rawText; // this is just a placeholder
-        
         let tasks = [];
 
         // split full text for wikification consumption
@@ -161,7 +164,7 @@ class Wikification {
             maxTextLength = 10000;  // the length of the text chunk
         
         // go through whole text
-        while (fullText > textIndex) {
+        while (fullText.length > textIndex) {
             // get the text chunk 
             let textChunk = fullText.substring(textIndex, textIndex + maxTextLength);
             // there is not text to be processed, break the cycle
@@ -169,8 +172,9 @@ class Wikification {
 
             if (textChunk.length === maxTextLength) {
                 // text chunk is of max length - make a cutoff at last  
-                // whitespace to avoid cutting in the middle of word
-                let cutOffLastWhitespace = textChunk.lastIndexOf(" ");
+                // end character to avoid cutting in the middle of sentence
+                const lastEndChar = textChunk.match(/[\.?!]/gi);
+                let cutOffLastWhitespace = textChunk.lastIndexOf(lastEndChar[lastEndChar.length-1]);
                 textChunk = textChunk.substring(0, cutOffLastWhitespace);
                 // increment text index
                 textIndex += cutOffLastWhitespace;
@@ -178,7 +182,6 @@ class Wikification {
                 // we got to the end of text
                 textIndex += maxTextLength;
             }
-
             // calculate the weight we add to the found wikipedia concepts
             let weight = textChunk.length / fullText.length;
 

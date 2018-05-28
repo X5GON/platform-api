@@ -1,13 +1,12 @@
 {
     "general": {
-        "name": "X5GON material pre-processing pipeline",
         "heartbeat": 1000
     },
     "spouts": [
         {
             "name": "crawler-input",
-            "working_dir": "./spouts",
             "type": "sys",
+            "working_dir": ".",
             "cmd": "rest",
             "init": {
                 "port": 7500
@@ -17,8 +16,8 @@
     "bolts": [
         {
             "name": "material-format",
-            "working_dir": "./components",
             "type": "inproc",
+            "working_dir": "./components",
             "cmd": "material-format.js",
             "inputs": [
                 { "source": "crawler-input" }
@@ -26,19 +25,29 @@
             "init": {}
         },
         {
-            "name": "wikification",
-            "working_dir": "./components",
+            "name": "text-extract",
             "type": "inproc",
-            "cmd": "wikification.js",
+            "working_dir": "./components",
+            "cmd": "text-extract.js",
             "inputs": [
                 { "source": "material-format" }
             ],
             "init": {}
         },
         {
-            "name": "material-validator",
-            "working_dir": "./components",
+            "name": "wikification",
             "type": "inproc",
+            "working_dir": "./components",
+            "cmd": "wikification.js",
+            "inputs": [
+                { "source": "text-extract" }
+            ],
+            "init": {}
+        },
+        {
+            "name": "material-validator",
+            "type": "inproc",
+            "working_dir": "./components",
             "cmd": "material-validator.js",
             "inputs": [
                 { "source": "wikification" }
@@ -47,13 +56,14 @@
         },
         {
             "name": "postgresql-storage",
-            "working_dir": "./components",
             "type": "inproc",
+            "working_dir": "./components",
             "cmd": "postgresql-storage.js",
             "inputs": [
                 { "source": "material-validator" }
             ],
             "init": {}
         }
-    ]
+    ],
+    "variables": {}
 }
