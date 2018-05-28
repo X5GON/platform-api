@@ -4,6 +4,7 @@
 
 // external modules
 const express = require('express');
+const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
@@ -38,6 +39,13 @@ app.use(session({
 
 // add the public folder
 app.use(express.static(__dirname + '/public/'));
+
+// set rendering engine
+app.engine('hbs', exphbs({
+    extname: 'hbs',
+    defaultLayout: 'main'
+}));
+app.set('view engine', 'hbs');
 
 // TODO: handle redirections - using proxy
 
