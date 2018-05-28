@@ -19,8 +19,8 @@ const minifyPaths= [
 for (let path of minifyPaths) {
     compressor.minify({
         compressor: 'gcc',
-        input: `../public/snippet/${path}/x5gon-log.js`,
-        output: `../public/snippet/${path}/x5gon-log.min.js`,
+        input: `../snippet/${path}/x5gon-log.js`,
+        output: `../snippet/${path}/x5gon-log.min.js`,
         callback: function (err, min) { }
     });
 }
