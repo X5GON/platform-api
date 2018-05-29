@@ -38,7 +38,7 @@ function _wikipediaRequest(text) {
                 lang: 'auto',
                 support: false,
                 ranges: false,
-                includeCosines: false,
+                includeCosines: true,
                 userKey: wikiConfig.userKey,
             },
             timeout: 5 * 60 * 1000 // five minutes
@@ -113,6 +113,8 @@ function enrichMaterial(text, weight, callback) {
                     name: concept.title.toString(),
                     secUri: concept.secUrl || null,
                     secName: concept.secTitle || null,
+                    wikiDataClasses: concept.wikiDataClasses,
+                    cosine: concept.cosine,
                     pageRank: concept.pageRank * weight
                 };
             });
