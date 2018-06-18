@@ -3,11 +3,13 @@
  */
 
 // external modules
+const https = require('https');
 const express = require('express');
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+const fs = require('fs');
 
 // internal modules
 const pg = require('../../lib/postgresQL')(require('../../config/pgconfig'));
@@ -60,3 +62,12 @@ const PORT = argv.PORT || 8080;
 
 // start the server
 app.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));
+
+// set https options
+if (fs.existsSync('./sslcert')) {
+    const options = {
+        cert: fs.readFileSync('./sslcert/fullchain.pem'),
+        key: fs.readFileSync('./sslcert/privkey.pem')
+    };
+    https.createServer(options, app).listen(8443);
+}
