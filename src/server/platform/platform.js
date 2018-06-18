@@ -70,14 +70,14 @@ require('./routes/route.handler')(app, pg, logger);
 // parameters used on the express app
 const PORT = argv.PORT || 8080;
 
-// start the server
-app.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));
-
-// set https options
 if (fs.existsSync('./sslcert')) {
+    // set https options and run the server
     const options = {
         cert: fs.readFileSync('./sslcert/fullchain.pem'),
         key: fs.readFileSync('./sslcert/privkey.pem')
     };
-    https.createServer(options, app).listen(8443);
+    https.createServer(options, app).listen(PORT);
+} else {
+    // start the server without https
+    app.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));
 }
