@@ -52,15 +52,6 @@ app.engine('hbs', exphbs({
 }));
 app.set('view engine', 'hbs');
 
-// redirect the user to the secure webpage
-// app.use((req, res, next) => {
-//     if((!req.secure) && (req.get('X-Forwarded-Proto') !== 'https')) {
-//         res.redirect('https://platform.x5gon.org');
-//     } else {
-//         next();
-//     }
-// });
-
 // TODO: handle redirections - using proxy
 
 // cookie parser
@@ -72,11 +63,14 @@ require('./routes/route.handler')(app, pg, logger);
 // parameters used on the express app
 const PORT = argv.PORT || 8080;
 
-if (fs.existsSync('./sslcert')) {
+// security options
+const security = require('./config/security');
+
+if (security['ssl-certificate']) {
     // set https options and run the server
     const sslOptions = {
-        cert: fs.readFileSync('./sslcert/fullchain.pem', 'utf8'),
-        key: fs.readFileSync('./sslcert/privkey.pem', 'utf8')
+        cert: fs.readFileSync(security['ssl-certificate'].cert, 'utf8'),
+        key: fs.readFileSync(security['ssl-certificate'].key, 'utf8')
     };
     https.createServer(sslOptions, app).listen(PORT);
     logger.info(`platform listening on port ${PORT}`);
