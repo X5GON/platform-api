@@ -41,13 +41,23 @@ app.use(session({
 
 // add the public folder
 app.use(express.static(__dirname + '/public/'));
-
+// secure Express server through setting HTTP headers
+app.use(require('helmet')());
 // set rendering engine
 app.engine('hbs', exphbs({
     extname: 'hbs',
     defaultLayout: 'main'
 }));
 app.set('view engine', 'hbs');
+
+// redirect the user to the secure webpage
+// app.use((req, res, next) => {
+//     if((!req.secure) && (req.get('X-Forwarded-Proto') !== 'https')) {
+//         res.redirect('https://platform.x5gon.org');
+//     } else {
+//         next();
+//     }
+// });
 
 // TODO: handle redirections - using proxy
 
