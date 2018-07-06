@@ -1,5 +1,5 @@
 // external modules
-const spawn = require('child_process').spawn;
+var PythonShell = require('python-shell');
 // internal modules
 const fileManager = require('./file-manager');
 
@@ -9,21 +9,23 @@ const fileManager = require('./file-manager');
  * @returns {Object} The promise.
  */
 module.exports = function (slug, path='./') {
-
     // contains promises waiting to be resolved
     let promises = [];
     const dfxpPath = `${path}/${slug[0]}/${slug}`;
     // execute on all files that contain .tx. in the name
     fileManager.executeOnFiles(dfxpPath, /.tx./g, (filename) => {
         let promise = new Promise((resolve, reject) => {
+            const options = {
+                scriptPath: __dirname,
+                args: [filename]
+            };
             // initialize process for running the python script
-            let process = spawn('python', [
-                __dirname + '/dfxp2srt.raw.py',
-                filename
-            ]);
-            // handle responses from the process
-            process.stdout.on('data', data => { resolve(data.toString()); });
-            process.stdout.on('error', error => { reject(error); });
+            PythonShell.run('dfxp2srt.py', options, (error, results) => {
+                if (error) { return reject(error); }
+                let dfxp = fileManager.getFileContent(filename);
+                let rawText = results ? results.toString() : '';
+                return resolve({ dfxp, rawText }); 
+            });
         });
         // push the promise 
         promises.push(promise);
