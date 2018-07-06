@@ -64,21 +64,21 @@ module.exports = function (pg, logger) {
 
     router.get('/', (req, res) => {
         // currently redirect to form page
-        res.redirect('/form');
+        res.redirect('/application-form');
     });
 
     // send application form page
-    router.get('/form', (req, res) => {
+    router.get('/application-form', (req, res) => {
         // check if the user was successfully validated by google captcha
         // this is used only when redirected from POST /repository
         const invalid = req.query.invalid ? req.query.invalid == 'true' : false;
 
         const recaptchaSiteKey = gConfig.reCaptcha.siteKey;
-        return res.render('index', { recaptchaSiteKey, invalid });
+        return res.render('application-form', { recaptchaSiteKey, invalid });
     });
 
     // send repository
-    router.post('/repository', (req, res) => {
+    router.post('/oer-provider', (req, res) => {
         // get body request
         const body = req.body;
 
@@ -111,14 +111,14 @@ module.exports = function (pg, logger) {
                         // insert repository information to postgres
                         pg.insert({ name, domain, contact, token }, 'repositories', (xerror, xresults) => {
                             // render the form submition
-                            return res.render('repository', { name, domain, contact, token });
+                            return res.render('oer-provider', { name, domain, contact, token });
                         });
 
                     } else {
                         // there are registered repositories in the database
                         const { name, domain, contact, token } = results[0];
                         // render the form submition
-                        return res.render('repository', { name, domain, contact, token });
+                        return res.render('oer-provider', { name, domain, contact, token });
                     }
                 });
             })
@@ -127,6 +127,12 @@ module.exports = function (pg, logger) {
                 console.log(error);
             });
     });
+
+    // send application form page
+    router.get('/privacy-policy', (req, res) => {
+        return res.render('privacy-policy', { });
+    });
+
 
     return router;
 };

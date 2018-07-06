@@ -13,9 +13,12 @@
     <link rel="stylesheet" href="/css/prism.css">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-    <link rel="stylesheet" href="/css/main.css">
-    <link rel="stylesheet" href="/css/form.css">
-    
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="/css/common.css">
+    <link rel="stylesheet" href="/css/application-form.css">
+    <link rel="stylesheet" href="/css/oer-provider.css">
+    <link rel="stylesheet" href="/css/privacy-policy.css">
 
     {{! link to the bootstrap js files }}
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
@@ -28,7 +31,6 @@
     {{! link prism for code factoring}}
     <script src="/js/prism.js"></script>
     
-
     <title>X5GON Platform</title>
 </head>
 
@@ -49,17 +51,20 @@
 
             {{! home link }}
             {{! TODO add a proper home page }}
-            <li class="nav-item">
-              <a class="nav-link" href="/form">Form <span class="sr-only">(current)</span></a>
-            </li>
+            {{!-- <li class="nav-item">
+              <a class="nav-link" href="/form">Join Now<span class="sr-only">(current)</span></a>
+            </li> --}}
 
           </ul>
+
+          <a class="nav-link call-to-action" href="/application-form">Join Now<span class="sr-only">(current)</span></a>
+
         </div>
       </div>
     </nav>
   </header>
 
-  <main role="main" class="container">
+  <main role="main">
     {{{body}}}
   </main>
     
@@ -82,10 +87,20 @@
             <div class="col-md">
 
               <h4>X5GON Project</h4>
-              <p class="contact">
-                X5GON Project Home Page<br>
-                <a href="https://www.x5gon.org/">x5gon.org</a>
+              <p class="link">
+                <a href="https://www.x5gon.org/">X5GON Project Home Page 
+                  <span><i class="fas fa-external-link-alt"></i></span>
+                </a>
               </p>
+              <p class="link">
+                <a href="/privacy-policy">Privacy Policy</a>
+              </p>
+
+              <p class="social-network">
+                <a class="mr-1" href="https://www.facebook.com/openingupslovenia/"><i class="fab fa-facebook-square"></i></a>
+                <a class="mr-1" href="https://twitter.com/OpenupSLO"><i class="fab fa-twitter-square"></i></a>
+              </p>
+
 
             </div>{{! .col-md.content}}
 

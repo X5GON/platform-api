@@ -1,0 +1,23 @@
+.information + ul.project-partners {
+    list-style-type: none;
+}
+
+.information + ul.project-partners li {
+    margin: 5px 0 15px;
+}
+
+.information + ul.project-partners a {
+    font-weight: 600;
+    color: #323232;
+    transition: color .2s;
+}
+
+.information + ul.project-partners a > .link {
+    color: #323232 !important;
+    font-size: 10px;
+}
+
+.information + ul.project-partners a:hover {
+    color: #456f7a;
+    text-decoration: none;
+}

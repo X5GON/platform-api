@@ -13,7 +13,11 @@ body {
 
 body > main {
     height: 100%;
-    padding-bottom: 450px;
+    padding-bottom: 400px;
+}
+
+@media screen and (max-width: 776px) {
+    body > main { padding-bottom: 630px; }
 }
 
 header .navbar { 
@@ -25,29 +29,29 @@ header .navbar .navbar-brand img {
     margin-left: 0;
 }
 
-header .navbar .nav-item { 
+header .navbar .nav-link { 
     background-color: white;
     font-weight: 600;    
+    color: #5b95a5;
 }
 
-header .navbar .nav-item a {
-    color: #5b95a5;
+header .navbar .nav-link.call-to-action {
+    background-color: #5b95a5;
+    color: white;
+    transition: background .2s;
+}
+
+header .navbar .nav-link.call-to-action:hover {
+    background-color: #456f7a;
 }
 
 footer {
     position: absolute;
     bottom: 0;
-
     background-color: #5b95a5;
     color: white;
     font-size: 14px;
 }
-
-footer .contact a { 
-    color: white; 
-    text-decoration: underline;
-}
-footer .contact a:hover { color: #e5e5e5; }
 
 footer .funding { 
     font-size: 12px; 
@@ -57,6 +61,7 @@ footer .funding {
 }
 footer .funding .col { margin: 0px; }
 footer .funding p { 
+    margin-top: 1rem;
     margin-bottom: 1rem; 
     line-height: 1.6;
 }
@@ -64,6 +69,28 @@ footer .funding p {
 footer .content { 
     padding: 16px 0 13px 0; 
 }
+
+footer .link { margin-bottom: 10px; }
+footer .link a { color: white; }
+footer .link a:hover { 
+    color: #e5e5e5; 
+    text-decoration: none;
+}
+footer .link span {
+    font-size: 10px
+}
+
+footer .social-network a { 
+    font-size: 22px;
+    color: white; 
+}
+footer .social-network a:hover { color: #e5e5e5; }
+
+footer .contact a { 
+    color: white; 
+    text-decoration: underline;
+}
+footer .contact a:hover { color: #e5e5e5; }
 
 footer .copyright { 
     font-size: 12px;
