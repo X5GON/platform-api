@@ -11,6 +11,16 @@
             "init": {
                 "port": 7500
             }
+        },
+        {
+            "name": "file-reader",
+            "working_dir": ".",
+            "type": "sys",
+            "cmd": "file_reader",
+            "init": {
+                "file_name": "../../../../../datasets/x5gon/oer/unibo/unibo-clean.json",
+                "file_format": "json"
+            }
         }
     ],
     "bolts": [
@@ -20,7 +30,8 @@
             "working_dir": "./components",
             "cmd": "material-format.js",
             "inputs": [
-                { "source": "crawler-input" }
+                { "source": "crawler-input" },
+                { "source": "file-reader" }
             ],
             "init": {}
         },

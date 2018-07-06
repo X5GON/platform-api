@@ -4,6 +4,11 @@
  * formats into a common schema.
  */
 
+// external libraries
+const http = require('http');
+const https = require('https');
+const fileType = require('file-type');
+
 // internal libraries
 const Logger = require('../../../lib/logging-handler')();
 // create a logger instance for logging wikification process
@@ -45,20 +50,48 @@ class MaterialFormat {
         // TODO: create the object containing the material format
         const formatedMaterial = {
             title: material.title,
-            provider: material.provider,
-            materialURL: material.materialURL,
+            description: material.description,
+            providerUri: material.providerUri,
+            materialUrl: material.materialUrl,
             author: material.author,
-            created: material.created,
-            type: material.type,
-            language: material.language,
-            metadata: { }
+            dateCreated: material.dateCreated,
+            dateRetrieved: material.dateRetrieved,
+            providerMetadata: material.providerMetadata,
+            materialMetadata: { }
         };
         
-        // log material formating process
-        logger.info('material format successful', { material, formatedMaterial });
-        // send formated material to the next component
-        this._onEmit(formatedMaterial, stream_id, callback);
+        if (material.materialUrl.indexOf('http://') === 0) {
+            http.get(material.materialUrl, res => {
+                this._handleResponse(res, material, formatedMaterial, stream_id, callback);
+            });
+        } else if (material.materialUrl.indexOf('https://') === 0) {
+            https.get(material.materialUrl, res => {
+                this._handleResponse(res, material, formatedMaterial, stream_id, callback);
+            });
+        } else {
+            logger.error('materialUrl is not valid', { material });
+            return callback();
+        }
     }
+
+    _handleResponse(response, material, formatedMaterial, stream_id, callback) {
+        if (response.statusCode !== 200) {
+            logger.warn(`Request denied with code ${response.statusCode}`, { material });
+            logger.info('material format successful', { material, formatedMaterial });
+            // send formated material to the next component
+            return this._onEmit(formatedMaterial, stream_id, callback);
+        } else {
+            response.on('data', chunk => {
+                response.destroy();
+                formatedMaterial.type = fileType(chunk);
+                // log material formating process
+                logger.info('material format successful', { material, formatedMaterial });
+                // send formated material to the next component
+                return this._onEmit(formatedMaterial, stream_id, callback);
+            });
+        }
+    }
+
 }
 
 exports.create = function (context) { return new MaterialFormat(context); };

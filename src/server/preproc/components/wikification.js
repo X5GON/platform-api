@@ -41,7 +41,7 @@ function _wikipediaRequest(text) {
                 includeCosines: true,
                 userKey: wikiConfig.userKey,
             },
-            timeout: 5 * 60 * 1000 // five minutes
+            timeout: 30 * 1000 // 30 seconds
         }, (error, response, body) => {
                 // handle error on request
                 if (error) { return reject(error); }
@@ -67,8 +67,6 @@ function enrichMaterial(text, weight, callback) {
                 // needed to handle strange parsing patterns
                 data = JSON.parse(data);
             } catch (error) {
-                console.log(data);
-                console.log(text);
                 // error when parsing response
                 logger.error('error [wikification.parsing]: unable to parse response', 
                     { error: error.message }
@@ -78,6 +76,11 @@ function enrichMaterial(text, weight, callback) {
 
             // get found concepts/annotations
             let annotations = data.annotations;
+            if (!annotations || !annotations.length) {
+                // return the concept list
+                return callback(null, []);
+            }
+
             // sort annotations by pageRank
             annotations.sort((concept1, concept2) => concept2.pageRank - concept1.pageRank);
 
@@ -158,9 +161,15 @@ class Wikification {
 
     receive(material, stream_id, callback) {
         // TODO: get the raw text from the material 
-        const fullText = material.metadata.rawText; // this is just a placeholder
-        let tasks = [];
+        const fullText = material.materialMetadata.rawText; // this is just a placeholder
 
+        if (!fullText) {
+            logger.warn('no raw text found for material', { materialUrl: material.materialUrl });
+            //send it to the next component in the pipeline
+            return this._onEmit(material, stream_id, callback);
+        }
+
+        let tasks = [];
         // split full text for wikification consumption
         let textIndex = 0,          // the text index - how much text was already processed
             maxTextLength = 10000;  // the length of the text chunk
@@ -171,12 +180,24 @@ class Wikification {
             let textChunk = fullText.substring(textIndex, textIndex + maxTextLength);
             // there is not text to be processed, break the cycle
             if (textChunk.length === 0) { break; }
-
             if (textChunk.length === maxTextLength) {
                 // text chunk is of max length - make a cutoff at last  
                 // end character to avoid cutting in the middle of sentence
+                let cutOffLastWhitespace;
+
                 const lastEndChar = textChunk.match(/[\.?!]/gi);
-                let cutOffLastWhitespace = textChunk.lastIndexOf(lastEndChar[lastEndChar.length-1]);
+                if (lastEndChar) {
+                    cutOffLastWhitespace = textChunk.lastIndexOf(lastEndChar[lastEndChar.length-1]);
+                }
+                // if there is not end character detected
+                if (!cutOffLastWhitespace) {
+                    cutOffLastWhitespace = textChunk.lastIndexOf(' ');
+                }
+                // if there is not space detected - cut of the whole chunk
+                if (!cutOffLastWhitespace) {
+                    cutOffLastWhitespace = textChunk.length;
+                }
+
                 textChunk = textChunk.substring(0, cutOffLastWhitespace);
                 // increment text index
                 textIndex += cutOffLastWhitespace;
@@ -186,7 +207,6 @@ class Wikification {
             }
             // calculate the weight we add to the found wikipedia concepts
             let weight = textChunk.length / fullText.length;
-
             // add a new wikification task on text chunk
             tasks.push((xcallback) => {
                 enrichMaterial(textChunk, weight, xcallback);
@@ -195,7 +215,7 @@ class Wikification {
 
         if (tasks.length === 0) { 
             // there were no tasks generated for the material - skip wikification
-            material.metadata.wikipediaConcepts = [];
+            material.materialMetadata.wikipediaConcepts = [];
             //send it to the next component in the pipeline
             return this._onEmit(material, stream_id, callback);
         }
@@ -203,32 +223,31 @@ class Wikification {
         // get wikipedia concepts of the material
         async.parallelLimit(tasks, 10, (error, concepts) => {
             if (error) {
-                // there was an error - it was already logged within  
-                // the function just end the with a callback
-                return callback();
+                // there was an error - it was already logged within the function  
+                // just end the with a callback
+                logger.warn('unable to retrieve concepts', { materialUrl: material.materialUrl });
+                return this._onEmit(material, stream_id, callback);
             }
-
-            // `concepts` is an array of arrays - flatten it
-            concepts = concepts.reduce((accumulator, currentValue) => 
-                accumulator.concat(currentValue), []);
 
             // concept storage
             let conceptMap = { };
             // merge concepts with matching uri
-            for (let concept of concepts) {
-                if (conceptMap[concept.uri]) {
-                    // concept exists in mapping - add weighted pageRank
-                    conceptMap[concept.uri].pageRank += concept.pageRank;
-                } else {
-                    //  add concept to the mapping
-                    conceptMap[concept.uri] = concept;
+            for (let conceptsBundle of concepts) {
+                for (let concept of conceptsBundle) {
+                    if (conceptMap[concept.uri]) {
+                        // concept exists in mapping - add weighted pageRank
+                        conceptMap[concept.uri].pageRank += concept.pageRank;
+                    } else {
+                        //  add concept to the mapping
+                        conceptMap[concept.uri] = concept;
+                    }
                 }
             }
-
             // store merged concepts within the material object 
-            material.metadata.wikipediaConcepts = Object.values(conceptMap);
+            material.materialMetadata.wikipediaConcepts = Object.values(conceptMap);
             //send it to the next component in the pipeline
-            this._onEmit(material, stream_id, callback);
+            logger.info('acquired wikipedia concepts for material', { materialUrl: material.materialUrl });
+            return this._onEmit(material, stream_id, callback);
         });
     }
 }

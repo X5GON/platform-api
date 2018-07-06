@@ -45,17 +45,17 @@ class PostgresqlStorage {
 
     receive(material, stream_id, callback) {
         // log material insertion
-        logger.info('start inserting material into oer_material database', { materialURL: material.materialURL });
+        logger.info('start inserting material into oer_material database', { materialUrl: material.materialUrl });
         // takes the material and insert it into the OER material table
         pg.insert(material, 'oer_materials', (error, result) => {
             if (error) {
                 // error when parsing response
                 logger.error('error [postgresql.insert]: unable to insert material', 
-                    { error: error.message, materialURL: material.materialURL }
+                    { error: error.message, materialUrl: material.materialUrl }
                 );
             } else {
                 // log successful material insertion
-                logger.info('material inserted into oer_material database', { materialURL: material.materialURL });
+                logger.info('material inserted into oer_material database', { materialUrl: material.materialUrl });
             }
             // this is the end of the pre-processing pipeline
             return callback();
