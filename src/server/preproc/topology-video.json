@@ -1,0 +1,80 @@
+{
+    "general": {
+        "heartbeat": 1000
+    },
+    "spouts": [
+        {
+            "name": "crawler-input",
+            "type": "sys",
+            "working_dir": ".",
+            "cmd": "rest",
+            "init": {
+                "port": 7500
+            }
+        },
+        {
+            "name": "file-reader",
+            "working_dir": ".",
+            "type": "sys",
+            "cmd": "file_reader",
+            "init": {
+                "file_name": "../../../data/videolectures/lectures.json",
+                "file_format": "json"
+            }
+        }
+    ],
+    "bolts": [
+        {
+            "name": "videolectures-format",
+            "type": "inproc",
+            "working_dir": "./components",
+            "cmd": "videolectures-format.js",
+            "inputs": [
+                { "source": "crawler-input" },
+                { "source": "file-reader" }
+            ],
+            "init": {}
+        },
+        {
+            "name": "dfxp-extract",
+            "type": "inproc",
+            "working_dir": "./components",
+            "cmd": "dfxp-extract.js",
+            "inputs": [
+                { "source": "videolectures-format" }
+            ],
+            "init": {}
+        },
+        {
+            "name": "wikification",
+            "type": "inproc",
+            "working_dir": "./components",
+            "cmd": "wikification.js",
+            "inputs": [
+                { "source": "dfxp-extract" }
+            ],
+            "init": {}
+        },
+        {
+            "name": "material-validator",
+            "type": "inproc",
+            "working_dir": "./components",
+            "cmd": "material-validator.js",
+            "inputs": [
+                { "source": "wikification" }
+            ],
+            "init": {}
+        },
+        {
+            "name": "postgresql-storage",
+            "type": "inproc",
+            "working_dir": "./components",
+            "cmd": "postgresql-storage.js",
+            "inputs": [
+                { "source": "material-validator" }
+            ],
+            "init": {}
+        }
+    ],
+    "variables": {}
+}

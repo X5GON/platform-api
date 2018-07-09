@@ -4,9 +4,12 @@
 
 // external modules
 const express = require('express');
+const helmet = require('helmet');
+const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
+
 
 // internal modules
 const pg = require('../../lib/postgresQL')(require('../../config/pgconfig'));
@@ -38,6 +41,14 @@ app.use(session({
 
 // add the public folder
 app.use(express.static(__dirname + '/public/'));
+// secure Express server through setting HTTP headers
+app.use(helmet());
+// set rendering engine
+app.engine('hbs', exphbs({
+    extname: 'hbs',
+    defaultLayout: 'main'
+}));
+app.set('view engine', 'hbs');
 
 // TODO: handle redirections - using proxy
 
@@ -50,5 +61,8 @@ require('./routes/route.handler')(app, pg, logger);
 // parameters used on the express app
 const PORT = argv.PORT || 8080;
 
-// start the server
+// security options
+const security = require('./config/security');
+
+// start the server without https
 app.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));
