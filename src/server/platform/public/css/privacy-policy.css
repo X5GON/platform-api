@@ -1,5 +1,10 @@
+.information + ul.user-attributes {
+    padding-left: 20px;
+}
+
 .information + ul.project-partners {
     list-style-type: none;
+    padding: 0px;
 }
 
 .information + ul.project-partners li {
