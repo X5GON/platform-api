@@ -4,7 +4,6 @@
 
 // external modules
 const express = require('express');
-const helmet = require('helmet');
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -41,8 +40,7 @@ app.use(session({
 
 // add the public folder
 app.use(express.static(__dirname + '/public/'));
-// secure Express server through setting HTTP headers
-app.use(helmet());
+
 // set rendering engine
 app.engine('hbs', exphbs({
     extname: 'hbs',
@@ -51,6 +49,7 @@ app.engine('hbs', exphbs({
 app.set('view engine', 'hbs');
 
 // TODO: handle redirections - using proxy
+require('./routes/proxy')(app);
 
 // cookie parser
 app.use(cookieParser(argv['session-secret']));

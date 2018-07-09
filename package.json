@@ -46,6 +46,7 @@
     "winston-daily-rotate-file": "^1.7.2"
   },
   "devDependencies": {
+    "http-proxy-middleware": "^0.18.0",
     "node-minify": "^2.4.1"
   }
 }
