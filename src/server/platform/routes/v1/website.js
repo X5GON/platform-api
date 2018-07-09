@@ -1,6 +1,5 @@
 // external modules
 const router = require('express').Router();
-const handlebars = require('handlebars');
 const request = require('request');
 
 // google verification configuration
@@ -130,6 +129,39 @@ module.exports = function (pg, logger) {
 
     // send application form page
     router.get('/privacy-policy', (req, res) => {
+        return res.render('privacy-policy', { });
+    });
+
+
+    /********************************************
+     * RECOMMENDATION EMBEDDINGS 
+     */
+
+    // send application form page
+    router.get('/embed/recommendations', (req, res) => {
+        // get the query
+        const query = req.query;
+        
+        let options = { layout: 'empty' };
+        if (Object.keys(query).length === 0) {
+            options.empty = true;
+            return res.render('recommendations', options);
+        }
+
+        let queryString = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
+        request(`http://localhost:8080/api/recommend/content?${queryString}`, (error, httpRequest, body) => {
+            const recommendations = JSON.parse(body);
+            if (recommendations.length === 0) {
+                options.empty = true;
+            } else {
+                options.empty = false;
+                options.recommendations = recommendations;
+            }
+            return res.render('recommendations', options);
+        });
+    });
+
+    router.get('/error', (req, res) => {
         return res.render('privacy-policy', { });
     });
 

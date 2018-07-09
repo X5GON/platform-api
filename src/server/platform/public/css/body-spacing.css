@@ -1,0 +1,13 @@
+body { 
+    padding-top: 5.5rem; 
+    height: 100%;
+}
+
+body > main {
+    height: 100%;
+    padding-bottom: 400px;
+}
+
+@media screen and (max-width: 776px) {
+    body > main { padding-bottom: 630px; }
+}

@@ -1,0 +1,13 @@
+<div class="recommendations width-restriction">
+  {{#each recommendations as | material index |}}
+    <a class="material" href="{{material.link}}" target="_top">
+      <div class="material-content">
+        <strong>{{material.title}}</strong><br>
+        <small>{{material.provider}}</small>
+      </div>
+    </a>
+  {{/each}}
+</div>
+<div class="footer text-right width-restriction">
+  <small>Powered by <a href="https://www.x5gon.org/" target="_blank">X5GON Project</a></small>
+</div>
