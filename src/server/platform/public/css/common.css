@@ -3,21 +3,10 @@ html {
     min-height: 100%;
 }
 
-body {
-    padding-top: 5.5rem;
-    height: 100%;
+body {    
     font-size: 14px;
     font-family: "Open Sans","Helvetica Neue",Helvetica,Roboto,Arial,sans-serif;
     color: #323232;
-}
-
-body > main {
-    height: 100%;
-    padding-bottom: 400px;
-}
-
-@media screen and (max-width: 776px) {
-    body > main { padding-bottom: 630px; }
 }
 
 header .navbar { 
