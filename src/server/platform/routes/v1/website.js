@@ -87,7 +87,7 @@ module.exports = function (pg, logger) {
         const token = req.query.providerId;
         // check if the repository already exists - return existing token
         pg.select({ name, token }, 'repositories', (error, results) => {
-            const referrer = req.header('Referrer') ? req.header('Referrer').split('?')[0] : '/oer-provider';
+            const referrer = req.header('Referrer') ? req.header('Referrer').split('?')[0] : '/application-form';
             if (error) { 
                 console.log(error);
                 res.redirect(`${referrer}?invalid=true`);
