@@ -61,6 +61,11 @@ function _generateToken(seed) {
  */
 module.exports = function (pg, logger) {
 
+
+    /********************************************
+     * PORTAL PAGES
+     */
+
     router.get('/', (req, res) => {
         // currently redirect to form page
         res.redirect('/application-form');
@@ -74,6 +79,29 @@ module.exports = function (pg, logger) {
 
         const recaptchaSiteKey = gConfig.reCaptcha.siteKey;
         return res.render('application-form', { recaptchaSiteKey, invalid });
+    });
+
+    router.get('/oer-provider', (req, res) => {
+        // get token used for accessing data
+        const name = req.query.name;
+        const token = req.query.providerId;
+        // check if the repository already exists - return existing token
+        pg.select({ name, token }, 'repositories', (error, results) => {
+            const referrer = req.header('Referrer') ? req.header('Referrer').split('?')[0] : '/oer-provider';
+            if (error) { 
+                console.log(error);
+                res.redirect(`${referrer}?invalid=true`);
+             }
+            
+            if (results.length === 0) {
+                return res.redirect(`${referrer}?invalid=true`);
+            } else {
+                // there are registered repositories in the database
+                const { name, domain, contact, token } = results[0];
+                // render the form submition
+                return res.render('oer-provider', { name, domain, contact, token });
+            }
+        });
     });
 
     // send repository
@@ -92,7 +120,7 @@ module.exports = function (pg, logger) {
             .then(validation => {
 
                 // if not validated - redirect to application form
-                if (!validation.success) { return res.redirect('/form?invalid=true'); }
+                if (!validation.success) { return res.redirect('/application-form?invalid=true'); }
 
                 // check if the repository already exists - return existing token
                 pg.select({ name, domain, contact }, 'repositories', (error, results) => {
@@ -110,14 +138,14 @@ module.exports = function (pg, logger) {
                         // insert repository information to postgres
                         pg.insert({ name, domain, contact, token }, 'repositories', (xerror, xresults) => {
                             // render the form submition
-                            return res.render('oer-provider', { name, domain, contact, token });
+                            return res.redirect(`/oer-provider?name=${name}&providerId=${token}`);
                         });
 
                     } else {
                         // there are registered repositories in the database
-                        const { name, domain, contact, token } = results[0];
+                        const { token } = results[0];
                         // render the form submition
-                        return res.render('oer-provider', { name, domain, contact, token });
+                        return res.redirect(`/oer-provider?name=${name}&providerId=${token}`);
                     }
                 });
             })
@@ -125,6 +153,11 @@ module.exports = function (pg, logger) {
                 // TODO: handle error
                 console.log(error);
             });
+    });
+
+    router.get('/oer-provider/login', (req, res) => {
+        const invalid = req.query.invalid;
+        return res.render('oer-provider-login', { invalid });
     });
 
     // send application form page

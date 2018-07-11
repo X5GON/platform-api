@@ -20,8 +20,13 @@ header .navbar .navbar-brand img {
 
 header .navbar .nav-link { 
     background-color: white;
+    transition: background .2s;
     font-weight: 600;    
     color: #5b95a5;
+}
+
+header .navbar .nav-link:hover { 
+    background-color: #f6f6f6;
 }
 
 header .navbar .nav-link.call-to-action {
