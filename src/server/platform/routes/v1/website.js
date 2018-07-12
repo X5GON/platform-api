@@ -176,20 +176,15 @@ module.exports = function (pg, logger) {
 
     // send application form page
     router.get('/embed/recommendations', (req, res) => {
-        // get the query
         const query = req.query;
-        
-        let options = { layout: 'empty' };
-        if (Object.keys(query).length === 0) {
-            options.empty = true;
-            return res.render('recommendations', options);
-        }
 
+        let options = { layout: 'empty' };
         let queryString = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
         request(`http://localhost:8080/api/recommend/content?${queryString}`, (error, httpRequest, body) => {
             if (error) {  }
             const recommendations = JSON.parse(body);
-            options.empty = recommendations.length === 0 ? false : true;
+            console.log(recommendations);
+            options.empty = recommendations.length === 0 || recommendations.error ? false : true;
             options.recommendations = recommendations;
             return res.render('recommendations', options);
         });
