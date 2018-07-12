@@ -1,0 +1,63 @@
+.width-restriction {
+    width: 280px;
+}
+
+.recommendations {
+    max-height: 400px;
+    overflow-y: scroll;
+}
+
+.recommendations::-webkit-scrollbar {
+    width: 10px;
+}
+
+.recommendations::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+}
+ 
+.recommendations::-webkit-scrollbar-thumb {
+    background: #888; 
+}
+
+.recommendations::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+}
+
+.recommendations .material {
+    color: #323232;
+}
+
+.recommendations .material:hover { 
+    text-decoration: none; 
+
+}
+
+.recommendations .material-content {
+    background-color: #f6f6f6;
+    font-size: 12px;
+    padding: 7px;
+    transition: background-color .2s;
+}
+
+.recommendations .material-content:hover {
+    background-color: #e6e6e6;
+}
+
+
+.recommendations .material-content small {
+    color: gray;
+    font-style: italic;
+}
+
+.footer { 
+    font-style: italic; 
+    background-color: transparent;
+}
+.footer a { 
+    color: #5b95a5; 
+}
+.footer a:hover {
+    color: #456f7a;
+    text-decoration: none;
+}
+

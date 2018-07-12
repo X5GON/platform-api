@@ -2,17 +2,34 @@
 const async = require('async');
 
 // prepare postgresql connection to the database
-const pg = require('../lib/utils/postgresQL')(require('../config/pgconfig'));
+const pg = require('../lib/postgresQL')(require('../config/pgconfig'));
 
 // prepare commands we want to execute
 let commands = [
+    // snippet user activity data table
     `CREATE TABLE IF NOT EXISTS client_activity (id serial PRIMARY KEY, uuid varchar NOT NULL,
         provider varchar NOT NULL, url varchar NOT NULL, visitedOn timestamp with time zone NOT NULL,
         referrer varchar NOT NULL, userAgent varchar NOT NULL, language varchar NOT NULL);`,
     'CREATE INDEX IF NOT EXISTS client_activity_id ON client_activity(id);',
     'CREATE INDEX IF NOT EXISTS client_activity_userid ON client_activity(uuid);',
     'CREATE INDEX IF NOT EXISTS client_activity_provider ON client_activity(provider);',
-    'CREATE INDEX IF NOT EXISTS client_activity_visitedOn ON client_activity(visitedOn);'
+    'CREATE INDEX IF NOT EXISTS client_activity_visitedOn ON client_activity(visitedOn);',
+    // repository contact and token
+    `CREATE TABLE IF NOT EXISTS repositories (id serial PRIMARY KEY, name varchar NOT NULL, 
+        domain varchar NOT NULL, contact varchar NOT NULL, token varchar NOT NULL);`,
+    'CREATE INDEX IF NOT EXISTS repositories_name_idx ON repositories(name);',
+    'CREATE INDEX IF NOT EXISTS repositories_domain_idx ON repositories(domain);',
+    'CREATE INDEX IF NOT EXISTS repositories_contact_idx ON repositories(contact);',
+    'CREATE INDEX IF NOT EXISTS repositories_token_idx ON repositories(token);',
+    // oer materials and metadata
+    `CREATE TABLE IF NOT EXISTS oer_materials (id serial PRIMARY KEY, title varchar NOT NULL, 
+        description varchar, providerUri varchar NOT NULL,
+        materialUrl varchar NOT NULL, author varchar, language varchar NOT NULL,
+        dateCreated timestamp with time zone, dateRetrieved timestamp with time zone, 
+        type jsonb, providerMetadata jsonb NOT NULL, 
+        materialMetadata jsonb NOT NULL);`,
+    'CREATE INDEX IF NOT EXISTS oer_materials_materialUrl_idx ON oer_materials(materialUrl);',
+    'CREATE INDEX IF NOT EXISTS oer_materials_type_idx ON oer_materials(type);'
 ];
 
 // execute them one by one

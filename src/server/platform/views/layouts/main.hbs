@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="application-name" content="X5GON Platform">
+  <meta name="description" content="Platform for connecting OER repositories and material">
+  <meta name="project" content="X5GON">
+  <meta name="author" content="Erik Novak">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> {{! link to the bootstrap css files }}
+  <link rel="stylesheet" href="/css/prism.css">
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4"
+    crossorigin="anonymous">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt"
+    crossorigin="anonymous">
+
+  <link rel="stylesheet" href="/css/common.css">
+  <link rel="stylesheet" href="/css/body-spacing.css">
+  <link rel="stylesheet" href="/css/application-form.css">
+  <link rel="stylesheet" href="/css/oer-provider.css">
+  <link rel="stylesheet" href="/css/privacy-policy.css"> {{! link to the bootstrap js files }}
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
+    crossorigin="anonymous"></script> {{! link to the google fonts }}
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,600i&amp;subset=latin-ext" rel="stylesheet"> {{! link prism for code factoring}}
+  <script src="/js/prism.js"></script>
+
+  <title>X5GON Platform</title>
+</head>
+
+<body>
+  {{! navigation for every page }}
+  <header>
+    <nav class="navbar navbar-expand-md fixed-top">
+      <div class="container">
+        <span class="navbar-brand mb-0 h1">
+          <img src="https://www.x5gon.org/wp-content/themes/x5gon/dist/assets/img/logo.svg" alt="X5GON">
+        </span>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+          aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+
+            {{! home link }} {{! TODO add a proper home page }}
+
+
+          </ul>
+          <a class="nav-link ml-2" href="/oer-provider/login">Login</a>
+          <a class="nav-link ml-2 call-to-action" href="/application-form">Join Now</a>
+
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <main role="main">
+    {{{body}}}
+  </main>
+
+  <footer class="container-fluid">
+    <div class="row">
+      <div class="col">
+
+        <div class="row funding">
+          <div class="col">
+            <p class="text-center">
+              This project has received funding from the European Union’s Horizon 2020 research and innovation programme under grant agreement
+              No 761758.
+            </p>
+          </div>
+        </div>
+
+        <div class="container content">
+          <div class="row">
+            <div class="col-md">
+
+              <h4>X5GON Project</h4>
+              <p class="link">
+                <a href="https://www.x5gon.org/">X5GON Project Home Page
+                  <span>
+                    <i class="fas fa-external-link-alt"></i>
+                  </span>
+                </a>
+              </p>
+              <p class="link">
+                <a href="/privacy-policy">Privacy Policy</a>
+              </p>
+
+              <p class="social-network">
+                <a class="mr-1" href="https://www.facebook.com/openingupslovenia/">
+                  <i class="fab fa-facebook-square"></i>
+                </a>
+                <a class="mr-1" href="https://twitter.com/OpenupSLO">
+                  <i class="fab fa-twitter-square"></i>
+                </a>
+              </p>
+
+
+            </div>{{! .col-md.content}}
+
+
+            <div class="col-md">
+
+              <h4>Contacts</h4>
+              <div class="row">
+
+                <div class="col-md-6">
+                  <p class="contact">
+                    General Enquiries
+                    <br>
+                    <a href="mailto:info@x5gon.org">info@x5gon.org</a>
+                  </p>
+                  <p class="contact">
+                    Partnering Projects and Industrial Relations
+                    <br>
+                    <a href="mailto:partnering@x5gon.org">partnering@x5gon.org</a>
+                  </p>
+                </div>
+
+                <div class="col-md-6">
+                  <p class="contact">
+                    Project Coordination
+                    <br>
+                    <a href="mailto:admin@x5gon.org">admin@x5gon.org</a>
+                  </p>
+                  <p class="contact">
+                    Press Enquiries
+                    <br>
+                    <a href="mailto:press@x5gon.org">press@x5gon.org</a>
+                  </p>
+                </div>
+
+              </div>{{! .row }}
+
+            </div>{{! .col-md.content }}
+
+
+          </div>{{! .row }}
+          <div class="row">
+            <div class="col text-center">
+              <span class="copyright">© X5gon</span>
+            </div>
+          </div>
+
+        </div>{{! .container }}
+
+      </div>{{! .col }}
+    </div>{{! .row }}
+  </footer>{{! .container-fluid }}
+
+</body>
+
+</html>

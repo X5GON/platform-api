@@ -15,10 +15,10 @@ const request = require('request');
 const querystring = require('querystring');
 
 // internal modules
-const Logger = require('../lib/utils/logging-handler')();
+const Logger = require('../lib/logging-handler')();
 
 // configurations
-const wikiConfig = require('../config/wikiconfig');
+const wikiConfig = require('../server/preproc/config/wikiconfig');
 
 // create a logger instance for logging recommendation requests
 const logger = Logger.createGroupInstance('recommendation-model-build', 'x5recommend');
@@ -138,9 +138,9 @@ function enrichLecture(lecture, callback) {
  *******************************************/
 
 // initialize database
-let x5recommend = new (require('../lib/x5recommend'))({
+let x5recommend = new (require('../server/recsys/engine/x5recommend'))({
     mode: 'createClean',
-    path: '../../data/x5recommend'
+    path: '../../data/recsys'
 });
 
 // get lectures data
@@ -201,7 +201,7 @@ while (!lecturesFIn.eof) {
 }
 
 // run all tasks
-async.parallelLimit(tasks, 5, (error, results) => {
+async.parallelLimit(tasks, 10, (error, results) => {
     for (let lecture of results) {
         // feed the recommender database
         let numberOfLectures = x5recommend.pushRecordContent(lecture);

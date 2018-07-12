@@ -60,6 +60,7 @@ typings/
 # ignore additional files
 data
 backup
+examples
 
 **/config
 

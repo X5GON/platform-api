@@ -9,7 +9,7 @@ module.exports = function (app, pg, logger) {
     ////////////////////////////////////////
     // API Routes
     ////////////////////////////////////////
-    
-    // user activity data handling
-    app.use('/api/v1', require('./v1/activity-logging')(pg, logger)); 
+
+    app.use('/', require('./v1/website')(pg, logger)); // website request handling
+    app.use('/api/v1', require('./v1/activity-logging')(pg, logger)); // user activity data handling
 };

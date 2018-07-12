@@ -99,3 +99,47 @@ exports.createDirectoryPath = function(dirPath) {
         exports.createFolder(currentDir);
     }
 };
+
+/**
+ * Find all files in a folder that follow a given rule and execute a method on them.
+ * @param {String} startPath - The folder in which we search for files.
+ * @param {RegExp} filter - A regular expression used to check file name.
+ * @param {Function} callback - The function to execute on the file.
+ */
+exports.executeOnFiles = function (startPath, filter, callback) {
+    // check if directory exists
+    if (!fs.existsSync(startPath)) {
+        throw new Error(`directory given by startPath does not exist: ${startPath}`);
+    }
+
+    // get all file names and iterate through
+    let files = fs.readdirSync(startPath);
+    for (let file of files) {
+        let filename = path.join(startPath, file);
+        let stat = fs.lstatSync(filename);
+        // check if file is a directory
+        if (stat.isDirectory()) {
+            // recursive check if it contains files 
+            exports.executeOnFiles(filename, filter, callback);
+        }
+        // if file name matches the filter - execute callback
+        else if (filter.test(file)) { callback(filename); }
+    }
+};
+
+/**
+ * Return the content of the given file.
+ * @param {String} filePath - The file to be read.
+ * @returns {String} The content of the file.
+ */
+exports.getFileContent = function (filePath) {
+    // check if file exists
+    if (!fs.existsSync(filePath)) {
+        throw new Error(`file does not exist: ${filePath}`);
+    }
+    // read the file and return it's content
+    return fs.readFileSync(filePath, 'utf8');
+};
+
+
+
