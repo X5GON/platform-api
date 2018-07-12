@@ -76,7 +76,6 @@ module.exports = function (pg, logger) {
         // check if the user was successfully validated by google captcha
         // this is used only when redirected from POST /repository
         const invalid = req.query.invalid ? req.query.invalid == 'true' : false;
-
         const recaptchaSiteKey = gConfig.reCaptcha.siteKey;
         return res.render('application-form', { recaptchaSiteKey, invalid });
     });
@@ -85,11 +84,16 @@ module.exports = function (pg, logger) {
         // get token used for accessing data
         const name = req.query.name;
         const token = req.query.providerId;
+        const referrer = req.header('Referrer') ? 
+            req.header('Referrer').split('?')[0] : 
+            '/application-form';
         // check if the repository already exists - return existing token
         pg.select({ name, token }, 'repositories', (error, results) => {
-            const referrer = req.header('Referrer') ? req.header('Referrer').split('?')[0] : '/application-form';
             if (error) { 
-                console.log(error);
+                logger.warn('error when retrieving repository data from table=repositories', {
+                    table: 'repositories',
+                    error
+                });
                 res.redirect(`${referrer}?invalid=true`);
              }
             
@@ -183,13 +187,10 @@ module.exports = function (pg, logger) {
 
         let queryString = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
         request(`http://localhost:8080/api/recommend/content?${queryString}`, (error, httpRequest, body) => {
+            if (error) {  }
             const recommendations = JSON.parse(body);
-            if (recommendations.length === 0) {
-                options.empty = true;
-            } else {
-                options.empty = false;
-                options.recommendations = recommendations;
-            }
+            options.empty = recommendations.length === 0 ? false : true;
+            options.recommendations = recommendations;
             return res.render('recommendations', options);
         });
     });
