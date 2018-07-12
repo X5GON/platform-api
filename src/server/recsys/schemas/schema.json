@@ -2,14 +2,14 @@
     "name": "Content",
     "fields": [
         { "name": "link", "type": "string", "primary": true },
-        { "name": "type", "type": "string", "shortstring": true },
         { "name": "title", "type": "string" },
         { "name": "description", "type": "string", "null": true },
-        { "name": "created", "type": "datetime", "null": true },
+        { "name": "rawContent", "type": "string", "null": true },
         { "name": "authors", "type": "string_v", "null": true },
         { "name": "provider", "type": "string", "shortstring": true },
         { "name": "metadata", "type": "json", "null": true },
-        { "name": "languages", "type": "string_v", "shortstring": true }
+        { "name": "extension", "type": "string", "null": true },
+        { "name": "language", "type": "string", "shortstring": true }
     ],
     "joins": [
         { "name": "concepts", "type": "index", "store": "Wikipedia", "inverse": "inContent" },

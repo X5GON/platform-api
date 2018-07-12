@@ -9,7 +9,7 @@ const qm = require('qminer');
 
 // internal modules
 const NearestNeighbor = require('./models/nearest-neighbors');
-const Logger = require('../../lib/logging-handler')();
+const Logger = require('../../../lib/logging-handler')();
 
 // create a logger instance for logging recommendation requests
 const logger = Logger.createGroupInstance('recommendation-requests', 'x5recommend');
@@ -56,7 +56,7 @@ class x5recommend {
         if (self.params.mode === 'create' || self.params.mode === 'createClean') {
             // open database in create mode - create the database from scratch
             baseParams.mode = self.params.mode;
-            baseParams.schema = require(path.join(__dirname, '/schemas/schema'));
+            baseParams.schema = require(path.join(__dirname, '../schemas/schema'));
         } else if (self.params.mode === 'open') {
             // open database in open mode - allowing records to be pushed to stores
             baseParams.mode = 'open';
@@ -119,7 +119,7 @@ class x5recommend {
             modelPath: path.join(self.params.path, '/contentTextNN.dat'),
             store: self.content,
             features: [{
-                type: 'text', source: 'Content', field: ['title', 'description'],
+                type: 'text', source: 'Content', field: ['title', 'description', 'rawContent'],
                 ngrams: 2, hashDimension: 200000
             }]
         });
@@ -199,27 +199,33 @@ class x5recommend {
 
     /**
      * Get content based recommendations.
-     * @param {Object} queryObject - The object containing the required query parameters.
-     * @param {String} [queryObject.text] - The text parameter. Finds material containing similar text.
-     * @param {String} [queryObject.url] - The url parameter. Finds the material found using the url and 
+     * @param {Object} query - The object containing the required query parameters.
+     * @param {String} [query.text] - The text parameter. Finds material containing similar text.
+     * @param {String} [query.url] - The url parameter. Finds the material found using the url and 
      * returns material similar to it.
      * @returns {Array.<Object>} An array of recommended learning material.
      */
-    recommendContent(queryObject) {
+    recommendContent(query) {
         let self = this;
         // distinguish between the url and title & description query methods
         let recommendations;
+        
+        if (query.url) {
+            // get recommendations based on wikipedia concepts using url
+            recommendations = self.contentWikiNN.search({ url: query.url }, self.content);
+        }
 
-        if (queryObject.text) {
-            // return the recommendation based on the query
-            recommendations = self.contentTextNN.search(queryObject, self.content);
-        } else if (queryObject.url) {
-            // return the recommendation based on the query
-            recommendations = self.contentWikiNN.search(queryObject, self.content);
-        } else {
+        if (query.text && (!recommendations || (recommendations && !recommendations[0].length))) {
+            // there were no recommendations found for given url 
+            // - try with content based recommendations
+            recommendations = self.contentTextNN.search({ text: query.text }, self.content);
+        }
+       
+        if ((query.url || query.text) && !recommendations) {
+            // log the error for unsupported parameters
             let errorMessage = 'Unsupported recommendation parameters';
             logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, { 
-                error: errorMessage, queryObject 
+                error: errorMessage, query 
             });
             // not supported query option - return error
             return { error: 'Unsupported recommendation parameters' };
