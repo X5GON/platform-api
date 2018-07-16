@@ -42,7 +42,13 @@ module.exports = function (pg, logger) {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, '../../snippet/images/beacon.png');
         // get query parameters
-        let userParameters = req.query;
+        let userParameters = { }; ;
+
+        userParameters.x5gonValidated = decodeURIComponent(req.query.x5gonValidated);
+        userParameters.dt = decodeURIComponent(req.query.dt);
+        userParameters.rq = decodeURIComponent(req.query.rq);
+        userParameters.rf = decodeURIComponent(req.query.rf);
+        userParameters.cid = decodeURIComponent(req.query.cid);
 
         // validate query schema
         if (!Object.keys(userParameters).length ||
