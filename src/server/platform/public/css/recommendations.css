@@ -43,6 +43,9 @@
     background-color: #e6e6e6;
 }
 
+.recommendations .material-content .fa-circle {
+    color: #5b95a5;
+}
 
 .recommendations .material-content small {
     color: gray;

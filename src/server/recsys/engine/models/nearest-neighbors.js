@@ -91,42 +91,50 @@ class NearestNeighbors {
      */
     search(query, store, maxCount=100, minSim=0.05) {
         let self = this;
-        // transform the query json into a sparse vector
-        let queryRec = query.url ? 
-            store.recordByName(query.url) :
-            store.newRecord({ description: query.text });
 
-        if (!queryRec) { 
-            // there is no record in the record set containing the url
-            // return an empty record set with weights
-            // TODO: tell the user of the missing record
-            return [store.newRecordSet(), []]; 
+        try {
+            // transform the query json into a sparse vector
+            let queryRec = query.url ? 
+                store.recordByName(query.url) :
+                store.newRecord({ description: query.text });
+        
+            if (!queryRec) { 
+                // there is no record in the record set containing the url
+                // return an empty record set with weights
+                // TODO: tell the user of the missing record
+                return [store.newRecordSet(), []]; 
+            }
+
+            let vector = self.featureSpace.extractSparseVector(queryRec);
+
+            // calculate similarities between query vector and content
+            let sim = self.matrix.multiplyT(vector);
+            let sort = sim.sortPerm(false);
+            let idVec = qm.la.IntVector();
+            let simVec = [ ];
+
+            if (maxCount > sort.perm.length) {
+                // the threshold is larger than the similarity vector
+                maxCount = sort.perm.length;
+            }
+
+            for (let i = 0; i < maxCount; i++) {
+                // get content id of (i+1)-th most similar content
+                let maxid = sort.perm[i];
+                // stop if similarity to small
+                if (sim[maxid] < minSim) { break; }
+                // skip the record used to find recommendations
+                if (query.url && maxid === queryRec.$id) { continue; }
+                // else remember the content and it's similarity
+                idVec.push(maxid);
+                simVec.push(sim[maxid]);
+            }
+
+            // return the record set and their similarities
+            return [store.newRecordSet(idVec), simVec];
+        } catch (error) {
+            return { error: error.message };
         }
-
-        let vector = self.featureSpace.extractSparseVector(queryRec);
-        // calculate similarities between query vector and content
-        let sim = self.matrix.multiplyT(vector);
-        let sort = sim.sortPerm(false);
-        let idVec = qm.la.IntVector();
-        let simVec = [ ];
-
-        if (maxCount > sort.perm.length) {
-            // the threshold is larger than the similarity vector
-            maxCount = sort.perm.length;
-        }
-
-        for (let i = 0; i < maxCount; i++) {
-            // get content id of (i+1)-th most similar content
-            let maxid = sort.perm[i];
-            // stop if similarity to small
-            if (sim[maxid] < minSim) { break; }
-            // else remember the content and it's similarity
-            idVec.push(maxid);
-            simVec.push(sim[maxid]);
-        }
-
-        // return the record set and their similarities
-        return [store.newRecordSet(idVec), simVec];
     }
 
 }
