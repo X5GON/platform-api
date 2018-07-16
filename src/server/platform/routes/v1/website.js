@@ -181,12 +181,15 @@ module.exports = function (pg, logger) {
         let options = { layout: 'empty' };
         let queryString = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
         request(`http://localhost:8080/api/recommend/content?${queryString}`, (error, httpRequest, body) => {
-            if (error) {  }
-            const recommendations = JSON.parse(body);
-            console.log(recommendations);
-            options.empty = recommendations.length === 0 || recommendations.error ? false : true;
-            options.recommendations = recommendations;
-            return res.render('recommendations', options);
+            try {
+                const recommendations = JSON.parse(body);
+                options.empty = recommendations.length === 0 || recommendations.error ? false : true;
+                options.recommendations = recommendations;
+                return res.render('recommendations', options);
+            } catch(xerror) {
+                options.empty = true;
+                return res.render('recommendations', options);
+            }
         });
     });
 
