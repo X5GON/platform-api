@@ -28,7 +28,7 @@ var x5gonActivityTracker = function () {
     var CURL = document.URL;
     var PURL = document.referrer;
 
-    var request = 'http://platform.x5gon.org/api/v1/snippet/log?x5gonValidated=';
+    var request = 'https://platform.x5gon.org/api/v1/snippet/log?x5gonValidated=';
     request += encodeURIComponent(validationFlag);
     request += '&dt=' + encodeURIComponent(Dt);
     request += '&rq=' + encodeURIComponent(CURL);
