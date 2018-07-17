@@ -90,7 +90,7 @@ var x5gonActivityTracker = function () {
     var CURL = document.URL;
     var PURL = document.referrer;
 
-    var request = 'http://platform.x5gon.org/api/v1/snippet/log?x5gonValidated=';
+    var request = 'https://platform.x5gon.org/api/v1/snippet/log?x5gonValidated=';
     request += encodeURIComponent(validationFlag);
     request += '&dt=' + encodeURIComponent(Dt);
     request += '&rq=' + encodeURIComponent(CURL);
@@ -120,7 +120,7 @@ function x5gonValidate() {
     // check if the user has been validated
     var validation = x5gonGetCookie('x5gonValidated');
     if (validation === null || validation === '') {
-      window.location.href='http://platform.x5gon.org/api/v1/snippet/tracker?callbackURL=' +
+      window.location.href='https://platform.x5gon.org/api/v1/snippet/tracker?callbackURL=' +
         document.URL;
     }
   }
