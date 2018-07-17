@@ -20,7 +20,16 @@ let commands = [
     'CREATE INDEX IF NOT EXISTS repositories_name_idx ON repositories(name);',
     'CREATE INDEX IF NOT EXISTS repositories_domain_idx ON repositories(domain);',
     'CREATE INDEX IF NOT EXISTS repositories_contact_idx ON repositories(contact);',
-    'CREATE INDEX IF NOT EXISTS repositories_token_idx ON repositories(token);'
+    'CREATE INDEX IF NOT EXISTS repositories_token_idx ON repositories(token);',
+    // oer materials and metadata
+    `CREATE TABLE IF NOT EXISTS oer_materials (id serial PRIMARY KEY, title varchar NOT NULL, 
+        description varchar, providerUri varchar NOT NULL,
+        materialUrl varchar NOT NULL, author varchar, language varchar NOT NULL,
+        dateCreated timestamp with time zone, dateRetrieved timestamp with time zone, 
+        type jsonb, providerMetadata jsonb NOT NULL, 
+        materialMetadata jsonb NOT NULL);`,
+    'CREATE INDEX IF NOT EXISTS oer_materials_materialUrl_idx ON oer_materials(materialUrl);',
+    'CREATE INDEX IF NOT EXISTS oer_materials_type_idx ON oer_materials(type);'
 ];
 
 // execute them one by one

@@ -1,0 +1,43 @@
+{{#if empty}}
+  <div class="recommendations width-restriction">
+    {{#each recommendations as | material index |}}
+    <a class="material" href="{{material.url}}" target="_top">
+      <table class="material-content">
+        <body>
+          <tr>
+            <td class="p-1">
+              {{#if videoType}}
+                <span class="fa-stack fa-lg">
+                  <i class="fas fa-circle fa-stack-2x"></i>
+                  <i class="fas fa-video fa-stack-1x fa-inverse"></i>
+                </span>
+              {{else if audioType}}
+                <span class="fa-stack fa-lg">
+                  <i class="fas fa-circle fa-stack-2x"></i>
+                  <i class="fas fa-audio fa-stack-1x fa-inverse"></i>
+                </span>
+              {{else}}
+                <span class="fa-stack fa-lg">
+                  <i class="fas fa-circle fa-stack-2x"></i>
+                  <i class="fas fa-file-alt fa-stack-1x fa-inverse"></i>
+                </span>
+              {{/if}}
+            </td>
+            <td class="w-100 p-1">
+              <strong>{{material.title}}</strong>
+              <br>
+              <small>{{material.provider}}</small>
+              <small class="float-right">{{material.type}}</small>
+            </td>
+          </tr>
+        </body>
+      </table>
+    </a>
+    {{/each}}
+  </div>
+  <div class="footer text-right width-restriction">
+    <small>Powered by
+      <a href="https://www.x5gon.org/" target="_blank">X5GON Project</a>
+    </small>
+  </div>
+{{/if}}

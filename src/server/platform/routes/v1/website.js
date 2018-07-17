@@ -1,6 +1,5 @@
 // external modules
 const router = require('express').Router();
-const handlebars = require('handlebars');
 const request = require('request');
 
 // google verification configuration
@@ -62,23 +61,55 @@ function _generateToken(seed) {
  */
 module.exports = function (pg, logger) {
 
+
+    /********************************************
+     * PORTAL PAGES
+     */
+
     router.get('/', (req, res) => {
         // currently redirect to form page
-        res.redirect('/form');
+        res.redirect('/application-form');
     });
 
     // send application form page
-    router.get('/form', (req, res) => {
+    router.get('/application-form', (req, res) => {
         // check if the user was successfully validated by google captcha
         // this is used only when redirected from POST /repository
         const invalid = req.query.invalid ? req.query.invalid == 'true' : false;
-
         const recaptchaSiteKey = gConfig.reCaptcha.siteKey;
-        return res.render('index', { recaptchaSiteKey, invalid });
+        return res.render('application-form', { recaptchaSiteKey, invalid });
+    });
+
+    router.get('/oer-provider', (req, res) => {
+        // get token used for accessing data
+        const name = req.query.name;
+        const token = req.query.providerId;
+        const referrer = req.header('Referrer') ? 
+            req.header('Referrer').split('?')[0] : 
+            '/application-form';
+        // check if the repository already exists - return existing token
+        pg.select({ name, token }, 'repositories', (error, results) => {
+            if (error) { 
+                logger.warn('error when retrieving repository data from table=repositories', {
+                    table: 'repositories',
+                    error
+                });
+                res.redirect(`${referrer}?invalid=true`);
+             }
+            
+            if (results.length === 0) {
+                return res.redirect(`${referrer}?invalid=true`);
+            } else {
+                // there are registered repositories in the database
+                const { name, domain, contact, token } = results[0];
+                // render the form submition
+                return res.render('oer-provider', { name, domain, contact, token });
+            }
+        });
     });
 
     // send repository
-    router.post('/repository', (req, res) => {
+    router.post('/oer-provider', (req, res) => {
         // get body request
         const body = req.body;
 
@@ -93,7 +124,7 @@ module.exports = function (pg, logger) {
             .then(validation => {
 
                 // if not validated - redirect to application form
-                if (!validation.success) { return res.redirect('/form?invalid=true'); }
+                if (!validation.success) { return res.redirect('/application-form?invalid=true'); }
 
                 // check if the repository already exists - return existing token
                 pg.select({ name, domain, contact }, 'repositories', (error, results) => {
@@ -111,14 +142,14 @@ module.exports = function (pg, logger) {
                         // insert repository information to postgres
                         pg.insert({ name, domain, contact, token }, 'repositories', (xerror, xresults) => {
                             // render the form submition
-                            return res.render('repository', { name, domain, contact, token });
+                            return res.redirect(`/oer-provider?name=${name}&providerId=${token}`);
                         });
 
                     } else {
                         // there are registered repositories in the database
-                        const { name, domain, contact, token } = results[0];
+                        const { token } = results[0];
                         // render the form submition
-                        return res.render('repository', { name, domain, contact, token });
+                        return res.redirect(`/oer-provider?name=${name}&providerId=${token}`);
                     }
                 });
             })
@@ -127,6 +158,45 @@ module.exports = function (pg, logger) {
                 console.log(error);
             });
     });
+
+    router.get('/oer-provider/login', (req, res) => {
+        const invalid = req.query.invalid;
+        return res.render('oer-provider-login', { invalid });
+    });
+
+    // send application form page
+    router.get('/privacy-policy', (req, res) => {
+        return res.render('privacy-policy', { });
+    });
+
+
+    /********************************************
+     * RECOMMENDATION EMBEDDINGS 
+     */
+
+    // send application form page
+    router.get('/embed/recommendations', (req, res) => {
+        const query = req.query;
+
+        let options = { layout: 'empty' };
+        let queryString = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
+        request(`http://localhost:8080/api/recommend/content?${queryString}`, (error, httpRequest, body) => {
+            try {
+                const recommendations = JSON.parse(body);
+                options.empty = recommendations.length === 0 || recommendations.error ? false : true;
+                options.recommendations = recommendations;
+                return res.render('recommendations', options);
+            } catch(xerror) {
+                options.empty = true;
+                return res.render('recommendations', options);
+            }
+        });
+    });
+
+    router.get('/error', (req, res) => {
+        return res.render('privacy-policy', { });
+    });
+
 
     return router;
 };

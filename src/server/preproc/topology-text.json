@@ -1,0 +1,80 @@
+{
+    "general": {
+        "heartbeat": 1000
+    },
+    "spouts": [
+        {
+            "name": "crawler-input",
+            "type": "sys",
+            "working_dir": ".",
+            "cmd": "rest",
+            "init": {
+                "port": 7500
+            }
+        },
+        {
+            "name": "file-reader",
+            "working_dir": ".",
+            "type": "sys",
+            "cmd": "file_reader",
+            "init": {
+                "file_name": "../../../../../datasets/x5gon/oer/unibo/unibo-clean.json",
+                "file_format": "json"
+            }
+        }
+    ],
+    "bolts": [
+        {
+            "name": "material-format",
+            "type": "inproc",
+            "working_dir": "./components",
+            "cmd": "material-format.js",
+            "inputs": [
+                { "source": "crawler-input" },
+                { "source": "file-reader" }
+            ],
+            "init": {}
+        },
+        {
+            "name": "text-extract",
+            "type": "inproc",
+            "working_dir": "./components",
+            "cmd": "text-extract.js",
+            "inputs": [
+                { "source": "material-format" }
+            ],
+            "init": {}
+        },
+        {
+            "name": "wikification",
+            "type": "inproc",
+            "working_dir": "./components",
+            "cmd": "wikification.js",
+            "inputs": [
+                { "source": "text-extract" }
+            ],
+            "init": {}
+        },
+        {
+            "name": "material-validator",
+            "type": "inproc",
+            "working_dir": "./components",
+            "cmd": "material-validator.js",
+            "inputs": [
+                { "source": "wikification" }
+            ],
+            "init": {}
+        },
+        {
+            "name": "postgresql-storage",
+            "type": "inproc",
+            "working_dir": "./components",
+            "cmd": "postgresql-storage.js",
+            "inputs": [
+                { "source": "material-validator" }
+            ],
+            "init": {}
+        }
+    ],
+    "variables": {}
+}

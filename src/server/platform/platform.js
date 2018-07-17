@@ -3,14 +3,11 @@
  */
 
 // external modules
-const https = require('https');
 const express = require('express');
-const helmet = require('helmet');
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const fs = require('fs');
 
 
 // internal modules
@@ -43,8 +40,7 @@ app.use(session({
 
 // add the public folder
 app.use(express.static(__dirname + '/public/'));
-// secure Express server through setting HTTP headers
-app.use(helmet());
+
 // set rendering engine
 app.engine('hbs', exphbs({
     extname: 'hbs',
@@ -53,6 +49,7 @@ app.engine('hbs', exphbs({
 app.set('view engine', 'hbs');
 
 // TODO: handle redirections - using proxy
+require('./routes/proxy')(app);
 
 // cookie parser
 app.use(cookieParser(argv['session-secret']));
@@ -66,15 +63,5 @@ const PORT = argv.PORT || 8080;
 // security options
 const security = require('./config/security');
 
-if (security['ssl-certificate']) {
-    // set https options and run the server
-    const sslOptions = {
-        cert: fs.readFileSync(security['ssl-certificate'].cert, 'utf8'),
-        key: fs.readFileSync(security['ssl-certificate'].key, 'utf8')
-    };
-    https.createServer(sslOptions, app).listen(PORT);
-    logger.info(`platform listening on port ${PORT}`);
-} else {
-    // start the server without https
-    app.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));
-}
+// start the server without https
+app.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));

@@ -180,7 +180,7 @@ class PostgreSQL {
             async.whilst(
                 () => { return (batchSize == lastBatch); },
                 (xcallback) => {
-                    cursor.read( batchSize, (err, rows) => {
+                    cursor.read(batchSize, (err, rows) => {
                         if (err) {
                             lastBatch = 0;
                         } else {
@@ -192,7 +192,7 @@ class PostgreSQL {
                         xcallback(err);
                     });
                 },
-                (err) => { cursor.close(() => { client.release(); }); callback(err); done(); }
+                (err) => { cursor.close(); callback(err); done(); }
             );
         });
     }
