@@ -42,7 +42,7 @@ module.exports = function (pg, logger) {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, '../../snippet/images/beacon.png');
         // get query parameters
-        let userParameters = { }; ;
+        let userParameters = { };
 
         userParameters.x5gonValidated = decodeURIComponent(req.query.x5gonValidated);
         userParameters.dt = decodeURIComponent(req.query.dt);
@@ -110,7 +110,7 @@ module.exports = function (pg, logger) {
 
         // get the file name
         let originalUrl = req.originalUrl.split('/');
-        const file = originalUrl[originalUrl.length - 1];
+        const file = originalUrl[originalUrl.length - 1].split('?')[0];
         // create the file path
         const filePath = path.join(__dirname, `../../snippet/global/${version}/${file}`);
 
