@@ -10,7 +10,7 @@ const https = require('https');
 const fileType = require('file-type');
 
 // internal libraries
-const Logger = require('../../../lib/logging-handler')();
+const Logger = require('../../../../lib/logging-handler')();
 // create a logger instance for logging wikification process
 const logger = Logger.createGroupInstance('material-format', 'preproc');
 
@@ -82,6 +82,7 @@ class MaterialFormat {
             return this._onEmit(formatedMaterial, stream_id, callback);
         } else {
             response.on('data', chunk => {
+                console.log(chunk);
                 response.destroy();
                 formatedMaterial.type = fileType(chunk);
                 // log material formating process

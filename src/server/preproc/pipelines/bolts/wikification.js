@@ -8,15 +8,14 @@
 // external modules
 const async = require('async');
 const request = require('request');
-const querystring = require('querystring');
 
 // internal libraries
-const Logger = require('../../../lib/logging-handler')();
+const Logger = require('../../../../lib/logging-handler')();
 // create a logger instance for logging wikification process
 const logger = Logger.createGroupInstance('wikification', 'preproc');
 
 // configurations
-const wikiConfig = require('../config/wikiconfig');
+const wikiConfig = require('../../config/wikiconfig');
 
 /********************************************
  * Helper functions

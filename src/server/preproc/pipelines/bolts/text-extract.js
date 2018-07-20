@@ -8,7 +8,7 @@ const textract = require('textract');
 const franc = require('franc');
 
 // internal libraries
-const Logger = require('../../../lib/logging-handler')();
+const Logger = require('../../../../lib/logging-handler')();
 // create a logger instance for logging wikification process
 const logger = Logger.createGroupInstance('text-extract', 'preproc');
 

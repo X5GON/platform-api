@@ -7,8 +7,8 @@
 const franc = require('franc');
 
 // internal libraries
-const dfxp2srt = require('../../../lib/python-dfxp2srt');
-const Logger = require('../../../lib/logging-handler')();
+const dfxp2srt = require('../../../../lib/python-dfxp2srt');
+const Logger = require('../../../../lib/logging-handler')();
 // create a logger instance for logging wikification process
 const logger = Logger.createGroupInstance('dfxp-extract', 'preproc');
 
@@ -44,7 +44,7 @@ class DfxpExtract {
 
         // get the raw text associated with the videos
         try {
-            let promise = dfxp2srt(material.slug, `../../../data/videolectures/data`);
+            let promise = dfxp2srt(material.slug, `../../../../data/videolectures/data`);
             // get the responses
             promise.then(data => {
                 material.materialMetadata.dfxp = data;
