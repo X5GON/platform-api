@@ -57,10 +57,10 @@
             "init": {}
         },
         {
-            "name": "bolt-console",
-            "type": "sys",
-            "working_dir": ".",
-            "cmd": "console",
+            "name": "postgresql-storage",
+            "type": "inproc",
+            "working_dir": "./bolts",
+            "cmd": "postgresql-storage.js",
             "inputs": [
                 { "source": "material-validator" }
             ],

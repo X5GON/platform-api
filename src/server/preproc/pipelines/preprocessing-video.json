@@ -17,10 +17,10 @@
     ],
     "bolts": [
         {
-            "name": "videolectures-format",
+            "name": "material-format",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "videolectures-format.js",
+            "cmd": "material-format.js",
             "inputs": [
                 { "source": "video-input" }
             ],
@@ -32,7 +32,7 @@
             "working_dir": "./bolts",
             "cmd": "dfxp-extract.js",
             "inputs": [
-                { "source": "videolectures-format" }
+                { "source": "material-format" }
             ],
             "init": {}
         },

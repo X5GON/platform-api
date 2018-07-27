@@ -16,7 +16,7 @@ class VideolecturesAPI extends BasicAPI {
      * @param {String} args.apikey - The key used to make the request.
      */
     constructor(args) {
-        args.domain = 'http://videolectures.net/';
+        args.domain = 'http://videolectures.net';
         super(args);
     }
 
@@ -61,15 +61,38 @@ class VideolecturesAPI extends BasicAPI {
                         return callback(error, material);
                     }
 
+                    const oerMaterials = [];
                     // include attachments to corresponding video
                     for (let attachments of content) {
-                        for (let video of material.videos) {
-                            if (video.id === attachments.id) { video.attachments = attachments; }
+                        for (let file of attachments.attachments) {
+                            if (file.type_display && (
+                                file.type_display.includes('Slide Presentation') ||
+                                file.type_display.includes('Video - generic video source'))) {
+                                oerMaterials.push({
+                                    title: material.title,
+                                    description: material.description,
+                                    providerUri: `${this.domain}/${material.slug}/`,
+                                    materialUrl: file.src,
+                                    author: material.authors,
+                                    language: material.language,
+                                    type: { ext: file.ext, mime: file.mimetype },
+                                    dateCreated: material.time,
+                                    dateRetrieved: (new Date()).toISOString(),
+                                    providerMetadata: {
+                                        title: 'Videolectures.NET',
+                                        url: this.domain
+                                    },
+                                    license: {
+                                        title: 'Creative Commons Attribution-Noncommercial-No Derivative Works 3.0',
+                                        url: 'https://creativecommons.org/licenses/by-nc-nd/3.0/legalcode'
+                                    }
+                                });
+                            }
                         }
                     }
 
                     // return the material through the callback
-                    return callback(null, material);
+                    return callback(null, oerMaterials);
 
                 }).catch(error => { return callback(error); });
 

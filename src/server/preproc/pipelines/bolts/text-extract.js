@@ -57,8 +57,6 @@ class TextExtract {
                 }
                 // save the raw text within the metadata
                 material.materialMetadata.rawText = text;
-                // ISO 639-2 Language Code 
-                material.language = franc(text);
                 // log successful text extraction
                 logger.info('extracting raw text from material successful', { materialUrl: material.materialUrl });
                 // send material object to next component

@@ -44,27 +44,25 @@ class DfxpExtract {
 
         // get the raw text associated with the videos
         try {
-            let promise = dfxp2srt(material.slug, `../../../../data/videolectures/data`);
+            let slug = material.providerUri.split('/')[3];
+            let promise = dfxp2srt(slug, `../../../../data/videolectures/data`);
             // get the responses
             promise.then(data => {
                 material.materialMetadata.dfxp = data;
                 material.materialMetadata.rawText = data.map(obj => obj.rawText).join(' ');
-                // ISO 639-2 Language Code 
-                material.language = franc(material.materialMetadata.rawText);
-                delete material.slug;
                 logger.info('raw text extraction from material successful', { materialUrl: material.materialUrl });
                 return this._onEmit(material, stream_id, callback);
             }).catch(error => {
-                logger.error('unable to extract raw text from material', { 
-                    materialUrl: material.materialUrl, 
-                    error: error.message 
+                logger.error('unable to extract raw text from material', {
+                    materialUrl: material.materialUrl,
+                    error: error.message
                 });
                 return callback();
             });
         } catch (error) {
-            logger.error('unable to extract raw text from material', { 
-                materialUrl: material.materialUrl, 
-                error: error.message 
+            logger.error('unable to extract raw text from material', {
+                materialUrl: material.materialUrl,
+                error: error.message
             });
             return callback();
         }

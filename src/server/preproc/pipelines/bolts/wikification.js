@@ -31,7 +31,7 @@ function _wikipediaRequest(text) {
     // create a request promise
     return new Promise((resolve, reject) => {
         request.post({
-            url: `${wikiConfig.wikifierUrl}/annotate-article`, 
+            url: `${wikiConfig.wikifierUrl}/annotate-article`,
             form: {
                 text: text,
                 lang: 'auto',
@@ -54,7 +54,7 @@ function _wikipediaRequest(text) {
 /**
  * Extracts wikipedia concepts from the given text.
  * @param {Object} text - The text to be wikified.
- * @param {Object} weight - The weight to be added to the material pageRank. Used 
+ * @param {Object} weight - The weight to be added to the material pageRank. Used
  * when text was sliced into chunks.
  * @param {Function} callback - The function called after all is done.
  */
@@ -67,7 +67,7 @@ function enrichMaterial(text, weight, callback) {
                 data = JSON.parse(data);
             } catch (error) {
                 // error when parsing response
-                logger.error('error [wikification.parsing]: unable to parse response', 
+                logger.error('error [wikification.parsing]: unable to parse response',
                     { error: error.message }
                 );
                 return callback(error);
@@ -88,7 +88,7 @@ function enrichMaterial(text, weight, callback) {
              *****************************/
 
             // calculate total pageRank from all concepts
-            let total = annotations.reduce((sum, currentConcept) => 
+            let total = annotations.reduce((sum, currentConcept) =>
                 sum + Math.pow(currentConcept.pageRank, 2), 0);
 
             // get top 80% concepts - noise reduction
@@ -102,7 +102,7 @@ function enrichMaterial(text, weight, callback) {
                     break;
                 }
             }
-            
+
             /******************************
              * prepare concepts
              *****************************/
@@ -115,9 +115,11 @@ function enrichMaterial(text, weight, callback) {
                     name: concept.title.toString(),
                     secUri: concept.secUrl || null,
                     secName: concept.secTitle || null,
+                    lang: concept.lang,
                     wikiDataClasses: concept.wikiDataClasses,
                     cosine: concept.cosine,
-                    pageRank: concept.pageRank * weight
+                    pageRank: concept.pageRank * weight,
+                    dbPediaIri: concept.dbPediaIri
                 };
             });
             // return the concept list
@@ -125,7 +127,7 @@ function enrichMaterial(text, weight, callback) {
         })
         .catch(error => {
             // TODO: log error and cleanup lecture object
-            logger.error('error [wikification.concepts]: unable to prepare concepts', 
+            logger.error('error [wikification.concepts]: unable to prepare concepts',
                 { error: error.message }
             );
             return callback(error);
@@ -159,7 +161,7 @@ class Wikification {
     }
 
     receive(material, stream_id, callback) {
-        // TODO: get the raw text from the material 
+        // TODO: get the raw text from the material
         const fullText = material.materialMetadata.rawText; // this is just a placeholder
 
         if (!fullText) {
@@ -172,15 +174,15 @@ class Wikification {
         // split full text for wikification consumption
         let textIndex = 0,          // the text index - how much text was already processed
             maxTextLength = 10000;  // the length of the text chunk
-        
+
         // go through whole text
         while (fullText.length > textIndex) {
-            // get the text chunk 
+            // get the text chunk
             let textChunk = fullText.substring(textIndex, textIndex + maxTextLength);
             // there is not text to be processed, break the cycle
             if (textChunk.length === 0) { break; }
             if (textChunk.length === maxTextLength) {
-                // text chunk is of max length - make a cutoff at last  
+                // text chunk is of max length - make a cutoff at last
                 // end character to avoid cutting in the middle of sentence
                 let cutOffLastWhitespace;
 
@@ -212,7 +214,7 @@ class Wikification {
             });
         }
 
-        if (tasks.length === 0) { 
+        if (tasks.length === 0) {
             // there were no tasks generated for the material - skip wikification
             material.materialMetadata.wikipediaConcepts = [];
             //send it to the next component in the pipeline
@@ -222,7 +224,7 @@ class Wikification {
         // get wikipedia concepts of the material
         async.parallelLimit(tasks, 10, (error, concepts) => {
             if (error) {
-                // there was an error - it was already logged within the function  
+                // there was an error - it was already logged within the function
                 // just end the with a callback
                 logger.warn('unable to retrieve concepts', { materialUrl: material.materialUrl });
                 return this._onEmit(material, stream_id, callback);
@@ -242,8 +244,25 @@ class Wikification {
                     }
                 }
             }
-            // store merged concepts within the material object 
+            // store merged concepts within the material object
             material.materialMetadata.wikipediaConcepts = Object.values(conceptMap);
+
+            if (!material.language) {
+                // get the dominant language of the material
+                let languages = { };
+                for (let concept of material.materialMetadata.wikipediaConcepts) {
+                    if (languages[concept.lang]) {
+                        languages[concept.lang] += 1;
+                    } else {
+                        languages[concept.lang] = 1;
+                    }
+                }
+                // get the maximum language
+                material.language = Object.keys(languages)
+                    .reduce((a, b) => languages[a] > languages[b] ? a : b);
+            }
+
+
             //send it to the next component in the pipeline
             logger.info('acquired wikipedia concepts for material', { materialUrl: material.materialUrl });
             return this._onEmit(material, stream_id, callback);
