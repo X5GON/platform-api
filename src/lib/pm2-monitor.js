@@ -4,6 +4,21 @@
  * [http://pm2.keymetrics.io/docs/usage/pm2-api/].
  */
 
+function msToTime(s) {
+	let ms = s % 1000;
+	s = (s - ms) / 1000;
+	let secs = s % 60;
+	s = (s - secs) / 60;
+	let mins = s % 60;
+	s = (s - mins) / 60;
+	let hrs = s % 24;
+	s = (s - hrs) / 24;
+	let days = s;
+
+
+	return days + ' days ' + hrs + 'h ' + mins + 'min ' + secs + 's';
+}
+
 class PM2Monitor {
 
     /**
@@ -142,6 +157,9 @@ class PM2Monitor {
 				pm2_env: {
 					status: process.pm2_env.status,
 					created_at: process.pm2_env.created_at,
+					created_at_clean: (new Date(process.pm2_env.created_at)).toISOString(),
+					running_time: process.pm2_env.status === 'online' ?
+						msToTime(Date.now() - process.pm2_env.created_at) : 'not running',
 					pm_uptime: process.pm2_env.pm_uptime,
 					unstable_restarts: process.pm2_env.unstable_restarts,
 					restart_time: process.pm2_env.restart_time,

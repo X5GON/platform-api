@@ -4,11 +4,13 @@ const router = require('express').Router();
 /**
  * Adds API routes for platform website requests.
  */
-module.exports = function () {
+module.exports = function (monitor) {
 
     router.get('/', (req, res) => {
         // currently redirect to form page
-        res.render('index', { });
+        monitor.listProcesses((error, processList) => {
+            res.render('index', { processList });
+        });
     });
 
     return router;

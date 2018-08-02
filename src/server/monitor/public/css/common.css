@@ -1,0 +1,118 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    font-size: 14px;
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Roboto,Arial,sans-serif;
+    color: #323232;
+    padding-top: 5.5rem;
+    height: 100%;
+}
+
+body > main {
+    height: 100%;
+    padding-bottom: 400px;
+}
+
+@media screen and (max-width: 776px) {
+    body > main { padding-bottom: 630px; }
+}
+
+header .navbar {
+    background-color: #eaeaea;
+}
+
+header .navbar .navbar-brand img {
+    max-height: 33px;
+    margin-left: 0;
+}
+
+header .navbar .nav-link {
+    background-color: white;
+    transition: background .2s;
+    font-weight: 600;
+    color: #5b95a5;
+}
+
+header .navbar .nav-link:hover {
+    background-color: #f6f6f6;
+}
+
+header .navbar .nav-link.call-to-action {
+    background-color: #5b95a5;
+    color: white;
+    transition: background .2s;
+}
+
+header .navbar .nav-link.call-to-action:hover {
+    background-color: #456f7a;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    background-color: #5b95a5;
+    color: white;
+    font-size: 14px;
+}
+
+footer .funding {
+    font-size: 12px;
+    background-color: #eaeaea;
+    color: black;
+    padding: 16px 0 13px 0;
+}
+footer .funding .col { margin: 0px; }
+footer .funding p {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    line-height: 1.6;
+}
+
+footer .content {
+    padding: 16px 0 13px 0;
+}
+
+footer .link { margin-bottom: 10px; }
+footer .link a { color: white; }
+footer .link a:hover {
+    color: #e5e5e5;
+    text-decoration: none;
+}
+footer .link span {
+    font-size: 10px
+}
+
+footer .social-network a {
+    font-size: 22px;
+    color: white;
+}
+footer .social-network a:hover { color: #e5e5e5; }
+
+footer .contact a {
+    color: white;
+    text-decoration: underline;
+}
+footer .contact a:hover { color: #e5e5e5; }
+
+footer .copyright {
+    font-size: 12px;
+}
+
+footer h1,
+footer h2,
+footer h3,
+footer h4,
+footer h5,
+footer h6 {
+    color: white;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    color: #5b95a5;
+}
+
+h1 { margin-bottom: 30px; }

@@ -1,0 +1,44 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+
+      <h1>X5GON Process Monitor</h1>
+
+      <table class="table" id="process-monitor">
+        <thead>
+          <tr>
+            <th scope="col" class="text-center">PM2 ID</th>
+            <th scope="col">Process Name</th>
+            <th scope="col" class="text-center">Status</th>
+            <th scope="col" class="text-center">Running Time</th>
+            <th scope="col" class="text-center">Created At</th>
+            <th scope="col" class="text-center">Interpreter</th>
+            <th scope="col" class="text-center">Times Restarted</th>
+            <th scope="col" class="text-center">PID</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each processList as |process|}}
+            <tr id="{{process.name}}">
+              <td class="text-center">{{process.pm_id}}</td>
+              <td>{{process.name}}</td>
+              <td class="text-center font-weight-bold {{statusColor process.pm2_env.status}}"
+                type="status">
+                {{process.pm2_env.status}}
+              </td>
+              <td class="text-center" type="running-time">{{process.pm2_env.running_time}}</td>
+              <td class="text-center" type="created-at">{{process.pm2_env.created_at_clean}}</td>
+              <td class="text-center">{{process.pm2_env.exec_interpreter}}</td>
+              <td class="text-center" type="restart-time">{{process.pm2_env.restart_time}}</td>
+              <td class="text-center">{{process.pid}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+
+    </div>{{! .col }}
+  </div>{{! .row }}
+</div>{{! .container }}
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/process-monitor-socket.js"></script>
