@@ -1,0 +1,189 @@
+/************************************************
+ * This class contains functions for monitoring
+ * processes using the pm2 API plugin
+ * [http://pm2.keymetrics.io/docs/usage/pm2-api/].
+ */
+
+class PM2Monitor {
+
+    /**
+     * Initialize the PM2Monitor instance. It connects to or
+     * creates a pm2 deamon and retrieves a list of processes
+     * currently running in the deamon.
+     */
+    constructor() {
+		let self = this;
+		// sets the pm2 object used to monitor
+		this.pm2 = require('pm2');
+		this._connected = false;
+		this._processList = [];
+		// create new/connect to the pm2 deamon
+		this.pm2.connect((error, response) => {
+			if (error) { console.log(error); return; }
+			self._connected = true;
+			// retrieve the list or running processes
+			self.listProcesses((xerror, processes) => {
+				if (error) { console.log(xerror); return; }
+				self._processList = processes.map(process => ({
+					name: process.name,
+					pid: process.pid,
+					pm_id: process.pm_id,
+					status: process.pm2_env.status
+				}));
+			});
+		});
+    }
+
+    /**
+     * Start the process identified by its name.
+     * @param {String} processName - The process name to be started.
+     * @param {Function} cb - The callback function.
+     */
+    startProcess(processName, cb) {
+        this._checkConnection(cb);
+		this._checkProcessExists(processName, cb, (listProcess) => {
+			// start the existing process
+			this.pm2.start(processName, (error, process) => {
+				if (error) { return cb(error); }
+				// fix process info in the list
+				if (process) { listProcess.status = process[0].status; }
+				return cb(null, process);
+			});
+		});
+    }
+
+    /**
+     * Stops the process with the process name.
+     * @param {String} processName - The process name to be stopped.
+     * @param {Function} cb - The callback function.
+     */
+    stopProcess(processName, cb) {
+        this._checkConnection(cb);
+		this._checkProcessExists(processName, cb, (listProcess) => {
+			// stop the process
+			this.pm2.stop(processName, (error, process) => {
+				if (error) { return cb(error); }
+				if (process) { listProcess.status = process[0].status; }
+				return cb(null, process);
+			});
+		});
+     }
+
+    /**
+     * Restart the process with the process name.
+     * @param {String} processName - The process name to be restarted.
+     * @param {Function} cb - The callback function.
+     */
+    restartProcess(processName, cb) {
+        this._checkConnection(cb);
+		this._checkProcessExists(processName, cb, (listProcess) => {
+			// restart the process
+			this.pm2.restart(processName, (error, process) => {
+				if (error) { return cb(error); }
+				if (process) { listProcess.status = process[0].status; }
+				return cb(null, process);
+			});
+		});
+    }
+
+    /**
+     * Delete the process with the process
+     * @param {String} processName - The process name to be deleted.
+     * @param {Function} cb - The callback function.
+     */
+    deleteProcess(processName, cb) {
+        this._checkConnection(cb);
+		this._checkProcessExists(processName, cb, (listProcess) => {
+			// delete the process
+			this.pm2.delete(processName, (error, process) => {
+				if (error) { return cb(error); }
+				// remove the process from the list
+				for (let idx = 0; idx < this._processList.length; idx++) {
+					if (this._processList[idx].name === listProcess.name) {
+						this._processList.splice(idx, 1); break;
+					}
+				}
+				return cb(null, process);
+			});
+		});
+    }
+
+    /**
+     * Get information of the the process with the process name.
+     * @param {String} processName - The process name to get information from.
+     * @param {Function} cb - The callback function.
+     */
+    describeProcess(processName, cb) {
+	this._checkConnection(cb);
+	this._checkProcessExists(processName, cb, () => {
+	    // get process information
+	    this.pm2.describe(processName, (error, description) => {
+	         if (error) { return cb(error); }
+	         return cb(null, description);
+	    });
+	});
+    }
+
+    /**
+     * Get the list of processes saved in pm2 deamon.
+     * @param {Function} cb - The callback function.
+     */
+    listProcesses(cb) {
+        this._checkConnection(cb);
+		// get the whole list of processes running
+        this.pm2.list((error, processes) => {
+			if (error) { return cb(error); }
+			// TODO: prepare the list of processes
+			const cleanList = processes.map(process => ({
+				name: process.name,
+				pid: process.pid,
+				pm_id: process.pm_id,
+				monit: process.monit,
+				pm2_env: {
+					status: process.pm2_env.status,
+					created_at: process.pm2_env.created_at,
+					pm_uptime: process.pm2_env.pm_uptime,
+					unstable_restarts: process.pm2_env.unstable_restarts,
+					restart_time: process.pm2_env.restart_time,
+					exec_interpreter: process.pm2_env.exec_interpreter,
+					instances: process.pm2_env.instances,
+					pm_exec_path: process.pm2_env.pm_exec_path,
+				}
+			}));
+	    	return cb(null, cleanList);
+		});
+    }
+
+    /**
+     * Checks if the pm2 is connected with the deamon.
+     * @param {Function} cb - The callback function.
+     */
+    _checkConnection(cb) {
+		if (!this._connected) {
+            return cb(new Error('PM2Monitor: not connected'));
+        }
+    }
+
+	/**
+	 * Checks if the pm2 process is running.
+	 * @param {String} processName - The process name to be checked if running.
+	 * @param {Function} cb - The callback function used by the original function.
+	 * @param {Function} fun - The function executed if the process exists.
+	 */
+    _checkProcessExists(processName, cb, fun) {
+		let processExists = false;
+		// check if the process exists
+		for (let process of this._processList) {
+			if (process.name === processName) {
+				processExists = true;
+				// run the function on the existing process
+				fun(process); break;
+			}
+		}
+		if (!processExists) {
+			return cb(new Error(`PM2Monitor: process does not exists - ${processName}`));
+		}
+   }
+}
+
+module.exports = PM2Monitor;

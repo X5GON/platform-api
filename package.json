@@ -42,6 +42,7 @@
     "qminer": "^9.1.2",
     "qtopology": "^2.0.5",
     "request": "^2.85.0",
+    "socket.io": "^2.1.1",
     "textract": "^2.2.0",
     "winston": "^2.4.0",
     "winston-daily-rotate-file": "^1.7.2"
