@@ -51,14 +51,14 @@ class PM2Monitor {
 
     /**
      * Start the process identified by its name.
-     * @param {String} processName - The process name to be started.
+     * @param {String} processId - The process name to be started.
      * @param {Function} cb - The callback function.
      */
-    startProcess(processName, cb) {
+    startProcess(processId, cb) {
         this._checkConnection(cb);
-		this._checkProcessExists(processName, cb, (listProcess) => {
+		this._checkProcessExists(processId, cb, (listProcess) => {
 			// start the existing process
-			this.pm2.start(processName, (error, process) => {
+			this.pm2.start(listProcess.name, (error, process) => {
 				if (error) { return cb(error); }
 				// fix process info in the list
 				if (process) { listProcess.status = process[0].status; }
@@ -69,14 +69,14 @@ class PM2Monitor {
 
     /**
      * Stops the process with the process name.
-     * @param {String} processName - The process name to be stopped.
+     * @param {String} processId - The process name to be stopped.
      * @param {Function} cb - The callback function.
      */
-    stopProcess(processName, cb) {
+    stopProcess(processId, cb) {
         this._checkConnection(cb);
-		this._checkProcessExists(processName, cb, (listProcess) => {
+		this._checkProcessExists(processId, cb, (listProcess) => {
 			// stop the process
-			this.pm2.stop(processName, (error, process) => {
+			this.pm2.stop(listProcess.name, (error, process) => {
 				if (error) { return cb(error); }
 				if (process) { listProcess.status = process[0].status; }
 				return cb(null, process);
@@ -86,14 +86,14 @@ class PM2Monitor {
 
     /**
      * Restart the process with the process name.
-     * @param {String} processName - The process name to be restarted.
+     * @param {String} processId - The process name to be restarted.
      * @param {Function} cb - The callback function.
      */
-    restartProcess(processName, cb) {
+    restartProcess(processId, cb) {
         this._checkConnection(cb);
-		this._checkProcessExists(processName, cb, (listProcess) => {
+		this._checkProcessExists(processId, cb, (listProcess) => {
 			// restart the process
-			this.pm2.restart(processName, (error, process) => {
+			this.pm2.restart(listProcess.name, (error, process) => {
 				if (error) { return cb(error); }
 				if (process) { listProcess.status = process[0].status; }
 				return cb(null, process);
@@ -103,14 +103,14 @@ class PM2Monitor {
 
     /**
      * Delete the process with the process
-     * @param {String} processName - The process name to be deleted.
+     * @param {String} processId - The process name to be deleted.
      * @param {Function} cb - The callback function.
      */
-    deleteProcess(processName, cb) {
+    deleteProcess(processId, cb) {
         this._checkConnection(cb);
-		this._checkProcessExists(processName, cb, (listProcess) => {
+		this._checkProcessExists(processId, cb, (listProcess) => {
 			// delete the process
-			this.pm2.delete(processName, (error, process) => {
+			this.pm2.delete(listProcess.name, (error, process) => {
 				if (error) { return cb(error); }
 				// remove the process from the list
 				for (let idx = 0; idx < this._processList.length; idx++) {
@@ -125,18 +125,18 @@ class PM2Monitor {
 
     /**
      * Get information of the the process with the process name.
-     * @param {String} processName - The process name to get information from.
+     * @param {String} processId - The process name to get information from.
      * @param {Function} cb - The callback function.
      */
-    describeProcess(processName, cb) {
-	this._checkConnection(cb);
-	this._checkProcessExists(processName, cb, () => {
-	    // get process information
-	    this.pm2.describe(processName, (error, description) => {
-	         if (error) { return cb(error); }
-	         return cb(null, description);
-	    });
-	});
+    describeProcess(processId, cb) {
+		this._checkConnection(cb);
+		this._checkProcessExists(processId, cb, (listProcess) => {
+			// get process information
+			this.pm2.describe(listProcess.name, (error, description) => {
+				if (error) { return cb(error); }
+				return cb(null, description);
+			});
+		});
     }
 
     /**
@@ -184,22 +184,29 @@ class PM2Monitor {
 
 	/**
 	 * Checks if the pm2 process is running.
-	 * @param {String} processName - The process name to be checked if running.
+	 * @param {String | Number} processId - The process pm_id or name to be checked if running.
 	 * @param {Function} cb - The callback function used by the original function.
 	 * @param {Function} fun - The function executed if the process exists.
 	 */
-    _checkProcessExists(processName, cb, fun) {
+    _checkProcessExists(processId, cb, fun) {
 		let processExists = false;
 		// check if the process exists
 		for (let process of this._processList) {
-			if (process.name === processName) {
+
+			let compareValue = null;
+			if (typeof processId === 'string') {
+				compareValue = process.name;
+			} else if (typeof processId === 'number') {
+				compareValue = process.pm_id;
+			}
+			if (compareValue === processId) {
 				processExists = true;
 				// run the function on the existing process
 				fun(process); break;
 			}
 		}
 		if (!processExists) {
-			return cb(new Error(`PM2Monitor: process does not exists - ${processName}`));
+			return cb(new Error(`PM2Monitor: process does not exists - ${processId}`));
 		}
    }
 }

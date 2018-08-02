@@ -64,7 +64,7 @@ socket.on('pm2-process', function(msg) {
                 <td class="text-center" type="restart-time">${process.pm2_env.restart_time}</td>
                 <td class="text-center">${process.pid}</td>
             </tr>`;
-
+        // add to the end of the body
         tableBody.append(row);
     }
 
