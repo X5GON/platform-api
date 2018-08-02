@@ -1,18 +1,21 @@
 [{
     "name": "Content",
     "fields": [
-        { "name": "link", "type": "string", "primary": true },
-        { "name": "type", "type": "string", "shortstring": true },
+        { "name": "url", "type": "string", "primary": true },
         { "name": "title", "type": "string" },
         { "name": "description", "type": "string", "null": true },
-        { "name": "created", "type": "datetime", "null": true },
-        { "name": "authors", "type": "string_v", "null": true },
+        { "name": "rawContent", "type": "string", "null": true },
         { "name": "provider", "type": "string", "shortstring": true },
+        { "name": "authors", "type": "string_v", "null": true },
         { "name": "metadata", "type": "json", "null": true },
-        { "name": "languages", "type": "string_v", "shortstring": true }
+        { "name": "extension", "type": "string", "null": true },
+        { "name": "mimetype", "type": "string", "null": true },
+        { "name": "language", "type": "string", "shortstring": true },
+        { "name": "wikipediaConceptNames", "type": "string_v", "null": true },
+        { "name": "wikipediaConceptPageRank", "type": "float_v", "null": true },
+        { "name": "wikipediaConceptCosine", "type": "float_v", "null": true }
     ],
     "joins": [
-        { "name": "concepts", "type": "index", "store": "Wikipedia", "inverse": "inContent" },
         { "name": "predecessor", "type": "field", "store": "Content", "inverse": "successor" },
         { "name": "successor", "type": "field", "store": "Content", "inverse": "predecessor" },
         { "name": "wasVisited", "type": "index", "store": "Activity", "inverse": "content" }
@@ -35,16 +38,5 @@
     "joins": [
         { "name": "user", "type": "field", "store": "Users", "inverse": "viewed" },
         { "name": "content", "type": "field", "store": "Content", "inverse": "wasVisited" }
-    ]
-}, {
-    "name": "Wikipedia",
-    "fields": [
-        { "name": "uri", "type": "string", "primary": true },
-        { "name": "name", "type": "string" },
-        { "name": "secUri", "type": "string", "null": true },
-        { "name": "secName", "type": "string", "null": true }
-    ],
-    "joins": [
-        { "name": "inContent", "type": "index", "store": "Content", "inverse": "concepts" }
     ]
 }]

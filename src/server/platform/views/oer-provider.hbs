@@ -1,0 +1,95 @@
+<div class="container">
+
+  <div class="row">
+    <div class="col">
+      <h1>OER Provider Information</h1>
+
+      <div class="row">
+        <div class="col-lg-3">
+
+          <div class="repo-information">
+            <h6>Repository Name</h6>
+            <p>{{name}}</p>
+          </div>{{! .repo-information }}
+
+          <div class="repo-information">
+            <h6>Domain URL</h6>
+            <p>
+              <a href="{{domain}}">{{domain}}</a>
+            </p>
+          </div>{{! .repo-information }}
+
+          <div class="repo-information">
+            <h6>Contact</h6>
+            <p>
+              <a href="mailto:{{contact}}">{{contact}}</a>
+            </p>
+          </div>{{! .repo-information }}
+
+        </div>{{! .col-lg-3 }}
+
+        <div class="col-lg-9">
+
+          {{! OER provider generated token }}
+          <div id="oer-provider-token" class="resource">
+            <h6>Your X5GON Token</h6>
+            <small class="form-text">
+              This is the X5GON Token generated for the your OER repository. Copy this token somewhere safe as it is your identification
+              token in the X5GON OER Network.
+            </small>
+            <pre class="mb-4">
+              <code class="language-handlebars">
+                {{ token }}
+              </code>
+            </pre>
+          </div>{{! #oer-provider-token }} 
+          
+          {{! OER provider generated hash number }}
+          <div id="oer-provider-library" class="resource">
+            <h6>X5GON Library</h6>
+            <small class="form-text">
+              The X5GON Library containing the functions for providing user activity data. This line should be included in the &lt;head&gt;
+              of the website containing the OER material.
+            </small>
+            <pre class="mb-4">
+              <code class="language-handlebars">
+                &lt;script type="text/javascript" src="https://platform.x5gon.org/api/v1/snippet/latest/x5gon-log.min.js"&gt;&lt;/script&gt; 
+              </code>
+            </pre>
+          </div>{{! #oer-provider-library }} 
+          
+          {{! OER provider generated snippet }}
+          <div id="oer-provider-snippet" class="resource">
+            <h6>X5GON User Activity Tracker Snippet</h6>
+            <small class="form-text">
+              This script should be included at the end of the &lt;body&gt; of the website containing the OER material. It is responsible
+              for sending user activity data to the X5GON Platform.
+            </small>
+            <pre class="mb-4">
+              <code class="language-handlebars">
+                &lt;script type="text/javascript"&gt;
+                  // snippet code for sending user activity data
+                  $(document).ready(function () {
+                    // send user activity to x5gon server
+                    x5gonActivityTracker('{{ token }}');
+                  });
+                &lt;/script&gt;
+              </code>
+            </pre>
+          </div>{{! #oer-provider-snippet }}
+
+          <h4>Documentation</h4>
+          <p class="information">
+            For information about what user data is acquired and how the snippet works access the documentation available
+            <a
+              href="/docs/X5GON User Activity Tracker Documentation.pdf" target="_blank">HERE</a>.
+          </p>
+
+        </div>{{! .col }}
+      </div>{{! .row }}
+
+      <div class="whitespace"></div>
+
+    </div>{{! .col }}
+  </div>{{! .row }}
+</div>

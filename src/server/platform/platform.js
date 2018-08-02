@@ -9,6 +9,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
+
 // internal modules
 const pg = require('../../lib/postgresQL')(require('../../config/pgconfig'));
 const Logger = require('../../lib/logging-handler')();
@@ -46,6 +47,7 @@ app.engine('hbs', exphbs({
 app.set('view engine', 'hbs');
 
 // TODO: handle redirections - using proxy
+require('./routes/proxy')(app);
 
 // cookie parser
 app.use(cookieParser(argv['session-secret']));
@@ -56,5 +58,5 @@ require('./routes/route.handler')(app, pg, logger);
 // parameters used on the express app
 const PORT = argv.PORT || 8080;
 
-// start the server
+// start the server without https
 app.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));
