@@ -57,6 +57,9 @@ typings/
 # dotenv environment variables file
 .env
 
+# package manager
+package-lock.json
+
 # ignore additional files
 data
 backup

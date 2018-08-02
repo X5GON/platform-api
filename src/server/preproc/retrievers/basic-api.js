@@ -6,12 +6,19 @@ class BasicAPI {
     /**
      * Initializes the API Basic class.
      * @param {Object} [args] - The constructor parameters.
-     * @param {String} [args.apikey] - The key used to make the request.
-     * @param {String} [args.domain] - The domain where the request is sent.
+     * @param {String|null} [args.apikey=null] - The key used to make the request.
+     * @param {String|null} [args.domain=null] - The domain where the request is sent.
+     * @param {Boolean} [args.crawlingEnabled=false] - If crawling is enabled for the crawling.
+     * @param {Object|null} [args.crawlingInterval=null] - The crawling interval object.
      */
     constructor(args = {}) {
         this.apikey = args.apikey || null;
         this.domain = args.domain || null;
+        // set crawling status variables
+        this._crawlingEnabled = args.crawlingEnabled || false;
+        this._crawlingInterval = args.crawlingInterval || null;
+        this._crawlingFrequency = args.crawlingFrequency || Infinity;
+
     }
 
     /**

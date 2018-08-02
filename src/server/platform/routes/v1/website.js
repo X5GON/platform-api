@@ -1,6 +1,5 @@
 // external modules
 const router = require('express').Router();
-const handlebars = require('handlebars');
 const request = require('request');
 
 // google verification configuration
@@ -20,8 +19,8 @@ function _googleVerifyUser(gRecaptchaResponse) {
     // create a request promise
     return new Promise((resolve, reject) => {
         // make a request for captcha validation
-        request.post({ 
-            url: gConfig.reCaptcha.verifyUrl, 
+        request.post({
+            url: gConfig.reCaptcha.verifyUrl,
             form: {
                 secret: gConfig.reCaptcha.secret,
                 response: gRecaptchaResponse,
@@ -99,7 +98,7 @@ module.exports = function (pg, logger) {
                 pg.select({ name, domain, contact }, 'repositories', (error, results) => {
                     // log error
                     if (error) { console.log(error); }
-                    
+
                     if (results.length === 0) {
                         // there is no registered repositories in the database
 
