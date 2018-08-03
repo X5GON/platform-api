@@ -9,17 +9,18 @@
           <thead>
             <tr>
               <th scope="col" class="text-center align-middle">PM2 ID</th>
-              <th scope="col" class="align-middle">Process Name</th>
+              <th scope="col" class="text-center align-middle">Process Name</th>
               <th scope="col" class="text-center align-middle">Status</th>
               <th scope="col" class="text-center align-middle">Running Time</th>
               <th scope="col" class="text-center align-middle">Created At</th>
               <th scope="col" class="text-center align-middle">Interpreter</th>
               <th scope="col" class="text-center align-middle">Times Restarted</th>
-              <th scope="col" class="text-center align-middle">PID</th>
+              <th scope="col" class="text-center align-middle">Unstable Restarts</th>
               <th scope="col" class="text-center align-middle">Actions</th>
             </tr>
           </thead>
           <tbody>
+
             {{#each processList as |process|}}
               <tr id="{{process.name}}">
                 <td class="text-center align-middle">{{process.pm_id}}</td>
@@ -28,22 +29,49 @@
                   type="status">
                   {{process.pm2_env.status}}
                 </td>
-                <td class="text-center align-middle" type="running-time">{{process.pm2_env.running_time}}</td>
-                <td class="text-center align-middle" type="created-at">{{process.pm2_env.created_at_clean}}</td>
-                <td class="text-center align-middle">{{process.pm2_env.exec_interpreter}}</td>
-                <td class="text-center align-middle" type="restart-time">{{process.pm2_env.restart_time}}</td>
-                <td class="text-center align-middle">{{process.pid}}</td>
+                <td class="text-center align-middle" type="running-time">
+                  {{process.pm2_env.running_time}}
+                </td>
+                <td class="text-center align-middle" type="created-at">
+                  {{process.pm2_env.created_at_clean}}
+                </td>
                 <td class="text-center align-middle">
-                  <button type="button" class="btn btn-primary btn-sm">Primary</button>
+                  {{process.pm2_env.exec_interpreter}}
+                </td>
+                <td class="text-center align-middle" type="restart-time">
+                  {{process.pm2_env.restart_time}}
+                </td>
+                <td class="text-center align-middle" type="unstable-restarts">
+                  {{process.pm2_env.unstable_restarts}}
+                </td>
+                <td class="text-center align-middle">
+
+                  {{#if (isEqual process.pm2_env.status 'online')}}
+                    <button type="button" class="btn btn-danger btn-sm"
+                      data-action="disable"
+                      data-process-id={{process.pm_id}}>
+                      disable
+                    </button>
+                  {{else}}
+                    <button type="button" class="btn btn-success btn-sm"
+                      data-action="enable"
+                      data-process-id={{process.pm_id}}>
+                      enable
+                    </button>
+                  {{/if}}
                 </td>
               </tr>
             {{/each}}
+
           </tbody>
-        </table>
-      </div>
+        </table>{{! #process-monitor }}
+      </div>{{! .table-responsive-lg }}
+
+
     </div>{{! .col }}
   </div>{{! .row }}
 </div>{{! .container }}
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="/js/process-monitor-socket.js"></script>
+<script src="/js/process-monitor-actions.js"></script>

@@ -12,7 +12,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
-// internal modules
+// internal modules for monitoring processes
 const PM2Monitor = require('../../lib/pm2-monitor');
 let monitor = new PM2Monitor();
 
@@ -46,7 +46,9 @@ const hbs = exphbs.create({
     defaultLayout: 'main',
     extname: 'hbs',
     helpers: {
-        isEqual: function (arg1, arg2) { return arg1 === arg2; },
+        isEqual: function (arg1, arg2) {
+            return arg1 === arg2;
+        },
         statusColor: function (arg1) {
             return arg1 === 'online' ? 'text-success' :
                 arg1 === 'launching' ? 'text-warning' :
@@ -68,7 +70,6 @@ app.use('/', require('./routes/website')(monitor)); // website request handling
 // parameters used on the express app
 const PORT = argv.PORT || 7500;
 
-
 // configure socket connections
 io.on('connection', function(socket){
     console.log('a user connected');
@@ -82,9 +83,7 @@ io.on('connection', function(socket){
                 io.emit('pm2-process-error', { error }) :
                 io.emit('pm2-process', list);
         });
-    }, 500);
-
-
+    }, 1000);
 });
 
 // start the server
