@@ -15,11 +15,14 @@ function prepareMaterial(oer) {
                     </span>
                 </td>
                 <td class="w-100 p-1">
-                    <a class="material" href="${oer.url}" target="_blank"><strong>${oer.title}</strong></a>
+                    <a class="material" href="${oer.url}" target="_blank">
+                        <strong>${oer.title}</strong>
+                        <small><i class="fas fa-external-link-alt"></i></small>
+                    </a>
                     <br>
                     <small class="material-link url font-italic">${oer.url}</small>
                     <br>
-                    ${oer.description ? '<p class="mb-0">' + oer.description + '</p>' : ''}
+                    ${oer.description ? '<p class="material-description mb-0">' + oer.description + '</p>' : ''}
                     <div class="row mt-2">
                         <div class="col-6 col-lg-3">
                             <strong class="mr-1">Provider:</strong>${oer.provider}
@@ -50,6 +53,13 @@ $(document).ready(function () {
             return;
         }
 
+        $('#search-results').html(
+            `<div class="text-center mt-5">
+                <p>Loading results...</p>
+            </div>`
+        );
+
+
         // get search results
         $.get('/api/v1/search?text=' + encodeURIComponent(query), function (data) {
             if (data.empty) {
@@ -75,5 +85,9 @@ $(document).ready(function () {
 
     });
 
+
+    $('#search-query').on('keyup', function (e) {
+        if (e.keyCode == 13) { $('#search').click(); }
+    });
 
 });

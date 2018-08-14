@@ -76,14 +76,20 @@
     color: #5b95a5;
 }
 
-#search-results .recommendations .material:hover {
-    color: #456f7a;
-}
-
 #search-results .recommendations .material-content {
     background-color: transparent;
 }
 
+#search-results .recommendations .material-content .material-description {
+    color: #3A3A3A;
+}
+
+
+#search-results .recommendations .material-content small {
+    color: #5b95a5;
+}
+
+#search-results .recommendations .material:hover,
 #search-results .recommendations .material-content .material-link {
     color: #456f7a;
 }
