@@ -1,0 +1,26 @@
+<div class="container">
+
+  <div class="row">
+    <div class="col-lg-6">
+      <div class="input-group">
+        <input type="text" id="search-query" class="form-control" placeholder="Search for OER material">
+        <div class="input-group-append">
+          <button class="btn btn-secondary" type="button" id="search">Search</button>
+        </div>
+      </div>{{! .input-group }}
+    </div>{{! .col-md-6 }}
+  </div>{{! .row }}
+
+  <div class="row">
+    <div class="col">
+      <div id="search-results">
+        <p class="mt-4">Results of your query will be shown here</p>
+
+      </div>{{! #search-results }}
+    </div>{{! .col }}
+  </div>{{! .row }}
+
+</div>
+
+
+<script type="application/javascript" src="/js/search.js"></script>

@@ -12,23 +12,23 @@
 }
 
 .recommendations::-webkit-scrollbar-track {
-    background: #f1f1f1; 
+    background: #f1f1f1;
 }
- 
+
 .recommendations::-webkit-scrollbar-thumb {
-    background: #888; 
+    background: #888;
 }
 
 .recommendations::-webkit-scrollbar-thumb:hover {
-    background: #555; 
+    background: #555;
 }
 
 .recommendations .material {
     color: #323232;
 }
 
-.recommendations .material:hover { 
-    text-decoration: none; 
+.recommendations .material:hover {
+    text-decoration: none;
 
 }
 
@@ -37,6 +37,7 @@
     font-size: 12px;
     padding: 7px;
     transition: background-color .2s;
+    width: 100%;
 }
 
 .recommendations .material-content:hover {
@@ -52,15 +53,44 @@
     font-style: italic;
 }
 
-.footer { 
-    font-style: italic; 
+.footer {
+    font-style: italic;
     background-color: transparent;
 }
-.footer a { 
-    color: #5b95a5; 
+.footer a {
+    color: #5b95a5;
 }
 .footer a:hover {
     color: #456f7a;
     text-decoration: none;
+}
+
+
+#search-results .recommendations {
+    max-height: inherit;
+    overflow: inherit;
+}
+
+#search-results .recommendations .material {
+    font-size: 18px;
+    color: #5b95a5;
+}
+
+#search-results .recommendations .material-content {
+    background-color: transparent;
+}
+
+#search-results .recommendations .material-content .material-description {
+    color: #3A3A3A;
+}
+
+
+#search-results .recommendations .material-content small {
+    color: #5b95a5;
+}
+
+#search-results .recommendations .material:hover,
+#search-results .recommendations .material-content .material-link {
+    color: #456f7a;
 }
 
