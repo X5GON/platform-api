@@ -14,8 +14,7 @@ let socket = io();
 socket.on('pm2-process', function(msg) {
 
     // get existing processes
-    let rows = $('#process-monitor tbody').find('tr');
-
+    let rows = $('#process-monitor tbody tr[data-process-head]');
     for (let rowIdx = 0; rowIdx < rows.length; rowIdx++) {
         let row = $(rows[rowIdx]);
         let processExists = false;
@@ -51,7 +50,11 @@ socket.on('pm2-process', function(msg) {
         }
 
         // if the process does not exist remove table row
-        if(!processExists) { row.remove(); }
+        if(!processExists) {
+            let processName = row.data('process-head');
+            $(`#process-monitor tr[data-process-body="${processName}"]`).remove();
+            row.remove();
+        }
     }
 
     // add new processes to the table

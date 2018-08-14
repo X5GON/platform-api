@@ -4,7 +4,7 @@
 
       <h1>X5GON Process Monitor</h1>
 
-      <div class="table-responsive-lg">
+      <div class="table-responsive">
         <table class="table" id="process-monitor">
           <thead>
             <tr>
@@ -22,7 +22,9 @@
           <tbody>
 
             {{#each processList as |process|}}
-              <tr id="{{process.name}}">
+              <tr id="{{process.name}}" data-toggle="collapse" data-process-head="{{process.name}}"
+                href="tr[data-process-body={{process.name}}] div.collapse">
+
                 <td class="text-center align-middle">{{process.pm_id}}</td>
                 <td class="align-middle">{{process.name}}</td>
                 <td class="text-center align-middle font-weight-bold {{statusColor process.pm2_env.status}}"
@@ -60,7 +62,29 @@
                     </button>
                   {{/if}}
                 </td>
-              </tr>
+              </tr>{{! tr#id=process.name }}
+
+              <tr data-process-body="{{process.name}}">
+
+                <td colspan="9">
+                  <div class="collapse">
+                    <div class="content container-fluid">
+                      <div class="row">
+                        <div class="col-md-4">
+                          <h6>CPU usage</h6>
+                          <div class="piechart">{{process.monit.cpu}}</div>
+                        </div>
+                        <div class="col-md-8">
+                          <h6>Memory usage</h6>
+                          <div class="timeline">{{process.monit.memory}}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+              </tr>{{! tr[data-process-body] }}
+
             {{/each}}
 
           </tbody>
@@ -73,5 +97,10 @@
 </div>{{! .container }}
 
 <script src="/socket.io/socket.io.js"></script>
+
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="/js/graph/timeline.js"></script>
+
 <script src="/js/process-monitor-socket.js"></script>
 <script src="/js/process-monitor-actions.js"></script>
+

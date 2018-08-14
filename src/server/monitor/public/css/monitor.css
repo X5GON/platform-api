@@ -14,19 +14,31 @@
     border-bottom: 0px;
 }
 
-.table-responsive-lg::-webkit-scrollbar {
+.table tbody tr:nth-child(2n-1) td {
+    border-bottom: 0px;
+}
+
+.table tbody tr[data-process-body] td {
+    padding: 0px;
+}
+
+.table tbody tr[data-process-body] td .content {
+    margin: 15px;
+}
+
+.table-responsive::-webkit-scrollbar {
     width: 10px;
 }
 
-.table-responsive-lg::-webkit-scrollbar-track {
+.table-responsive::-webkit-scrollbar-track {
     background: #f1f1f1;
 }
 
-.table-responsive-lg::-webkit-scrollbar-thumb {
+.table-responsive::-webkit-scrollbar-thumb {
     background: #888;
 }
 
-.table-responsive-lg::-webkit-scrollbar-thumb:hover {
+.table-responsive::-webkit-scrollbar-thumb:hover {
     background: #555;
 }
 
