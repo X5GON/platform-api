@@ -19,9 +19,33 @@ module.exports = function (pg, logger) {
      */
 
     router.get('/search', (req, res) => {
-        // currently redirect to form page
-        return res.render('search');
+
+        if (Object.keys(req.query).length) {
+            // get user query
+            let query = req.query;
+
+            let queryString = Object.keys(query).map(key => `${key}=${encodeURIComponent(query[key])}`).join('&');
+            request(`http://localhost:8080/api/recommend/content?${queryString}`, (error, httpRequest, body) => {
+                let options = { };
+                try {
+                    const recommendations = JSON.parse(body);
+                    options.empty = recommendations.length === 0 || recommendations.error ? true : false;
+                    options.recommendations = recommendations;
+                    options.numberOfResults = recommendations.length;
+                    return res.render('search-results', { layout: 'search-results', query: query.text, options });
+                } catch(xerror) {
+                    options.empty = true;
+                    return res.render('search-results', { layout: 'search-results', query: query.text, options });
+                }
+            });
+
+            // currently redirect to form page
+        } else {
+            // currently redirect to form page
+            return res.render('search', { layout: 'search' });
+        }
     });
+
 
     // send application form page
     router.get('/api/v1/search', (req, res) => {

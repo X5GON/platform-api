@@ -37,31 +37,34 @@
   {{! navigation for every page }}
   <header>
     <nav class="navbar navbar-expand-md fixed-top">
-      <div class="container">
-        <span class="navbar-brand mb-0 h1">
+        <span class="navbar-brand mb-0 h-1">
           <a href="https://www.x5gon.org/">
             <img src="https://www.x5gon.org/wp-content/themes/x5gon/dist/assets/img/logo.svg" alt="X5GON">
           </a>
         </span>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-          aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+
+        <div class="form-inline">
+          <div class="input-group">
+            <input type="search" id="search-query" class="form-control rounded-0" value="{{query}}">
+            <div class="input-group-append">
+              <button class="btn btn-secondary rounded-0" type="submit">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav mr-auto">
 
             {{! home link }} {{! TODO add a proper home page }}
-            <li class="nav-item">
-              <a class="nav-link" href="/search">Search</a>
-            </li>
 
           </ul>
           <a class="nav-link ml-2" href="/oer-provider/login">Login</a>
           <a class="nav-link ml-2 call-to-action" href="/application-form">Join Now</a>
 
         </div>
-      </div>
     </nav>
   </header>
 

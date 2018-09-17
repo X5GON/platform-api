@@ -1,0 +1,56 @@
+<div class="container-fluid">
+
+  <div class="row">
+    <div class="offset-lg-1 col-lg-4">
+      <div id="search-results">
+        {{#if options.empty}}
+          <small>No educational material found</small>
+        {{else}}
+          <small>Top {{options.numberOfResults}} OER material results</small>
+          <div class="recommendations mt-3">
+            {{#each options.recommendations as |recommendation index|}}
+              <table class="material-content mb-3">
+                <body>
+                  <tr>
+                    <td class="align-top p-1 pt-2">
+                      <span class="fa-stack fa-lg">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        {{!-- <i class="fas fa-{{if recommendation.videoType ? 'video' : oer.audioType ? 'audio' : 'file-alt' }}
+                          fa-stack-1x fa-inverse"></i> --}}
+                      </span>
+                    </td>
+                    <td class="w-100 p-1">
+                      <a class="material" href="{{recommendation.url}}" target="_blank">
+                        <strong>{{recommendation.title}}</strong>
+                        <small><i class="fas fa-external-link-alt"></i></small>
+                      </a>
+                      <br>
+                      <small class="material-link url font-italic">{{recommendation.url}}</small>
+                      <br>
+                      {{!-- {{if recommendation.description (concat '<p class="material-description mb-0">' recommendation.description '</p>') ''}} --}}
+                      <div class="row mt-2">
+                        <div class="col-6 col-lg-4">
+                          <strong class="mr-1">Provider:</strong>{{recommendation.provider}}
+                        </div>
+                        <div class="col-6 col-lg-4">
+                          <strong class="mr-1">Language:</strong>{{recommendation.language}}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </body>
+              </table>
+
+            {{/each}}
+          </div>
+        {{/if}}
+
+
+      </div>
+    </div>{{! .col-md-6 }}
+  </div>{{! .row }}
+
+</div>
+
+
+<script type="application/javascript" src="/js/search.js"></script>

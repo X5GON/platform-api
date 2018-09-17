@@ -65,6 +65,16 @@
     text-decoration: none;
 }
 
+#search-input {
+    margin-top: 200px;
+    text-align: center;
+    margin-bottom: 200px;
+}
+
+#search-input img {
+    width: 80%;
+
+}
 
 #search-results .recommendations {
     max-height: inherit;
