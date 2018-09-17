@@ -33,38 +33,38 @@
   <title>X5GON Platform</title>
 </head>
 
-<body class="pt-6">
+<body class="pt-5">
   {{! navigation for every page }}
   <header>
-    <nav class="navbar navbar-expand-md fixed-top">
-        <span class="navbar-brand mb-0 h-1">
-          <a href="https://www.x5gon.org/">
-            <img src="https://www.x5gon.org/wp-content/themes/x5gon/dist/assets/img/logo.svg" alt="X5GON">
-          </a>
-        </span>
+    <nav class="navbar navbar-expand-sm fixed-top">
+      <span class="navbar-brand mb-0 h-1">
+        <a href="https://www.x5gon.org/">
+          <img src="https://www.x5gon.org/wp-content/themes/x5gon/dist/assets/img/logo.svg" alt="X5GON">
+        </a>
+      </span>
 
-        <div class="form-inline">
-          <div class="input-group">
-            <input type="search" id="search-query" class="form-control rounded-0" value="{{query}}">
-            <div class="input-group-append">
-              <button class="btn btn-secondary rounded-0" type="submit">
-                <i class="fas fa-search"></i>
-              </button>
-            </div>
+      <div class="form-inline col-4 pl-0">
+        <form class="input-group w-100" action="/search" method="get">
+          <input type="text" name="text" id="search-query" class="form-control rounded-0" value="{{query}}">
+          <div class="input-group-append">
+            <button type="submit" class="btn btn-secondary rounded-0" onClick="return empty()">
+              <i class="fas fa-search"></i>
+            </button>
           </div>
-        </div>
+        </form>
+      </div>
 
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
 
-            {{! home link }} {{! TODO add a proper home page }}
+          {{! home link }} {{! TODO add a proper home page }}
 
-          </ul>
-          <a class="nav-link ml-2" href="/oer-provider/login">Login</a>
-          <a class="nav-link ml-2 call-to-action" href="/application-form">Join Now</a>
+        </ul>
+        <a class="nav-link ml-2" href="/application-form">Platform</a>
+        <a class="nav-link ml-2" href="https://www.x5gon.org/">Project</a>
 
-        </div>
+      </div>
     </nav>
   </header>
 

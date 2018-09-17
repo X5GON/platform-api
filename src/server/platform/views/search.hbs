@@ -4,14 +4,14 @@
     <div id="search-input" class="offset-md-2 col-md-8 offset-lg-3 col-lg-6">
       <img src="https://www.x5gon.org/wp-content/themes/x5gon/dist/assets/img/logo.svg" alt="X5GON" class="mb-3">
 
-      <div class="input-group">
-        <input type="text" id="search-query" class="form-control rounded-0" placeholder="Search for OER material">
+      <form class="input-group">
+        <input type="text" name="text" id="search-query" class="form-control rounded-0" placeholder="Search for OER material">
         <div class="input-group-append">
-          <button class="btn btn-secondary rounded-0" type="button" id="search">
+          <button type="submit" class="btn btn-secondary rounded-0" onClick="return empty()">
             <i class="fas fa-search"></i>
           </button>
         </div>
-      </div>{{! .input-group }}
+      </form>{{! .input-group }}
     </div>{{! .col-md-6 }}
   </div>{{! .row }}
 

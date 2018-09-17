@@ -1,12 +1,12 @@
 <div class="container-fluid">
 
   <div class="row">
-    <div class="offset-lg-1 col-lg-4">
-      <div id="search-results">
+    <div class="offset-sm-2 col-md-8 offset-lg-1 col-lg-4">
+      <div id="search-results" class="mt-3">
         {{#if options.empty}}
           <small>No educational material found</small>
         {{else}}
-          <small>Top {{options.numberOfResults}} OER material results</small>
+          <small>Top {{options.recommendations.length}} OER material results</small>
           <div class="recommendations mt-3">
             {{#each options.recommendations as |recommendation index|}}
               <table class="material-content mb-3">
@@ -15,8 +15,8 @@
                     <td class="align-top p-1 pt-2">
                       <span class="fa-stack fa-lg">
                         <i class="fas fa-circle fa-stack-2x"></i>
-                        {{!-- <i class="fas fa-{{if recommendation.videoType ? 'video' : oer.audioType ? 'audio' : 'file-alt' }}
-                          fa-stack-1x fa-inverse"></i> --}}
+                        <i class="fas fa-{{recommendation.type}}
+                          fa-stack-1x fa-inverse"></i>
                       </span>
                     </td>
                     <td class="w-100 p-1">
@@ -25,15 +25,15 @@
                         <small><i class="fas fa-external-link-alt"></i></small>
                       </a>
                       <br>
-                      <small class="material-link url font-italic">{{recommendation.url}}</small>
+                      <i class="material-link url font-italic">{{recommendation.url}}</i>
                       <br>
-                      {{!-- {{if recommendation.description (concat '<p class="material-description mb-0">' recommendation.description '</p>') ''}} --}}
+                      {{#if recommendation.description }}
+                        <p class="material-description mb-0">{{recommendation.description}}</p>
+                      {{else}} {{/if}}
                       <div class="row mt-2">
-                        <div class="col-6 col-lg-4">
-                          <strong class="mr-1">Provider:</strong>{{recommendation.provider}}
-                        </div>
-                        <div class="col-6 col-lg-4">
-                          <strong class="mr-1">Language:</strong>{{recommendation.language}}
+                        <div class="col-12">
+                          <span class="d-inline-block mr-4"><strong class="mr-1">Provider:</strong>{{recommendation.provider}}</span>
+                          <span class="d-inline-block mr-4"><strong class="mr-1">Language:</strong>{{recommendation.language}}</span>
                         </div>
                       </div>
                     </td>
@@ -51,6 +51,5 @@
   </div>{{! .row }}
 
 </div>
-
 
 <script type="application/javascript" src="/js/search.js"></script>
