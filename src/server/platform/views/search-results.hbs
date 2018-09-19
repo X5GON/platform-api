@@ -1,54 +1,47 @@
-<div class="container-fluid">
 
-  <div class="row">
-    <div class="offset-sm-2 col-md-8 offset-lg-1 col-lg-4">
-      <div id="search-results" class="mt-3">
-        {{#if options.empty}}
-          <small>No educational material found</small>
-        {{else}}
-          <small>Top {{options.recommendations.length}} OER material results</small>
-          <div class="recommendations mt-3">
-            {{#each options.recommendations as |recommendation index|}}
-              <table class="material-content mb-3">
-                <body>
-                  <tr>
-                    <td class="align-top p-1 pt-2">
-                      <span class="fa-stack fa-lg">
-                        <i class="fas fa-circle fa-stack-2x"></i>
-                        <i class="fas fa-{{recommendation.type}}
-                          fa-stack-1x fa-inverse"></i>
-                      </span>
-                    </td>
-                    <td class="w-100 p-1">
-                      <a class="material" href="{{recommendation.url}}" target="_blank">
-                        <strong>{{recommendation.title}}</strong>
-                        <small><i class="fas fa-external-link-alt"></i></small>
-                      </a>
-                      <br>
-                      <i class="material-link url font-italic">{{recommendation.url}}</i>
-                      <br>
-                      {{#if recommendation.description }}
-                        <p class="material-description mb-0">{{recommendation.description}}</p>
-                      {{else}} {{/if}}
-                      <div class="row mt-2">
-                        <div class="col-12">
-                          <span class="d-inline-block mr-4"><strong class="mr-1">Provider:</strong>{{recommendation.provider}}</span>
-                          <span class="d-inline-block mr-4"><strong class="mr-1">Language:</strong>{{recommendation.language}}</span>
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </body>
-              </table>
+<div id="search-results" class="mt-3">
+  {{#if options.empty}}
+    <small>No educational material found</small>
+  {{else}}
+    <small>Top {{options.recommendations.length}} OER material results</small>
+    <div class="recommendations mt-3">
+      {{#each options.recommendations as |recommendation index|}}
+        <table class="material-content mb-4">
+          <body>
+            <tr>
+              <td class="align-top p-1 pt-2">
+                <span class="fa-stack fa-lg">
+                  <i class="fas fa-circle fa-stack-2x"></i>
+                  <i class="fas fa-{{recommendation.type}}
+                    fa-stack-1x fa-inverse"></i>
+                </span>
+              </td>
+              <td class="w-100 p-1">
+                <a class="material" href="{{recommendation.url}}" target="_blank">
+                  <strong>{{recommendation.title}}</strong>
+                  <small><i class="fas fa-external-link-alt"></i></small>
+                </a>
+                <br>
+                <span class="material-link url">{{recommendation.url}}</span>
+                <br>
+                {{#if recommendation.description }}
+                  <p class="material-description mb-0">{{recommendation.description}}</p>
+                {{else}} {{/if}}
+                <div class="row mt-2">
+                  <div class="col-12">
+                    <span class="d-inline-block mr-4"><strong class="mr-1">Language:</strong>{{recommendation.language}}</span>
+                    <span class="d-inline-block mr-4"><strong class="mr-1">Provider:</strong>{{recommendation.provider}}</span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </body>
+        </table>
 
-            {{/each}}
-          </div>
-        {{/if}}
+      {{/each}}
+    </div>
+  {{/if}}
 
-
-      </div>
-    </div>{{! .col-md-6 }}
-  </div>{{! .row }}
 
 </div>
 

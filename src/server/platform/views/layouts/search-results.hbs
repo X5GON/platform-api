@@ -33,24 +33,26 @@
   <title>X5GON Platform</title>
 </head>
 
-<body class="pt-5">
+<body class="pt-0">
   {{! navigation for every page }}
   <header>
-    <nav class="navbar navbar-expand-sm fixed-top">
+    <nav class="navbar navbar-expand-sm pb-0">
       <span class="navbar-brand mb-0 h-1">
         <a href="https://www.x5gon.org/">
           <img src="https://www.x5gon.org/wp-content/themes/x5gon/dist/assets/img/logo.svg" alt="X5GON">
         </a>
       </span>
 
-      <div class="form-inline col-4 pl-0">
+      <div id="search-container" class="form-inline pl-0">
         <form class="input-group w-100" action="/search" method="get">
-          <input type="text" name="text" id="search-query" class="form-control rounded-0" value="{{query}}">
+          <input type="text" name="text" id="search-query" class="form-control rounded-0" value="{{query.query}}">
           <div class="input-group-append">
             <button type="submit" class="btn btn-secondary rounded-0" onClick="return empty()">
               <i class="fas fa-search"></i>
             </button>
           </div>
+          <input type="hidden" name="page" value="{{query.page}}" />
+          <input type="hidden" name="type" value="{{query.types.selectedType}}" />
         </form>
       </div>
 
@@ -61,11 +63,39 @@
           {{! home link }} {{! TODO add a proper home page }}
 
         </ul>
-        <a class="nav-link ml-2" href="/application-form">Platform</a>
-        <a class="nav-link ml-2" href="https://www.x5gon.org/">Project</a>
+
+        <a class="ml-2" href="/application-form">
+          <span class="fa-stack">
+            <i class="link-background fas fa-circle fa-stack-2x"></i>
+            <i class="link-symbol fas fa-handshake fa-stack-1x fa-inverse"></i>
+          </span>
+        </a>
+        <a class="ml-2" href="https://www.x5gon.org/">
+          <span class="fa-stack">
+            <i class="link-background fas fa-circle fa-stack-2x"></i>
+            <i class="link-symbol fas fa-home fa-stack-1x fa-inverse"></i>
+          </span>
+        </a>
 
       </div>
     </nav>
+
+    <nav class="navbar navbar-expand-sm py-0">
+      <div id="search-options-elements">
+        <div class="navigation py-3 {{#if (query.types.active 'all')}} active {{/if}}">
+          <a class="link p-3" href="/search?text={{query.query}}&page={{query.page}}&type=all">All</a>
+        </div>
+        <div class="navigation py-3 {{#if (query.types.active 'video')}} active {{/if}}">
+          <a class="link p-3" href="/search?text={{query.query}}&page={{query.page}}&type=video">Video</a>
+        </div>
+        <div class="navigation py-3 {{#if (query.types.active 'audio')}} active {{/if}}">
+          <a class="link p-3" href="/search?text={{query.query}}&page={{query.page}}&type=audio">Audio</a>
+        </div>
+        <div class="navigation py-3 {{#if (query.types.active 'text')}} active {{/if}}">
+          <a class="link p-3" href="/search?text={{query.query}}&page={{query.page}}&type=text">Text</a>
+        </div>
+      </div>
+
   </header>
 
   <main role="main">
