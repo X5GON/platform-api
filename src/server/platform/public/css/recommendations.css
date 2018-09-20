@@ -29,7 +29,6 @@
 
 .recommendations .material:hover {
     text-decoration: none;
-
 }
 
 .recommendations .material-content {
@@ -65,6 +64,81 @@
     text-decoration: none;
 }
 
+#search-container {
+    width: 600px;
+}
+
+#search-input {
+    margin-top: 200px;
+    text-align: center;
+    margin-bottom: 200px;
+}
+
+#search-input img {
+    width: 80%;
+
+}
+
+#search-options-elements {
+    margin-left: 156px;
+    font-size: 12px;
+}
+
+@media screen and (max-width: 576px) {
+    #search-options-elements {
+        margin-left: 0px;
+    }
+}
+
+#search-options-elements .navigation {
+    background-color: transparent;
+    display: inline-block;
+    text-align: center;
+}
+#search-options-elements a {
+    font-weight: 600;
+    color: #5b95a5;
+}
+
+#search-options-elements .link:hover {
+    text-decoration: none;
+}
+
+#search-options-elements .active .link {
+    border-bottom: 3px solid #5b95a5;
+}
+
+#search-results-container {
+    padding-left: 176px;
+    padding-right: 16px;
+    width: 100%;
+}
+
+#search-results {
+    width: 600px;
+}
+
+@media screen and (max-width: 1360px) {
+    #search-results-container {
+        width: 789px;
+    }
+}
+
+@media screen and (max-width: 804px) {
+    #search-results-container {
+        width: auto;
+    }
+    #search-results {
+        width: auto;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    #search-results-container {
+        padding-left: 16px;
+        width: auto;
+    }
+}
 
 #search-results .recommendations {
     max-height: inherit;
@@ -91,6 +165,48 @@
 
 #search-results .recommendations .material:hover,
 #search-results .recommendations .material-content .material-link {
-    color: #456f7a;
+    color: #6c757d;
 }
 
+#search-results .navigation-buttons .btn {
+    border-radius: 0px;
+}
+
+#search-results .navigation-buttons .btn.btn-tertiary {
+    background-color: #eaeaea;
+    color: #6c757d;
+}
+
+#search-results .navigation-buttons .btn.btn-tertiary.active {
+    background-color: #d1d1d1;
+    color: #3A3A3A;
+}
+
+#search-results-container .material-inspect-container {
+    display: table-cell;
+}
+
+#search-results-container .material-inspect-container .material-title {
+    font-size: 18px;
+}
+
+
+
+@media screen and (max-width: 1360px) {
+    #search-results-container .material-inspect-container {
+        display: none;
+    }
+    #search-results .inspect {
+        display: none;
+    }
+}
+
+#search-results .inspect {
+    cursor: pointer;
+}
+
+#material-inspect {
+    height: 600px;
+    width: 100%;
+    border: 0px;
+}
