@@ -29,6 +29,7 @@
     crossorigin="anonymous"></script> {{! link to the google fonts }}
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,600i&amp;subset=latin-ext" rel="stylesheet"> {{! link prism for code factoring}}
   <script src="/js/prism.js"></script>
+  <script src="/js/common.js"></script>
 
   <title>X5GON Platform</title>
 </head>
@@ -51,7 +52,7 @@
               <i class="fas fa-search"></i>
             </button>
           </div>
-          <input type="hidden" name="page" value="{{query.page}}" />
+          <input type="hidden" name="page" value="1" />
           <input type="hidden" name="type" value="{{query.types.selectedType}}" />
         </form>
       </div>
@@ -83,16 +84,31 @@
     <nav class="navbar navbar-expand-sm py-0">
       <div id="search-options-elements">
         <div class="navigation py-3 {{#if (query.types.active 'all')}} active {{/if}}">
-          <a class="link p-3" href="/search?text={{query.query}}&page={{query.page}}&type=all">All</a>
+          <a class="link p-3"
+            {{#unless (query.types.active 'all')}}
+              {{#if false}}href="/search?text={{query.query}}&page={{query.page}}&type=all"{{/if}}
+            {{/unless}}>All</a>
         </div>
         <div class="navigation py-3 {{#if (query.types.active 'video')}} active {{/if}}">
-          <a class="link p-3" href="/search?text={{query.query}}&page={{query.page}}&type=video">Video</a>
+          <a class="link p-3"
+            data-toggle="tooltip" data-placement="bottom" title="Coming soon"
+            {{#unless (query.types.active 'video')}}
+              {{#if false}}href="/search?text={{query.query}}&page={{query.page}}&type=video"{{/if}}
+            {{/unless}}>Video</a>
         </div>
         <div class="navigation py-3 {{#if (query.types.active 'audio')}} active {{/if}}">
-          <a class="link p-3" href="/search?text={{query.query}}&page={{query.page}}&type=audio">Audio</a>
+          <a class="link p-3"
+            data-toggle="tooltip" data-placement="bottom" title="Coming soon"
+            {{#unless (query.types.active 'audio')}}
+              {{#if false}}href="/search?text={{query.query}}&page={{query.page}}&type=audio"{{/if}}
+            {{/unless}}>Audio</a>
         </div>
         <div class="navigation py-3 {{#if (query.types.active 'text')}} active {{/if}}">
-          <a class="link p-3" href="/search?text={{query.query}}&page={{query.page}}&type=text">Text</a>
+          <a class="link p-3"
+            data-toggle="tooltip" data-placement="bottom" title="Coming soon"
+            {{#unless (query.types.active 'text')}}
+              {{#if false}}href="/search?text={{query.query}}&page={{query.page}}&type=text"{{/if}}
+            {{/unless}}>Text</a>
         </div>
       </div>
 

@@ -13,6 +13,8 @@ const request = require('request');
  */
 module.exports = function (pg, logger) {
 
+    // maximum numbers of documents in recommendation list
+    const MAX_DOCS = 10;
 
     /********************************************
      * PORTAL PAGES
@@ -23,7 +25,7 @@ module.exports = function (pg, logger) {
             // get user query parameters and/or set initial ones
             let queryParams = req.query;
             queryParams.type = queryParams.type || 'all';
-            queryParams.page = queryParams.page || 1;
+            queryParams.page = parseInt(queryParams.page) || 1;
 
             let queryString = Object.keys(queryParams).map(key => `${key}=${encodeURIComponent(queryParams[key])}`).join('&');
             request(`http://localhost:8080/api/recommend/content?${queryString}`, (error, httpRequest, body) => {
@@ -39,7 +41,7 @@ module.exports = function (pg, logger) {
                             };
                         },
                     },
-                    page: 1
+                    page: queryParams.page
                 };
                 // set placeholder for options
                 let options = { };
@@ -56,8 +58,38 @@ module.exports = function (pg, logger) {
                         // determine material type
                         recommendation.type = recommendation.videoType ? 'video' :
                             recommendation.audioType ? 'audio' : 'file-alt';
+                        // embed url
+                        recommendation.embedUrl = recommendation.provider === 'Videolectures.NET' ?
+                            `${recommendation.url}iframe/1/` : recommendation.url;
                     });
-                    options.recommendations = recommendations;
+
+                    // save recommendations
+                    let recLength = recommendations.length;
+                    options.recommendations = {
+                        length: recLength,
+                        documents: recommendations.slice(MAX_DOCS * (query.page - 1), MAX_DOCS * query.page)
+                    };
+
+                    // get number of pages - limit is set to 10 documents per page
+                    let maxPages = Math.ceil(recLength / MAX_DOCS);
+
+                    let quickSelect = [];
+                    for (let i = query.page - 2; i < query.page + 3; i++) {
+                        if (i < 1 || maxPages < i) { continue; }
+                        quickSelect.push({ pageN: i, active: i === query.page });
+                    }
+
+                    // save pagination values
+                    options.pagination = {
+                        current: query.page,
+                        max: maxPages,
+                        get onFirstPage() { return this.current === 1; },
+                        get onLastPage() { return this.current === this.max; },
+                        get previous() { return this.current - 1; },
+                        get next() { return this.current + 1; },
+                        quickSelect
+                    };
+
                 } catch(xerror) {
                     options.empty = true;
                 }
