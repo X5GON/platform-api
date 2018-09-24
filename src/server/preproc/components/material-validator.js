@@ -39,14 +39,13 @@ class MaterialValidator {
 
     receive(material, stream_id, callback) {
         // log the begining of material formating
-        logger.info('starting validating material', { material });
-        
+        logger.info('starting validating material', { materialUrl: material.materialUrl });
         
         // TODO: add material validation function
 
-        logger.info('material format successful', { material });
+        logger.info('material format successful', { materialUrl: material.materialUrl });
         // send formated material to the next component
-        this._onEmit(material, stream_id, callback);
+        return this._onEmit(material, stream_id, callback);
     }
 }
 
