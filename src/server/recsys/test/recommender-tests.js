@@ -35,14 +35,14 @@ describe('recommender-tests.js: Recommender engine unit tests.', function(){ // 
   });
   
   it('Should handle an empty query', function(done){
-    let expected = {"error": "Missing query"};    
+    let expected = {'error': 'Missing query'};    
     let recommendations = recsys.recommend();
     assert.deepEqual(expected, recommendations);
     done();
   });
   
   it('Should handle an empty query object', function(done){
-    let expected = {"error": "Empty query object"};    
+    let expected = {'error': 'Empty query object'};    
     let recommendations = recsys.recommend({});
     assert.deepEqual(expected, recommendations);
     done();
@@ -51,7 +51,7 @@ describe('recommender-tests.js: Recommender engine unit tests.', function(){ // 
   describe('Text queries.', function(){ // describe L2
     
     it('Should handle an empty text query', function(done){
-      let expected = {"error": "Empty query object"};      
+      let expected = {'error': 'Empty query object'};      
       let query = { text: '' };
       let recommendations = recsys.recommend(query);
       assert.deepEqual(expected, recommendations);
@@ -70,7 +70,7 @@ describe('recommender-tests.js: Recommender engine unit tests.', function(){ // 
   describe('URL queries.', function(){ // describe L2
     
     it('Should handle an empty url query', function(done){
-      let expected = {"error": "Empty query object"}
+      let expected = {'error': 'Empty query object'};
       let query = { url: '' };
       let recommendations = recsys.recommend(query);
       assert.deepEqual(expected, recommendations);
@@ -79,14 +79,14 @@ describe('recommender-tests.js: Recommender engine unit tests.', function(){ // 
     
     it('Should handle a non-existing url query', function(done){
       let expected = [];
-      let query = { url: 'http://videolectures.net/kdd2016_broder_deep/'}
+      let query = { url: 'http://videolectures.net/kdd2016_broder_deep/'};
       let recommendations = recsys.recommend(query);
       assert.deepEqual(expected, recommendations);
       done();
     });
     
     it('Should handle an url query', function(done){
-      let query = { url: 'http://videolectures.net/kdd2016_broder_deep_learning/'}
+      let query = { url: 'http://videolectures.net/kdd2016_broder_deep_learning/'};
       let recommendations = recsys.recommend(query);
       assert.ok(recommendations);
       done();
@@ -97,7 +97,7 @@ describe('recommender-tests.js: Recommender engine unit tests.', function(){ // 
   describe('Text and URL queries.', function(){ // describe L2
     
     it('Should handle an empty text and url query', function(done){
-      let expected = {"error": "Empty query object"};      
+      let expected = {'error': 'Empty query object'};      
       let query = { text: '', url: '' };
       let recommendations = recsys.recommend(query);
       assert.deepEqual(expected, recommendations);
@@ -105,7 +105,7 @@ describe('recommender-tests.js: Recommender engine unit tests.', function(){ // 
     });
     
     it('Should handle a text and an empty url query as text query', function(done){
-      let textQuery = { text: 'deep learning' }
+      let textQuery = { text: 'deep learning' };
       let expected = recsys.recommend(textQuery);
       let query = { text: 'deep learning', url: '' };
       let recommendations = recsys.recommend(query);
@@ -114,7 +114,7 @@ describe('recommender-tests.js: Recommender engine unit tests.', function(){ // 
     });
     
     it('Should handle an empty text and a full url query as text query', function(done){
-      let urlQuery = { url: 'http://videolectures.net/kdd2016_broder_deep_learning/' }
+      let urlQuery = { url: 'http://videolectures.net/kdd2016_broder_deep_learning/' };
       let expected = recsys.recommend(urlQuery);
       let query = { text: '', url: 'http://videolectures.net/kdd2016_broder_deep_learning/' };
       let recommendations = recsys.recommend(query);
@@ -123,7 +123,7 @@ describe('recommender-tests.js: Recommender engine unit tests.', function(){ // 
     });
     
     it('Should handle a text and url query as url query', function(done){
-      let urlQuery = { url: 'http://videolectures.net/kdd2016_broder_deep_learning/' }
+      let urlQuery = { url: 'http://videolectures.net/kdd2016_broder_deep_learning/' };
       let expected = recsys.recommend(urlQuery);
       let query = { text: 'deep learning', url: 'http://videolectures.net/kdd2016_broder_deep_learning/' };
       let recommendations = recsys.recommend(query);
