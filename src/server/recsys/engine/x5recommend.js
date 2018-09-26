@@ -250,6 +250,15 @@ class x5recommend {
         // distinguish between the url and title & description query methods
         let recommendations;
         
+        if (!query){
+            let errorMessage = 'Missing query';
+            logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, { 
+                error: errorMessage, query 
+            });
+            // not supported query option - return error
+            return { error: errorMessage };            
+        }
+        
         if (query.url && query.type === 'cosine') {
             // get recommendations based on wikipedia concepts using url & cosine metrics
             recommendations = self.contentWikiCosineNN.search({ url: query.url }, self.content);
@@ -271,16 +280,44 @@ class x5recommend {
                 error: errorMessage, query 
             });
             // not supported query option - return error
-            return { error: 'Unsupported recommendation parameters' };
-        } else if (recommendations.error) {
+            return { error: errorMessage };
+        }else if (!recommendations) {
+            let errorMessage = 'Empty query object';
+            logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, { 
+                error: errorMessage, query 
+            });
+            // not supported query option - return error
+            return { error: errorMessage };
+        }else if (recommendations.error) {
             // log the error given by the recommendation search
             logger.error(`error [x5recommend.recommendContent]: ${recommendations.error}`, { 
                 error: recommendations.error, query 
             });
             // not supported query option - return error
-            return { error: 'Error when processing data' };
+            return { error: errorMessage };
         }
-
+      
+      return recommendations;        
+    }    
+    
+    /********************************************
+     * General Interface for Recommendations
+     *******************************************/
+    
+    /**
+     * Get recommendations.
+     * @param {Object} query - The object containing the query parameters. Query parameters depend on the type of 
+     * recommendation.
+     * @returns {Array.<Object>} An array of recommended learning material.
+     */ 
+    
+    recommend(query){
+        let recommendations = this.recommendContent(query);
+        
+        if (recommendations.error){
+            return recommendations;
+        }
+        
         /**
          * Detects the type of the material.
          * @param {String} mimetype - The mimetype of the material.
@@ -308,6 +345,7 @@ class x5recommend {
             audioType: detectType(material.mimetype) === 'audio',
             textType: detectType(material.mimetype) === 'text',
         }));
+      
     }
 }
 module.exports = x5recommend;

@@ -36,7 +36,7 @@ module.exports = function (pg, logger) {
         }
 
         // get the recommended material
-        let recommendations = x5recommend.recommendContent(query);
+        let recommendations = x5recommend.recommend(query);
 
         // log the recommendation success
         logger.info('client requested for recommendation successful');
@@ -45,7 +45,7 @@ module.exports = function (pg, logger) {
 
     });
     
-    // GET recommendation based on query
+    // POST recommendation based on query
     router.post('/recommend/content', (req, res) => {
         logger.info('client requested for recommendation',
             logger.formatRequest(req)
@@ -65,7 +65,7 @@ module.exports = function (pg, logger) {
         }
 
         // get the recommended material
-        let recommendations = x5recommend.recommendContent(query);
+        let recommendations = x5recommend.recommend(query);
 
         // log the recommendation success
         logger.info('client requested for recommendation successful');
