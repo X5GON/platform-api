@@ -8,7 +8,7 @@
 
 var assert = require('assert');
 var request = require('supertest');
-var server = require('../recsys.js');
+var server = require('../recsys.js'); //TODO: export server as a module
 var async = require('async');
 var env = process.env.NODE_ENV;
 
