@@ -16,7 +16,7 @@ const qm = require('qminer');
 const Logger = require('../../../lib/logging-handler')();
 
 // create a logger instance for logging recommendation requests
-const logger = Logger.createGroupInstance('recommendation-requests', 'x5recommend');
+const logger = Logger.createGroupInstance('recommender-tests', 'x5recommend');
 
 
 describe('recommender-tests.js: Recommender engine unit tests.', function(){ // describe L1
