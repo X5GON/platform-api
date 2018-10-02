@@ -1,0 +1,21 @@
+language: node_js
+
+node_js:
+  - 10
+
+cache:
+  directories:
+    - "node_modules"
+
+install:
+  - npm install
+
+script:
+  - npm install -g mocha
+  - npm test
+
+os: linux
+
+notifications:
+  email:
+    - erik.novak@ijs.si

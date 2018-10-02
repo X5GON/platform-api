@@ -7,10 +7,12 @@
     "start:platform": "cd src/server/platform && node platform.js --session-secret=keyboardcat",
     "start:platformInspect": "cd src/server/platform && node inspect platform.js --session-secret=keyboardcat",
     "minify:snippet": "cd src/server/platform/scripts && node minify-snippet.js",
-    "start:recsys": "cd src/server/recsys && node recsys.js",
-    "start:recsysInspect": "cd src/server/recsys && node inspect recsys.js",
+    "start:recsys": "cd src/server/recsys && NODE_ENV=production node recsys.js",
+    "start:recsysInspect": "cd src/server/recsys && NODE_ENV=production node inspect recsys.js",
     "postgres:create": "cd src/load && node create-postgres-tables.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run test:recsys",
+    "test:recsys": "cd src/server/recsys/test && NODE_ENV=test mocha *.js"
+
   },
   "repository": {
     "type": "git",
@@ -43,10 +45,11 @@
     "request": "^2.85.0",
     "textract": "^2.2.0",
     "winston": "^2.4.0",
-    "winston-daily-rotate-file": "^1.7.2"
+    "winston-daily-rotate-file": "^1.7.2",
+    "http-proxy-middleware": "^0.18.0"
   },
   "devDependencies": {
-    "http-proxy-middleware": "^0.18.0",
+    "supertest": "^3.3.0",
     "node-minify": "^2.4.1"
   }
 }

@@ -15,8 +15,10 @@ const Logger = require('../../lib/logging-handler')();
 // parameters given to the process
 const argv = require('minimist')(process.argv.slice(2));
 
+// get process environment
+const env = process.env.NODE_ENV;
 // create a logger instance for logging API requests
-const logger = Logger.createGroupInstance('recsys-requests', 'api');
+const logger = Logger.createGroupInstance(`recsys-requests-${env}`, 'api', env !== 'test');
 
 // create express app
 let app = express();
@@ -35,4 +37,7 @@ app.use('/api/v1/', require('./routes/recommendations')(pg, logger));
 const PORT = argv.PORT || 3000;
 
 // start the server
-app.listen(PORT, () => logger.info(`recsys listening on port ${PORT}`));
+let server = app.listen(PORT, () => logger.info(`recsys listening on port ${PORT}`));
+
+// export the server for testing
+module.exports = server;

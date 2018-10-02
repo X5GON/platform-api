@@ -1,0 +1,133 @@
+
+<div id="search-results-container" class="mt-3 d-table">
+  <div class="d-table-row">
+
+    <div id="search-results" class="mt-3 d-table-cell">
+      {{#if options.empty}}
+        <small>No educational material found</small>
+      {{else}}
+        <small>
+          {{#if options.pagination.onFirstPage}}
+            Top {{options.recommendations.length}} OER material results
+          {{else}}
+            Page {{options.pagination.current}} of top {{options.recommendations.length}}
+            OER material results
+          {{/if}}
+        </small>
+
+        <div class="recommendations mt-3">
+          {{#each options.recommendations.documents as |document index|}}
+            <table class="material-content mb-4">
+              <body>
+                <tr>
+                  <td class="align-top p-1 pt-2">
+                    <span class="fa-stack fa-lg">
+                      <i class="fas fa-circle fa-stack-2x"></i>
+                      <i class="fas fa-{{document.type}}
+                        fa-stack-1x fa-inverse"></i>
+                    </span>
+                  </td>
+                  <td class="w-100 p-1">
+                    <a class="material" href="{{document.url}}" target="_blank">
+                      {{document.title}}
+                      <small><i class="fas fa-external-link-alt"></i></small>
+                    </a>
+                    <br>
+                    <span class="material-link url">{{document.url}}</span>
+                    <br>
+                    {{#if document.description }}
+                      <p class="material-description mb-0">{{document.description}}</p>
+                    {{else}} {{/if}}
+                    <div class="row mt-2">
+                      <div class="col-12">
+                        <span class="d-inline-block mr-4"><strong class="mr-1">Language:</strong>{{document.language}}</span>
+                        <span class="d-inline-block mr-4"><strong class="mr-1">Provider:</strong>{{document.provider}}</span>
+                        <span class="inspect float-right badge badge-secondary"
+                          data-title="{{document.title}}"
+                          data-embed="{{document.embedUrl}}"
+                          data-type="{{document.type}}">
+                            Inspect
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </body>
+            </table>
+
+          {{/each}}
+        </div>
+        {{! navigation }}
+        <nav class="navigation-buttons text-center">
+          <ul class="pagination justify-content-center">
+
+            {{! Go to first page }}
+            <li class="page-item">
+              <a class="btn btn-secondary rounded-left {{#if options.pagination.onFirstPage}}disabled{{/if}}"
+                {{#unless options.pagination.onFirstPage}}
+                  href="/search?text={{ query.query }}&page=1&type={{ query.types.selectedType }}"
+                {{/unless}}>
+                <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+              </a>
+            </li>
+
+            {{! Go to previous page }}
+            <li class="page-item">
+              <a class="btn btn-secondary {{#if options.pagination.onFirstPage}}disabled{{/if}}"
+                {{#unless options.pagination.onFirstPage}}
+                  href="/search?text={{query.query}}&page={{options.pagination.previous}}&type={{query.types.selectedType}}"
+                {{/unless}}>
+                <i class="fa fa-angle-left" aria-hidden="true"></i>
+              </a>
+            </li>
+
+            {{! Set buttons to navigate through pages }}
+            {{#each options.pagination.quickSelect as |quickPage|}}
+              <li class="page-item">
+                <a class="btn btn-tertiary {{#if quickPage.active}}active{{/if}}"
+                  {{#unless quickPage.active}}
+                    href="/search?text={{../query.query}}&page={{quickPage.pageN}}&type={{../query.types.selectedType}}"
+                  {{/unless}}>
+                  {{quickPage.pageN}}
+                </a>
+              </li>
+            {{/each}}
+
+            {{! Go to next page }}
+            <li class="page-item">
+              <a class="btn btn-secondary {{#if options.pagination.onLastPage}}disabled{{/if}}"
+                {{#unless options.pagination.onLastPage}}
+                  href="/search?text={{query.query}}&page={{options.pagination.next}}&type={{query.types.selectedType}}"
+                {{/unless}}>
+                <i class="fa fa-angle-right" aria-hidden="true"></i>
+              </a>
+            </li>
+
+            {{! Go to last page }}
+            <li class="page-item">
+              <a class="btn btn-secondary rounded-right {{#if options.pagination.onLastPage}}disabled{{/if}}"
+                {{#unless options.pagination.onLastPage}}
+                  href="/search?text={{query.query}}&page={{options.pagination.max}}&type={{query.types.selectedType}}"
+                {{/unless}}>
+                <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+              </a>
+            </li>
+
+          </ul>
+        </nav>
+
+      {{/if}}
+    </div>
+
+    <div class="material-inspect-container">
+      <small class="invisible">Material Content</small>
+      <div class="mt-3 ml-5">
+        <h5 class="invisible material-title pt-1">Title</h5>
+        <iframe id="material-inspect"></iframe>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script type="application/javascript" src="/js/search.js"></script>

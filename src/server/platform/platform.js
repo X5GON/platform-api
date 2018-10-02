@@ -60,8 +60,5 @@ require('./routes/route.handler')(app, pg, logger);
 // parameters used on the express app
 const PORT = argv.PORT || 8080;
 
-// security options
-const security = require('./config/security');
-
 // start the server without https
 app.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));

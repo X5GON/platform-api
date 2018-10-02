@@ -11,11 +11,9 @@ const qm = require('qminer');
 const NearestNeighbor = require('./models/nearest-neighbors');
 const Logger = require('../../../lib/logging-handler')();
 
-// create a logger instance for logging recommendation requests
-const logger = Logger.createGroupInstance('recommendation-requests', 'x5recommend');
-
 /**
- * The x5recommend class - handling the recommendation requests given by
+ * @class x5recommend
+ * @classdesc The x5recommend class - handling the recommendation requests given by
  * the x5gon project users.
  */
 class x5recommend {
@@ -26,11 +24,18 @@ class x5recommend {
      * @param {String} params.mode - The database creation mode. Possible options
      * `create`, `open` and `readOnly`.
      * @param {String} params.path - The path where the database is stored.
+     * @param {String} [params.env='production'] - The environment in which it is initialized.
+     * Possible options `production` and `text`.
      */
     constructor(params) {
         let self = this;
         // parse parameters
         self.params = params;
+        if (!self.params.env) { self.params.env = 'production'; }
+        // set the recommender requests logger
+        self.logger = Logger.createGroupInstance(`recommendation-requests-${self.params.env}`,
+            'x5recommend', self.params.env !== 'test');
+
         // load database
         self._loadBase();
 
@@ -38,6 +43,7 @@ class x5recommend {
             // load the recommendation models
             self._loadModels();
         }
+
     }
 
     /**
@@ -66,8 +72,8 @@ class x5recommend {
         } else {
             // unsupported qminer mode - log the error
             let errorMessage = `Value of parameter 'mode' is not supported: ${self.params.mode}`;
-            logger.error(`error [x5recommend._loadBase]: ${errorMessage}`, { error: errorMessage });
-            throw errorMessage;
+            self.logger.error(`error [x5recommend._loadBase]: ${errorMessage}`, { error: errorMessage });
+            throw Error(errorMessage);
         }
 
         // create or open the database
@@ -106,7 +112,7 @@ class x5recommend {
      *******************************************/
 
     /**
-     * @description Create the Nearest Neighbor model for Content store based on 
+     * @description Create the Nearest Neighbor model for Content store based on
      * text.
      * @private
      */
@@ -119,14 +125,14 @@ class x5recommend {
             modelPath: path.join(self.params.path, '/contentTextNN.dat'),
             store: self.content,
             features: [{
-                type: 'text', source: 'Content', field: ['title', 'description'],
-                ngrams: 2, hashDimension: 200000
+                type: 'text', source: 'Content', field: ['title', 'description', 'rawContent'],
+                ngrams: 2, hashDimension: 20000
             }]
         });
     }
 
     /**
-     * @description Loads the Nearest Neighbor model for Content store based on 
+     * @description Loads the Nearest Neighbor model for Content store based on
      * text.
      * @private
      */
@@ -140,9 +146,8 @@ class x5recommend {
         });
     }
 
-
     /**
-     * @description Create the Nearest Neighbor model for Content store based on 
+     * @description Create the Nearest Neighbor model for Content store based on
      * Wikipedia concepts.
      * @private
      */
@@ -155,14 +160,14 @@ class x5recommend {
             modelPath: path.join(self.params.path, '/contentWikiNN.dat'),
             store: self.content,
             features: [{
-                type: 'multinomial', source: { store: "Content", join: "concepts" }, 
-                field: 'secUri'
+                type: 'multinomial', source: 'Content',
+                field: 'wikipediaConceptNames'
             }]
         });
     }
 
     /**
-     * @description Loads the Nearest Neighbor model for Content store based on 
+     * @description Loads the Nearest Neighbor model for Content store based on
      * Wikipedia concepts.
      * @private
      */
@@ -176,6 +181,41 @@ class x5recommend {
         });
     }
 
+    /**
+     * @description Create the Nearest Neighbor model for Content store based on
+     * Wikipedia concept consine metrics.
+     * @private
+     */
+    _createContentWikiCosineNNModel() {
+        let self = this;
+        // create the content nearest neighbor model
+        self.contentWikiCosineNN = new NearestNeighbor({
+            mode: 'create',
+            base: self.base,
+            modelPath: path.join(self.params.path, '/contentWikiCosineNN.dat'),
+            store: self.content,
+            features: [{
+                type: 'multinomial', source: 'Content',
+                field: 'wikipediaConceptNames',
+                valueField: 'wikipediaConceptCosine'
+            }]
+        });
+    }
+
+    /**
+     * @description Loads the Nearest Neighbor model for Content store based on
+     * Wikipedia concept consine metrics.
+     * @private
+     */
+    _loadContentWikiCosineNNModel() {
+        let self = this;
+        // load the nearest neighbor model used for content recommendation
+        self.contentWikiCosineNN = new NearestNeighbor({
+            mode: 'load',
+            base: self.base,
+            modelPath: path.join(self.params.path, '/contentWikiCosineNN.dat')
+        });
+    }
 
     /**
      * @description Create the recommendation models.
@@ -184,7 +224,7 @@ class x5recommend {
         let self = this;
         self._createContentTextNNModel();
         self._createContentWikiNNModel();
-
+        self._createContentWikiCosineNNModel();
     }
 
     /**
@@ -195,46 +235,123 @@ class x5recommend {
         let self = this;
         self._loadContentTextNNModel();
         self._loadContentWikiNNModel();
+        self._loadContentWikiCosineNNModel();
     }
 
+    /********************************************
+     * Content Recommendation Functions
+     *******************************************/
+
     /**
-     * Get content based recommendations.
-     * @param {Object} queryObject - The object containing the required query parameters.
-     * @param {String} [queryObject.text] - The text parameter. Finds material containing similar text.
-     * @param {String} [queryObject.url] - The url parameter. Finds the material found using the url and 
+     * @description Get content based recommendations.
+     * @param {Object} query - The object containing the required query parameters.
+     * @param {String} [query.text] - The text parameter. Finds material containing similar text.
+     * @param {String} [query.url] - The url parameter. Finds the material found using the url and
      * returns material similar to it.
+     * @param {String} [query.type] - The metrics type.
      * @returns {Array.<Object>} An array of recommended learning material.
      */
-    recommendContent(queryObject) {
+    recommendContent(query) {
         let self = this;
         // distinguish between the url and title & description query methods
         let recommendations;
 
-        if (queryObject.text) {
-            // return the recommendation based on the query
-            recommendations = self.contentTextNN.search(queryObject, self.content);
-        } else if (queryObject.url) {
-            // return the recommendation based on the query
-            recommendations = self.contentWikiNN.search(queryObject, self.content);
-        } else {
-            let errorMessage = 'Unsupported recommendation parameters';
-            logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, { 
-                error: errorMessage, queryObject 
+        if (!query) {
+            let errorMessage = 'Missing query';
+            self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
+                error: errorMessage, query
             });
             // not supported query option - return error
-            return { error: 'Unsupported recommendation parameters' };
+            return { error: errorMessage };
+        }
+
+        if (query.url && query.type === 'cosine') {
+            // get recommendations based on wikipedia concepts using url & cosine metrics
+            recommendations = self.contentWikiCosineNN.search({ url: query.url }, self.content);
+        } else if (query.url) {
+            // get recommendations based on wikipedia concepts using url
+            recommendations = self.contentWikiNN.search({ url: query.url }, self.content);
+        }
+
+        if (query.text && (!recommendations || (recommendations && !recommendations[0].length))) {
+            // there were no recommendations found for given url
+            // - try with content based recommendations
+            recommendations = self.contentTextNN.search({ text: query.text }, self.content);
+        }
+
+        if ((query.url || query.text) && !recommendations) {
+            // log the error for unsupported parameters
+            let errorMessage = 'Unsupported recommendation parameters';
+            self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
+                error: errorMessage, query
+            });
+            // not supported query option - return error
+            return { error: errorMessage };
+        } else if (!recommendations) {
+            let errorMessage = 'Empty query object';
+            self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
+                error: errorMessage, query
+            });
+            // not supported query option - return error
+            return { error: errorMessage };
+        } else if (recommendations.error) {
+            // log the error given by the recommendation search
+            self.logger.error(`error [x5recommend.recommendContent]: ${recommendations.error}`, {
+                error: recommendations.error, query
+            });
+            // not supported query option - return error
+            return { error: errorMessage };
+        }
+
+      return recommendations;
+    }
+
+    /********************************************
+     * General Interface for Recommendations
+     *******************************************/
+
+    /**
+     * Get recommendations.
+     * @param {Object} query - The object containing the query parameters. Query parameters
+     * depend on the type of recommendation.
+     * @returns {Array.<Object>} An array of recommended learning material.
+     */
+
+    recommend(query){
+        let recommendations = this.recommendContent(query);
+
+        if (recommendations.error){
+            return recommendations;
+        }
+
+        /**
+         * Detects the type of the material.
+         * @param {String} mimetype - The mimetype of the material.
+         * @returns {String} The type of the material.
+         */
+        function detectType(mimetype) {
+            let mime = mimetype.split('/');
+            if (mime[0] === 'video') {
+                return 'video';
+            } else {
+                return 'text';
+            }
         }
 
         // return the list of recommended materials with their weights
-        return recommendations[0].map((material, id) => {
-            return {
-                weight: recommendations[1][id],
-                link: material.link,
-                title: material.title,
-                description: material.description,
-                provider: material.provider
-            };
-        });
+        return recommendations[0].map((material, id) => ({
+            weight: recommendations[1][id],
+            url: material.url,
+            title: material.title,
+            description: material.description,
+            provider: material.provider,
+            language: material.language,
+            type: detectType(material.mimetype),
+            videoType: detectType(material.mimetype) === 'video',
+            audioType: detectType(material.mimetype) === 'audio',
+            textType: detectType(material.mimetype) === 'text',
+        }));
+
     }
 }
 module.exports = x5recommend;
