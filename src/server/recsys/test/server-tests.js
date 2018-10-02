@@ -1,19 +1,17 @@
-'use strict';
-
 /**************************************************************
  *
  * SERVER TESTS FOR RECOMMENDER ENGINE
  *
  */
 
-var assert = require('assert');
-var request = require('supertest');
-var server = require('../recsys.js'); //TODO: export server as a module
-var async = require('async');
-var env = process.env.NODE_ENV;
+const assert = require('assert');
+const request = require('supertest');
+let server = require('../recsys.js'); //TODO: export server as a module
+const async = require('async');
+const env = process.env.NODE_ENV;
 
-var host_url = 'http://localhost:3000';
-var container_url = host_url + '/api/v1/recommend';
+let host_url = 'http://localhost:3000';
+let container_url = host_url + '/api/v1/recommend';
 
 
 describe('/recommend/content', function () {

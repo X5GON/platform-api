@@ -1,4 +1,3 @@
-'use strict';
 /**************************************************************
  *
  * UNIT TESTS FOR RECOMMENDER ENGINE
@@ -6,17 +5,15 @@
  */
 
 
-let assert = require('assert');
+const assert = require('assert');
 let x5recommend = require('../engine/x5recommend.js');
-let path = require('path');
-
-const qm = require('qminer');
+const path = require('path');
+// const qm = require('qminer');
 
 // internal modules
-const Logger = require('../../../lib/logging-handler')();
-
+// const Logger = require('../../../lib/logging-handler')();
 // create a logger instance for logging recommendation requests
-const logger = Logger.createGroupInstance('recommender-tests', 'x5recommend');
+// const logger = Logger.createGroupInstance('recommender-tests', 'x5recommend');
 
 
 describe('recommender-tests.js: Recommender engine unit tests.', function () { // describe L1
