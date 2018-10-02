@@ -2,10 +2,12 @@
 const router = require('express').Router();
 const path = require('path');
 
+const env = process.env.NODE_ENV;
 // internal modules - recommendation base & models
 const x5recommend = new (require(path.join(__dirname, '../engine/x5recommend')))({
     mode: 'readOnly',
-    path: path.join(__dirname, '../../../../data/recsys')
+    path: path.join(__dirname, '../../../../data/recsys'),
+    env
 });
 
 
@@ -38,7 +40,7 @@ module.exports = function (pg, logger) {
 
         // get the recommended material
         let recommendations = x5recommend.recommend(query);
-        
+
         if (recommendations.error){
             let errorMessage = 'error when making recommendations: ' + recommendations.error;
             logger.warn('warning [query_parameters]: client requested for recommendation failed',
@@ -55,7 +57,7 @@ module.exports = function (pg, logger) {
         return res.send(recommendations);
 
     });
-    
+
     // POST recommendation based on query
     router.post('/recommend/content', (req, res) => {
         logger.info('client requested for recommendation',
@@ -78,7 +80,7 @@ module.exports = function (pg, logger) {
 
         // get the recommended material
         let recommendations = x5recommend.recommend(query);
-        
+
         if (recommendations.error){
             let errorMessage = 'error when making recommendations: ' + recommendations.error;
             logger.warn('warning [query_parameters]: client requested for recommendation failed',
