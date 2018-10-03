@@ -1,3 +1,6 @@
+// configurations
+const config = require('../../../../config/config');
+
 // external modules
 const router = require('express').Router();
 const handlebars = require('handlebars');
@@ -5,9 +8,13 @@ const path = require('path');
 const fs = require('fs');
 
 // internal modules
+// const KafkaProducer = require('../../../../lib/kafka-producer');
 const validator = require('../../../../lib/schema-validator')({
     userActivitySchema: require('../../schemas/user-activity-schema')
 });
+
+// TODO: initialize kafka producer
+// const producer = new KafkaProducer(config.kafka);
 
 /**
  * Adds API routes for logging user activity.
@@ -57,9 +64,9 @@ module.exports = function (pg, logger) {
             const provider = userParameters.cid ? userParameters.cid : 'unknown';
             // log user parameters error
             logger.error('error [route_body]: client activity logging failed',
-                logger.formatRequest(req, { 
+                logger.formatRequest(req, {
                     error: 'The body of the request is not in valid schema',
-                    provider 
+                    provider
 
                 })
             );
@@ -91,6 +98,8 @@ module.exports = function (pg, logger) {
                     logger.formatRequest(req, { error: error.message })
                 );
             } else {
+                // redirect activity to information retrievers
+                // producer.send('retrieval-topic', activity);
                 // log postgres success
                 logger.info('client activity logging successful',
                     logger.formatRequest(req)

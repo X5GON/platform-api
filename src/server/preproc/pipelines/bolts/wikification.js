@@ -6,14 +6,14 @@
  */
 
 // configurations
-const config = require('../../../config/config');
+const config = require('../../../../config/config');
 
 // external modules
 const async = require('async');
 const request = require('request');
 
 // internal libraries
-const Logger = require('../../../lib/logging-handler')();
+const Logger = require('../../../../lib/logging-handler')();
 // create a logger instance for logging wikification process
 const logger = Logger.createGroupInstance('wikification', 'preproc');
 
@@ -116,9 +116,11 @@ function enrichMaterial(text, weight, callback) {
                     name: concept.title.toString(),
                     secUri: concept.secUrl || null,
                     secName: concept.secTitle || null,
+                    lang: concept.lang,
                     wikiDataClasses: concept.wikiDataClasses,
                     cosine: concept.cosine,
-                    pageRank: concept.pageRank * weight
+                    pageRank: concept.pageRank * weight,
+                    dbPediaIri: concept.dbPediaIri
                 };
             });
             // return the concept list
@@ -245,6 +247,23 @@ class Wikification {
             }
             // store merged concepts within the material object
             material.materialMetadata.wikipediaConcepts = Object.values(conceptMap);
+
+            if (!material.language) {
+                // get the dominant language of the material
+                let languages = { };
+                for (let concept of material.materialMetadata.wikipediaConcepts) {
+                    if (languages[concept.lang]) {
+                        languages[concept.lang] += 1;
+                    } else {
+                        languages[concept.lang] = 1;
+                    }
+                }
+                // get the maximum language
+                material.language = Object.keys(languages)
+                    .reduce((a, b) => languages[a] > languages[b] ? a : b);
+            }
+
+
             //send it to the next component in the pipeline
             logger.info('acquired wikipedia concepts for material', { materialUrl: material.materialUrl });
             return this._onEmit(material, stream_id, callback);

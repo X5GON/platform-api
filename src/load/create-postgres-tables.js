@@ -32,7 +32,13 @@ let commands = [
         type jsonb, providerMetadata jsonb NOT NULL,
         materialMetadata jsonb NOT NULL);`,
     'CREATE INDEX IF NOT EXISTS oer_materials_materialUrl_idx ON oer_materials(materialUrl);',
-    'CREATE INDEX IF NOT EXISTS oer_materials_type_idx ON oer_materials(type);'
+    'CREATE INDEX IF NOT EXISTS oer_materials_type_idx ON oer_materials(type);',
+    // oer queue - for materials not yet retrieved
+    `CREATE TABLE IF NOT EXISTS oer_queue (id serial NOT NULL, 
+        materialUrl varchar NOT NULL PRIMARY KEY, providerUri varchar NOT NULL, 
+        inserted timestamp with time zone DEFAULT NOW());`,
+    `CREATE INDEX IF NOT EXISTS oer_queue_materialUrl_idx ON oer_queue(materialUrl);`,
+    `CREATE INDEX IF NOT EXISTS oer_queue_inserted_idx ON oer_queue(inserted);`
 ];
 
 // execute them one by one

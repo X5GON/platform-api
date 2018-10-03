@@ -8,7 +8,7 @@ const textract = require('textract');
 const franc = require('franc');
 
 // internal libraries
-const Logger = require('../../../lib/logging-handler')();
+const Logger = require('../../../../lib/logging-handler')();
 // create a logger instance for logging wikification process
 const logger = Logger.createGroupInstance('text-extract', 'preproc');
 
@@ -57,8 +57,6 @@ class TextExtract {
                 }
                 // save the raw text within the metadata
                 material.materialMetadata.rawText = text;
-                // ISO 639-2 Language Code 
-                material.language = franc(text);
                 // log successful text extraction
                 logger.info('extracting raw text from material successful', { materialUrl: material.materialUrl });
                 // send material object to next component

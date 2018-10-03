@@ -5,11 +5,11 @@
  */
 
 // internal libraries
-const Logger = require('../../../lib/logging-handler')();
+const Logger = require('../../../../lib/logging-handler')();
 // create a logger instance for logging wikification process
 const logger = Logger.createGroupInstance('material-format', 'preproc');
 
-const validator = require('../../../lib/schema-validator')();
+const validator = require('../../../../lib/schema-validator')();
 
 /**
  * Formats Material into a common schema.
