@@ -11,7 +11,7 @@ exports.removeFile = function(fileName) {
     if (fs.existsSync(fileName)) {
         fs.unlinkSync(fileName);
     } else {
-        console.warn(`File does not exist: ${fileName}`);
+        throw Error(`File does not exist: ${fileName}`);
     }
 };
 
