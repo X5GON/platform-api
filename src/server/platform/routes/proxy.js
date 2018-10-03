@@ -1,3 +1,6 @@
+// configurations
+const config = require('../../../config/config');
+
 // create proxy for api calls
 const proxy = require('http-proxy-middleware');
 
@@ -9,9 +12,9 @@ const proxy = require('http-proxy-middleware');
  */
 module.exports = function (app) {
     // redirect to the Recommendation System route
-    app.use('/api/recommend', proxy('/api/recommend', {
-        target: 'http://localhost:3000',
-        pathRewrite: { '^/api/recommend/': '/api/v1/recommend/' }
+    app.use('/api/v1/recommend', proxy('/api/v1/recommend', {
+        target: `http://localhost:${config.recsys.port}`,
+        // pathRewrite: { '^/api/v1/recommend/': '/api/v1/recommend/' }
     }));
 
 };

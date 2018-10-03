@@ -2,6 +2,8 @@
  * Runs the X5GON recommendation engine
  */
 
+// configurations
+const config = require('../../config/config');
 
 // external modules
 const express = require('express');
@@ -9,11 +11,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 // internal modules
-const pg = require('../../lib/postgresQL')(require('../../config/pgconfig'));
+const pg = require('../../lib/postgresQL')(config.pg);
 const Logger = require('../../lib/logging-handler')();
-
-// parameters given to the process
-const argv = require('minimist')(process.argv.slice(2));
 
 // get process environment
 const env = process.env.NODE_ENV;
@@ -34,7 +33,7 @@ app.use(cookieParser()); // cookie parser
 app.use('/api/v1/', require('./routes/recommendations')(pg, logger));
 
 // parameters used on the express app
-const PORT = argv.PORT || 3000;
+const PORT = config.recsys.port;
 
 // start the server
 let server = app.listen(PORT, () => logger.info(`recsys listening on port ${PORT}`));

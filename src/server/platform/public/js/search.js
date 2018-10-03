@@ -7,7 +7,7 @@ function empty() {
 $(document).ready(function () {
     // add on click function
     $('#search-query').on('keyup', function (e) {
-        if (e.keyCode == 13) { $('#search').click(); }
+        if (e.keyCode === 13) { $('#search').click(); }
     });
 
     $('.inspect').click(function () {
@@ -25,7 +25,5 @@ $(document).ready(function () {
         $('.material-inspect-container .material-title').html(title);
         $('.material-inspect-container .material-title').removeClass('invisible');
     });
-
-    $()
 
 });

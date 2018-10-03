@@ -11,6 +11,6 @@ module.exports = function (app, pg, logger) {
     ////////////////////////////////////////
 
     app.use('/', require('./v1/website')(pg, logger)); // website request handling
-    app.use('/', require('./v1/search')(pg, logger)); // website request handling
+    app.use('/api/v1', require('./v1/search')(pg, logger)); // website request handling
     app.use('/api/v1', require('./v1/activity-logging')(pg, logger)); // user activity data handling
 };
