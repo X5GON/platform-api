@@ -1,17 +1,20 @@
-{
+// configurations
+const config = require('../../../config/config');
+
+module.exports = {
     "general": {
         "heartbeat": 2000,
         "pass_binary_messages": true
     },
     "spouts": [
         {
-            "name": "text-input",
+            "name": "video-input",
             "type": "inproc",
             "working_dir": "./spouts",
             "cmd": "kafka-spout.js",
             "init": {
-                "kafka_host": "192.168.99.100:9092",
-                "topic": "text-topic"
+                "kafka_host": config.kafka.host,
+                "topic": "video-topic"
             }
         }
     ],
@@ -22,15 +25,15 @@
             "working_dir": "./bolts",
             "cmd": "material-format.js",
             "inputs": [
-                { "source": "text-input" }
+                { "source": "video-input" }
             ],
             "init": {}
         },
         {
-            "name": "text-extract",
+            "name": "dfxp-extract",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "text-extract.js",
+            "cmd": "dfxp-extract.js",
             "inputs": [
                 { "source": "material-format" }
             ],
@@ -42,7 +45,7 @@
             "working_dir": "./bolts",
             "cmd": "wikification.js",
             "inputs": [
-                { "source": "text-extract" }
+                { "source": "dfxp-extract" }
             ],
             "init": {}
         },
@@ -66,7 +69,6 @@
             ],
             "init": {}
         }
-
     ],
     "variables": {}
 }

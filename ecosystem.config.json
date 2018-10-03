@@ -3,7 +3,12 @@
         "name": "X5GON_platform",
         "script": "platform.js",
         "cwd": "./src/server/platform/",
-        "args": "--session-secret=keyboardcatz",
+        "env": {
+            "NODE_ENV": "dev"
+        },
+        "env_production": {
+            "NODE_ENV": "prod"
+        },
         "instances": "1",
         "exec_mode": "cluster",
         "autorestart": true,
@@ -12,6 +17,12 @@
         "name": "X5GON_recommender_engine",
         "script": "recsys.js",
         "cwd": "./src/server/recsys/",
+        "env": {
+            "NODE_ENV": "dev"
+        },
+        "env_production": {
+            "NODE_ENV": "prod"
+        },
         "instances": "1",
         "exec_mode": "cluster",
         "autorestart": true,
@@ -20,6 +31,12 @@
         "name": "X5GON_collectors",
         "script": "collector.js",
         "cwd": "./src/server/preproc/",
+        "env": {
+            "NODE_ENV": "dev"
+        },
+        "env_production": {
+            "NODE_ENV": "prod"
+        },
         "instances": "1",
         "exec_mode": "cluster",
         "autorestart": true,
@@ -28,7 +45,14 @@
         "name": "X5GON_preproc_pipeline_text",
         "script": "pipeline.js",
         "cwd": "./src/server/preproc/pipelines/",
-        "args": "--topology=preprocessing-text",
+        "env": {
+            "NODE_ENV": "dev",
+            "TOPOLOGY": "preprocessing-text"
+        },
+        "env_production": {
+            "NODE_ENV": "prod",
+            "TOPOLOGY": "preprocessing-text"
+        },
         "instances": "1",
         "exec_mode": "cluster",
         "autorestart": true,
@@ -37,7 +61,14 @@
         "name": "X5GON_preproc_pipeline_video",
         "script": "pipeline.js",
         "cwd": "./src/server/preproc/pipelines/",
-        "args": "--topology=preprocessing-video",
+        "env": {
+            "NODE_ENV": "dev",
+            "TOPOLOGY": "preprocessing-video"
+        },
+        "env_production": {
+            "NODE_ENV": "prod",
+            "TOPOLOGY": "preprocessing-video"
+        },
         "instances": "1",
         "exec_mode": "cluster",
         "autorestart": true,

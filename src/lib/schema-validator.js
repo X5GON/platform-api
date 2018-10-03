@@ -9,7 +9,7 @@ const Logger = require('./logging-handler')();
 class Validator {
 
     /**
-     * Initializes the JSON validator.
+     * @description Initializes the JSON validator.
      * @param {Object} params - The constructor parameter.
      */
     constructor(params) {
@@ -23,7 +23,7 @@ class Validator {
     }
 
     /**
-     * Object validation function.
+     * @description Object validation function.
      * @param {Object} object - The validated object.
      * @param {Object} schema - The schema the message object must follow.
      * @returns {Boolean} Returns `true` if object matches schema. Otherwise, `false`.
@@ -43,7 +43,7 @@ class Validator {
     }
 
     /**
-     * Checks if the object is an integer.
+     * @description Checks if the object is an integer.
      * @param {Object} object - The object to be validated.
      * @returns {Boolean} True if the `object` is an integer. Otherwise, return false.
      */

@@ -4,13 +4,14 @@
   "description": "connecting OER repositories",
   "main": "index.js",
   "scripts": {
-    "start:platform": "cd src/server/platform && node platform.js --session-secret=keyboardcat",
-    "start:platformInspect": "cd src/server/platform && node inspect platform.js --session-secret=keyboardcat",
+    "start:platform": "cd src/server/platform && NODE_ENV=dev node platform.js",
+    "start:platformInspect": "cd src/server/platform && NODE_ENV=dev node inspect platform.js",
     "minify:snippet": "cd src/server/platform/scripts && node minify-snippet.js",
-    "start:recsys": "cd src/server/recsys && node recsys.js",
-    "start:recsysInspect": "cd src/server/recsys && node inspect recsys.js",
+    "start:recsys": "cd src/server/recsys && NODE_ENV=dev node recsys.js",
+    "start:recsysInspect": "cd src/server/recsys && NODE_ENV=dev node inspect recsys.js",
     "postgres:create": "cd src/load && node create-postgres-tables.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "npm run test:recsys",
+    "test:recsys": "cd src/server/recsys/test && NODE_ENV=test mocha *.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "async": "^2.6.0",
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",
+    "dotenv": "^6.0.0",
     "express": "^4.16.2",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
@@ -33,6 +35,7 @@
     "franc": "^4.0.0",
     "handlebars": "^4.0.11",
     "helmet": "^3.12.1",
+    "http-proxy-middleware": "^0.18.0",
     "jsonschema": "^1.2.2",
     "kafka-node": "^2.6.1",
     "minimist": "^1.2.0",
@@ -49,7 +52,7 @@
     "winston-daily-rotate-file": "^1.7.2"
   },
   "devDependencies": {
-    "http-proxy-middleware": "^0.18.0",
+    "supertest": "^3.3.0",
     "node-minify": "^2.4.1"
   }
 }

@@ -22,6 +22,7 @@ var x5gonActivityTracker = function () {
    */
   function x5gonGetRequestString(validationFlag, providerToken) {
     var Dat = new Date();
+    // TODO: use Dat.toISOString() returns the same result
     var Dt = Dat.getFullYear() + '-' + x5gonCheckTime(Dat.getMonth() + 1) + '-' +
       x5gonCheckTime(Dat.getDate()) + 'T' + x5gonCheckTime(Dat.getHours()) + ':' +
       x5gonCheckTime(Dat.getMinutes()) + ':' + x5gonCheckTime(Dat.getSeconds()) + 'Z';

@@ -1,10 +1,9 @@
 // external modules
 const qtopology = require('qtopology');
-const argv = require('minimist')(process.argv.slice(2));
 
 // load preprocessing pipeline configuration
 
-let config = require(`./${argv.topology}`);
+let config = require(`./${process.env.TOPOLOGY}`);
 
 // compile the pipeline - inject variables and perform checks
 let compiler = new qtopology.TopologyCompiler(config);

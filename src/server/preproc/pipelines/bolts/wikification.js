@@ -5,6 +5,9 @@
  * stored within the material object and sent to the next component.
  */
 
+// configurations
+const config = require('../../../config/config');
+
 // external modules
 const async = require('async');
 const request = require('request');
@@ -14,8 +17,6 @@ const Logger = require('../../../../lib/logging-handler')();
 // create a logger instance for logging wikification process
 const logger = Logger.createGroupInstance('wikification', 'preproc');
 
-// configurations
-const wikiConfig = require('../../config/wikiconfig');
 
 /********************************************
  * Helper functions
@@ -31,14 +32,10 @@ function _wikipediaRequest(text) {
     // create a request promise
     return new Promise((resolve, reject) => {
         request.post({
-            url: `${wikiConfig.wikifierUrl}/annotate-article`,
-            form: {
-                text: text,
-                lang: 'auto',
+            url: `${config.preproc.wikifier.wikifierUrl}/annotate-article`,
                 support: false,
-                ranges: false,
                 includeCosines: true,
-                userKey: wikiConfig.userKey,
+                userKey: config.preproc.wikifier.userKey,
             },
             timeout: 30 * 1000 // 30 seconds
         }, (error, response, body) => {

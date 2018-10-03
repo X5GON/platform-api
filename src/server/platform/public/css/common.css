@@ -3,13 +3,13 @@ html {
     min-height: 100%;
 }
 
-body {    
+body {
     font-size: 14px;
     font-family: "Open Sans","Helvetica Neue",Helvetica,Roboto,Arial,sans-serif;
     color: #323232;
 }
 
-header .navbar { 
+header .navbar {
     background-color: #eaeaea;
 }
 
@@ -18,14 +18,14 @@ header .navbar .navbar-brand img {
     margin-left: 0;
 }
 
-header .navbar .nav-link { 
+header .navbar .nav-link {
     background-color: white;
     transition: background .2s;
-    font-weight: 600;    
+    font-weight: 600;
     color: #5b95a5;
 }
 
-header .navbar .nav-link:hover { 
+header .navbar .nav-link:hover {
     background-color: #f6f6f6;
 }
 
@@ -39,6 +39,19 @@ header .navbar .nav-link.call-to-action:hover {
     background-color: #456f7a;
 }
 
+header .navbar a {
+    color: #a7a7a7;
+    transition: background .2s;
+}
+
+header .navbar a:hover {
+    color: #5b95a5;
+}
+
+header .navbar a .link-symbol {
+    color: white;
+}
+
 footer {
     position: absolute;
     bottom: 0;
@@ -47,46 +60,46 @@ footer {
     font-size: 14px;
 }
 
-footer .funding { 
-    font-size: 12px; 
+footer .funding {
+    font-size: 12px;
     background-color: #eaeaea;
     color: black;
-    padding: 16px 0 13px 0; 
+    padding: 16px 0 13px 0;
 }
 footer .funding .col { margin: 0px; }
-footer .funding p { 
+footer .funding p {
     margin-top: 1rem;
-    margin-bottom: 1rem; 
+    margin-bottom: 1rem;
     line-height: 1.6;
 }
 
-footer .content { 
-    padding: 16px 0 13px 0; 
+footer .content {
+    padding: 16px 0 13px 0;
 }
 
 footer .link { margin-bottom: 10px; }
 footer .link a { color: white; }
-footer .link a:hover { 
-    color: #e5e5e5; 
+footer .link a:hover {
+    color: #e5e5e5;
     text-decoration: none;
 }
 footer .link span {
     font-size: 10px
 }
 
-footer .social-network a { 
+footer .social-network a {
     font-size: 22px;
-    color: white; 
+    color: white;
 }
 footer .social-network a:hover { color: #e5e5e5; }
 
-footer .contact a { 
-    color: white; 
+footer .contact a {
+    color: white;
     text-decoration: underline;
 }
 footer .contact a:hover { color: #e5e5e5; }
 
-footer .copyright { 
+footer .copyright {
     font-size: 12px;
 }
 

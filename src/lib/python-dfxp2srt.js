@@ -4,7 +4,7 @@ var PythonShell = require('python-shell');
 const fileManager = require('./file-manager');
 
 /**
- * Extract raw text from dfxp files.
+ * @description Extract raw text from dfxp files.
  * @param {String} slug - Identifier for videolectures.
  * @returns {Object} The promise.
  */
@@ -24,10 +24,10 @@ module.exports = function (slug, path='./') {
                 if (error) { return reject(error); }
                 let dfxp = fileManager.getFileContent(filename);
                 let rawText = results ? results.toString() : '';
-                return resolve({ dfxp, rawText }); 
+                return resolve({ dfxp, rawText });
             });
         });
-        // push the promise 
+        // push the promise
         promises.push(promise);
     });
     // return the promise with the given resolutions

@@ -1,8 +1,11 @@
+// configurations
+const config = require('../config/config');
+
 // external modules
 const async = require('async');
 
 // prepare postgresql connection to the database
-const pg = require('../lib/postgresQL')(require('../config/pgconfig'));
+const pg = require('../lib/postgresQL')(config.pg);
 
 // prepare commands we want to execute
 let commands = [
@@ -15,18 +18,18 @@ let commands = [
     'CREATE INDEX IF NOT EXISTS client_activity_provider ON client_activity(provider);',
     'CREATE INDEX IF NOT EXISTS client_activity_visitedOn ON client_activity(visitedOn);',
     // repository contact and token
-    `CREATE TABLE IF NOT EXISTS repositories (id serial PRIMARY KEY, name varchar NOT NULL, 
+    `CREATE TABLE IF NOT EXISTS repositories (id serial PRIMARY KEY, name varchar NOT NULL,
         domain varchar NOT NULL, contact varchar NOT NULL, token varchar NOT NULL);`,
     'CREATE INDEX IF NOT EXISTS repositories_name_idx ON repositories(name);',
     'CREATE INDEX IF NOT EXISTS repositories_domain_idx ON repositories(domain);',
     'CREATE INDEX IF NOT EXISTS repositories_contact_idx ON repositories(contact);',
     'CREATE INDEX IF NOT EXISTS repositories_token_idx ON repositories(token);',
     // oer materials and metadata
-    `CREATE TABLE IF NOT EXISTS oer_materials (id serial PRIMARY KEY, title varchar NOT NULL, 
+    `CREATE TABLE IF NOT EXISTS oer_materials (id serial PRIMARY KEY, title varchar NOT NULL,
         description varchar, providerUri varchar NOT NULL,
         materialUrl varchar NOT NULL, author varchar, language varchar NOT NULL,
-        dateCreated timestamp with time zone, dateRetrieved timestamp with time zone, 
-        type jsonb, providerMetadata jsonb NOT NULL, 
+        dateCreated timestamp with time zone, dateRetrieved timestamp with time zone,
+        type jsonb, providerMetadata jsonb NOT NULL,
         materialMetadata jsonb NOT NULL);`,
     'CREATE INDEX IF NOT EXISTS oer_materials_materialUrl_idx ON oer_materials(materialUrl);',
     'CREATE INDEX IF NOT EXISTS oer_materials_type_idx ON oer_materials(type);',
