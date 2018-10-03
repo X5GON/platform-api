@@ -6,16 +6,18 @@
  * (http://wikifier.org).
  */
 
+// configurations
+const config = require('../config/config');
+
 // external modules
 const qm = require('qminer');
 
 // internal modules
 const Logger = require('../lib/logging-handler')();
-
 // create a logger instance for logging recommendation requests
 const logger = Logger.createGroupInstance('recommendation-model-build', 'x5recommend');
-// initialize connection with postgresql 
-const pg = require('../lib/postgresQL')(require('../config/pgconfig'));
+// initialize connection with postgresql
+const pg = require('../lib/postgresQL')(config.pg);
 
 /********************************************
  * Run Script
@@ -30,20 +32,20 @@ let x5recommend = new (require('../server/recsys/engine/x5recommend'))({
 
 pg.selectLarge({ }, 'oer_materials', 10, (error, results) => {
     // handle error and close the postgres connection
-    if (error) { 
+    if (error) {
         logger.error('error when retrieving from postgres', { error: error.message });
         return;
     }
     for (let material of results) {
         logger.info(`next record being processed id=${material.id}`);
         // extract values from postgres record
-        let { 
-            title, 
-            description, 
-            materialurl: url, 
-            author: authors, 
-            language, 
-            type: { ext: extension, mime: mimetype },  
+        let {
+            title,
+            description,
+            materialurl: url,
+            author: authors,
+            language,
+            type: { ext: extension, mime: mimetype },
             providermetadata: { title: provider },
             materialmetadata: { rawText: rawContent, wikipediaConcepts }
         } = material;
@@ -57,7 +59,7 @@ pg.selectLarge({ }, 'oer_materials', 10, (error, results) => {
 
         // prepare wikipedia concepts if they exist
         if (wikipediaConcepts) {
-            wikipediaConcepts.forEach(concept => { 
+            wikipediaConcepts.forEach(concept => {
                 // set the wikipedia concepts for the record
                 let uri = concept.secUri ? concept.secUri : concept.uri;
                 wikipediaConceptNames.push(uri);
@@ -67,7 +69,7 @@ pg.selectLarge({ }, 'oer_materials', 10, (error, results) => {
         }
 
 
-        // create new record and 
+        // create new record and
         let record = {
             url,
             title,
@@ -83,13 +85,13 @@ pg.selectLarge({ }, 'oer_materials', 10, (error, results) => {
             wikipediaConceptCosine
         };
 
-        // push to the recommendation model 
+        // push to the recommendation model
         x5recommend.pushRecordContent(record);
         logger.info(`pushed record with id=${material.id}`, { url });
 
     }
 }, (error) => {    // write the material jsons
-    if (error) { 
+    if (error) {
         logger.error('error when processing data from postgres', { error: error.message });
     } else {
         // build the models

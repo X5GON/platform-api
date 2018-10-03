@@ -1,9 +1,10 @@
+// configurations
+const config = require('../../../../config/config');
+
 // external modules
 const router = require('express').Router();
 const request = require('request');
 
-// google verification configuration
-const gConfig = require('../../config/googleconfig');
 
 /********************************************
  * Helper functions
@@ -19,10 +20,10 @@ function _googleVerifyUser(gRecaptchaResponse) {
     // create a request promise
     return new Promise((resolve, reject) => {
         // make a request for captcha validation
-        request.post({ 
-            url: gConfig.reCaptcha.verifyUrl, 
+        request.post({
+            url: config.platform.google.reCaptcha.verifyUrl,
             form: {
-                secret: gConfig.reCaptcha.secret,
+                secret: config.platform.google.reCaptcha.secret,
                 response: gRecaptchaResponse,
             }
         }, (error, httpResponse, body) => {
@@ -76,7 +77,7 @@ module.exports = function (pg, logger) {
         // check if the user was successfully validated by google captcha
         // this is used only when redirected from POST /repository
         const invalid = req.query.invalid ? req.query.invalid == 'true' : false;
-        const recaptchaSiteKey = gConfig.reCaptcha.siteKey;
+        const recaptchaSiteKey = config.platform.google.reCaptcha.siteKey;
         return res.render('application-form', { recaptchaSiteKey, invalid });
     });
 
@@ -84,19 +85,19 @@ module.exports = function (pg, logger) {
         // get token used for accessing data
         const name = req.query.name;
         const token = req.query.providerId;
-        const referrer = req.header('Referrer') ? 
-            req.header('Referrer').split('?')[0] : 
+        const referrer = req.header('Referrer') ?
+            req.header('Referrer').split('?')[0] :
             '/application-form';
         // check if the repository already exists - return existing token
         pg.select({ name, token }, 'repositories', (error, results) => {
-            if (error) { 
+            if (error) {
                 logger.warn('error when retrieving repository data from table=repositories', {
                     table: 'repositories',
                     error
                 });
                 res.redirect(`${referrer}?invalid=true`);
              }
-            
+
             if (results.length === 0) {
                 return res.redirect(`${referrer}?invalid=true`);
             } else {
@@ -130,7 +131,7 @@ module.exports = function (pg, logger) {
                 pg.select({ name, domain, contact }, 'repositories', (error, results) => {
                     // log error
                     if (error) { console.log(error); }
-                    
+
                     if (results.length === 0) {
                         // there is no registered repositories in the database
 
@@ -171,7 +172,98 @@ module.exports = function (pg, logger) {
 
 
     /********************************************
-     * RECOMMENDATION EMBEDDINGS 
+     * RECOMMENDATION SEARCH
+     */
+
+    // maximum numbers of documents in recommendation list
+    const MAX_DOCS = 10;
+
+    router.get('/search', (req, res) => {
+        if (Object.keys(req.query).length) {
+            // get user query parameters and/or set initial ones
+            let queryParams = req.query;
+            queryParams.type = queryParams.type || 'all';
+            queryParams.page = parseInt(queryParams.page) || 1;
+
+            let queryString = Object.keys(queryParams).map(key => `${key}=${encodeURIComponent(queryParams[key])}`).join('&');
+            request(`http://localhost:${config.platform.port}/api/v1/recommend/content?${queryString}`, (error, httpRequest, body) => {
+                // set query parameters
+                let query = {
+                    query: queryParams.text,
+                    types: {
+                        selectedType: queryParams.type ? queryParams.type : 'all',
+                        get active() {
+                            let self = this;
+                            return function (type) {
+                                return self.selectedType === type;
+                            };
+                        },
+                    },
+                    page: queryParams.page
+                };
+                // set placeholder for options
+                let options = { };
+
+                try {
+                    const recommendations = JSON.parse(body);
+                    options.empty = recommendations.length === 0 || recommendations.error ? true : false;
+                    recommendations.forEach(recommendation => {
+                        if (recommendation.description) {
+                            // slice the description into a more digestive element
+                            let abstract = recommendation.description.split(' ').slice(0, 30).join(' ');
+                            if (recommendation.description !== abstract) { recommendation.description = `${abstract} ...`; }
+                        }
+                        // determine material type
+                        recommendation.type = recommendation.videoType ? 'video' :
+                            recommendation.audioType ? 'audio' : 'file-alt';
+                        // embed url
+                        recommendation.embedUrl = recommendation.provider === 'Videolectures.NET' ?
+                            `${recommendation.url}iframe/1/` : recommendation.url;
+                    });
+
+                    // save recommendations
+                    let recLength = recommendations.length;
+                    options.recommendations = {
+                        length: recLength,
+                        documents: recommendations.slice(MAX_DOCS * (query.page - 1), MAX_DOCS * query.page)
+                    };
+
+                    // get number of pages - limit is set to 10 documents per page
+                    let maxPages = Math.ceil(recLength / MAX_DOCS);
+
+                    let quickSelect = [];
+                    for (let i = query.page - 2; i < query.page + 3; i++) {
+                        if (i < 1 || maxPages < i) { continue; }
+                        quickSelect.push({ pageN: i, active: i === query.page });
+                    }
+
+                    // save pagination values
+                    options.pagination = {
+                        current: query.page,
+                        max: maxPages,
+                        get onFirstPage() { return this.current === 1; },
+                        get onLastPage() { return this.current === this.max; },
+                        get previous() { return this.current - 1; },
+                        get next() { return this.current + 1; },
+                        quickSelect
+                    };
+
+                } catch(xerror) {
+                    options.empty = true;
+                }
+                return res.render('search-results', { layout: 'search-results', query, options });
+
+            });
+
+            // currently redirect to form page
+        } else {
+            // currently redirect to form page
+            return res.render('search', { layout: 'search' });
+        }
+    });
+
+    /********************************************
+     * RECOMMENDATION EMBEDDINGS
      */
 
     // send application form page
@@ -180,7 +272,7 @@ module.exports = function (pg, logger) {
 
         let options = { layout: 'empty' };
         let queryString = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
-        request(`http://localhost:8080/api/recommend/content?${queryString}`, (error, httpRequest, body) => {
+        request(`http://localhost:${config.platform.port}/api/v1/recommend/content?${queryString}`, (error, httpRequest, body) => {
             try {
                 const recommendations = JSON.parse(body);
                 options.empty = recommendations.length === 0 || recommendations.error ? false : true;
@@ -192,6 +284,7 @@ module.exports = function (pg, logger) {
             }
         });
     });
+
 
     router.get('/error', (req, res) => {
         return res.render('privacy-policy', { });

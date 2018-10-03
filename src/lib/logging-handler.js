@@ -10,7 +10,7 @@ require('winston-daily-rotate-file');
 class Logger {
 
     /**
-     * Prepares the logs folder.
+     * @description Prepares the logs folder.
      */
     constructor() {
         // set log folder path
@@ -23,7 +23,7 @@ class Logger {
     }
 
     /**
-     * Creates a daily-rotate-file transport.
+     * @description Creates a daily-rotate-file transport.
      * @param {String} fileName - The name of the the log files.
      * @param {String} path - The path to the log files.
      * @returns {Object} The Daily-rotate-file transport.
@@ -40,7 +40,7 @@ class Logger {
     }
 
     /**
-     * Create a logger instance.
+     * @description Create a logger instance.
      * @param {String} fileName - The name of the log file (the function adds a date pattern to the name).
      * @param {String} [level='info'] - The level of the logger instance.
      * @param {String} [subFolder=''] - The folder where the files are saved.
@@ -78,7 +78,7 @@ class Logger {
     }
 
     /**
-     * Create a logger instance that write in three different files: `info`, `warn` and `error`.
+     * @description Create a logger instance that write in three different files: `info`, `warn` and `error`.
      * @param {String} fileName - The name of the log file (the function adds a date pattern to the name).
      * @param {String} [subFolder=''] - The folder where the files are saved.
      * @param {Boolean} [consoleFlag=true] - Enable console logging.

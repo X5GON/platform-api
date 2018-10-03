@@ -9,7 +9,7 @@ const async = require('async');
 class PostgreSQL {
 
     /**
-     * Initialize postgresql pool connections.
+     * @description Initialize postgresql pool connections.
      * @param {Object} config - The postgres config object.
      * @param {String} config.user - The user logging in.
      * @param {String} config.database - The database name.
@@ -26,7 +26,7 @@ class PostgreSQL {
     }
 
     /**
-     * Initializes client pool used for connecting to the database.
+     * @description Initializes client pool used for connecting to the database.
      * @private
      */
     _initializePool() {
@@ -41,7 +41,7 @@ class PostgreSQL {
     }
 
     /**
-     * Extracts the keys and values used for querying.
+     * @description Extracts the keys and values used for querying.
      * @param {Object} obj - The object containing the parameters.
      * @returns {Object} Containing the query parameters, values and the number of query parameters.
      * @private
@@ -69,7 +69,7 @@ class PostgreSQL {
     }
 
     /**
-     * Extracts the condition rules.
+     * @description Extracts the condition rules.
      * @param {Object | Object[]} conditions - The conditions used after the WHERE statement.
      * @param {Number} i - The starting number for parameter indexing.
      * @returns {Object} Containing the conditions and the statement values.
@@ -113,7 +113,7 @@ class PostgreSQL {
     }
 
     /**
-     * Closes the connections.
+     * @description Closes the connections.
      * @returns {Null}
      */
     close(callback) {
@@ -122,7 +122,7 @@ class PostgreSQL {
     }
 
     /**
-     * Executes the query given the values.
+     * @description Executes the query given the values.
      * @param {String} query - The query statement.
      * @param {Array} params - The values used in the statement.
      * @param {Function} callback - The callback function.
@@ -156,7 +156,7 @@ class PostgreSQL {
     }
 
     /**
-     * Executes the query given the values.
+     * @description Executes the query given the values.
      * @param {String} query - The query statement.
      * @param {Array} params - The values used in the statement.
      * @param {Integer} batchSize - The size of the result returns at oance
@@ -198,7 +198,7 @@ class PostgreSQL {
     }
 
     /**
-     * Inserts the object in the database.
+     * @description Inserts the object in the database.
      * @param {Object} values - The object containing the keys and values.
      * @param {String} table - Table name.
      * @param {Function} callback - The callback function.
@@ -216,7 +216,7 @@ class PostgreSQL {
     }
 
     /**
-     * Finds the rows in the database.
+     * @description Finds the rows in the database.
      * @param {Object | Object[]} conditions - The conditions used to find the rows.
      * @param {String} table - Table name.
      * @param {Function} callback - The callback function.
@@ -234,7 +234,7 @@ class PostgreSQL {
     }
 
     /**
-     * Finds the rows in the database.
+     * @description Finds the rows in the database.
      * @param {Object | Object[]} conditions - The conditions used to find the rows.
      * @param {String} table - Table name.
      * @param {Integer} batchSize - The size of the result returnes at once
@@ -253,7 +253,7 @@ class PostgreSQL {
     }
 
     /**
-     * Updates the rows in the database.
+     * @description Updates the rows in the database.
      * @param {Object} values - The values used for updating the rows.
      * @param {Object | Object[]} conditions - The conditions used to find the rows.
      * @param {String} table - Table name.
@@ -273,7 +273,7 @@ class PostgreSQL {
     }
 
     /**
-     * Deletes the rows in the database.
+     * @description Deletes the rows in the database.
      * @param {Object | Object[]} conditions - The conditions used to find the rows.
      * @param {String} table - Table name.
      * @param {Function} callback - The callback function.
@@ -288,7 +288,7 @@ class PostgreSQL {
     }
 
     /**
-     * Upserts (updates or inserts) the row in the database.
+     * @description Upserts (updates or inserts) the row in the database.
      * @param {Object} values - The values of the row.
      * @param {String} table - Table name.
      * @param {Function} callback - The callback function.

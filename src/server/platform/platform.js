@@ -2,6 +2,9 @@
  * Runs the X5GON platform server
  */
 
+// configurations
+const config = require('../../config/config');
+
 // external modules
 const express = require('express');
 const exphbs = require('express-handlebars');
@@ -9,18 +12,12 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 
-
 // internal modules
-const pg = require('../../lib/postgresQL')(require('../../config/pgconfig'));
+const pg = require('../../lib/postgresQL')(config.pg);
 const Logger = require('../../lib/logging-handler')();
 
 // create a logger instance for logging API requests
 const logger = Logger.createGroupInstance('api-requests', 'api');
-
-// parameters given to the process
-const argv = require('minimist')(process.argv.slice(2));
-// log process parameters
-logger.info('accepted process parameters', { argv });
 
 // create express app
 let app = express();
@@ -32,7 +29,7 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 }));
 
 app.use(session({
-    secret: argv['session-secret'],
+    secret: config.platform.sessionSecret,
     resave: true,
     saveUninitialized: true,
     cookie: { domain: '.x5gon.org' }
@@ -52,13 +49,16 @@ app.set('view engine', 'hbs');
 require('./routes/proxy')(app);
 
 // cookie parser
-app.use(cookieParser(argv['session-secret']));
+app.use(cookieParser(config.platform.sessionSecret));
 
 // sets the API routes
 require('./routes/route.handler')(app, pg, logger);
 
 // parameters used on the express app
-const PORT = argv.PORT || 8080;
+const PORT = config.platform.port;
 
 // start the server without https
-app.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));
+const server = app.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));
+
+// export the server for testing
+module.exports = server;
