@@ -3,13 +3,10 @@ const KafkaConsumer = require('../../lib/kafka-consumer');
 const KafkaProducer = require('../../lib/kafka-producer');
 
 // configurations
-const kafkaConfig = require('../../config/kafkaconfig');
-const retrieverConfig = require('./config/retrieverconfig');
+const config = require('../../config/config');
 
 // setup connection with the database
-const pg = require('../../lib/postgresQL')(
-    require('../../config/pgconfig')
-);
+const pg = require('../../lib/postgresQL')(config.pg);
 
 class OERCollectors {
 
@@ -18,8 +15,8 @@ class OERCollectors {
      */
     constructor() {
         // set kafka consumer & producers
-        this._consumer = new KafkaConsumer(kafkaConfig.host, 'retrieval-topic');
-        this._producer = new KafkaProducer(kafkaConfig);
+        this._consumer = new KafkaConsumer(config.kafka.host, 'retrieval-topic');
+        this._producer = new KafkaProducer(config.kafka);
 
         // crawling configuration
         this.defaultFrequency = 7 * 24 * 60 * 60 * 1000; // one week
@@ -27,8 +24,8 @@ class OERCollectors {
         // initialize different retrievers
         this._apis = [];
         // go through retriever configurations
-        for (let config of retrieverConfig) {
-            config.config.crawlingFrequency = this.defaultFrequency;
+        for (let repo of config.preproc.retriever) {
+            repo.config.crawlingFrequency = this.defaultFrequency;
             this.addAPI(config);
         }
     }
@@ -172,7 +169,7 @@ class OERCollectors {
                     self._producer.send('text-topic', material);
                 }
             }
-        }
+        };
     }
 }
 

@@ -22,11 +22,11 @@
           <tbody>
 
             {{#each processList as |process|}}
-              <tr id="{{process.name}}" data-toggle="collapse" data-process-head="{{process.name}}"
-                href="tr[data-process-body={{process.name}}] div.collapse">
+              <tr id="{{process.name}}" data-process-head="{{process.name}}">
 
                 <td class="text-center align-middle">{{process.pm_id}}</td>
-                <td class="align-middle">{{process.name}}</td>
+                <td class="align-middle" data-toggle="collapse"
+                  href="tr[data-process-body={{process.name}}] div.collapse">{{process.name}}</td>
                 <td class="text-center align-middle font-weight-bold {{statusColor process.pm2_env.status}}"
                   type="status">
                   {{process.pm2_env.status}}
@@ -68,13 +68,13 @@
 
                 <td colspan="9">
                   <div class="collapse">
-                    <div class="content container-fluid">
+                    <div class="content">
                       <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-4 pl-4">
                           <h6>CPU usage</h6>
                           <div class="piechart">{{process.monit.cpu}}</div>
                         </div>
-                        <div class="col-md-8">
+                        <div class="col-md-8 pl-4">
                           <h6>Memory usage</h6>
                           <div class="timeline">{{process.monit.memory}}</div>
                         </div>
@@ -97,9 +97,6 @@
 </div>{{! .container }}
 
 <script src="/socket.io/socket.io.js"></script>
-
-<script src="https://d3js.org/d3.v5.min.js"></script>
-<script src="/js/graph/timeline.js"></script>
 
 <script src="/js/process-monitor-socket.js"></script>
 <script src="/js/process-monitor-actions.js"></script>

@@ -5,7 +5,7 @@
  */
 
 // configurations
-const config = require('../../../config/config');
+const config = require('../../../../config/config');
 
 // internal libraries
 const Logger = require('../../../../lib/logging-handler')();
@@ -13,8 +13,7 @@ const Logger = require('../../../../lib/logging-handler')();
 const logger = Logger.createGroupInstance('postgresql-storage', 'preproc');
 
 // postgres library
-const pg = require('../../../lib/postgresQL')(config.pg);
-
+const pg = require('../../../../lib/postgresQL')(config.pg);
 
 /**
  * Stores the OER material into PostgresQL database.

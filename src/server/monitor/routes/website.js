@@ -1,8 +1,9 @@
+// configurations
+const config = require('../../../config/config');
+
 // external modules
 const router = require('express').Router();
 const url = require('url');
-// configurations
-const config = require('../config/adminconfig');
 
 /**
  * Adds API routes for platform website requests.
@@ -11,7 +12,7 @@ module.exports = function (monitor) {
 
     function isAdmin(req, res, next) {
         const { token } = req.query;
-        if (token !== config.adminToken) {
+        if (token !== config.monitor.adminToken) {
             return res.redirect(url.format({
                 pathname: '/monitor/error',
                 query: {

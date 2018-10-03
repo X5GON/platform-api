@@ -6,7 +6,7 @@
  */
 
 // configurations
-const config = require('../../../config/config');
+const config = require('../../../../config/config');
 
 // external modules
 const async = require('async');
