@@ -33,9 +33,14 @@ function _wikipediaRequest(text) {
     return new Promise((resolve, reject) => {
         request.post({
             url: `${config.preproc.wikifier.wikifierUrl}/annotate-article`,
-            support: false,
-            includeCosines: true,
-            userKey: config.preproc.wikifier.userKey,
+            form: {
+                text: text,
+                lang: 'auto',
+                support: false,
+                ranges: false,
+                includeCosines: true,
+                userKey: config.preproc.wikifier.userKey,
+            },
             timeout: 30 * 1000 // 30 seconds
         }, (error, response, body) => {
                 // handle error on request
