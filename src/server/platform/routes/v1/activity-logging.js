@@ -1,3 +1,6 @@
+// configurations
+const config = require('../../../../config/config');
+
 // external modules
 const router = require('express').Router();
 const handlebars = require('handlebars');
@@ -5,15 +8,13 @@ const path = require('path');
 const fs = require('fs');
 
 // internal modules
-const KafkaProducer = require('../../../../lib/kafka-producer');
+// const KafkaProducer = require('../../../../lib/kafka-producer');
 const validator = require('../../../../lib/schema-validator')({
     userActivitySchema: require('../../schemas/user-activity-schema')
 });
 
-// initialize kafka producer
-const producer = new KafkaProducer({
-    host: '192.168.99.100:9092'
-});
+// TODO: initialize kafka producer
+// const producer = new KafkaProducer(config.kafka);
 
 /**
  * Adds API routes for logging user activity.
