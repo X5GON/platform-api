@@ -16,7 +16,30 @@ const request = require('request');
  */
 module.exports = function (pg, logger) {
 
-    // send application form page
+    /**
+     * @api {GET} /api/v1/search Get the recommendations in JSON format
+     * @apiName GetRecommendationsMeta
+     * @apiGroup Recommendations
+     *
+     * @apiParam {String} [text] - The raw text. If both `text` and `url` are present, `url` has the priority
+     * @apiParam {String} [url] - The url of the material. If both `text` and `url` are present, `url`
+     * has the priority
+     * @apiParam {String="cosine","null"} [type] - The metrics used in combination with the url parameter
+     *
+     * @apiSuccess (200) {Object} result - The object containing the status and recommendations.
+     * @apiSuccess (200) {Boolean} result.empty - If recommendations were found for the given query.
+     * @apiSuccess (200) {Object[]} result.recommendations - The recommendations sorted by relevance/weight in descending order.
+     * @apiSuccess (200) {Number} result.recommendations.weight - The relevance weight.
+     * @apiSuccess (200) {String} result.recommendations.url - the material url.
+     * @apiSuccess (200) {String} result.recommendations.title - The material title.
+     * @apiSuccess (200) {String} result.recommendations.description - The material description.
+     * @apiSuccess (200) {String} result.recommendations.provider - The provider of the material.
+     * @apiSuccess (200) {String} result.recommendations.language - The language in which the material is written/spoken.
+     * @apiSuccess (200) {String="video","audio","text"} result.recommendations.type - The material type.
+     *
+     * @apiExample {curl} Example usage:
+     *      curl -i https://platform.x5gon.org/api/v1/search?url=https://platform.x5gon.org/materialUrl&text=deep+learning
+     */
     router.get('/search', (req, res) => {
         const query = req.query;
         let queryString = Object.keys(query).map(key => `${key}=${encodeURIComponent(query[key])}`).join('&');
