@@ -20,6 +20,10 @@ exports.removeFile = function(fileName) {
  * @param {String} sourcePath - The folder to be removed.
  */
 exports.removeFolder = function (sourcePath) {
+    if (!fs.existsSync(sourcePath)) {
+        throw Error(`Folder does not exist: ${sourcePath}`);
+    }
+
     let source = path.resolve(sourcePath);
     // ensure to clean up the database after the tests
     if (fs.existsSync(source)) {
@@ -135,7 +139,7 @@ exports.executeOnFiles = function (startPath, filter, callback) {
 exports.getFileContent = function (filePath) {
     // check if file exists
     if (!fs.existsSync(filePath)) {
-        throw new Error(`file does not exist: ${filePath}`);
+        throw Error(`file does not exist: ${filePath}`);
     }
     // read the file and return it's content
     return fs.readFileSync(filePath, 'utf8');
