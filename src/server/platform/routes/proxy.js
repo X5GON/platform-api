@@ -5,7 +5,7 @@ const config = require('../../../config/config');
 const proxy = require('http-proxy-middleware');
 
 /**
- * Adds proxies to express app.
+ * @description Adds proxies to express app.
  * @param {Object} app - Express app.
  */
 module.exports = function (app) {

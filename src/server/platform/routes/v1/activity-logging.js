@@ -70,12 +70,12 @@ module.exports = function (pg, logger) {
      *
      * @apiParamExample {json} User Activity Information:
      *  {
-     *      "x5gonValidated": true,
-     *      "dt": "2018-10-04T10%3A19%3A45Z",
-     *      "rq": "https://platform.x5gon.org/example",
-     *      "rf": null,
-     *      "cid": "x5gonTokenXYZ",
-     *      "test": true
+     *    "x5gonValidated": true,
+     *    "dt": "2018-10-04T10%3A19%3A45Z",
+     *    "rq": "https://platform.x5gon.org/example",
+     *    "rf": null,
+     *    "cid": "x5gonTokenXYZ",
+     *    "test": true
      *  }
      */
     router.get('/snippet/log', (req, res) => {
@@ -97,7 +97,7 @@ module.exports = function (pg, logger) {
     });
 
     /**
-     * Validates the user requests and returns the options/headers for the beacon image
+     * @description Validates the user requests and returns the options/headers for the beacon image
      * & the user parameters
      * @param {Object} req - The express request object.
      * @returns {Object} The options and user parameters.
@@ -150,12 +150,12 @@ module.exports = function (pg, logger) {
      *
      * @apiParamExample {json} User Activity Information:
      *  {
-     *      "x5gonValidated": true,
-     *      "dt": "2018-10-04T10%3A19%3A45Z",
-     *      "rq": "https://platform.x5gon.org/example",
-     *      "rf": null,
-     *      "cid": "x5gonTokenXYZ",
-     *      "test": true
+     *    "x5gonValidated": true,
+     *    "dt": "2018-10-04T10%3A19%3A45Z",
+     *    "rq": "https://platform.x5gon.org/example",
+     *    "rf": null,
+     *    "cid": "x5gonTokenXYZ",
+     *    "test": true
      *  }
      */
     router.get('/snippet/log/development', (req, res) => {
@@ -183,12 +183,12 @@ module.exports = function (pg, logger) {
      *
      * @apiParamExample {json} User Activity Information:
      *  {
-     *      "x5gonValidated": true,
-     *      "dt": "2018-10-04T10%3A19%3A45Z",
-     *      "rq": "https://platform.x5gon.org/example",
-     *      "rf": null,
-     *      "cid": "x5gonTokenXYZ",
-     *      "test": true
+     *    "x5gonValidated": true,
+     *    "dt": "2018-10-04T10%3A19%3A45Z",
+     *    "rq": "https://platform.x5gon.org/example",
+     *    "rf": null,
+     *    "cid": "x5gonTokenXYZ",
+     *    "test": true
      *  }
      */
     router.get('/snippet/log/production', (req, res) => {

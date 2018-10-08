@@ -4,21 +4,11 @@
  * is the provider token. Uses the image pixel integration.
  */
 var x5gonActivityTracker = function () {
-
   /**
-   * Checks and changes the number to be part of time format.
-   * @param {Number} num - The number used to compose time.
-   * @returns {String} Part of time format.
-   */
-  function x5gonCheckTime(num) {
-    if(num < 10) { num = '0' + num; }
-    return num;
-  }
-
-  /**
-   * Creates the request string.
+   * @description Creates the request string.
    * @param {Boolean|String} validationFlag - If the user already validated X5GON.
    * @param {String} providerToken - The OER provider token used for identification.
+   * @param {Boolean} test - Indicator if the tracker is used for testing or production.
    */
   function x5gonGetRequestString(validationFlag, providerToken, test) {
     var Dat = new Date();

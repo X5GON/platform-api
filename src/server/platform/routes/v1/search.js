@@ -10,7 +10,7 @@ const request = require('request');
  *******************************************/
 
 /**
- * Adds API routes for platform website requests.
+ * @description Adds API routes for platform website requests.
  * @param {Object} pg - Postgres connection wrapper.
  * @param {Object} logger - The logger object.
  */

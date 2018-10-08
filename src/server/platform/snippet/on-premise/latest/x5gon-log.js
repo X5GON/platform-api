@@ -66,23 +66,13 @@ function x5gonCheckCookie() {
  * is the provider token. Uses the image pixel integration.
  */
 var x5gonActivityTracker = function () {
-
-  /**
-   * Checks and changes the number to be part of time format.
-   * @param {Number} num - The number used to compose time.
-   * @returns {String} Part of time format.
-   */
-  function x5gonCheckTime(num) {
-    if(num < 10) { num = '0' + num; }
-    return num;
-  }
-
   /**
    * Creates the request string.
    * @param {Boolean|String} validationFlag - If the user already validated X5GON.
    * @param {String} providerToken - The OER provider token used for identification.
+   * @param {Boolean} test - Indicator if the tracker is used for testing or production.
    */
-  function x5gonGetRequestString(validationFlag, providerToken) {
+  function x5gonGetRequestString(validationFlag, providerToken, test) {
     var Dat = new Date();
     var Dt = Dat.toISOString().split('.')[0] + 'Z';
     var CURL = document.URL;
@@ -94,13 +84,14 @@ var x5gonActivityTracker = function () {
     request += '&rq=' + encodeURIComponent(CURL);
     request += '&rf=' + encodeURIComponent(PURL);
     request += '&cid=' + encodeURIComponent(providerToken);
+    if (test) { request +='&test=' + test; }
     return request;
   }
 
-  return function(providerToken) {
+  return function(providerToken, test) {
     try {
       var img = document.createElement('img');
-      img.setAttribute('src', x5gonGetRequestString(x5gonCheckCookie(), providerToken));
+      img.setAttribute('src', x5gonGetRequestString(x5gonCheckCookie(), providerToken, test));
       document.body.appendChild(img);
     } catch(err) { }
   };
