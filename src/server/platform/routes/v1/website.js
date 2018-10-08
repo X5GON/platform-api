@@ -267,19 +267,20 @@ module.exports = function (pg, logger) {
      */
 
     /**
-     * @api {GET} /embed/recommendations Get the embed-ready recommendation list
+     * @api {GET} /embed/recommendations Ember-ready recommendation list
+     * @apiDescription Gets the embed-ready recommendation list html
      * @apiName GetRecommendationsEmbedReady
      * @apiGroup Recommendations
+     * @apiVersion 1.0.0
      *
-     * @apiParam {String} [text] - The raw text. If both `text` and `url` are present, `url` has the priority
-     * @apiParam {String} [url] - The url of the material. If both `text` and `url` are present, `url`
-     * has the priority
-     * @apiParam {String="cosine","null"} [type] - The metrics used in combination with the url parameter
+     * @apiParam {String} [text] - The raw text. If both `text` and `url` are present, `url` has the priority.
+     * @apiParam {String} [url] - The url of the material. If both `text` and `url` are present, `url` has the priority.
+     * @apiParam {String="cosine","null"} [type] - The metrics used in combination with the url parameter.
      *
      * @apiSuccess (200) {String} list - The html of the embed-ready list.
      * @apiExample {html} Example usage:
-     *      <iframe src="https://platform.x5gon.org/api/v1/search?url=https://platform.x5gon.org/materialUrl&text=deep+learning"
-     *          style="border: 0px;width: 100%;"></iframe>
+     *      <iframe src="https://platform.x5gon.org/api/v1/search?url=https://platform.x5gon.org/materialUrl&text=education"
+     *          style="border:0px;height:425px;"></iframe>
      */
     router.get('/embed/recommendations', (req, res) => {
         const query = req.query;
