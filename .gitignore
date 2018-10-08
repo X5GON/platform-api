@@ -62,7 +62,5 @@ data
 backup
 examples
 
-**/config
-
 # ignore minified files
 src/server/**/*.min.js

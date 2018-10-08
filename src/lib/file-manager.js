@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 /**
- * Removes the file.
+ * @description Removes the file.
  * @param {String} fileName - Name of the file to be removed.
  */
 exports.removeFile = function(fileName) {
@@ -11,15 +11,19 @@ exports.removeFile = function(fileName) {
     if (fs.existsSync(fileName)) {
         fs.unlinkSync(fileName);
     } else {
-        console.warn(`File does not exist: ${fileName}`);
+        throw Error(`File does not exist: ${fileName}`);
     }
 };
 
 /**
- * Removes the folder and it's content.
+ * @description Removes the folder and it's content.
  * @param {String} sourcePath - The folder to be removed.
  */
 exports.removeFolder = function (sourcePath) {
+    if (!fs.existsSync(sourcePath)) {
+        throw Error(`Folder does not exist: ${sourcePath}`);
+    }
+
     let source = path.resolve(sourcePath);
     // ensure to clean up the database after the tests
     if (fs.existsSync(source)) {
@@ -42,7 +46,7 @@ exports.removeFolder = function (sourcePath) {
 };
 
 /**
- * Copies the folder source to folder destination.
+ * @description Copies the folder source to folder destination.
  * @param {String} source - The source folder.
  * @param {String} destination - The destination folder.
  */
@@ -74,7 +78,7 @@ exports.copyFolder = function(source, destination) {
 };
 
 /**
- * Creates a directory.
+ * @description Creates a directory.
  * @param {String} dirPath - Directory path.
  */
 exports.createFolder = function(dirPath) {
@@ -84,7 +88,7 @@ exports.createFolder = function(dirPath) {
 };
 
 /**
- * Creates all directories in path.
+ * @description Creates all directories in path.
  * @param {String} dirPath - Directory path.
  */
 exports.createDirectoryPath = function(dirPath) {
@@ -101,7 +105,7 @@ exports.createDirectoryPath = function(dirPath) {
 };
 
 /**
- * Find all files in a folder that follow a given rule and execute a method on them.
+ * @description Find all files in a folder that follow a given rule and execute a method on them.
  * @param {String} startPath - The folder in which we search for files.
  * @param {RegExp} filter - A regular expression used to check file name.
  * @param {Function} callback - The function to execute on the file.
@@ -119,7 +123,7 @@ exports.executeOnFiles = function (startPath, filter, callback) {
         let stat = fs.lstatSync(filename);
         // check if file is a directory
         if (stat.isDirectory()) {
-            // recursive check if it contains files 
+            // recursive check if it contains files
             exports.executeOnFiles(filename, filter, callback);
         }
         // if file name matches the filter - execute callback
@@ -128,14 +132,14 @@ exports.executeOnFiles = function (startPath, filter, callback) {
 };
 
 /**
- * Return the content of the given file.
+ * @description Return the content of the given file.
  * @param {String} filePath - The file to be read.
  * @returns {String} The content of the file.
  */
 exports.getFileContent = function (filePath) {
     // check if file exists
     if (!fs.existsSync(filePath)) {
-        throw new Error(`file does not exist: ${filePath}`);
+        throw Error(`file does not exist: ${filePath}`);
     }
     // read the file and return it's content
     return fs.readFileSync(filePath, 'utf8');

@@ -4,14 +4,16 @@
  * it into postgresQL database.
  */
 
+// configurations
+const config = require('../../../../config/config');
+
 // internal libraries
-const Logger = require('../../../lib/logging-handler')();
+const Logger = require('../../../../lib/logging-handler')();
 // create a logger instance for logging wikification process
 const logger = Logger.createGroupInstance('postgresql-storage', 'preproc');
 
 // postgres library
-const pg = require('../../../lib/postgresQL')(require('../../../config/pgconfig'));
-
+const pg = require('../../../../lib/postgresQL')(config.pg);
 
 /**
  * Stores the OER material into PostgresQL database.
@@ -50,7 +52,7 @@ class PostgresqlStorage {
         pg.insert(material, 'oer_materials', (error, result) => {
             if (error) {
                 // error when parsing response
-                logger.error('error [postgresql.insert]: unable to insert material', 
+                logger.error('error [postgresql.insert]: unable to insert material',
                     { error: error.message, materialUrl: material.materialUrl }
                 );
             } else {

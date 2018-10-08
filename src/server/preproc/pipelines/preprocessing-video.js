@@ -1,54 +1,48 @@
-{
+// configurations
+const config = require('../../../config/config');
+
+module.exports = {
     "general": {
-        "heartbeat": 1000
+        "heartbeat": 2000,
+        "pass_binary_messages": true
     },
     "spouts": [
         {
-            "name": "crawler-input",
-            "type": "sys",
-            "working_dir": ".",
-            "cmd": "rest",
+            "name": "video-input",
+            "type": "inproc",
+            "working_dir": "./spouts",
+            "cmd": "kafka-spout.js",
             "init": {
-                "port": 7500
-            }
-        },
-        {
-            "name": "file-reader",
-            "working_dir": ".",
-            "type": "sys",
-            "cmd": "file_reader",
-            "init": {
-                "file_name": "../../../data/videolectures/lectures.json",
-                "file_format": "json"
+                "kafka_host": config.kafka.host,
+                "topic": "video-topic"
             }
         }
     ],
     "bolts": [
         {
-            "name": "videolectures-format",
+            "name": "material-format",
             "type": "inproc",
-            "working_dir": "./components",
-            "cmd": "videolectures-format.js",
+            "working_dir": "./bolts",
+            "cmd": "material-format.js",
             "inputs": [
-                { "source": "crawler-input" },
-                { "source": "file-reader" }
+                { "source": "video-input" }
             ],
             "init": {}
         },
         {
             "name": "dfxp-extract",
             "type": "inproc",
-            "working_dir": "./components",
+            "working_dir": "./bolts",
             "cmd": "dfxp-extract.js",
             "inputs": [
-                { "source": "videolectures-format" }
+                { "source": "material-format" }
             ],
             "init": {}
         },
         {
             "name": "wikification",
             "type": "inproc",
-            "working_dir": "./components",
+            "working_dir": "./bolts",
             "cmd": "wikification.js",
             "inputs": [
                 { "source": "dfxp-extract" }
@@ -58,7 +52,7 @@
         {
             "name": "material-validator",
             "type": "inproc",
-            "working_dir": "./components",
+            "working_dir": "./bolts",
             "cmd": "material-validator.js",
             "inputs": [
                 { "source": "wikification" }
@@ -68,7 +62,7 @@
         {
             "name": "postgresql-storage",
             "type": "inproc",
-            "working_dir": "./components",
+            "working_dir": "./bolts",
             "cmd": "postgresql-storage.js",
             "inputs": [
                 { "source": "material-validator" }
@@ -77,4 +71,4 @@
         }
     ],
     "variables": {}
-}
+};

@@ -1,25 +1,20 @@
-{
+// configurations
+const config = require('../../../config/config');
+
+module.exports = {
     "general": {
-        "heartbeat": 1000
+        "heartbeat": 2000,
+        "pass_binary_messages": true
     },
     "spouts": [
         {
-            "name": "crawler-input",
-            "type": "sys",
-            "working_dir": ".",
-            "cmd": "rest",
+            "name": "text-input",
+            "type": "inproc",
+            "working_dir": "./spouts",
+            "cmd": "kafka-spout.js",
             "init": {
-                "port": 7500
-            }
-        },
-        {
-            "name": "file-reader",
-            "working_dir": ".",
-            "type": "sys",
-            "cmd": "file_reader",
-            "init": {
-                "file_name": "../../../../../datasets/x5gon/oer/unibo/unibo-clean.json",
-                "file_format": "json"
+                "kafka_host": config.kafka.host,
+                "topic": "text-topic"
             }
         }
     ],
@@ -27,18 +22,17 @@
         {
             "name": "material-format",
             "type": "inproc",
-            "working_dir": "./components",
+            "working_dir": "./bolts",
             "cmd": "material-format.js",
             "inputs": [
-                { "source": "crawler-input" },
-                { "source": "file-reader" }
+                { "source": "text-input" }
             ],
             "init": {}
         },
         {
             "name": "text-extract",
             "type": "inproc",
-            "working_dir": "./components",
+            "working_dir": "./bolts",
             "cmd": "text-extract.js",
             "inputs": [
                 { "source": "material-format" }
@@ -48,7 +42,7 @@
         {
             "name": "wikification",
             "type": "inproc",
-            "working_dir": "./components",
+            "working_dir": "./bolts",
             "cmd": "wikification.js",
             "inputs": [
                 { "source": "text-extract" }
@@ -58,7 +52,7 @@
         {
             "name": "material-validator",
             "type": "inproc",
-            "working_dir": "./components",
+            "working_dir": "./bolts",
             "cmd": "material-validator.js",
             "inputs": [
                 { "source": "wikification" }
@@ -68,13 +62,14 @@
         {
             "name": "postgresql-storage",
             "type": "inproc",
-            "working_dir": "./components",
+            "working_dir": "./bolts",
             "cmd": "postgresql-storage.js",
             "inputs": [
                 { "source": "material-validator" }
             ],
             "init": {}
         }
+
     ],
     "variables": {}
-}
+};
