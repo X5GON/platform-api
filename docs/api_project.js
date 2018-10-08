@@ -1,4 +1,4 @@
-{
+define({
   "title": "X5GON API Documentation",
   "url": "https://platform.x5gon.org",
   "version": "1.0.0",
@@ -9,8 +9,8 @@
   "apidoc": "0.3.0",
   "generator": {
     "name": "apidoc",
-    "time": "2018-10-08T13:50:45.959Z",
+    "time": "2018-10-08T14:03:48.295Z",
     "url": "http://apidocjs.com",
     "version": "0.17.6"
   }
-}
+});
