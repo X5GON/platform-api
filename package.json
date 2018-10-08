@@ -1,6 +1,6 @@
 {
   "name": "x5gon",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Connecting OER repositories",
   "main": "index.js",
   "scripts": {
