@@ -5,7 +5,7 @@
  */
 var x5gonActivityTracker = function () {
   /**
-   * @description Creates the request string.
+   * Creates the request string.
    * @param {Boolean|String} validationFlag - If the user already validated X5GON.
    * @param {String} providerToken - The OER provider token used for identification.
    * @param {Boolean} test - Indicator if the tracker is used for testing or production.

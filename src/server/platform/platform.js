@@ -45,7 +45,7 @@ app.engine('hbs', exphbs({
 }));
 app.set('view engine', 'hbs');
 
-// TODO: handle redirections - using proxy
+// redirect specific requests to other services
 require('./routes/proxy')(app);
 
 // cookie parser

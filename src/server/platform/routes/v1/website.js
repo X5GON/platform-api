@@ -11,7 +11,7 @@ const request = require('request');
  *******************************************/
 
 /**
- * Verify user with the given recaptcha response.
+ * @description Verify user with the given recaptcha response.
  * @param {String} gRecaptchaResponse - The google recaptcha response.
  * @returns {Promise} The promise of the verification.
  * @private
@@ -37,7 +37,7 @@ function _googleVerifyUser(gRecaptchaResponse) {
 }
 
 /**
- * Generates a token for the seed string.
+ * @description Generates a token for the seed string.
  * @param {String} seed - The seed string used to generate token.
  * @return {String} The token used to indentify the repository.
  */
@@ -56,7 +56,7 @@ function _generateToken(seed) {
 
 
 /**
- * Adds API routes for platform website requests.
+ * @description Adds API routes for platform website requests.
  * @param {Object} pg - Postgres connection wrapper.
  * @param {Object} logger - The logger object.
  */
@@ -266,7 +266,22 @@ module.exports = function (pg, logger) {
      * RECOMMENDATION EMBEDDINGS
      */
 
-    // send application form page
+    /**
+     * @api {GET} /embed/recommendations Ember-ready recommendation list
+     * @apiDescription Gets the embed-ready recommendation list html
+     * @apiName GetRecommendationsEmbedReady
+     * @apiGroup Recommendations
+     * @apiVersion 1.0.0
+     *
+     * @apiParam {String} [text] - The raw text. If both `text` and `url` are present, `url` has the priority.
+     * @apiParam {String} [url] - The url of the material. If both `text` and `url` are present, `url` has the priority.
+     * @apiParam {String="cosine","null"} [type] - The metrics used in combination with the url parameter.
+     *
+     * @apiSuccess (200) {String} list - The html of the embed-ready list.
+     * @apiExample {html} Example usage:
+     *      <iframe src="https://platform.x5gon.org/api/v1/search?url=https://platform.x5gon.org/materialUrl&text=education"
+     *          style="border:0px;height:425px;"></iframe>
+     */
     router.get('/embed/recommendations', (req, res) => {
         const query = req.query;
 
