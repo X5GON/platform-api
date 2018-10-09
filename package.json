@@ -1,7 +1,7 @@
 {
   "name": "x5gon",
-  "version": "0.0.1",
-  "description": "connecting OER repositories",
+  "version": "1.0.0",
+  "description": "Connecting OER repositories",
   "main": "index.js",
   "scripts": {
     "start:platform": "cd src/server/platform && node platform.js",
@@ -12,7 +12,9 @@
     "postgres:create": "cd src/load && node create-postgres-tables.js",
     "test": "cd src/test && NODE_ENV=test mocha all-tests.js",
     "test:recsys": "cd src/server/recsys/test && NODE_ENV=test mocha *.js",
-    "test:lib": "cd src/test/lib && NODE_ENV=test mocha *.js"
+    "test:lib": "cd src/test/lib && NODE_ENV=test mocha *.js",
+    "postinstall": "npm run minify:snippet",
+    "create:apidocs": "apidoc -i src/server -o apidocs --private false"
   },
   "repository": {
     "type": "git",
@@ -53,8 +55,16 @@
     "winston-daily-rotate-file": "^1.7.2"
   },
   "devDependencies": {
+    "apidoc": "^0.17.6",
     "mocha": "^5.2.0",
     "node-minify": "^2.4.1",
     "supertest": "^3.3.0"
+  },
+  "apidoc": {
+    "title": "X5GON API Documentation",
+    "url": "https://platform.x5gon.org",
+    "version": "1.0.0",
+    "name": "X5GON",
+    "description": " Cross Modal, Cross Cultural, Cross Lingual, Cross Domain, and Cross Site Global OER Network"
   }
 }
