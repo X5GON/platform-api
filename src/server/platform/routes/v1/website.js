@@ -279,7 +279,7 @@ module.exports = function (pg, logger) {
      *
      * @apiSuccess (200) {String} list - The html of the embed-ready list.
      * @apiExample {html} Example usage:
-     *      <iframe src="https://platform.x5gon.org/api/v1/search?url=https://platform.x5gon.org/materialUrl&text=education"
+     *      <iframe src="https://platform.x5gon.org/embed/recommendations?url=https://platform.x5gon.org/materialUrl&text=education"
      *          style="border:0px;height:425px;"></iframe>
      */
     router.get('/embed/recommendations', (req, res) => {
