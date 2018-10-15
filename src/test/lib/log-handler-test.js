@@ -1,5 +1,4 @@
 const assert = require('assert');
-const mocha = require('mocha');
 const fileManager = require('../../lib/file-manager');
 const Logger = require('../../lib/logging-handler');
 const winston = require('winston');
