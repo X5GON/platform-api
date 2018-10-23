@@ -120,7 +120,7 @@ describe('logging-handler.js: logging handler methods unit tests.', function () 
                     loggerTesting.transports.console;
                     xdone();
                 });           
-                 done();
+                done();
             });
         });
 
@@ -190,10 +190,3 @@ describe('logging-handler.js: logging handler methods unit tests.', function () 
     });
 
 });
-
-
-
-
-
-
-

@@ -53,10 +53,6 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
     });
 
-    before(function (done) { // create/intialize db
-        done();
-    });
-
     after(function (done) { // clean/erase db
         async.eachSeries(
             dropTable,
@@ -139,7 +135,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
 
         it ('Should give error on empty values', function (done) {
-            pg.insert( {}, 'repositories', function (err, res) {
+            pg.insert({}, 'repositories', function (err, res) {
                 assert.notEqual(err, null);
                 done();
             });
@@ -156,7 +152,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
     describe('3.Select', function () {
 
         it ('Should give no error with empty conditions in SELECT statement', function (done) {
-            pg.select( {}, 'repositories', function (err, res) {
+            pg.select({}, 'repositories', function (err, res) {
                 assert.equal(err, null);
                 done();
             });
@@ -190,7 +186,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
 
     describe.skip('3.3 SelectLarge', function () {
         it ('Should give no error with conditions', function (done) {
-            pg.selectLarge( { }, 'repositories', 10, (err, res) => {
+            pg.selectLarge({}, 'repositories', 10, (err, res) => {
             // assert.ok(res.length <= 10);                
             },(err, res) => {
             // assert.equal(err,null);
@@ -236,7 +232,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
          });
 
          it ('Should give error with missing values', function (done) {
-            pg.update( {} ,{ id: 100 }, 'repositories', function (err, res) {
+            pg.update({} ,{ id: 100 }, 'repositories', function (err, res) {
                 assert.notEqual(err, null);
                 assert.equal(res.length, 0);
                 done();
@@ -255,7 +251,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
     describe('5.Delete', function () {
         
         it ('Should give error with empty conditions', function (done) {
-            pg.delete( {}, 'repositories', function (err, res) {
+            pg.delete({}, 'repositories', function (err, res) {
                 assert.notEqual(err, null);
                 assert.equal(res.length, 0);
                 done();
@@ -335,7 +331,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
 
         it ('Should give error with missing values', function (done) {
-            pg.upsert( {} , { id: 100 }, 'repositories', function (err, res) {
+            pg.upsert({} , { id: 100 }, 'repositories', function (err, res) {
                 assert.notEqual(err, null);                
                 assert.equal(res.length, 0);
                 done();
