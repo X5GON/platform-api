@@ -10,13 +10,13 @@ const config = require('../../config/config');
 const async = require('async');
 const pg = require('../../lib/postgresQL')(config.pg);
 let createTable = [
-    `CREATE TABLE IF NOT EXISTS repositories (id serial PRIMARY KEY, name varchar NOT NULL, domain varchar NOT NULL, contact varchar NOT NULL, token varchar NOT NULL);`,
-    'CREATE INDEX IF NOT EXISTS repositories_name_idx ON repositories(name);',
-    'CREATE INDEX IF NOT EXISTS repositories_domain_idx ON repositories(domain);',
-    'CREATE INDEX IF NOT EXISTS repositories_contact_idx ON repositories(contact);',
-    'CREATE INDEX IF NOT EXISTS repositories_token_idx ON repositories(token);'
+    `CREATE TABLE IF NOT EXISTS test_table (id serial PRIMARY KEY, name varchar NOT NULL, domain varchar NOT NULL, contact varchar NOT NULL, token varchar NOT NULL);`,
+    'CREATE INDEX IF NOT EXISTS test_table_name_idx ON test_table(name);',
+    'CREATE INDEX IF NOT EXISTS test_table_domain_idx ON test_table(domain);',
+    'CREATE INDEX IF NOT EXISTS test_table_contact_idx ON test_table(contact);',
+    'CREATE INDEX IF NOT EXISTS test_table_token_idx ON test_table(token);'
     ];
-let dropTable = [`DROP TABLE repositories;`];
+let dropTable = [`DROP TABLE test_table;`];
 let querystr = '';
 
 describe('postgresQL.js: db methods unit tests.', function () {
@@ -46,9 +46,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
                         }
                     );
                 },
-                () => { 
-                 done();
-                 }
+                () => { done(); }
             );
         });
     });
@@ -71,7 +69,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
     describe('1.Execute', function () {
 
         it ('Should give error on invalid query', function (done) {
-            querystr = 'add new TABLE repositories;';
+            querystr = 'add new TABLE test_table;';
             pg.execute( querystr, [] , function (err, res) {
                 assert.notEqual(err, null);
                 assert.ok(res);
@@ -81,7 +79,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
 
         it ('Should give no errors with seprate params in statement', function (done) {
             let param = [ 999, 'Firstname', 'domain', '911', 'TOken' ];
-            querystr = 'INSERT INTO repositories (id, name, domain, contact, token) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+            querystr = 'INSERT INTO test_table (id, name, domain, contact, token) VALUES ($1, $2, $3, $4, $5) RETURNING *';
             pg.execute(querystr, param, function (err, res) {
                 assert.ok(res);
                 assert.equal(err, null);  
@@ -97,7 +95,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
 
         it ('Should give error with invalid/missing params', function (done) {
             let param = ['Firstname', 'domain', '911', 'TOken'];
-            querystr = 'INSERT INTO repositories (id, name, domain ,contact ,token) VALUES ($1, $2, $3, $4, $5)';
+            querystr = 'INSERT INTO test_table (id, name, domain ,contact ,token) VALUES ($1, $2, $3, $4, $5)';
             pg.execute(querystr, param, function (err, res) {
                 assert.notEqual(err, null);           
                 done();
@@ -108,7 +106,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
     describe('2.Insert',function () {
 
         it ('Should give no errors with correct INSERT statement with Values', function (done) {
-            pg.insert({ id: 100, name: 'Firstname', domain: 'domain', contact: '911', token: 'TOken'}, 'repositories', function (err, res) {
+            pg.insert({ id: 100, name: 'Firstname', domain: 'domain', contact: '911', token: 'TOken'}, 'test_table', function (err, res) {
                 assert.equal(err, null);
                 assert.equal(res.length, 1);
                 assert.equal(res[0].id, 100);
@@ -121,13 +119,13 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
 
         it ('Should give error on invalid INSERT statement', function (done) {
-            pg.insert(( 100, 'Firstname', 'domain', '911', 'TOken'), 'repositories' , function (err, res) {
+            pg.insert(( 100, 'Firstname', 'domain', '911', 'TOken'), 'test_table' , function (err, res) {
                 assert.notEqual(err, null);
                 done();
             });
         });
 
-        it ('Should give error on missing table in INSERT', function (done) {
+        it ('Should give error on invalid table in INSERT', function (done) {
             pg.insert({ id: 100, name: 'Firstname', domain: 'domain', contact: '911', token: 'TOken' }, 'missing' , function (err, res) {
                 assert.notEqual(err,null);
                 done();
@@ -135,14 +133,14 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
 
         it ('Should give error on empty values', function (done) {
-            pg.insert({}, 'repositories', function (err, res) {
+            pg.insert({}, 'test_table', function (err, res) {
                 assert.notEqual(err, null);
                 done();
             });
         });
 
         it ('Should give error on invalid values', function (done) {
-            pg.insert({ id_name: 100, name: 'Firstname', domain: '', contact: '911', token: 'TOken'}, 'repositories' , function (err, res) {
+            pg.insert({ id_name: 100, name: 'Firstname', domain: '', contact: '911', token: 'TOken'}, 'test_table' , function (err, res) {
                 assert.notEqual(err,null);
                 done();
             });
@@ -152,14 +150,14 @@ describe('postgresQL.js: db methods unit tests.', function () {
     describe('3.Select', function () {
 
         it ('Should give no error with empty conditions in SELECT statement', function (done) {
-            pg.select({}, 'repositories', function (err, res) {
+            pg.select({}, 'test_table', function (err, res) {
                 assert.equal(err, null);
                 done();
             });
         });
 
         it ('Should give no error with proper conditions', function (done) {
-            pg.select({ id: 100 }, 'repositories', function (err, res) {
+            pg.select({ id: 100 }, 'test_table', function (err, res) {
                 assert.equal(err, null);
                 assert.equal(res.length, 1)
                 assert.equal(res[0].id, 100);
@@ -168,7 +166,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
 
         it ('Should give error with invalid conditions', function (done) {
-            pg.select({ foo: 100 }, 'repositories', function (err, res) {
+            pg.select({ foo: 100 }, 'test_table', function (err, res) {
                 assert.notEqual(err, null);
                 assert.equal(res.length, 0);
                 done();
@@ -186,7 +184,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
 
     describe.skip('3.3 SelectLarge', function () {
         it ('Should give no error with conditions', function (done) {
-            pg.selectLarge({}, 'repositories', 10, (err, res) => {
+            pg.selectLarge({}, 'test_table', 10, (err, res) => {
             // assert.ok(res.length <= 10);                
             },(err, res) => {
             // assert.equal(err,null);
@@ -198,7 +196,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
     describe('4.Update', function () {
 
         it ('Should give no error with set conditions & values', function (done) {
-            pg.update({ name: 'Fname' }, { id: 100 }, 'repositories', function (err, res) {
+            pg.update({ name: 'Fname' }, { id: 100 }, 'test_table', function (err, res) {
                 assert.equal(err, null);
                 assert.equal(res.length, 1);
                 assert.equal(res[0].id, 100);
@@ -208,7 +206,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
 
         it ('Should give error with empty conditions', function (done) {
-            pg.update({ name: 'Fname' }, {} , 'repositories', function (err, res) {
+            pg.update({ name: 'Fname' }, {} , 'test_table', function (err, res) {
                 assert.notEqual(err, null);
                 assert.equal(res.length, 0);
                 done();
@@ -216,7 +214,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
 
         it ('Should give error with invalid conditions', function (done) {
-            pg.update({ name: 'Fname' }, { id_name: 100 }, 'repositories', function (err, res) {
+            pg.update({ name: 'Fname' }, { id_name: 100 }, 'test_table', function (err, res) {
                 assert.notEqual(err, null);
                 assert.equal(res.length, 0);
                 done();
@@ -224,7 +222,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
 
         it ('Should give error with invalid values', function (done) {
-            pg.update({ name_id: 'Fname' }, { id: 100 }, 'repositories', function (err, res) {
+            pg.update({ name_id: 'Fname' }, { id: 100 }, 'test_table', function (err, res) {
                 assert.notEqual(err, null);
                 assert.equal(res.length, 0);
                 done();
@@ -232,7 +230,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
          });
 
          it ('Should give error with missing values', function (done) {
-            pg.update({} ,{ id: 100 }, 'repositories', function (err, res) {
+            pg.update({} ,{ id: 100 }, 'test_table', function (err, res) {
                 assert.notEqual(err, null);
                 assert.equal(res.length, 0);
                 done();
@@ -251,7 +249,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
     describe('5.Delete', function () {
         
         it ('Should give error with empty conditions', function (done) {
-            pg.delete({}, 'repositories', function (err, res) {
+            pg.delete({}, 'test_table', function (err, res) {
                 assert.notEqual(err, null);
                 assert.equal(res.length, 0);
                 done();
@@ -259,14 +257,14 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
 
         it ('Should give no error with proper conditions', function (done) {
-            pg.delete({ id: 100 }, 'repositories', function (err, res) {
+            pg.delete({ id: 100 }, 'test_table', function (err, res) {
                 assert.equal(err, null);
                 done();
             });
         });
 
         it ('Should give error with invalid conditions', function (done) {
-            pg.delete({ id_name: 100 }, 'repositories', function (err, res) {
+            pg.delete({ id_name: 100 }, 'test_table', function (err, res) {
                 assert.notEqual(err, null);
                 assert.equal(res.length, 0);
                 done();
@@ -285,21 +283,21 @@ describe('postgresQL.js: db methods unit tests.', function () {
     describe('6.UpSert', function () {
 
         it ('Should give no error with conditions & values', function (done) {
-            pg.upsert({ name: 'Fname', domain: 'domain', contact: '911', token: 'TOken'}, { id: 99 }, 'repositories', function (err, res) {
+            pg.upsert({ name: 'Fname', domain: 'domain', contact: '911', token: 'TOken'}, { id: 99 }, 'test_table', function (err, res) {
                 assert.equal(err, null);
                 done();
             });
         });
 
         it ('Should update the record if it exists', function (done) {
-            pg.upsert({ name:'Firstname', domain: 'domain', contact: '911', token: 'TOken'},{ id: 99 }, 'repositories', function (err, res) {
+            pg.upsert({ name:'Firstname', domain: 'domain', contact: '911', token: 'TOken'},{ id: 99 }, 'test_table', function (err, res) {
                 assert.equal(err, null);
                 done();
             });
         });
 
         it ('Should give error with no conditions', function (done) {
-            pg.upsert({name: 'Fname', domain: 'domain', contact: '911', token: 'TOken'}, {} , 'repositories', function (err, res) {
+            pg.upsert({name: 'Fname', domain: 'domain', contact: '911', token: 'TOken'}, {} , 'test_table', function (err, res) {
                 assert.notEqual(err, null);                
                 assert.equal(res.length, 0);
                 done();
@@ -307,7 +305,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
 
         it ('Should give error with >1 conditions', function (done) {
-            pg.upsert({name: 'Fname', domain: 'domain', contact: '911', token: 'TOken'}, { id_name: 'Fname' }, 'repositories', function (err, res) {
+            pg.upsert({name: 'Fname', domain: 'domain', contact: '911', token: 'TOken'}, { id_name: 'Fname' }, 'test_table', function (err, res) {
                 assert.notEqual(err, null);                
                 assert.equal(res.length, 0);
                 done();
@@ -315,7 +313,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
 
         it ('Should give error with invalid conditions', function (done) {
-            pg.upsert({ name: 'Fname', domain: 'domain', contact: '911', token: 'TOken'},{ id_name: 'Fname' }, 'repositories', function (err, res) {
+            pg.upsert({ name: 'Fname', domain: 'domain', contact: '911', token: 'TOken'},{ id_name: 'Fname' }, 'test_table', function (err, res) {
                 assert.notEqual(err, null);                
                 assert.equal(res.length, 0);
                 done();
@@ -323,7 +321,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
 
         it ('Should give error with invalid values', function (done) {
-            pg.upsert({ name_id: 'Fname', domain: '', contact: '911', token: 'TOken'}, { id: 100 }, 'repositories', function (err, res) {
+            pg.upsert({ name_id: 'Fname', domain: '', contact: '911', token: 'TOken'}, { id: 100 }, 'test_table', function (err, res) {
                 assert.notEqual(err, null);                
                 assert.equal(res.length, 0);
                 done();
@@ -331,7 +329,7 @@ describe('postgresQL.js: db methods unit tests.', function () {
         });
 
         it ('Should give error with missing values', function (done) {
-            pg.upsert({} , { id: 100 }, 'repositories', function (err, res) {
+            pg.upsert({} , { id: 100 }, 'test_table', function (err, res) {
                 assert.notEqual(err, null);                
                 assert.equal(res.length, 0);
                 done();
