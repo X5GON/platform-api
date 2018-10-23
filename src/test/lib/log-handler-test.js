@@ -13,17 +13,17 @@ describe('logging-handler.js: logging handler methods unit tests.', function () 
 
     describe('Require module.', function () {
 
-        it ('Should not throw an error when requiring the module', function (done) {
+        it('Should not throw an error when requiring the module', function (done) {
             assert.doesNotThrow(Logger);
             done();
         });
 
-        it ('Should be a function for creating new logger factories', function (done) {
+        it('Should be a function for creating new logger factories', function (done) {
             assert.ok(typeof Logger === 'function');
             done();
         });
 
-        it ('Should create a new logger instance', function (done) {
+        it('Should create a new logger instance', function (done) {
             const logger = Logger();
             assert.equal(path.join(__dirname, '../../../logs/'), logger.folder);
             done();
@@ -102,93 +102,89 @@ describe('logging-handler.js: logging handler methods unit tests.', function () 
                 done();
             });
 
-
             it('Should create the proper path if given', function (done) {
                 const loggerTesting = logger.createInstance('log-file', 'error','Sub-test');
-                assert.ok(fs.lstatSync(path.join(__dirname,"../../../logs/Sub-test")).isDirectory());
+                assert.ok(fs.lstatSync(path.join(__dirname, '../../../logs/Sub-test')).isDirectory());
                 done();
             });
 
             it('Should write to console by default & colorize', function (done) {
-              const loggerTesting = logger.createInstance('log-file');
-             assert.equal(loggerTesting.transports.console.colorize, true);
-                 done();
-             });
+                const loggerTesting = logger.createInstance('log-file');
+                assert.equal(loggerTesting.transports.console.colorize, true);
+                done();
+            });
 
-
-             it('Should not write to console if consoleFlage=false', function (done) {
-                const loggerTesting = logger.createInstance('log-file', 'error', '',false);
+            it('Should not write to console if consoleFlage = false', function (done) {
+                const loggerTesting = logger.createInstance('log-file', 'error', '', false);
                 assert.throws(function (xdone) {
                     loggerTesting.transports.console;
                     xdone();
                 });           
                  done();
-                });
-
+            });
         });
 
         describe('createGroupInstance.', function () {
 
-                it('Should write to console by default & colorize', function (done) {
+            it('Should write to console by default & colorize', function (done) {
                 const loggerTesting = logger.createGroupInstance('log-file');
-               assert.equal(loggerTesting.transports.console.colorize, true);
-                   done();
-                });
+                assert.equal(loggerTesting.transports.console.colorize, true);
+                done();
+            });
 
-                it('Should not write to console if consoleFlage=false', function (done) {
-                const loggerTesting = logger.createGroupInstance('log-file','',false);
+            it('Should not write to console if consoleFlage = false', function (done) {
+                const loggerTesting = logger.createGroupInstance('log-file', '', false);
                 assert.throws(function (xdone) {
                     loggerTesting.transports.console;
                     xdone();
-                    });          
-                    done();
-                });
+                });          
+                done();
+            });
 
-                it('Should create the proper path if given', function (done) {
-                    const loggerTesting = logger.createGroupInstance('log-file','Sub-test');
-                    assert.ok(fs.lstatSync(path.join(__dirname,"../../../logs/Sub-test")).isDirectory());
-                    //loggerTesting.info('asfwdgw');
-                    done();
-                });
+            it('Should create the proper path if given', function (done) {
+                const loggerTesting = logger.createGroupInstance('log-file', 'Sub-test');
+                assert.ok(fs.lstatSync(path.join(__dirname, '../../../logs/Sub-test')).isDirectory());
+                done();
+            });
 
-                it('Should have createGroupInstance', function (done) {
-                    assert.ok(logger.createGroupInstance);
-                    done();
-                });
-    
-                it('createInstance should be type function', function (done) {
-                    assert.equal(typeof logger.createGroupInstance, 'function');
-                    done();
-                });
-    
-                it('Should not throw an error if fileName is present', function (done) {
-                    assert.doesNotThrow(function () {
-                        logger.createGroupInstance('log-file');
-                    });
-                    done();
-                });
-    
-                it('Should return a winston logger object', function (done) {
-                    const loggerTesting = logger.createGroupInstance('log-file');
-                    assert.ok(loggerTesting instanceof winston.Logger);
-                    done();
-                });
+            it('Should have createGroupInstance', function (done) {
+                assert.ok(logger.createGroupInstance);
+                done();
+            });
 
-                it('Should return a winston logger object with all 3 levels', function (done) {
-                    const loggerTesting = logger.createGroupInstance('log-file');
-                    assert.equal(loggerTesting.transports['log-file-info'].level, 'info');
-                    assert.equal(loggerTesting.transports['log-file-error'].level, 'error');
-                    assert.equal(loggerTesting.transports['log-file-warn'].level, 'warn');
-                    done();
-                });  
-                it('Should return error if no parameters are given', function (done) {
-                    assert.throws(function (xdone) {
-                        logger.createGroupInstance();
-                        xdone();
-                    });
-                    done();
-                });
+            it('createInstance should be type function', function (done) {
+                assert.equal(typeof logger.createGroupInstance, 'function');
+                done();
+            });
 
+            it('Should not throw an error if fileName is present', function (done) {
+                assert.doesNotThrow(function () {
+                    logger.createGroupInstance('log-file');
+                });
+                done();
+            });
+
+            it('Should return a winston logger object', function (done) {
+                const loggerTesting = logger.createGroupInstance('log-file');
+                assert.ok(loggerTesting instanceof winston.Logger);
+                done();
+            });
+
+            it('Should return a winston logger object with all 3 levels', function (done) {
+                const loggerTesting = logger.createGroupInstance('log-file');
+                assert.equal(loggerTesting.transports['log-file-info'].level, 'info');
+                assert.equal(loggerTesting.transports['log-file-error'].level, 'error');
+                assert.equal(loggerTesting.transports['log-file-warn'].level, 'warn');
+                done();
+            });  
+
+            it('Should return error if no parameters are given', function (done) {
+                assert.throws(function (xdone) {
+                    logger.createGroupInstance();
+                    xdone();
+                });
+                done();
+            });
         });
 
     });
