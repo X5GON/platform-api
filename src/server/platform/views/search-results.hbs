@@ -16,10 +16,16 @@
             <table class="material-content mb-4">
               <body>
                 <tr>
-                  <td class="align-top p-1 pt-2">
+                  <td class="align-top p-1 pt-2 text-center">
                     <span class="fa-stack fa-lg">
                       <i class="fas fa-circle fa-stack-2x"></i>
                       <i class="fas fa-{{document.type}} fa-stack-1x fa-inverse"></i>
+                    </span>
+                    <span class="inspect badge badge-secondary rounded-0"
+                      data-title="{{document.title}}"
+                      data-embed="{{document.embedUrl}}"
+                      data-type="{{document.type}}">
+                        Inspect
                     </span>
                   </td>
                   <td class="w-100 p-1">
@@ -40,12 +46,6 @@
                         </span>
                         <span class="d-inline-block mr-4">
                           <strong class="mr-1">Provider:</strong>{{document.provider}}
-                        </span>
-                        <span class="inspect float-right badge badge-secondary"
-                          data-title="{{document.title}}"
-                          data-embed="{{document.embedUrl}}"
-                          data-type="{{document.type}}">
-                            Inspect
                         </span>
                       </div>
                     </div>
