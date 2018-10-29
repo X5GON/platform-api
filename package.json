@@ -58,7 +58,8 @@
     "apidoc": "^0.17.6",
     "mocha": "^5.2.0",
     "node-minify": "^2.4.1",
-    "supertest": "^3.3.0"
+    "supertest": "^3.3.0",
+    "ua-parser-js": "^0.7.18"
   },
   "apidoc": {
     "title": "X5GON API Documentation",

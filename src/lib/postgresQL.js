@@ -118,7 +118,11 @@ class PostgreSQL {
      */
     close(callback) {
         let self = this;
-        self.pool.end().then(callback);
+        if (callback && typeof(callback) === 'function') {
+            self.pool.end().then(callback);
+        } else {
+            self.pool.end();
+        }
     }
 
     /**
@@ -192,7 +196,11 @@ class PostgreSQL {
                         xcallback(err);
                     });
                 },
-                (err) => { cursor.close(); callback(err); done(); }
+                (err) => {
+                    cursor.close(() => {
+                        callback(err); done();
+                    });
+                }
             );
         });
     }
