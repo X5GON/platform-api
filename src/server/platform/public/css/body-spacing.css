@@ -1,5 +1,5 @@
-body { 
-    padding-top: 5.5rem; 
+body {
+    padding-top: 5.5rem;
     height: 100%;
 }
 
@@ -9,5 +9,5 @@ body > main {
 }
 
 @media screen and (max-width: 776px) {
-    body > main { padding-bottom: 630px; }
+    body > main { padding-bottom: 730px; }
 }

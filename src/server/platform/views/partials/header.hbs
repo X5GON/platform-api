@@ -6,23 +6,26 @@
           <img src="https://www.x5gon.org/wp-content/themes/x5gon/dist/assets/img/logo.svg" alt="X5GON">
         </a>
       </span>
-      <button class="navbar-toggler" type="button" data-toggle="collapse"
+      {{!-- <button class="navbar-toggler" type="button" data-toggle="collapse"
         data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
         aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
-      </button>
+      </button> --}}
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+
+        {{! home link }} {{! TODO add a proper home page }}
+        <li class="nav-item">
+          <a class="btn btn-nav btn-sm" href="/search">Search</a>
+        </li>
+      </ul>
+
+      {{!-- <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
 
-          {{! home link }} {{! TODO add a proper home page }}
-          <li class="nav-item">
-            <a class="btn btn-nav btn-sm" href="/search">Search</a>
-          </li>
+        </ul> --}}
 
-        </ul>
-
-        <a class="ml-2" href="/oer-provider/login" data-toggle="tooltip"
+        <a href="/oer-provider/login" data-toggle="tooltip"
           data-placement="bottom" title="Provider login">
           <span class="fa-stack">
             <i class="link-background fas fa-circle fa-stack-2x"></i>
@@ -42,7 +45,7 @@
           href="https://www.x5gon.org/#subscribe">
             Subscribe
         </a>
-      </div>
+      {{!-- </div> --}}
     </div>
   </nav>
 </header>

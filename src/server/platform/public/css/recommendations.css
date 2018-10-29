@@ -191,6 +191,7 @@
 #search-results .navigation-buttons .btn.btn-tertiary {
     background-color: #eaeaea;
     color: #6c757d;
+    font-weight: 600;
 }
 
 #search-results .navigation-buttons .btn.btn-tertiary.active {
