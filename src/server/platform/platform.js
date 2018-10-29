@@ -6,6 +6,7 @@
 const config = require('../../config/config');
 
 // external modules
+const fs = require('fs');
 const express = require('express');
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
@@ -41,7 +42,8 @@ app.use(express.static(__dirname + '/public/'));
 // set rendering engine
 app.engine('hbs', exphbs({
     extname: 'hbs',
-    defaultLayout: 'main'
+    defaultLayout: 'main',
+    partialsDir: `${__dirname}/views/partials/`
 }));
 app.set('view engine', 'hbs');
 

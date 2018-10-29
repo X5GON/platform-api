@@ -7,6 +7,7 @@ const handlebars = require('handlebars');
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
+const cors = require('cors');
 
 // internal modules
 // const KafkaProducer = require('../../../../lib/kafka-producer');
@@ -284,7 +285,7 @@ module.exports = function (pg, logger) {
      * @apiExample {html} Example usage:
      *      <script type="text/javascript" src="https://platform.x5gon.org/api/v1/snippet/latest/x5gon-log.min.js"></script>
      */
-    router.get('/snippet/:version/x5gon-log(.min)?.js', (req, res) => {
+    router.get('/snippet/:version/x5gon-log(.min)?.js', cors(), (req, res) => {
         // TODO: check if the parameters are valid
 
         // get the version parameter

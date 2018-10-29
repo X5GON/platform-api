@@ -47,6 +47,10 @@
     color: #5b95a5;
 }
 
+.recommendations .material-content .badge {
+    background-color: #5b95a5;
+}
+
 .recommendations .material-content small {
     color: gray;
 }
@@ -70,7 +74,7 @@
 #search-input {
     margin-top: 200px;
     text-align: center;
-    margin-bottom: 200px;
+    margin-bottom: 20px;
 }
 
 #search-input img {
@@ -166,9 +170,22 @@
 #search-results .recommendations .material-content .material-link {
     color: #6c757d;
 }
+#search-results .recommendations .material-content .material-link {
+    word-break: break-all;
+}
 
 #search-results .navigation-buttons .btn {
     border-radius: 0px;
+    border: 0px;
+
+}
+
+#search-results .navigation-buttons .page-item .btn-secondary {
+    background-color: #5b95a5;
+}
+
+#search-results .navigation-buttons .page-item .btn-secondary:hover {
+    background-color: #456f7a;
 }
 
 #search-results .navigation-buttons .btn.btn-tertiary {
@@ -177,6 +194,10 @@
 }
 
 #search-results .navigation-buttons .btn.btn-tertiary.active {
+    background-color: #c1c1c1;
+    color: #1A1A1A;
+}
+#search-results .navigation-buttons .btn.btn-tertiary:hover {
     background-color: #d1d1d1;
     color: #3A3A3A;
 }
@@ -208,4 +229,18 @@
     height: 600px;
     width: 100%;
     border: 0px;
+}
+
+.btn-rounded-border {
+    border-radius: 50px;
+    background-color: #eaeaea;
+    font-weight: 600;
+    font-size: 12px;
+    width: 100%;
+    color: #3a3a3a;
+}
+
+.btn-rounded-border:hover {
+    background-color: #cacaca;
+    color: #3a3a3a;
 }

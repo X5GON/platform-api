@@ -1,4 +1,4 @@
-{{#if empty}}
+{{#unless empty}}
   <div class="recommendations width-restriction">
     {{#each recommendations as | material index |}}
     <a class="material" href="{{material.url}}" target="_top">
@@ -40,4 +40,4 @@
       <a href="https://www.x5gon.org/" target="_blank">X5GON Project</a>
     </small>
   </div>
-{{/if}}
+{{/unless}}
