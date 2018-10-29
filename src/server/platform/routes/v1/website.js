@@ -78,7 +78,7 @@ module.exports = function (pg, logger) {
         // this is used only when redirected from POST /repository
         const invalid = req.query.invalid ? req.query.invalid == 'true' : false;
         const recaptchaSiteKey = config.platform.google.reCaptcha.siteKey;
-        return res.render('application-form', { recaptchaSiteKey, invalid, title: 'Application' });
+        return res.render('application-form', { recaptchaSiteKey, invalid, title: 'Join' });
     });
 
     router.get('/oer-provider', (req, res) => {
@@ -285,12 +285,20 @@ module.exports = function (pg, logger) {
     router.get('/embed/recommendations', (req, res) => {
         const query = req.query;
 
-        let options = { layout: 'empty' };
+        // recommender list style parameters
+        const { width, height, fontSize } = query;
+        let style = {
+            width,
+            height,
+            fontSize
+        };
+
+        let options = { layout: 'empty', style };
         let queryString = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
         request(`http://localhost:${config.platform.port}/api/v1/recommend/content?${queryString}`, (error, httpRequest, body) => {
             try {
                 const recommendations = JSON.parse(body);
-                options.empty = recommendations.length === 0 || recommendations.error ? false : true;
+                options.empty = recommendations.length !== 0 || recommendations.error ? false : true;
                 options.recommendations = recommendations;
                 return res.render('recommendations', options);
             } catch(xerror) {

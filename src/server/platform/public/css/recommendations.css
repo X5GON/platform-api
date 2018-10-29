@@ -33,7 +33,7 @@
 
 .recommendations .material-content {
     background-color: #f6f6f6;
-    font-size: 12px;
+    font-size: 13px;
     padding: 7px;
     transition: background-color .2s;
     width: 100%;
@@ -72,7 +72,7 @@
 }
 
 #search-input {
-    margin-top: 200px;
+    margin-top: 160px;
     text-align: center;
     margin-bottom: 20px;
 }
