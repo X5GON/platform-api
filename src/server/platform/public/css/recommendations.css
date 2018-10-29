@@ -32,7 +32,7 @@
 }
 
 .recommendations .material-content {
-    background-color: #f6f6f6;
+    background-color: transparent;
     font-size: 13px;
     padding: 7px;
     transition: background-color .2s;
