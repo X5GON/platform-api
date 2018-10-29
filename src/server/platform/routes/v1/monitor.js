@@ -1,5 +1,5 @@
 // configurations
-const config = require('../../../config/config');
+const config = require('../../../../config/config');
 
 // external modules
 const router = require('express').Router();
@@ -41,7 +41,7 @@ module.exports = function (monitor) {
     router.get('/monitor', isAdmin, (req, res) => {
         // currently redirect to form page
         monitor.listProcesses((error, processList) => {
-            return res.render('index', { processList });
+            return res.render('monitor', { layout: 'main-monitor', processList, title: 'Process Monitor' });
         });
     });
 
@@ -95,11 +95,11 @@ module.exports = function (monitor) {
                 break;
         }
 
-        return res.render('error', { message, title: 'Missing Path' });
+        return res.render('error', { message, title: '404'  });
     });
 
     router.get('/*', (req, res) => {
-        return res.render('error', { title: 'Missing Path' });
+        return res.render('error', { title: '404'  });
     });
 
     return router;
