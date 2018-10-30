@@ -4,7 +4,7 @@ const pg = require('../../../lib/postgresQL')(config.pg);
 
 class OaiPmhAPI {
   /**
-   * Initialize the oai-pmh API class.
+   * Initialize the oai-pmh class.
    * @param {Object} args - The constructor parameters.
    */
   constructor(args) {
@@ -159,8 +159,8 @@ class OaiPmhAPI {
       if(Vals[Keys.indexOf('dc:identifier')] instanceof Array) {
         formatedMaterial.providerMetadata.title = Vals[Keys.indexOf('dc:identifier')][0].split('/', 3)[2];
         formatedMaterial.providerMetadata.url = Vals[Keys.indexOf('dc:identifier')][0].split('/', 3).join('/');
-        formatedMaterial.providerUri = Vals[Keys.indexOf('dc:identifier')][0].toString();        
-        formatedMaterial.materialUrl = Vals[Keys.indexOf('dc:identifier')][0].toString();
+        formatedMaterial.providerUri = (Vals[Keys.indexOf('dc:identifier')][0]).toString();        
+        formatedMaterial.materialUrl = (Vals[Keys.indexOf('dc:identifier')][0]).toString();
       }else{
         formatedMaterial.providerMetadata.title = Vals[Keys.indexOf('dc:identifier')].split('/', 3)[2];
         formatedMaterial.providerMetadata.url = Vals[Keys.indexOf('dc:identifier')].split('/', 3).join('/');
@@ -169,7 +169,7 @@ class OaiPmhAPI {
       }
 
       if(formatedMaterial.providerUri.includes('arxiv')){
-        formatedMaterial.materialUrl = Vals[Keys.indexOf('dc:identifier')].toString().split('abs').join('pdf');
+        formatedMaterial.materialUrl = formatedMaterial.materialUrl.split('abs').join('pdf');
         try{formatedMaterial.license.material = await this.getRec (this.domain, Vals[Keys.indexOf('identifier')], 'arXiv');}
         catch(err){console.log(err)}
       }else if(Keys.includes('dc:source') && (Vals[Keys.indexOf('dc:source')] !== null)) {
