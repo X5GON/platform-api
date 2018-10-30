@@ -26,4 +26,11 @@ $(document).ready(function () {
         $('.material-inspect-container .material-title').removeClass('invisible');
     });
 
+    $(window).resize(function () {
+        if ($(this).width() < 1346) {
+            $('.material-inspect-container .material-title').html(null);
+            $('#material-inspect').attr('src', null);
+        }
+    });
+
 });

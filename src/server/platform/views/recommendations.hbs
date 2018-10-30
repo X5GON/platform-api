@@ -1,11 +1,12 @@
-{{#if empty}}
-  <div class="recommendations width-restriction">
+{{#unless empty }}
+  <div class="recommendations width-restriction"
+    style="width:{{style.width}};max-height:{{style.height}};">
     {{#each recommendations as | material index |}}
     <a class="material" href="{{material.url}}" target="_top">
-      <table class="material-content">
+      <table class="material-content" style="font-size:{{../style.fontSize}};">
         <body>
           <tr>
-            <td class="p-1">
+            <td class="align-top p-1 pt-2 text-center">
               {{#if videoType}}
                 <span class="fa-stack fa-lg">
                   <i class="fas fa-circle fa-stack-2x"></i>
@@ -24,10 +25,9 @@
               {{/if}}
             </td>
             <td class="w-100 p-1">
-              <strong>{{material.title}}</strong>
-              <br>
-              <small>{{material.provider}}</small>
-              <small class="float-right">{{material.type}}</small>
+              <strong class="d-block">{{material.title}}</strong>
+              <small class="d-block"><b>Provider:</b> {{material.provider}}</small>
+              <small class="d-block"><b>Language:</b> {{material.language}}</small>
             </td>
           </tr>
         </body>
@@ -35,9 +35,10 @@
     </a>
     {{/each}}
   </div>
-  <div class="footer text-right width-restriction">
+  <div class="footer text-right width-restriction"
+    style="width:{{style.width}};">
     <small>Powered by
       <a href="https://www.x5gon.org/" target="_blank">X5GON Project</a>
     </small>
   </div>
-{{/if}}
+{{/unless}}

@@ -18,24 +18,24 @@ header .navbar .navbar-brand img {
     margin-left: 0;
 }
 
-header .navbar .nav-link {
+header .navbar .btn-nav {
     background-color: white;
     transition: background .2s;
     font-weight: 600;
     color: #5b95a5;
 }
 
-header .navbar .nav-link:hover {
+header .navbar .btn-nav:hover {
     background-color: #f6f6f6;
 }
 
-header .navbar .nav-link.call-to-action {
+header .navbar .btn-nav.call-to-action {
     background-color: #5b95a5;
     color: white;
     transition: background .2s;
 }
 
-header .navbar .nav-link.call-to-action:hover {
+header .navbar .btn-nav.call-to-action:hover {
     background-color: #456f7a;
 }
 
@@ -118,3 +118,67 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 { margin-bottom: 30px; }
+
+button[type="submit"] {
+    border: 0px;
+    background-color: #5b95a5;
+}
+
+button[type="submit"]:hover,
+button[type="submit"]:focus,
+button[type="submit"]:active {
+    background-color: #456f7a;
+}
+
+.btn.btn-outline-secondary {
+    border: 2px solid #5b95a5;
+    color: #5b95a5;
+    font-weight: 600;
+}
+
+.btn.btn-outline-secondary:hover {
+    background-color: #5b95a5;
+    color: white;
+}
+
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus {
+    border-color: #ced4da;
+
+}
+
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+a:focus,
+a:active,
+.btn:focus,
+.btn:active {
+    outline: none !important;
+    box-shadow: none;
+}
