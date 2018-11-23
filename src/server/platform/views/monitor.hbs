@@ -1,0 +1,103 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+
+      <h1>Process Monitor</h1>
+
+      <div class="table-responsive">
+        <table class="table" id="process-monitor">
+          <thead>
+            <tr>
+              <th scope="col" class="text-center align-middle">PM2 ID</th>
+              <th scope="col" class="text-center align-middle">Process Name</th>
+              <th scope="col" class="text-center align-middle">Status</th>
+              <th scope="col" class="text-center align-middle">Running Time</th>
+              <th scope="col" class="text-center align-middle">Created At</th>
+              <th scope="col" class="text-center align-middle">Interpreter</th>
+              <th scope="col" class="text-center align-middle">Times Restarted</th>
+              <th scope="col" class="text-center align-middle">Unstable Restarts</th>
+              <th scope="col" class="text-center align-middle">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+
+            {{#each processList as |process|}}
+              <tr id="{{process.name}}" data-process-head="{{process.name}}">
+
+                <td class="text-center align-middle">{{process.pm_id}}</td>
+                <td class="align-middle" data-toggle="collapse"
+                  href="tr[data-process-body={{process.name}}] div.collapse">{{process.name}}</td>
+                <td class="text-center align-middle font-weight-bold {{statusColor process.pm2_env.status}}"
+                  type="status">
+                  {{process.pm2_env.status}}
+                </td>
+                <td class="text-center align-middle" type="running-time">
+                  {{process.pm2_env.running_time}}
+                </td>
+                <td class="text-center align-middle" type="created-at">
+                  {{process.pm2_env.created_at_clean}}
+                </td>
+                <td class="text-center align-middle">
+                  {{process.pm2_env.exec_interpreter}}
+                </td>
+                <td class="text-center align-middle" type="restart-time">
+                  {{process.pm2_env.restart_time}}
+                </td>
+                <td class="text-center align-middle" type="unstable-restarts">
+                  {{process.pm2_env.unstable_restarts}}
+                </td>
+                <td class="text-center align-middle">
+
+                  {{#if (isEqual process.pm2_env.status 'online')}}
+                    <button type="button" class="btn btn-danger btn-sm"
+                      data-action="disable"
+                      data-process-id={{process.pm_id}}>
+                      disable
+                    </button>
+                  {{else}}
+                    <button type="button" class="btn btn-success btn-sm"
+                      data-action="enable"
+                      data-process-id={{process.pm_id}}>
+                      enable
+                    </button>
+                  {{/if}}
+                </td>
+              </tr>{{! tr#id=process.name }}
+
+              <tr data-process-body="{{process.name}}">
+
+                <td colspan="9">
+                  <div class="collapse">
+                    <div class="content">
+                      <div class="row">
+                        <div class="col-md-4 pl-4">
+                          <h6>CPU usage</h6>
+                          <div class="piechart">{{process.monit.cpu}}</div>
+                        </div>
+                        <div class="col-md-8 pl-4">
+                          <h6>Memory usage</h6>
+                          <div class="timeline">{{process.monit.memory}}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+
+              </tr>{{! tr[data-process-body] }}
+
+            {{/each}}
+
+          </tbody>
+        </table>{{! #process-monitor }}
+      </div>{{! .table-responsive-lg }}
+
+
+    </div>{{! .col }}
+  </div>{{! .row }}
+</div>{{! .container }}
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script src="/js/process-monitor-socket.js"></script>
+<script src="/js/process-monitor-actions.js"></script>
+

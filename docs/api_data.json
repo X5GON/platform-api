@@ -54,7 +54,7 @@
     "examples": [
       {
         "title": "Example usage:",
-        "content": "<iframe src=\"https://platform.x5gon.org/api/v1/search?url=https://platform.x5gon.org/materialUrl&text=education\"\n    style=\"border:0px;height:425px;\"></iframe>",
+        "content": "<iframe src=\"https://platform.x5gon.org/embed/recommendations?url=https://platform.x5gon.org/materialUrl&text=education\"\n    style=\"border:0px;height:425px;\"></iframe>",
         "type": "html"
       }
     ],
