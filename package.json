@@ -30,6 +30,7 @@
     "async": "^2.6.0",
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
     "dotenv": "^6.0.0",
     "express": "^4.16.2",
     "express-handlebars": "^3.0.0",
@@ -37,7 +38,9 @@
     "file-type": "^8.0.0",
     "franc": "^4.0.0",
     "handlebars": "^4.0.11",
+    "handlebars-helper-sri": "0.0.0",
     "helmet": "^3.12.1",
+    "helmet-csp": "^2.7.1",
     "http-proxy-middleware": "^0.18.0",
     "jsonschema": "^1.2.2",
     "kafka-node": "^2.6.1",
@@ -58,7 +61,8 @@
     "apidoc": "^0.17.6",
     "mocha": "^5.2.0",
     "node-minify": "^2.4.1",
-    "supertest": "^3.3.0"
+    "supertest": "^3.3.0",
+    "ua-parser-js": "^0.7.18"
   },
   "apidoc": {
     "title": "X5GON API Documentation",
