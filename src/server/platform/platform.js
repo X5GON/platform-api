@@ -6,7 +6,6 @@
 const config = require('../../config/config');
 
 // external modules
-const fs = require('fs');
 const express = require('express');
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
@@ -46,8 +45,7 @@ app.use(session({
 // add the public folder
 app.use(express.static(__dirname + '/public/'));
 
-// set rendering engine
-app.engine('hbs', exphbs({
+let hbs = exphbs.create({
     extname: 'hbs',
     defaultLayout: 'main',
     partialsDir: `${__dirname}/views/partials/`,
@@ -59,9 +57,20 @@ app.engine('hbs', exphbs({
             return arg1 === 'online' ? 'text-success' :
                 arg1 === 'launching' ? 'text-warning' :
                 'text-danger';
+        },
+        json: function (obj) {
+            return JSON.stringify(obj);
+        },
+        concat: function (...args) {
+            args.pop(); return args.join('');
         }
     }
-}));
+});
+
+hbs.handlebars = require('handlebars-helper-sri').register(hbs.handlebars);
+
+// set rendering engine
+app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 
 // redirect specific requests to other services
@@ -83,8 +92,8 @@ io.on('connection', function(socket) {
     setInterval(() => {
         monitor.listProcesses((error, list) => {
             return error ?
-                io.emit('pm2-process-error', { error }) :
-                io.emit('pm2-process', list);
+                io.emit('monitor-process-error', { error }) :
+                io.emit('monitor-process', list);
         });
     }, 1000);
 });

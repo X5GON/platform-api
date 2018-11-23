@@ -8,6 +8,7 @@ const path = require('path');
 const fs = require('fs');
 const url = require('url');
 const cors = require('cors');
+const csp = require('helmet-csp');
 
 // internal modules
 // const KafkaProducer = require('../../../../lib/kafka-producer');
@@ -17,6 +18,13 @@ const validator = require('../../../../lib/schema-validator')({
 
 // TODO: initialize kafka producer
 // const producer = new KafkaProducer(config.kafka);
+
+const middlewareCSP = csp({
+    directives: {
+        requireSriFor: ['script']
+    }
+});
+
 
 /**
  * @description Adds API routes for logging user activity.
@@ -285,7 +293,7 @@ module.exports = function (pg, logger) {
      * @apiExample {html} Example usage:
      *      <script type="text/javascript" src="https://platform.x5gon.org/api/v1/snippet/latest/x5gon-log.min.js"></script>
      */
-    router.get('/snippet/:version/x5gon-log(.min)?.js', (req, res) => {
+    router.get('/snippet/:version/x5gon-log(.min)?.js', cors(), middlewareCSP, (req, res) => {
         // TODO: check if the parameters are valid
 
         // get the version parameter

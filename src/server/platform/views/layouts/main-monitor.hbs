@@ -9,8 +9,8 @@
   <meta name="author" content="Erik Novak">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> {{! link to the bootstrap css files }}
 
-  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-16x16.png">
   <link rel="stylesheet" href="/css/prism.css">
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
@@ -43,7 +43,7 @@
 
 <body>
   {{! navigation for every page }}
-  {{> header }}
+  {{> header-monitor }}
 
   <main role="main">
     {{{body}}}
@@ -51,6 +51,8 @@
 
   {{> footer }}
 
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://d3js.org/d3.v3.min.js"></script>
 </body>
 
 </html>

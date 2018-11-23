@@ -4,7 +4,7 @@ const config = require('../../../../config/config');
 // external modules
 const router = require('express').Router();
 const request = require('request');
-
+const fs = require('fs');
 
 /********************************************
  * Helper functions
@@ -103,8 +103,10 @@ module.exports = function (pg, logger) {
             } else {
                 // there are registered repositories in the database
                 const { name, domain, contact, token } = results[0];
+                // get snippet libraries
+                const snippetLibs = fs.readdirSync(__dirname + '/../../snippet/global/');
                 // render the form submition
-                return res.render('oer-provider', { name, domain, contact, token, title: 'OER Provider Information' });
+                return res.render('oer-provider', { name, domain, contact, token, snippetLibs, title: 'OER Provider Information' });
             }
         });
     });
