@@ -8,7 +8,6 @@ const path = require('path');
 const fs = require('fs');
 const url = require('url');
 const cors = require('cors');
-const csp = require('helmet-csp');
 
 // internal modules
 // const KafkaProducer = require('../../../../lib/kafka-producer');
@@ -18,13 +17,6 @@ const validator = require('../../../../lib/schema-validator')({
 
 // TODO: initialize kafka producer
 // const producer = new KafkaProducer(config.kafka);
-
-const middlewareCSP = csp({
-    directives: {
-        requireSriFor: ['script']
-    }
-});
-
 
 /**
  * @description Adds API routes for logging user activity.
@@ -245,10 +237,27 @@ module.exports = function (pg, logger) {
             return res.sendFile(beaconPath, options);
         }
 
-        // get the user id from the X5GON tracker
-        let uuid = req.cookies[x5gonCookieName] ?
-            req.cookies[x5gonCookieName] :
-            'unknown:not-tracking';
+        let uuid;
+        // generate a the tracker cookie - if not exists
+        if (!req.cookies[x5gonCookieName]) {
+            // generate the cookie value
+            let cookieValue = Math.random().toString().substr(2) + "X" + Date.now();
+            // set expiration date for the cookie
+            let expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 3650);
+            // set the cookie for the user
+            res.cookie(x5gonCookieName, cookieValue, { expires: expirationDate, httpOnly: true });
+
+            // set uuid of the user
+            uuid = cookieValue;
+        }
+
+        if (!uuid) {
+            // get the user id from the X5GON tracker
+            uuid = req.cookies[x5gonCookieName] ?
+                req.cookies[x5gonCookieName] :
+                'unknown:not-tracking';
+        }
 
         // prepare the acitivity object
         let activity = {
@@ -293,28 +302,17 @@ module.exports = function (pg, logger) {
      * @apiExample {html} Example usage:
      *      <script type="text/javascript" src="https://platform.x5gon.org/api/v1/snippet/latest/x5gon-log.min.js"></script>
      */
-    router.get('/snippet/:version/x5gon-log(.min)?.js', cors(), middlewareCSP, (req, res) => {
+    router.get('/snippet/:version/x5gon-log(.min)?.js', cors(), (req, res) => {
         // TODO: check if the parameters are valid
 
         // get the version parameter
         const version = req.params.version;
-
         // get the file name
         let originalUrl = req.originalUrl.split('/');
         const file = originalUrl[originalUrl.length - 1].split('?')[0];
+
         // create the file path
         const filePath = path.join(__dirname, `../../snippet/global/${version}/${file}`);
-
-        // generate a the tracker cookie - if not exists
-        if (!req.cookies[x5gonCookieName]) {
-            // generate the cookie value
-            let cookieValue = Math.random().toString().substr(2) + "X" + Date.now();
-            // set expiration date for the cookie
-            let expirationDate = new Date();
-            expirationDate.setDate(expirationDate.getDate() + 3650);
-            // set the cookie for the user
-            res.cookie(x5gonCookieName, cookieValue, { expires: expirationDate, httpOnly: true });
-        }
 
         // send the file of the appropriate version
         res.sendFile(filePath);
