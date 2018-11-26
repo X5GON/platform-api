@@ -149,6 +149,17 @@ module.exports = function (pg, logger) {
     }
 
     /**
+     * @description Checks if the request has been povided by a bot.
+     * @param {Object} req - The express request object.
+     * @returns {Boolean} True if the request was given by a bot.
+     * @private
+     */
+    function _isBot(req) {
+        let userAgent = req.get('user-agent').toLowerCase();
+        return userAgent.includes('bot') || userAgent.includes('preview');
+    }
+
+    /**
      * @api {GET} /api/v1/snippet/log/development User activity acquisition for testing
      * @apiDescription Sends user activity snippet information FOR TESTING.
      * All parameters should be encoded by the `encodeURIComponent` function
@@ -231,6 +242,20 @@ module.exports = function (pg, logger) {
                     error: 'The body of the request is not in valid schema',
                     provider
 
+                })
+            );
+            // send beacon image to user
+            return res.sendFile(beaconPath, options);
+        }
+
+        if (_isBot(req)) {
+            // the user parameters object is either empty or is not in correct schema
+            const provider = userParameters.cid ? userParameters.cid : 'unknown';
+            // log user parameters error
+            logger.warn('warn [route_body]: client activity logging failed',
+                logger.formatRequest(req, {
+                    error: 'The request has been provided by a bot',
+                    provider
                 })
             );
             // send beacon image to user
