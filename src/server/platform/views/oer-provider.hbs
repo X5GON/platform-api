@@ -117,9 +117,11 @@
 
             <p>
               Included the provided lines of code in the <code class="language-handlebars">&lt;head&gt;</code>
-              of the website containing the OER material.<br>
-              <b>NOTE:</b> we recommend you to save the source files <code>cookieconsent.min.css</code> and
-              <code>cookieconsent.min.js</code> on your server and import it into your repository.
+              of the website containing the OER material. In addition, the <code>condition</code> in the
+              <code>onInitialise</code> and <code>onStatusChange</code> should be a boolean value (i.e.
+              <code>true</code> or <code>false</code>) indicating that the page contains OER material.
+              <b>NOTE:</b> we recommend you to save the <code>cookieconsent.min.css</code> and
+              <code>cookieconsent.min.js</code> source files on your server and import it into your repository.
             </p>
 
             <pre class="mb-4">
@@ -145,11 +147,14 @@
                       },
                       "type": "opt-in",
                       "content": {
-                        "message": "This website uses cookies to analyze your learning interests and patterns, improving your learning experience (in collaboration with the X5GON project).",
+                        "message": `This website uses cookies for functional and analytical purposes. In addition,
+                          we use cookies to deliver personalized, responsive services and to improve the site.
+                          This is done in collaboration with the X5GON project.`,
                         "dismiss": "Decline",
                         "allow": "Allow cookies",
                         "link": "Learn more",
-                        // link to the X5GON platform privacy policy - describing what we are collecting
+                        // link to the X5GON platform privacy policy - describing what are we collecting
+                        // through the platform
                         "href": "https://platform.x5gon.org/privacy-policy"
                       },
                       onInitialise: function (status) {
@@ -158,7 +163,9 @@
                         if (type == 'opt-in' && didConsent) {
                           // enable cookies - send user data to the platform
                           // only if the user enabled cookies
-                          x5gonActivityTracker('{{ token }}');
+                          if (typeof x5gonActivityTracker !== 'undefined') {
+                            x5gonActivityTracker('{{ token }}');
+                          }
                         }
                       },
                       onStatusChange: function(status, chosenBefore) {
@@ -167,7 +174,9 @@
                         if (type == 'opt-in' && didConsent) {
                           // enable cookies - send user data to the platform
                           // only if the user enabled cookies
-                          x5gonActivityTracker('{{ token }}');
+                          if (typeof x5gonActivityTracker !== 'undefined') {
+                            x5gonActivityTracker('{{ token }}');
+                          }
                         }
                       },
                       onRevokeChoice: function() {
