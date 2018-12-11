@@ -15,8 +15,8 @@ const prod = {
         google: {
             reCaptcha: {
                 verifyUrl: 'https://www.google.com/recaptcha/api/siteverify',
-                siteKey: process.env.PROD_PLATFORM_GOOGLE_RECAPTCHA_SITEKEY,
-                secret: process.env.PROD_PLATFORM_GOOGLE_RECAPTCHA_SECRET
+                siteKey: process.env.GOOGLE_RECAPTCHA_SITEKEY,
+                secret: process.env.GOOGLE_RECAPTCHA_SECRET
             }
         }
     },
@@ -30,13 +30,17 @@ const prod = {
                 domain: "http://videolectures.net/",
                 script: "videolectures-api.js",
                 config: {
-                    apikey: process.env.PROD_PREPROC_RETRIEVERS_VL_APIKEY
+                    apikey: process.env.RETRIEVERS_VL_APIKEY
                 }
             }
         ],
         wikifier: {
-            wikifierUrl: process.env.PROD_PREPROC_WIKIFIER_URL,
-            userKey: process.env.PROD_PREPROC_WIKIFIER_USERKEY
+            wikifierUrl: process.env.PREPROC_WIKIFIER_URL,
+            userKey: process.env.PREPROC_WIKIFIER_USERKEY
+        },
+        ttp: {
+            user: process.env.PREPROC_TTP_USER,
+            token: process.env.PREPROC_TTP_TOKEN,
         }
     },
     monitor: {
@@ -45,7 +49,7 @@ const prod = {
         adminToken: process.env.PROD_MONITOR_ADMIN_TOKEN
     },
     kafka: {
-        host: process.env.PROD_KAFKA_HOST || '192.168.99.100:9092'
+        host: process.env.PROD_KAFKA_HOST || 'localhost:9092'
     },
     pg: {
         host: process.env.PROD_PG_HOST || 'localhost',
@@ -66,8 +70,8 @@ const dev = {
         google: {
             reCaptcha: {
                 verifyUrl: 'https://www.google.com/recaptcha/api/siteverify',
-                siteKey: process.env.DEV_PLATFORM_GOOGLE_RECAPTCHA_SITEKEY,
-                secret: process.env.DEV_PLATFORM_GOOGLE_RECAPTCHA_SECRET
+                siteKey: process.env.GOOGLE_RECAPTCHA_SITEKEY,
+                secret: process.env.GOOGLE_RECAPTCHA_SECRET
             }
         }
     },
@@ -81,13 +85,17 @@ const dev = {
                 domain: "http://videolectures.net/",
                 script: "videolectures-api.js",
                 config: {
-                    apikey: process.env.DEV_PREPROC_RETRIEVERS_VL_APIKEY
+                    apikey: process.env.RETRIEVERS_VL_APIKEY
                 }
             }
         ],
         wikifier: {
-            wikifierUrl: process.env.DEV_PREPROC_WIKIFIER_URL,
-            userKey: process.env.DEV_PREPROC_WIKIFIER_USERKEY
+            wikifierUrl: process.env.PREPROC_WIKIFIER_URL,
+            userKey: process.env.PREPROC_WIKIFIER_USERKEY
+        },
+        ttp: {
+            user: process.env.PREPROC_TTP_USER,
+            token: process.env.PREPROC_TTP_TOKEN,
         }
     },
     monitor: {
@@ -96,7 +104,7 @@ const dev = {
         adminToken: process.env.DEV_MONITOR_ADMIN_TOKEN
     },
     kafka: {
-        host: process.env.DEV_KAFKA_HOST || '192.168.99.100:9092'
+        host: process.env.DEV_KAFKA_HOST || 'localhost:9092'
     },
     pg: {
         host: process.env.DEV_PG_HOST || 'localhost',
@@ -117,8 +125,8 @@ const test = {
         google: {
             reCaptcha: {
                 verifyUrl: 'https://www.google.com/recaptcha/api/siteverify',
-                siteKey: process.env.TEST_PLATFORM_GOOGLE_RECAPTCHA_SITEKEY,
-                secret: process.env.TEST_PLATFORM_GOOGLE_RECAPTCHA_SECRET
+                siteKey: process.env.GOOGLE_RECAPTCHA_SITEKEY,
+                secret: process.env.GOOGLE_RECAPTCHA_SECRET
             }
         }
     },
@@ -132,13 +140,17 @@ const test = {
                 domain: "http://videolectures.net/",
                 script: "videolectures-api.js",
                 config: {
-                    apikey: process.env.TEST_PREPROC_RETRIEVERS_VL_APIKEY
+                    apikey: process.env.RETRIEVERS_VL_APIKEY
                 }
             }
         ],
         wikifier: {
-            wikifierUrl: process.env.TEST_PREPROC_WIKIFIER_URL,
-            userKey: process.env.TEST_PREPROC_WIKIFIER_USERKEY
+            wikifierUrl: process.env.PREPROC_WIKIFIER_URL,
+            userKey: process.env.PREPROC_WIKIFIER_USERKEY
+        },
+        ttp: {
+            user: process.env.PREPROC_TTP_USER,
+            token: process.env.PREPROC_TTP_TOKEN,
         }
     },
     monitor: {
@@ -147,7 +159,7 @@ const test = {
         adminToken: process.env.TEST_MONITOR_ADMIN_TOKEN
     },
     kafka: {
-        host: process.env.TEST_KAFKA_HOST || '192.168.99.100:9092'
+        host: process.env.TEST_KAFKA_HOST || 'localhost:9092'
     },
     pg: {
         host: process.env.TEST_PG_HOST || 'localhost',

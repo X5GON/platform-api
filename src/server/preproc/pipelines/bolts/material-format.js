@@ -9,25 +9,23 @@ const http = require('http');
 const https = require('https');
 const fileType = require('file-type');
 
-// internal libraries
-const Logger = require('../../../../lib/logging-handler')();
-// create a logger instance for logging wikification process
-const logger = Logger.createGroupInstance('material-format', 'preproc');
-
-
 /**
  * Formats Material into a common schema.
  */
 class MaterialFormat {
 
-    constructor(context) {
+    constructor() {
         this._name = null;
         this._onEmit = null;
+        this._context = null;
     }
 
     init(name, config, context, callback) {
         this._name = name;
+        this._context = context;
         this._onEmit = config.onEmit;
+        this._prefix = `[MaterialFormat ${this._name}]`;
+
         // use other fields from config to control your execution
         callback();
     }
@@ -42,62 +40,72 @@ class MaterialFormat {
     }
 
     receive(material, stream_id, callback) {
-        // log the begining of material formating
-        logger.info('starting formating material', { material });
+        // get material attributes
+        const {
+            title,
+            description,
+            providerUri,
+            materialUrl,
+            author,
+            language,
+            type,
+            dateCreated,
+            dateRetrieved,
+            providerMetadata } = material;
 
-        // TODO: get material attributes
-
-        // TODO: create the object containing the material format
-        const formatedMaterial = {
-            title: material.title,
-            description: material.description,
-            providerUri: material.providerUri,
-            materialUrl: material.materialUrl,
-            author: material.author,
-            language: material.language,
-            type: material.type,
-            dateCreated: material.dateCreated,
-            dateRetrieved: material.dateRetrieved,
-            providerMetadata: material.providerMetadata,
+        // create the object containing the material format
+        const formattedMaterial = {
+            title,
+            description,
+            providerUri,
+            materialUrl,
+            author,
+            language,
+            type,
+            dateCreated,
+            dateRetrieved,
+            providerMetadata,
             materialMetadata: { }
         };
 
-        if (formatedMaterial.type) {
+        if (formattedMaterial.type) {
             // send formated material to the next component
-            logger.info('material format successful', { material, formatedMaterial });
-            return this._onEmit(formatedMaterial, stream_id, callback);
+            return this._onEmit(formattedMaterial, stream_id, callback);
+
         } else if (material.materialUrl.indexOf('http://') === 0) {
-            http.get(material.materialUrl, res => {
-                this._handleResponse(res, material, formatedMaterial, stream_id, callback);
+            // make a http request and retrieve material type
+            http.get(material.materialUrl, response => {
+                this._handleResponse(response, formattedMaterial, stream_id, callback);
             });
+
         } else if (material.materialUrl.indexOf('https://') === 0) {
-            https.get(material.materialUrl, res => {
-                this._handleResponse(res, material, formatedMaterial, stream_id, callback);
+            // make a https request and retrieve material type
+            https.get(material.materialUrl, response => {
+                this._handleResponse(response, formattedMaterial, stream_id, callback);
             });
+
         } else {
-            logger.error('materialUrl is not valid', { material });
-            return callback();
+            // unable to get format of the material - send to partial table
+            return this._onEmit(formattedMaterial, 'stream_partial', callback);
         }
     }
 
-    _handleResponse(response, material, formatedMaterial, stream_id, callback) {
+    _handleResponse(response, material, stream_id, callback) {
         if (response.statusCode !== 200) {
-            logger.warn(`Request denied with code ${response.statusCode}`, { material });
-            logger.info('material format successful', { material, formatedMaterial });
             // send formated material to the next component
-            return this._onEmit(formatedMaterial, stream_id, callback);
+            return this._onEmit(material, stream_id, callback);
         } else {
             response.on('data', chunk => {
                 response.destroy();
-                formatedMaterial.type = fileType(chunk);
-                // log material formating process
-                logger.info('material format successful', { material, formatedMaterial });
+                material.type = fileType(chunk);
                 // send formated material to the next component
-                return this._onEmit(formatedMaterial, stream_id, callback);
+                return this._onEmit(material, stream_id, callback);
             });
         }
     }
 
 }
 
-exports.create = function (context) { return new MaterialFormat(context); };
+exports.create = function (context) {
+    return new MaterialFormat(context);
+};

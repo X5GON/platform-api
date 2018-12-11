@@ -1,11 +1,20 @@
+/************************************************
+ * Kafka Consumer Spout
+ * This component is listening to a Kafka topic
+ * and then sends the message forward to the next
+ * component in the topology.
+ */
+
 // external modules
-const k = require("kafka-node");
+const k = require('kafka-node');
 
 const HIGH_WATER = 100;
 const LOW_WATER = 10;
 
 /**
- * Kafka consumer class.
+ * @class KafkaConsumer
+ * @description Listens to a particular Kafka topic/channel
+ * and stores and prepares the messages for consumption.
  */
 class KafkaConsumer {
 
@@ -15,8 +24,10 @@ class KafkaConsumer {
      * @param {String} topic - The topic kafka consumer is listening to.
      */
     constructor(host, topic) {
+        // the message container
         this._data = [];
 
+        // setup the consumer options
         const options = {
             kafkaHost: host,
             ssl: true,
@@ -31,37 +42,54 @@ class KafkaConsumer {
             onRebalance: (isAlreadyMember, callback) => { callback(); }
         };
 
-        this.consumer_group = new k.ConsumerGroup(options, [topic]);
-        this._high_water_clearing = false;
+        // initialize the consumer group and flags
+        this.consumerGroup = new k.ConsumerGroup(options, [topic]);
+        this._highWaterClearing = false;
         this._enabled = true;
 
-        this.consumer_group.on('message', (message) => {
+        // setup the listener
+        this.consumerGroup.on('message', (message) => {
+            // push the new message to the container
             this._data.push(JSON.parse(message.value));
+
+            // handle large amount of data
             if (this._data.length >= HIGH_WATER) {
-                this._high_water_clearing = true;
-                this.consumer_group.pause();
+                this._highWaterClearing = true;
+                this.consumerGroup.pause();
             }
         });
     }
 
+    /**
+     * @description Enables message consumption.
+     */
     enable() {
+
         if (!this._enabled) {
-            if (!this._high_water_clearing) {
-                this.consumer_group.resume();
+            if (!this._highWaterClearing) {
+                this.consumerGroup.resume();
             }
             this._enabled = true;
         }
     }
 
+    /**
+     * @description Disable/pause message consumption.
+     */
     disable() {
         if (this._enabled) {
-            if (!this._high_water_clearing) {
-                this.consumer_group.pause();
+            if (!this._highWaterClearing) {
+                this.consumerGroup.pause();
             }
             this._enabled = false;
         }
     }
 
+
+    /**
+     * @description Get the next message.
+     * @returns {Null|Object} The message object if present. Otherwise, returns null.
+     */
     next() {
         if (!this._enabled) {
             return null;
@@ -70,8 +98,8 @@ class KafkaConsumer {
             let msg = this._data[0];
             this._data = this._data.slice(1);
             if (this._data.length <= LOW_WATER) {
-                this._high_water_clearing = false;
-                this.consumer_group.resume();
+                this._highWaterClearing = false;
+                this.consumerGroup.resume();
             }
             return msg;
         } else {
@@ -79,8 +107,12 @@ class KafkaConsumer {
         }
     }
 
+    /**
+     * Stops and closes the consumer group.
+     * @param {Function} cb - Callback function.
+     */
     stop(cb) {
-        this.consumer_group.close(true, cb);
+        this.consumerGroup.close(true, cb);
     }
 }
 
