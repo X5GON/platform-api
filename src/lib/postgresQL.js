@@ -134,8 +134,11 @@ class PostgreSQL {
      */
     close() {
         let self = this;
-        self._pool.end().then(() => console.log('[PostgresQL close] pg.pool has ended'));
-        return null;
+        if (callback && typeof(callback) === 'function') {
+            self.pool.end().then(callback);
+        } else {
+            self.pool.end();
+        }
     }
 
     /**
@@ -158,7 +161,7 @@ class PostgreSQL {
                     if (xerror) { return callback(xerror); }
                     let rows = results ? results.rows : [];
                     // return the results to the user
-                    return callback(null, rows);
+                    if (callback) return callback(null, rows);
                 });
             } else {
                 client.query(statement, params, (xerror, results) => {
@@ -168,7 +171,7 @@ class PostgreSQL {
                     if (xerror) { return callback(xerror); }
                     let rows = results ? results.rows : [];
                     // return the results to the user
-                    return callback(null, rows);
+                    if (callback) return callback(null, rows);
                 });
             }
         });
@@ -360,8 +363,13 @@ class PostgreSQL {
         // get the condition keys - must be UNIQUE
         let conditionKeys = Object.keys(conditions);
         if (conditionKeys.length > 1) {
+<<<<<<< HEAD
             const error = new Error(`[PostgresQL upsert] Too many conditions ${conditionKeys.join(',')}`);
             return callback(error);
+=======
+            console.log(`Error in postgresQL.js, too many conditions ${conditions}.`);
+            callback();
+>>>>>>> ee53990dff97da6ddf284d1019d6bcf10ec56759
         }
         // create the query command
         const query = `INSERT INTO ${table} (${recordKeys.join(',')}) VALUES (${recordValIds})

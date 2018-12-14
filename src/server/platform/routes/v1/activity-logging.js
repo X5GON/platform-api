@@ -7,6 +7,7 @@ const handlebars = require('handlebars');
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
+const cors = require('cors');
 
 // internal modules
 // const KafkaProducer = require('../../../../lib/kafka-producer');
@@ -148,6 +149,17 @@ module.exports = function (pg, logger) {
     }
 
     /**
+     * @description Checks if the request has been povided by a bot.
+     * @param {Object} req - The express request object.
+     * @returns {Boolean} True if the request was given by a bot.
+     * @private
+     */
+    function _isBot(req) {
+        let userAgent = req.get('user-agent').toLowerCase();
+        return userAgent.includes('bot') || userAgent.includes('preview');
+    }
+
+    /**
      * @api {GET} /api/v1/snippet/log/development User activity acquisition for testing
      * @apiDescription Sends user activity snippet information FOR TESTING.
      * All parameters should be encoded by the `encodeURIComponent` function
@@ -236,10 +248,41 @@ module.exports = function (pg, logger) {
             return res.sendFile(beaconPath, options);
         }
 
-        // get the user id from the X5GON tracker
-        let uuid = req.cookies[x5gonCookieName] ?
-            req.cookies[x5gonCookieName] :
-            'unknown:not-tracking';
+        if (_isBot(req)) {
+            // the user parameters object is either empty or is not in correct schema
+            const provider = userParameters.cid ? userParameters.cid : 'unknown';
+            // log user parameters error
+            logger.warn('warn [route_body]: client activity logging failed',
+                logger.formatRequest(req, {
+                    error: 'The request has been provided by a bot',
+                    provider
+                })
+            );
+            // send beacon image to user
+            return res.sendFile(beaconPath, options);
+        }
+
+        let uuid;
+        // generate a the tracker cookie - if not exists
+        if (!req.cookies[x5gonCookieName]) {
+            // generate the cookie value
+            let cookieValue = Math.random().toString().substr(2) + "X" + Date.now();
+            // set expiration date for the cookie
+            let expirationDate = new Date();
+            expirationDate.setDate(expirationDate.getDate() + 3650);
+            // set the cookie for the user
+            res.cookie(x5gonCookieName, cookieValue, { expires: expirationDate, httpOnly: true });
+
+            // set uuid of the user
+            uuid = cookieValue;
+        }
+
+        if (!uuid) {
+            // get the user id from the X5GON tracker
+            uuid = req.cookies[x5gonCookieName] ?
+                req.cookies[x5gonCookieName] :
+                'unknown:not-tracking';
+        }
 
         // prepare the acitivity object
         let activity = {
@@ -284,28 +327,17 @@ module.exports = function (pg, logger) {
      * @apiExample {html} Example usage:
      *      <script type="text/javascript" src="https://platform.x5gon.org/api/v1/snippet/latest/x5gon-log.min.js"></script>
      */
-    router.get('/snippet/:version/x5gon-log(.min)?.js', (req, res) => {
+    router.get('/snippet/:version/x5gon-log(.min)?.js', cors(), (req, res) => {
         // TODO: check if the parameters are valid
 
         // get the version parameter
         const version = req.params.version;
-
         // get the file name
         let originalUrl = req.originalUrl.split('/');
         const file = originalUrl[originalUrl.length - 1].split('?')[0];
+
         // create the file path
         const filePath = path.join(__dirname, `../../snippet/global/${version}/${file}`);
-
-        // generate a the tracker cookie - if not exists
-        if (!req.cookies[x5gonCookieName]) {
-            // generate the cookie value
-            let cookieValue = Math.random().toString().substr(2) + "X" + Date.now();
-            // set expiration date for the cookie
-            let expirationDate = new Date();
-            expirationDate.setDate(expirationDate.getDate() + 3650);
-            // set the cookie for the user
-            res.cookie(x5gonCookieName, cookieValue, { expires: expirationDate, httpOnly: true });
-        }
 
         // send the file of the appropriate version
         res.sendFile(filePath);

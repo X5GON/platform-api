@@ -95,11 +95,11 @@ module.exports = function (monitor) {
                 break;
         }
 
-        return res.render('error', { message });
+        return res.render('error', { message, title: 'Missing Path' });
     });
 
     router.get('/*', (req, res) => {
-        return res.render('error', { });
+        return res.render('error', { title: 'Missing Path' });
     });
 
     return router;
