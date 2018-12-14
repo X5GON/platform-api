@@ -39,6 +39,7 @@ class ExtractionDFXP {
         try {
             let slug = material.provideruri.split('/')[3];
             let promise = dfxp2srt(slug, `../../../../data/videolectures/data`);
+
             // get the responses
             promise.then(transcripts => {
                 // set placeholders for the values

@@ -363,13 +363,8 @@ class PostgreSQL {
         // get the condition keys - must be UNIQUE
         let conditionKeys = Object.keys(conditions);
         if (conditionKeys.length > 1) {
-<<<<<<< HEAD
             const error = new Error(`[PostgresQL upsert] Too many conditions ${conditionKeys.join(',')}`);
             return callback(error);
-=======
-            console.log(`Error in postgresQL.js, too many conditions ${conditions}.`);
-            callback();
->>>>>>> ee53990dff97da6ddf284d1019d6bcf10ec56759
         }
         // create the query command
         const query = `INSERT INTO ${table} (${recordKeys.join(',')}) VALUES (${recordValIds})
