@@ -1,7 +1,7 @@
 /********************************************************************
  * PostgresQL storage process
- * This component receives the verified OER material object and stores
- * it into postgresQL database.
+ * This component receives the verified OER material object and
+ * stores it into postgresQL database.
  */
 
 class PostgresqlStorage {
@@ -32,8 +32,6 @@ class PostgresqlStorage {
     }
 
     shutdown(callback) {
-        // prepare for gracefull shutdown, e.g. save state
-
         // close connection to postgres database
         this._pg.close();
 
@@ -43,11 +41,13 @@ class PostgresqlStorage {
 
     receive(material, stream_id, callback) {
         // takes the material and insert it into the OER material table
-        this._pg.insert(material, this._postgresTable, (error, result) => {
+        this._pg.insert(material, /* { materialurl: {} }, */ this._postgresTable, (error, result) => {
             if (error) {
-                console.warn({ error: error.message, materialUrl: material.materialUrl });
+                console.warn({ error: error.message, materialurl });
             } else {
-                console.log('material inserted into oer_material database', { materialUrl: material.materialUrl });
+                console.log(`material inserted into ${this._postgresTable} database`,
+                    { materialurl: material.materialurl }
+                );
             }
             // this is the end of the material processing pipeline
             return callback();

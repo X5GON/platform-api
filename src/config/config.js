@@ -28,7 +28,7 @@ const prod = {
             {
                 name: "Videolectures.NET",
                 domain: "http://videolectures.net/",
-                script: "videolectures-api.js",
+                script: "api-videolectures.js",
                 config: {
                     apikey: process.env.RETRIEVERS_VL_APIKEY
                 }
@@ -83,7 +83,7 @@ const dev = {
             {
                 name: "Videolectures.NET",
                 domain: "http://videolectures.net/",
-                script: "videolectures-api.js",
+                script: "api-videolectures.js",
                 config: {
                     apikey: process.env.RETRIEVERS_VL_APIKEY
                 }
@@ -138,7 +138,7 @@ const test = {
             {
                 name: "Videolectures.NET",
                 domain: "http://videolectures.net/",
-                script: "videolectures-api.js",
+                script: "api-videolectures.js",
                 config: {
                     apikey: process.env.RETRIEVERS_VL_APIKEY
                 }

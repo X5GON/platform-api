@@ -6,10 +6,10 @@ const k = require('kafka-node');
  */
 class KafkaProducer {
 
-    constructor(config) {
+    constructor(host) {
         let self = this;
         const options = {
-            kafkaHost: config.host
+            kafkaHost: host
         };
 
         this._ready = false;
@@ -32,11 +32,11 @@ class KafkaProducer {
         if (self._ready) {
             // the producer is ready
             self._producer.createTopics([topic], false, (error, data) => {
-                if (error) { console.log(error); }
+                if (error) { console.log(error); return; }
                 const messages = JSON.stringify(msg);
                 const payload = [{ topic, messages }];
                 self._producer.send(payload, (xerror, data) => {
-                    if (xerror) { console.log(xerror); }
+                    if (xerror) { console.log(xerror); return; }
                 });
             });
         }

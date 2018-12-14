@@ -143,7 +143,7 @@ class ExtractionTTP {
             const options = Object.assign({ }, this._options, {
                 manifest: {
                     media: {
-                        url: material.materialUrl
+                        url: material.materialurl
                     }
                 },
                 metadata: {
@@ -264,15 +264,16 @@ class ExtractionTTP {
                 }
 
                 // save transcriptions into the material's metadata field
-                material.materialMetadata.dfxp = dfxp;
-                material.materialMetadata.rawText = rawText;
-                material.materialMetadata.transcriptions = transcriptions;
+                material.materialmetadata.dfxp = dfxp;
+                material.materialmetadata.rawText = rawText;
+                material.materialmetadata.transcriptions = transcriptions;
 
                 // send material to the next component
                 return this._onEmit(material, stream_id, callback);
 
             }).catch(e => {
                 // TODO: log error message and store the not completed material
+                material.message = `${this._prefix} ${e.message}`;
                 return this._onEmit(material, 'stream_partial', callback);
             });
 
@@ -282,6 +283,7 @@ class ExtractionTTP {
             // one containing incomplete & unhandled materials
 
             // TODO: log material
+            material.message = `${this._prefix} Not supported language.`;
             return this._onEmit(material, 'stream_partial', callback);
         }
     }

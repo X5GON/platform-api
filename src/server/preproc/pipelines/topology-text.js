@@ -27,6 +27,31 @@ module.exports = {
             "inputs": [{
                 "source": "text-input"
             }],
+            "init": {
+                "fields": [
+                    { "name": "title" },
+                    { "name": "description" },
+                    { "name": "provideruri" },
+                    { "name": "materialurl" },
+                    { "name": "author" },
+                    { "name": "language" },
+                    { "name": "type" },
+                    { "name": "datecreated" },
+                    { "name": "dateretrieved" },
+                    { "name": "providermetadata" },
+                    { "name": "materialmetadata", "default": {} },
+                    { "name": "license" }
+                ]
+            }
+        },
+        {
+            "name": "material-type",
+            "type": "inproc",
+            "working_dir": "./bolts",
+            "cmd": "material-type.js",
+            "inputs": [{
+                "source": "material-format",
+            }],
             "init": {}
         },
         {
@@ -35,7 +60,7 @@ module.exports = {
             "working_dir": "./bolts",
             "cmd": "extraction-text.js",
             "inputs": [{
-                "source": "material-format",
+                "source": "material-type",
             }],
             "init": {}
         },
@@ -53,7 +78,7 @@ module.exports = {
             }
         },
         {
-            "name": "material-validation",
+            "name": "material-validator",
             "type": "inproc",
             "working_dir": "./bolts",
             "cmd": "material-validator.js",
@@ -74,10 +99,10 @@ module.exports = {
             "working_dir": "./bolts",
             "cmd": "postgresql-storage.js",
             "inputs": [{
-                "source": "material-validation",
+                "source": "material-validator",
             }],
             "init": {
-                "postgres_table": "oer_materials",
+                "postgres_table": "oer_materials_update",
                 "pg": config.pg
             }
         },
@@ -87,7 +112,7 @@ module.exports = {
             "working_dir": "./bolts",
             "cmd": "postgresql-storage.js",
             "inputs": [{
-                "source": "material-validation",
+                "source": "material-validator",
             }],
             "init": {
                 "postgres_table": "oer_materials_dev",
@@ -114,7 +139,7 @@ module.exports = {
                 "source": "wikification",
                 "stream_id": "stream_partial"
             },{
-                "source": "material-validation",
+                "source": "material-validator",
                 "stream_id": "stream_partial"
             }],
             "init": {
@@ -134,9 +159,6 @@ module.exports = {
             "cmd": "console",
             "inputs": [{
                 "source": "material-format"
-            },
-            {
-                "source": "material-validation"
             }],
             "init": {}
         },

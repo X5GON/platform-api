@@ -48,17 +48,19 @@ class ExtractionText {
     receive(material, stream_id, callback) {
         if (material.type && !this._invalidTypes.includes(material.type.ext)) {
             // extract raw text from materialURL
-            textract.fromUrl(material.materialUrl, (error, text) => {
+            textract.fromUrl(material.materialurl, (error, text) => {
                 if (error) {
+                    material.message = `${this._prefix} Not able to extract text.`;
                     return this._onEmit(material, 'stream_partial', callback);
                 }
                 // save the raw text within the metadata
-                material.materialMetadata.rawText = text;
+                material.materialmetadata.rawText = text;
                 // send material object to next component
                 return this._onEmit(material, stream_id, callback);
             });
         } else {
             // send the material to the partial table
+            material.message = `${this._prefix} Material does not have type provided.`;
             return this._onEmit(material, 'stream_partial', callback);
         }
     }

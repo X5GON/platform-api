@@ -27,7 +27,7 @@ class Validator {
     validateSchema(object, schema) {
         let self = this;
         let validation = self._validator.validate(object, schema);
-        console.log(validation.errors);
+        if (validation.errors.length) console.log(validation.errors);
         return !validation.errors.length;
     }
 

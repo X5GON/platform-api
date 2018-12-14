@@ -24,7 +24,7 @@ class Wikification {
      * @param {Function} callback - The function called when wikifier returns the wikipedia
      * concepts and language.
      */
-    processText(text, callback) {
+    processText(text) {
         let self = this;
 
         // separate text and prepare tasks for retrieving wiki concepts
@@ -35,47 +35,50 @@ class Wikification {
             return callback(null, { wikipediaConcepts: [], language: null });
         }
 
-        // get wikipedia concepts of the material
-        async.parallelLimit(tasks, 10, (error, concepts) => {
-            if (error) { return callback(error); }
+        return new Promise((resolve, reject) => {
+            // get wikipedia concepts of the material
+            async.parallelLimit(tasks, 10, (error, concepts) => {
+                if (error) { return reject(error); }
 
-            // wikipedia concepts storage
-            let conceptMap = { };
+                // wikipedia concepts storage
+                let conceptMap = { };
 
-            // merge concepts with matching uri
-            for (let conceptsBundle of concepts) {
-                for (let concept of conceptsBundle) {
-                    if (conceptMap[concept.uri]) {
-                        // concept exists in mapping - add weighted pageRank
-                        conceptMap[concept.uri].pageRank   += concept.pageRank;
-                        conceptMap[concept.uri].cosine     += concept.cosine;
-                        conceptMap[concept.uri].supportLen += concept.supportLen;
+                // merge concepts with matching uri
+                for (let conceptsBundle of concepts) {
+                    for (let concept of conceptsBundle) {
+                        if (conceptMap[concept.uri]) {
+                            // concept exists in mapping - add weighted pageRank
+                            conceptMap[concept.uri].pageRank   += concept.pageRank;
+                            conceptMap[concept.uri].cosine     += concept.cosine;
+                            conceptMap[concept.uri].supportLen += concept.supportLen;
 
-                    } else {
-                        //  add concept to the mapping
-                        conceptMap[concept.uri] = concept;
+                        } else {
+                            //  add concept to the mapping
+                            conceptMap[concept.uri] = concept;
+                        }
                     }
                 }
-            }
-            // store merged concepts within the material object
-            const wikipediaConcepts = Object.values(conceptMap);
+                // store merged concepts within the material object
+                const wikipediaConcepts = Object.values(conceptMap);
 
-            // get the dominant language of the material
-            let languages = { };
-            for (let concept of wikipediaConcepts) {
-                if (languages[concept.lang]) {
-                    languages[concept.lang] += 1;
-                } else {
-                    languages[concept.lang] = 1;
+                // get the dominant language of the material
+                let languages = { };
+                for (let concept of wikipediaConcepts) {
+                    if (languages[concept.lang]) {
+                        languages[concept.lang] += 1;
+                    } else {
+                        languages[concept.lang] = 1;
+                    }
                 }
-            }
 
-            // get the maximum language
-            const language = Object.keys(languages)
-                .reduce((a, b) => languages[a] > languages[b] ? a : b);
+                // get the maximum language
+                const language = Object.keys(languages)
+                    .reduce((a, b) => languages[a] > languages[b] ? a : b);
 
-            return callback(null, { wikipediaConcepts, language });
+                return resolve({ wikipediaConcepts, language });
+            });
         });
+
     }
 
     /////////////////////////////////////////////
@@ -92,25 +95,22 @@ class Wikification {
         let self = this;
 
         // create a wikifier request promise object
-        return new Promise((resolve, reject) => {
-            rp({
-                method: 'POST',
-                url: `${self._wikifierUrl}/annotate-article`,
-                body: {
-                    text: text,
-                    lang: 'auto',
-                    support: true,
-                    ranges: false,
-                    includeCosines: true,
-                    userKey: self._userKey,
-                    nTopDfValuesToIgnore: 50,
-                    nWordsToIgnoreFromList: 50
-                },
-                json: true
-            })
-            .then(body => resolve(body))
-            .catch(error => reject(error));
+        return rp({
+            method: 'POST',
+            url: `${self._wikifierUrl}/annotate-article`,
+            body: {
+                text: text,
+                lang: 'auto',
+                support: true,
+                ranges: false,
+                includeCosines: true,
+                userKey: self._userKey,
+                nTopDfValuesToIgnore: 50,
+                nWordsToIgnoreFromList: 50
+            },
+            json: true
         });
+
     }
 
 
@@ -179,10 +179,7 @@ class Wikification {
             });
             // return the concept list
             return callback(null, concepts);
-        }).catch(error => {
-            // TODO: log error and cleanup lecture object
-            return callback(error);
-        });
+        }).catch(error => { return callback(error) });
     }
 
 
@@ -190,52 +187,62 @@ class Wikification {
      * @description Splits the full text into smaller chunks and prepares
      * tasks to be sent to wikifier.
      * @param {String} text - The full text to be sent to wikifier.
-     * @param {Number} maxTextLength - The maximum text length to be sent
+     * @param {Number} maxLength - The maximum text length to be sent
      * to wikifier.
      * @returns {Function[]} Array of tasks.
      */
-    _prepareWikificationTasks(text, maxTextLength) {
+    _prepareWikificationTasks(text, maxLength) {
         let self = this;
 
+        /**
+         * @description Creates a material enriching task function.
+         * @param {String} chunk - The chunk sent to be enriched.
+         * @param {Number} weight - The weight used to normalize the response.
+         * @returns {Function} The enriching task.
+         */
+        function _createEnrichTask(chunk, weight) {
+            return callback => self._enrichMaterial(chunk, weight, callback);
+        }
+
+        // set placeholders
         let tasks = [];
         let textIndex = 0;
+
         // go through whole text
         while (text.length > textIndex) {
             // get the text chunk
-            let textChunk = text.substring(textIndex, textIndex + maxTextLength);
+            let chunk = text.substring(textIndex, textIndex + maxLength);
             // there is not text to be processed, break the cycle
-            if (textChunk.length === 0) { break; }
-            if (textChunk.length === maxTextLength) {
+            if (chunk.length === 0) { break; }
+            if (chunk.length === maxLength) {
                 // text chunk is of max length - make a cutoff at last
                 // end character to avoid cutting in the middle of sentence
-                let cutOffLastWhitespace;
+                let cutoff;
 
-                const lastEndChar = textChunk.match(/[\.?!]/gi);
+                const lastEndChar = chunk.match(/[\.?!]/gi);
                 if (lastEndChar) {
-                    cutOffLastWhitespace = textChunk.lastIndexOf(lastEndChar[lastEndChar.length-1]);
+                    cutoff = chunk.lastIndexOf(lastEndChar[lastEndChar.length-1]);
                 }
                 // if there is not end character detected
-                if (!cutOffLastWhitespace) {
-                    cutOffLastWhitespace = textChunk.lastIndexOf(' ');
+                if (!cutoff) {
+                    cutoff = chunk.lastIndexOf(' ');
                 }
                 // if there is not space detected - cut of the whole chunk
-                if (!cutOffLastWhitespace) {
-                    cutOffLastWhitespace = textChunk.length;
+                if (!cutoff) {
+                    cutoff = chunk.length;
                 }
 
-                textChunk = textChunk.substring(0, cutOffLastWhitespace);
+                chunk = chunk.substring(0, cutoff);
                 // increment text index
-                textIndex += cutOffLastWhitespace;
+                textIndex += cutoff;
             } else {
                 // we got to the end of text
-                textIndex += maxTextLength;
+                textIndex += maxLength;
             }
             // calculate the weight we add to the found wikipedia concepts
-            let weight = textChunk.length / text.length;
+            let weight = chunk.length / text.length;
             // add a new wikification task on text chunk
-            tasks.push((callback) => {
-                self._enrichMaterial(textChunk, weight, callback);
-            });
+            tasks.push(_createEnrichTask(chunk, weight));
         }
         return tasks;
     }
@@ -280,36 +287,38 @@ class ExtractionWikipedia {
         let self = this;
 
        // get the raw text from the material
-        const fullText = material.materialMetadata.rawText;
+        const text = material.materialmetadata.rawText;
 
-        if (!fullText) {
+        if (!text) {
             //send it to the next component in the pipeline
+            material.message = `${this._prefix} No text provided.`;
             return this._onEmit(material, 'stream_partial', callback);
         }
 
         // process material text and extract wikipedia concepts
-        self._wikifier.processText(fullText, (e, response) => {
-            if (e) {
+        self._wikifier.processText(text)
+            .then(response => {
+                // retrieve wikifier results
+                const { wikipediaConcepts, language } = response;
+
+                if (!wikipediaConcepts.length) {
+                    // no wikipedia concepts extracted - send it to partial material table
+                    material.message = `${this._prefix} No wikipedia concepts found`;
+                    return this._onEmit(material, 'stream_partial', callback);
+                }
+
+                // store merged concepts within the material object
+                material.materialmetadata.wikipediaConcepts = wikipediaConcepts;
+                // assign the missing language using the wikifier autodetect
+                if (!material.language) { material.language = language; }
+
+                //send it to the next component in the pipeline
+                return this._onEmit(material, stream_id, callback);
+            }).catch(e => {
                 // there was an error - send the material to partial table
+                material.message = `${this._prefix} ${e.message}`;
                 return this._onEmit(material, 'stream_partial', callback);
-            }
-
-            // retrieve wikifier results
-            const { wikipediaConcepts, language } = response;
-
-            if (!wikipediaConcepts.length) {
-                // no wikipedia concepts extracted - send it to partial material table
-                return this._onEmit(material, 'stream_partial', callback);
-            }
-
-            // store merged concepts within the material object
-            material.materialMetadata.wikipediaConcepts = wikipediaConcepts;
-            // assign the missing language using the wikifier autodetect
-            if (!material.language) { material.language = language; }
-
-            //send it to the next component in the pipeline
-            return this._onEmit(material, stream_id, callback);
-        });
+            });
     }
 }
 

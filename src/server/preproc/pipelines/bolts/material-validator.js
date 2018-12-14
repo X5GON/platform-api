@@ -19,11 +19,11 @@ const materialSchema = {
             "description": "A short description of the OER material or course",
             "type": "string"
         },
-        "providerUri": {
+        "provideruri": {
             "description": "The url of provider where the OER material can be found",
             "type": "string"
         },
-        "materialUrl": {
+        "materialurl": {
             "description": "The source/direct url of the OER material",
             "type": "string"
         },
@@ -34,13 +34,14 @@ const materialSchema = {
         "language": {
             "description": "The origin language of the OER material",
             "type": "string",
-
+            "minLength": 2,
+            "maxLength": 2
         },
-        "dateCreated": {
+        "datecreated": {
             "description": "The date when the OER material was created",
             "type": "string"
         },
-        "dateRetrieved": {
+        "dateretrieved": {
             "description": "The date when the OER material was retrieved by the platform",
             "type": "string"
         },
@@ -48,7 +49,7 @@ const materialSchema = {
             "description": "The extension and type of the OER material",
             "type": ["object", "string", "null"]
         },
-        "providerMetadata": {
+        "providermetadata": {
             "description": "The provider metadata",
             "type": "object",
             "properties": {
@@ -56,17 +57,17 @@ const materialSchema = {
                     "description": "The name of the OER provider",
                     "type": "string"
                 },
-                "domain": {
-                    "description": "The domain on which the OER provider is found",
+                "url": {
+                    "description": "The url where the OER provider is found",
                     "type": "string"
                 }
             },
             "required": [
                 "title",
-                "domain"
+                "url"
             ]
         },
-        "materialMetadata": {
+        "materialmetadata": {
             "description": "The material metadata extracted by platform",
             "type": "object",
             "properties": {
@@ -120,12 +121,11 @@ const materialSchema = {
     },
     "required": [
         "title",
-        "providerUri",
-        "materialUrl",
+        "provideruri",
+        "materialurl",
         "language",
-        "providerMetadata",
-        "materialMetadata",
-        "license"
+        "providermetadata",
+        "materialmetadata"
     ]
 };
 

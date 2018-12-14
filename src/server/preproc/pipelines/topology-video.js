@@ -27,28 +27,68 @@ module.exports = {
             "inputs": [{
                 "source": "video-input"
             }],
+            "init": {
+                "fields": [
+                    { "name": "title" },
+                    { "name": "description" },
+                    { "name": "provideruri" },
+                    { "name": "materialurl" },
+                    { "name": "author" },
+                    { "name": "language" },
+                    { "name": "type" },
+                    { "name": "datecreated" },
+                    { "name": "dateretrieved" },
+                    { "name": "providermetadata" },
+                    { "name": "materialmetadata", "default": {} },
+                    { "name": "license" }
+                ]
+            }
+        },
+        {
+            "name": "material-type",
+            "type": "inproc",
+            "working_dir": "./bolts",
+            "cmd": "material-type.js",
+            "inputs": [{
+                "source": "material-format",
+            }],
             "init": {}
         },
         {
-            "name": "video-content-extraction",
+            "name": "video-dfxp-extraction",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "extraction-ttp.js",
+            "cmd": "extraction-dfxp.js",
             "inputs": [{
-                "source": "material-format"
+                "source": "material-type",
             }],
-            "init": {
-                "user": config.ttp.user,
-                "token": config.ttp.token
-            }
+            "init": {}
         },
+        // {
+        //     "name": "video-content-extraction",
+        //     "type": "inproc",
+        //     "working_dir": "./bolts",
+        //     "cmd": "extraction-ttp.js",
+        //     "inputs": [{
+        //         "source": "material-type"
+        //     }],
+        //     "init": {
+        //         "user": config.preproc.ttp.user,
+        //         "token": config.preproc.ttp.token
+        //     },
+        //     "disabled": true
+        // },
         {
             "name": "wikification",
             "type": "inproc",
             "working_dir": "./bolts",
             "cmd": "extraction-wikipedia.js",
-            "inputs": [{
-                "source": "video-content-extraction"
+            "inputs": [
+            //     {
+            //     "source": "video-content-extraction"
+            // },
+            {
+                "source": "video-dfxp-extraction"
             }],
             "init": {
                 "userKey": config.preproc.wikifier.userKey,
@@ -80,7 +120,7 @@ module.exports = {
                 "source": "material-validator",
             }],
             "init": {
-                "postgres_table": "oer_materials",
+                "postgres_table": "oer_materials_update",
                 "pg": config.pg
             }
         },
@@ -111,9 +151,14 @@ module.exports = {
                 "source": "material-format",
                 "stream_id": "stream_partial"
             },{
-                "source": "video-content-extraction",
+                "source": "video-dfxp-extraction",
                 "stream_id": "stream_partial"
-            },{
+            },
+            // {
+            //     "source": "video-content-extraction",
+            //     "stream_id": "stream_partial"
+            // },
+            {
                 "source": "wikification",
                 "stream_id": "stream_partial"
             },{
@@ -124,7 +169,22 @@ module.exports = {
                 "postgres_table": "oer_materials_partial",
                 "pg": config.pg
             }
-        }
+        },
+
+        /****************************************
+         * Storing partial OER materials
+         */
+
+        {
+            "name": "material-console",
+            "working_dir": ".",
+            "type": "sys",
+            "cmd": "console",
+            "inputs": [{
+                "source": "material-format"
+            }],
+            "init": {}
+        },
     ],
     "variables": {}
 };
