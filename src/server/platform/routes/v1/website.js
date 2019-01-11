@@ -11,7 +11,7 @@ const request = require('request');
  *******************************************/
 
 /**
- * Verify user with the given recaptcha response.
+ * @description Verify user with the given recaptcha response.
  * @param {String} gRecaptchaResponse - The google recaptcha response.
  * @returns {Promise} The promise of the verification.
  * @private
@@ -37,7 +37,7 @@ function _googleVerifyUser(gRecaptchaResponse) {
 }
 
 /**
- * Generates a token for the seed string.
+ * @description Generates a token for the seed string.
  * @param {String} seed - The seed string used to generate token.
  * @return {String} The token used to indentify the repository.
  */
@@ -56,7 +56,7 @@ function _generateToken(seed) {
 
 
 /**
- * Adds API routes for platform website requests.
+ * @description Adds API routes for platform website requests.
  * @param {Object} pg - Postgres connection wrapper.
  * @param {Object} logger - The logger object.
  */
@@ -78,7 +78,7 @@ module.exports = function (pg, logger) {
         // this is used only when redirected from POST /repository
         const invalid = req.query.invalid ? req.query.invalid == 'true' : false;
         const recaptchaSiteKey = config.platform.google.reCaptcha.siteKey;
-        return res.render('application-form', { recaptchaSiteKey, invalid });
+        return res.render('application-form', { recaptchaSiteKey, invalid, title: 'Join' });
     });
 
     router.get('/oer-provider', (req, res) => {
@@ -104,7 +104,7 @@ module.exports = function (pg, logger) {
                 // there are registered repositories in the database
                 const { name, domain, contact, token } = results[0];
                 // render the form submition
-                return res.render('oer-provider', { name, domain, contact, token });
+                return res.render('oer-provider', { name, domain, contact, token, title: 'OER Provider Information' });
             }
         });
     });
@@ -162,12 +162,12 @@ module.exports = function (pg, logger) {
 
     router.get('/oer-provider/login', (req, res) => {
         const invalid = req.query.invalid;
-        return res.render('oer-provider-login', { invalid });
+        return res.render('oer-provider-login', { invalid, title: 'Login' });
     });
 
     // send application form page
     router.get('/privacy-policy', (req, res) => {
-        return res.render('privacy-policy', { });
+        return res.render('privacy-policy', { title: 'Privacy Policy' });
     });
 
 
@@ -251,7 +251,7 @@ module.exports = function (pg, logger) {
                 } catch(xerror) {
                     options.empty = true;
                 }
-                return res.render('search-results', { layout: 'search-results', query, options });
+                return res.render('search-results', { layout: 'search', query, options });
 
             });
 
@@ -266,16 +266,39 @@ module.exports = function (pg, logger) {
      * RECOMMENDATION EMBEDDINGS
      */
 
-    // send application form page
+    /**
+     * @api {GET} /embed/recommendations Ember-ready recommendation list
+     * @apiDescription Gets the embed-ready recommendation list html
+     * @apiName GetRecommendationsEmbedReady
+     * @apiGroup Recommendations
+     * @apiVersion 1.0.0
+     *
+     * @apiParam {String} [text] - The raw text. If both `text` and `url` are present, `url` has the priority.
+     * @apiParam {String} [url] - The url of the material. If both `text` and `url` are present, `url` has the priority.
+     * @apiParam {String="cosine","null"} [type] - The metrics used in combination with the url parameter.
+     *
+     * @apiSuccess (200) {String} list - The html of the embed-ready list.
+     * @apiExample {html} Example usage:
+     *      <iframe src="https://platform.x5gon.org/embed/recommendations?url=https://platform.x5gon.org/materialUrl&text=education"
+     *          style="border:0px;height:425px;"></iframe>
+     */
     router.get('/embed/recommendations', (req, res) => {
         const query = req.query;
 
-        let options = { layout: 'empty' };
+        // recommender list style parameters
+        const { width, height, fontSize } = query;
+        let style = {
+            width,
+            height,
+            fontSize
+        };
+
+        let options = { layout: 'empty', style };
         let queryString = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
         request(`http://localhost:${config.platform.port}/api/v1/recommend/content?${queryString}`, (error, httpRequest, body) => {
             try {
                 const recommendations = JSON.parse(body);
-                options.empty = recommendations.length === 0 || recommendations.error ? false : true;
+                options.empty = recommendations.length !== 0 || recommendations.error ? false : true;
                 options.recommendations = recommendations;
                 return res.render('recommendations', options);
             } catch(xerror) {

@@ -118,12 +118,11 @@ class PostgreSQL {
      */
     close(callback) {
         let self = this;
-        if (callback && typeof callback === 'function') {
+        if (callback && typeof(callback) === 'function') {
             self.pool.end().then(callback);
         } else {
-          self.pool.end();
+            self.pool.end();
         }
-        
     }
 
     /**
@@ -142,16 +141,16 @@ class PostgreSQL {
             // execute statement
             if (params.length == 0){
                 client.query(statement, (err, results) => {
-                    if (err) { console.log(err); }
                     done(err);
+                    if (err) { console.log(err); }
                     let res = results ? results.rows : [];
                     // release the client
                     if (callback) { callback(err, res); }
                 });
             } else {
                 client.query(statement, params, (err, results) => {
-                    if (err) { console.log(err); }
                     done(err);
+                    if (err) { console.log(err); }
                     let res = results ? results.rows : [];
                     // release the client
                     if (callback) { callback(err, res); }
@@ -197,9 +196,10 @@ class PostgreSQL {
                         xcallback(err);
                     });
                 },
-                (err) => { cursor.close(() => {
-                    done(); return callback(err); 
-                  }); 
+                (err) => {
+                    cursor.close(() => {
+                        done(); callback(err);
+                    });
                 }
             );
         });
@@ -311,7 +311,7 @@ class PostgreSQL {
 
         let conditionKeys = Object.keys(conditions);
         if (conditionKeys.length > 1) {
-            console.log(`Error in postgresql.js, too many conditions ${conditions}.`);
+            console.log(`Error in postgresQL.js, too many conditions ${conditions}.`);
             callback();
         }
         let query = `INSERT INTO ${table} (${keys.join(',')}) VALUES (${[...Array(keys.length).keys()].map((id) => '$'+(id+1)).join(',')})

@@ -13,7 +13,11 @@ const minifyPaths= [
 
     // version 1 snippets
     'global/v1',
-    'on-premise/v1'
+    'on-premise/v1',
+
+    // version 2 snippets
+    'global/v2',
+    'on-premise/v2'
 ];
 
 for (let path of minifyPaths) {

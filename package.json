@@ -1,17 +1,20 @@
 {
   "name": "x5gon",
-  "version": "0.0.1",
-  "description": "connecting OER repositories",
+  "version": "1.0.0",
+  "description": "Connecting OER repositories",
   "main": "index.js",
   "scripts": {
-    "start:platform": "cd src/server/platform && NODE_ENV=dev node platform.js",
-    "start:platformInspect": "cd src/server/platform && NODE_ENV=dev node inspect platform.js",
+    "start:platform": "cd src/server/platform && node platform.js",
+    "start:platformInspect": "cd src/server/platform && node inspect platform.js",
     "minify:snippet": "cd src/server/platform/scripts && node minify-snippet.js",
-    "start:recsys": "cd src/server/recsys && NODE_ENV=dev node recsys.js",
-    "start:recsysInspect": "cd src/server/recsys && NODE_ENV=dev node inspect recsys.js",
+    "start:recsys": "cd src/server/recsys && node recsys.js",
+    "start:recsysInspect": "cd src/server/recsys && node inspect recsys.js",
     "postgres:create": "cd src/load && node create-postgres-tables.js",
-    "test": "npm run test:recsys",
-    "test:recsys": "cd src/server/recsys/test && NODE_ENV=test mocha *.js"
+    "test": "cd src/test && NODE_ENV=test mocha all-tests.js",
+    "test:recsys": "cd src/server/recsys/test && NODE_ENV=test mocha *.js",
+    "test:lib": "cd src/test/lib && NODE_ENV=test mocha *.js",
+    "postinstall": "npm run minify:snippet",
+    "create:apidocs": "apidoc -i src/server -o docs --private false"
   },
   "repository": {
     "type": "git",
@@ -27,6 +30,7 @@
     "async": "^2.6.0",
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
     "dotenv": "^6.0.0",
     "express": "^4.16.2",
     "express-handlebars": "^3.0.0",
@@ -34,6 +38,7 @@
     "file-type": "^8.0.0",
     "franc": "^4.0.0",
     "handlebars": "^4.0.11",
+    "handlebars-helper-sri": "0.0.0",
     "helmet": "^3.12.1",
     "http-proxy-middleware": "^0.18.0",
     "jsonschema": "^1.2.2",
@@ -52,7 +57,17 @@
     "winston-daily-rotate-file": "^1.7.2"
   },
   "devDependencies": {
+    "apidoc": "^0.17.6",
+    "mocha": "^5.2.0",
+    "node-minify": "^2.4.1",
     "supertest": "^3.3.0",
-    "node-minify": "^2.4.1"
+    "ua-parser-js": "^0.7.18"
+  },
+  "apidoc": {
+    "title": "X5GON API Documentation",
+    "url": "https://platform.x5gon.org",
+    "version": "1.0.0",
+    "name": "X5GON",
+    "description": " Cross Modal, Cross Cultural, Cross Lingual, Cross Domain, and Cross Site Global OER Network"
   }
 }

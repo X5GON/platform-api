@@ -2,10 +2,12 @@
 
   <div class="row">
     <div id="search-input" class="offset-md-2 col-md-8 offset-lg-3 col-lg-6">
-      <img src="https://www.x5gon.org/wp-content/themes/x5gon/dist/assets/img/logo.svg" alt="X5GON" class="mb-3">
+      <img src="https://www.x5gon.org/wp-content/themes/x5gon/dist/assets/img/logo.svg"
+        alt="X5GON" class="my-3">
 
       <form class="input-group">
-        <input type="text" name="text" id="search-query" class="form-control rounded-0" placeholder="Search for OER material">
+        <input type="text" name="text" id="search-query" class="form-control rounded-0"
+          placeholder="Search for OER material">
         <div class="input-group-append">
           <button type="submit" class="btn btn-secondary rounded-0" onClick="return empty()">
             <i class="fas fa-search"></i>
@@ -14,6 +16,27 @@
       </form>{{! .input-group }}
     </div>{{! .col-md-6 }}
   </div>{{! .row }}
+
+  <div class="row">
+    <div class="offset-md-2 col-md-8 offset-lg-3 col-lg-6">
+      <h6 class="text-center">Suggested Queries</h6>
+
+      <div class="row">
+        <div class="col-md-6 mb-2 text-center">
+          <a class="btn btn-rounded-border" href="/search?text=machine+learning">Machine Learning</a>
+        </div>
+        <div class="col-md-6 mb-2 text-center">
+          <a class="btn btn-rounded-border" href="/search?text=deep+learning">Deep Learning</a>
+        </div>
+        <div class="col-md-6 mb-2 text-center">
+          <a class="btn btn-rounded-border" href="/search?text=support+vector+machine">Support Vector Machine</a>
+        </div>
+        <div class="col-md-6 mb-2 text-center">
+          <a class="btn btn-rounded-border" href="/search?text=climate+change">Climate Change</a>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </div>
 
