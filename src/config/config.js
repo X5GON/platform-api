@@ -54,7 +54,9 @@ const prod = {
         max: parseInt(process.env.PROD_PG_MAX) || 10,
         idleTimeoutMillis: parseInt(process.env.PROD_PG_IDLE_TIMEOUT_MILLIS) || 30000,
         user: process.env.PROD_PG_USER || 'postgres',
-        password: process.env.PROD_PG_PASSWORD
+        password: process.env.PROD_PG_PASSWORD,
+        schema: process.env.PROD_PG_SCHEMA || 'public',
+        version: process.env.PROD_PG_SCHEMA || '*'
     }
 };
 
@@ -105,7 +107,9 @@ const dev = {
         max: parseInt(process.env.DEV_PG_MAX) || 10,
         idleTimeoutMillis: parseInt(process.env.DEV_PG_IDLE_TIMEOUT_MILLIS) || 30000,
         user: process.env.DEV_PG_USER || 'postgres',
-        password: process.env.DEV_PG_PASSWORD
+        password: process.env.DEV_PG_PASSWORD,
+        schema: process.env.DEV_PG_SCHEMA || 'public',
+        version: process.env.DEV_PG_SCHEMA || '*'
     }
 };
 
@@ -156,7 +160,9 @@ const test = {
         max: parseInt(process.env.TEST_PG_MAX) || 10,
         idleTimeoutMillis: parseInt(process.env.TEST_PG_IDLE_TIMEOUT_MILLIS) || 30000,
         user: process.env.TEST_PG_USER || 'postgres',
-        password: process.env.TEST_PG_PASSWORD
+        password: process.env.TEST_PG_PASSWORD,
+        schema: process.env.TEST_PG_SCHEMA || 'public',
+        version: process.env.TEST_PG_SCHEMA || '*'
     }
 };
 

@@ -53,8 +53,12 @@ PROD_MONITOR_ADMIN_TOKEN=admin-token
 ######################################
 # PostgresQL
 
-# postgres database password
+## postgres database password
 PROD_PG_PASSWORD=postgres-password
+
+## postgres database options
+PROD_PG_SCHEMA=postgres-database-schema(optional)
+PROD_PG_VERSION=postgres-database-version(optional)
 
 
 #######################################
@@ -85,8 +89,12 @@ DEV_MONITOR_ADMIN_TOKEN=admin-token
 ######################################
 # PostgresQL
 
-# postgres database password
+## postgres database password
 DEV_PG_PASSWORD=postgres-password
+
+## postgres database options
+DEV_PG_SCHEMA=postgres-database-schema(optional)
+DEV_PG_VERSION=postgres-database-version(optional)
 
 #######################################
 ### Test variables
@@ -116,7 +124,11 @@ TEST_MONITOR_ADMIN_TOKEN=admin-token
 ######################################
 # PostgresQL
 
-# postgres database password
+## postgres database password
 TEST_PG_PASSWORD=postgres-password
+
+## postgres database options
+TEST_PG_SCHEMA=postgres-database-schema(optional)
+TEST_PG_VERSION=postgres-database-version(optional)
 ```
 
