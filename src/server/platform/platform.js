@@ -51,7 +51,7 @@ app.use(express.static(__dirname + '/public/'));
 app.engine('hbs', exphbs({
     extname: 'hbs',
     defaultLayout: 'main',
-    partialsDir: `${__dirname}/views/partials/`, // /
+    partialsDir: `${__dirname}/views/partials/`,
     helpers: {
         isEqual: function (arg1, arg2) {
             return arg1 === arg2;
