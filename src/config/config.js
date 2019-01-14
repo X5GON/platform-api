@@ -56,7 +56,7 @@ const prod = {
         user: process.env.PROD_PG_USER || 'postgres',
         password: process.env.PROD_PG_PASSWORD,
         schema: process.env.PROD_PG_SCHEMA || 'public',
-        version: process.env.PROD_PG_SCHEMA || '*'
+        version: process.env.PROD_PG_VERSION || '*'
     }
 };
 
@@ -109,7 +109,7 @@ const dev = {
         user: process.env.DEV_PG_USER || 'postgres',
         password: process.env.DEV_PG_PASSWORD,
         schema: process.env.DEV_PG_SCHEMA || 'public',
-        version: process.env.DEV_PG_SCHEMA || '*'
+        version: process.env.DEV_PG_VERSION || '*'
     }
 };
 
@@ -162,7 +162,7 @@ const test = {
         user: process.env.TEST_PG_USER || 'postgres',
         password: process.env.TEST_PG_PASSWORD,
         schema: process.env.TEST_PG_SCHEMA || 'public',
-        version: process.env.TEST_PG_SCHEMA || '*'
+        version: process.env.TEST_PG_VERSION || '*'
     }
 };
 

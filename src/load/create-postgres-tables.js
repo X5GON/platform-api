@@ -8,8 +8,8 @@ const async = require('async');
 const pg = require('../lib/postgresQL')(config.pg);
 
 // check if config.schema is defined
-const schema = config.pg.pg_schema;
-let pg_version = config.pg.pg_version;
+const schema = config.pg.schema;
+let pg_version = config.pg.version;
 
 // returns row containing boolean true if schema in config exists, false otherwise
 const schemaExistsString = `SELECT exists(SELECT schema_name FROM information_schema.schemata WHERE
@@ -24,7 +24,7 @@ const checkVersion = `SELECT ver FROM ${schema}.version`;
 const tablesExistString = `SELECT * FROM information_schema.tables 
     WHERE table_schema = '${schema}'`;
 
-// DB creates initially creates data bases
+// DB initially creates data bases
 const dbCreates = {
     client_activity:
         `CREATE TABLE ${schema}.client_activity 
@@ -119,7 +119,8 @@ const dbCreates = {
 /* DB updates
  * Template: {version: <int>, update: `string (SQL query)`}
  */
-const dbUpdates = [];
+const dbUpdates = [
+    {version: 1, update: `CREATE TABLE ${schema}.banana ( ver integer PRIMARY KEY);`}];
 
 // latest pg version
 const latestVersion = dbUpdates.length;
@@ -158,16 +159,21 @@ function prepareTables(maincallback) {
             console.log('Error checking tables:' + err);
             return process.exit();
         }
+        
+        // delete already existing tables from dbCreates object
         for (let i = 0; i < res.length; i++) {
             let tableName = res[i].table_name;
             delete dbCreates[tableName];
         }
+        
+        // create a list of all non-existing tables to loop through with async
         let tableCreates = Object.keys(dbCreates);
         
         async.eachSeries(tableCreates,
             // 2nd param is the function that each item is passed to
             function (tableCreateKey, callback) {
                 let sql = dbCreates[tableCreateKey];
+                // execute create query from dbCreates for a specific table
                 pg.execute(sql, [], function (err, result) {
                     if (err) {
                         console.log('Error creating tables:' +
@@ -208,7 +214,8 @@ function updateTables (callback) {
     const vMax = (dbUpdates.length)? dbUpdates[dbUpdates.length - 1].version : 0;
     let vCurrent = 0;
     console.log(`About to update DB to version ${vGoal} out of max version: ${vMax}`);
-
+    
+    // log the update and update the version in db
     const logUpdate = function (version, logCallback) {
         console.log(`Updating database version : v${version} => 
                                 v${parseInt(version + 1)}`);
@@ -256,6 +263,7 @@ function updateTables (callback) {
     }//doSingleUpdate
 
     pg.execute(checkVersion, [], function (err, r) {
+        // check the current version of the db
         if (err) {
             console.error('Problem checking version:' + err);
             return process.exit();
@@ -265,6 +273,7 @@ function updateTables (callback) {
             vCurrent = r[0].ver;
         }
         console.log(`Current version is ${vCurrent}`);
+        // loop through all item s in dbUpdates and execute the queries
         async.eachSeries(dbUpdates,
             // 2nd param is the function that each item is passed to
             function (updateObj, callback) {
@@ -301,6 +310,9 @@ function startDBCreate(callback) {
             updateTables(function () {
                 console.log('DONE');
                 pg.close();
+                if (callback && typeof(callback) === 'function'){
+                    callback();
+                }
             });
         });
     });

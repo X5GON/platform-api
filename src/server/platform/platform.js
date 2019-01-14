@@ -16,6 +16,7 @@ const session = require('express-session');
 // internal modules
 const pg = require('../../lib/postgresQL')(config.pg);
 const Logger = require('../../lib/logging-handler')();
+const dbUpdate = require('../../load/create-postgres-tables');
 
 // create a logger instance for logging API requests
 const logger = Logger.createGroupInstance('api-requests', 'api');
@@ -50,7 +51,7 @@ app.use(express.static(__dirname + '/public/'));
 app.engine('hbs', exphbs({
     extname: 'hbs',
     defaultLayout: 'main',
-    partialsDir: `${__dirname}/views/partials/`,
+    partialsDir: `${__dirname}/views/partials/`, // /
     helpers: {
         isEqual: function (arg1, arg2) {
             return arg1 === arg2;
@@ -92,8 +93,17 @@ io.on('connection', function(socket) {
 // parameters used on the express app
 const PORT = config.platform.port;
 
-// start the server without https
-const server = http.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));
+// start the server
+const server = function(callback) {
+    logger.info("Starting DB update.");
+    dbUpdate.startDBCreate(function () {
+        logger.info("Starting the server");
+        http.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));
+        if (callback) {
+            callback();
+        }
+    });
+};
 
 // export the server for testing
-module.exports = server;
+module.exports = server();
