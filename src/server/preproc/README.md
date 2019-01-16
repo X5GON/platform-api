@@ -30,7 +30,7 @@ command should start a docker container (in dettach mode `[-d]`).
 **NOTE:** It is required to run the Kafka container before starting the pipeline.
 
 ```bash
-sudo docker run -p 2181:2181 -p 9092:9092 -d --env ADVERTISED_HOST=localhost --restart unless-stopped --env ADVERTISED_PORT=9092 --name kafka-x5gon -h kafka-x5gon eriknovak/kafka-x5gon
+sudo docker run -p 2181:2181 -p 9092:9092 -d --env ADVERTISED_HOST=localhost --env ADVERTISED_PORT=9092 --restart unless-stopped --name kafka-x5gon -h kafka-x5gon eriknovak/kafka-x5gon
 ```
 
 ## Folder Structure
