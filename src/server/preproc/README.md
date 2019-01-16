@@ -44,7 +44,8 @@ The folder structure is as follows:
 
 ## Processing Pipelines
 
-The processing pipelines accept Open Educational Materials of a particular *type* nad process it accordingly. The two types that are currently supported are:
+The processing pipelines accept Open Educational Materials of a particular *type*
+and process it accordingly. The two types that are currently supported are:
 
 - text
 - video/audio
@@ -52,32 +53,42 @@ The processing pipelines accept Open Educational Materials of a particular *type
 Figure 1 shows the material processing pipeline architecture.
 
 ![preprocessing pipeline](imgs/X5GON-processing-pipeline.png)
-<p style="text-align:center;"><i>Figure 1:</i> The material processing pipeline architecture. It shows how we acquire materials via different APIs and send it to the appropriate pipeline based on the material's type.</p>
+*Figure 1:* The material processing pipeline architecture. It shows how we acquire
+materials via different APIs and send it to the appropriate pipeline based on the
+material's type.
 
 
 Each pipeline contains the following components:
 
 - **Format.** Formats the acquired materials into a common schema.
-- **Content Extraction.** Extracts the content from the material. This is done based on the material type:
-    - **Text.** We use *textract*, a Nodejs library that is able to extract raw text from the text material.
-    - **Video/Audio.** We use the *Transcription and Translation Platform* (TTP) which automatically generates
-        transcriptions (subtitles) and translates the video content.
+- **Content Extraction.** Extracts the content from the material. This is done
+    based on the material type:
+    - **Text.** We use *textract*, a Nodejs library that is able to extract raw
+        text from the text material.
+    - **Video/Audio.** We use the *Transcription and Translation Platform* (TTP)
+        which automatically generates transcriptions (subtitles) and translates
+        the video content.
 
-- **Content Enrichment.** Enriches the content by extracting additional features from the material.
-    - **Wikification.** We use *wikifier*, an online service for extracting wikipedia concepts associated with      the provided text.
-    - **DMOZ Classification (TODO).** We still need to develop the DMOZ classification model to acquire the         different topics the material is associated with.
+- **Content Enrichment.** Enriches the content by extracting additional features
+    from the material.
+    - **Wikification.** We use *wikifier*, an online service for extracting
+        wikipedia concepts associated with the provided text.
+    - **DMOZ Classification (TODO).** We still need to develop the DMOZ classification
+        model to acquire the different topics the material is associated with.
 
 - **Validation.** Validates if the material object contains all of the required values.
 
-- **Material Storing.** Stores the material in the appropriate database. If there were any errors during this
-    process, we store the error and the material in a different table for future exploration.
+- **Material Storing.** Stores the material in the appropriate database. If there
+    were any errors during thisprocess, we store the error and the material in a
+    different table for future exploration.
 
 Components of the pipeline are stored in the [pipelines](pipelines/) folder.
 
 ## Retrievers
 
-The retrievers are responsible for retrieving materials from OER providers that are registered in the
-X5GON Network. For each provider we need to develop its own retriever, custom for their API.
+The retrievers are responsible for retrieving materials from OER providers that
+are registered in the X5GON Network. For each provider we need to develop its
+own retriever, custom for their API.
 
 The currenlty available retrievers are for the following OER providers:
 
