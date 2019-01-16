@@ -130,6 +130,7 @@ const materialSchema = {
 };
 
 
+
 class MaterialValidator {
 
     constructor() {
@@ -161,10 +162,11 @@ class MaterialValidator {
     }
 
     receive(material, stream_id, callback) {
-        // TODO: add material validation function
+        // validate the provided material
         const validation = this._validator.validateSchema(material, materialSchema);
         const stream_direction = validation ? stream_id : 'stream_partial';
-        // send formated material to the next component
+
+        // send material to the next component
         return this._onEmit(material, stream_direction, callback);
 
 

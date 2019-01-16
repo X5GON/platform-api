@@ -12,33 +12,43 @@ const rp = require('request-promise-native');
 
 class Wikification {
 
-    constructor(userKey, wikifierUrl) {
+    /**
+     * @description The construction of the wikification object.
+     * @param {String} userKey - The user key from wikifier.
+     * @param {String} wikifierUrl - The wikifier url/domain to where we send requests.
+     * @param {Number} maxLength - The maximum length of the text we allow sending to wikifier.
+     */
+    constructor(userKey, wikifierUrl, maxLength) {
         this._userKey = userKey;
         this._wikifierUrl = wikifierUrl;
+        this._maxLength = maxLength || 10000;
     }
 
 
     /**
      * @description Extracts wikipedia concepts out of text.
      * @param {String} text - The text being wikified.
-     * @param {Function} callback - The function called when wikifier returns the wikipedia
-     * concepts and language.
      */
     processText(text) {
         let self = this;
 
         // separate text and prepare tasks for retrieving wiki concepts
-        let tasks = self._prepareWikificationTasks(text, 10000);
+        let tasks = self._prepareWikificationTasks(text, self._maxLength);
 
         if (tasks.length === 0) {
             // there is nothing to extract - return empty objects
-            return callback(null, { wikipediaConcepts: [], language: null });
+            return Promise.reject(new Error('No tasks produced for text'));
         }
 
         return new Promise((resolve, reject) => {
-            // get wikipedia concepts of the material
-            async.parallelLimit(tasks, 10, (error, concepts) => {
+            // get wikipedia concepts from text
+            async.parallelLimit(tasks, 5, (error, concepts) => {
                 if (error) { return reject(error); }
+
+                if (concepts.length === 0) {
+                    // there were no concepts extracted
+                    return reject(new Error('No concepts were extracted'));
+                }
 
                 // wikipedia concepts storage
                 let conceptMap = { };
@@ -131,19 +141,20 @@ class Wikification {
             let annotations = data.annotations;
             if (!annotations || !annotations.length) {
                 // return the concept list
-                return callback(null, []);
+                return callback(new Error('No annotations found for text'));
             }
 
             // sort annotations by pageRank
-            annotations.sort((concept1, concept2) => concept2.pageRank - concept1.pageRank);
+            annotations.sort((concept1, concept2) =>
+                concept2.pageRank - concept1.pageRank);
 
             /******************************
              * get top wikipedia concepts
              *****************************/
 
             // calculate total pageRank from all concepts
-            let total = annotations.reduce((sum, currentConcept) =>
-                sum + Math.pow(currentConcept.pageRank, 2), 0);
+            let total = annotations.reduce((sum, concept) =>
+                sum + Math.pow(concept.pageRank, 2), 0);
 
             // get top 80% concepts - noise reduction
             let partial = 0;
@@ -179,7 +190,11 @@ class Wikification {
             });
             // return the concept list
             return callback(null, concepts);
-        }).catch(error => { return callback(error) });
+
+        }, error => {
+            console.log(error.message);
+            return callback(error);
+        });
     }
 
 
@@ -219,19 +234,16 @@ class Wikification {
                 // end character to avoid cutting in the middle of sentence
                 let cutoff;
 
-                const lastEndChar = chunk.match(/[\.?!]/gi);
-                if (lastEndChar) {
-                    cutoff = chunk.lastIndexOf(lastEndChar[lastEndChar.length-1]);
+                const lastCharacter = chunk.match(/[\.?!]/gi);
+                if (lastCharacter) {
+                    cutoff = chunk.lastIndexOf(lastCharacter[lastCharacter.length - 1]);
                 }
                 // if there is not end character detected
-                if (!cutoff) {
-                    cutoff = chunk.lastIndexOf(' ');
-                }
+                if (!cutoff) { cutoff = chunk.lastIndexOf(' '); }
                 // if there is not space detected - cut of the whole chunk
-                if (!cutoff) {
-                    cutoff = chunk.length;
-                }
+                if (!cutoff) { cutoff = chunk.length; }
 
+                // get the chunk
                 chunk = chunk.substring(0, cutoff);
                 // increment text index
                 textIndex += cutoff;
@@ -296,29 +308,32 @@ class ExtractionWikipedia {
         }
 
         // process material text and extract wikipedia concepts
-        self._wikifier.processText(text)
-            .then(response => {
-                // retrieve wikifier results
-                const { wikipediaConcepts, language } = response;
+        self._wikifier.processText(text).then(response => {
 
-                if (!wikipediaConcepts.length) {
-                    // no wikipedia concepts extracted - send it to partial material table
-                    material.message = `${this._prefix} No wikipedia concepts found`;
-                    return this._onEmit(material, 'stream_partial', callback);
-                }
+            // retrieve wikifier results
+            const { wikipediaConcepts, language } = response;
 
-                // store merged concepts within the material object
-                material.materialmetadata.wikipediaConcepts = wikipediaConcepts;
-                // assign the missing language using the wikifier autodetect
-                if (!material.language) { material.language = language; }
-
-                //send it to the next component in the pipeline
-                return this._onEmit(material, stream_id, callback);
-            }).catch(e => {
-                // there was an error - send the material to partial table
-                material.message = `${this._prefix} ${e.message}`;
+            if (!wikipediaConcepts.length) {
+                // no wikipedia concepts extracted - send it to partial material table
+                material.message = `${this._prefix} No wikipedia concepts found`;
                 return this._onEmit(material, 'stream_partial', callback);
-            });
+            }
+
+            // store merged concepts within the material object
+            material.materialmetadata.wikipediaConcepts = wikipediaConcepts;
+            // assign the missing language using the wikifier language autodetect
+            if (!material.language || [null, undefined, '', 'und'].includes(material.language)) {
+                material.language = language;
+            }
+
+            //send it to the next component in the pipeline
+            return this._onEmit(material, stream_id, callback);
+
+        }).catch(error => {
+            // there was an error - send the material to partial table
+            material.message = `${this._prefix} ${error.message}`;
+            return this._onEmit(material, 'stream_partial', callback);
+        });
     }
 }
 

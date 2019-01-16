@@ -8,13 +8,14 @@ module.exports = {
     },
     "spouts": [
         {
-            "name": "text-input",
+            "name": "video-input",
             "type": "inproc",
             "working_dir": "./spouts",
             "cmd": "kafka-spout.js",
             "init": {
                 "kafka_host": config.kafka.host,
-                "topic": "text-topic"
+                "topic": "video.topic",
+                "groupId": 'videoGroup'
             }
         }
     ],
@@ -25,7 +26,7 @@ module.exports = {
             "working_dir": "./bolts",
             "cmd": "material-format.js",
             "inputs": [{
-                "source": "text-input"
+                "source": "video-input"
             }],
             "init": {
                 "fields": [
@@ -55,14 +56,16 @@ module.exports = {
             "init": {}
         },
         {
-            "name": "text-content-extraction",
+            "name": "video-dfxp-extraction",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "extraction-text.js",
+            "cmd": "extraction-dfxp.js",
             "inputs": [{
                 "source": "material-type",
             }],
-            "init": {}
+            "init": {
+                "dfxp_folder": "../../../../data/videolectures/data"
+            }
         },
         {
             "name": "wikification",
@@ -70,11 +73,11 @@ module.exports = {
             "working_dir": "./bolts",
             "cmd": "extraction-wikipedia.js",
             "inputs": [{
-                "source": "text-content-extraction",
+                "source": "video-dfxp-extraction"
             }],
             "init": {
                 "userKey": config.preproc.wikifier.userKey,
-                "wikifierUrl": config.preproc.wikifier.wikifierUrl,
+                "wikifierUrl": config.preproc.wikifier.wikifierUrl
             }
         },
         {
@@ -83,7 +86,7 @@ module.exports = {
             "working_dir": "./bolts",
             "cmd": "material-validator.js",
             "inputs": [{
-                "source": "wikification",
+                "source": "wikification"
             }],
             "init": {}
         },
@@ -133,7 +136,7 @@ module.exports = {
                 "source": "material-format",
                 "stream_id": "stream_partial"
             },{
-                "source": "text-content-extraction",
+                "source": "video-dfxp-extraction",
                 "stream_id": "stream_partial"
             },{
                 "source": "wikification",
@@ -146,25 +149,7 @@ module.exports = {
                 "postgres_table": "oer_materials_partial",
                 "pg": config.pg
             }
-        },
-
-        /****************************************
-         * Storing partial OER materials
-         */
-
-        {
-            "name": "material-console",
-            "working_dir": ".",
-            "type": "sys",
-            "cmd": "console",
-            "inputs": [{
-                "source": "material-format"
-            }],
-            "init": {}
-        },
-
-
-
+        }
     ],
     "variables": {}
 };

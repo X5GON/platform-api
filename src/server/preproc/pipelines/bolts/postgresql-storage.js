@@ -41,7 +41,8 @@ class PostgresqlStorage {
 
     receive(material, stream_id, callback) {
         // takes the material and insert it into the OER material table
-        this._pg.insert(material, /* { materialurl: {} }, */ this._postgresTable, (error, result) => {
+        const materialurl = material.materialurl;
+        this._pg.upsert(material, { materialurl: {} }, this._postgresTable, (error, result) => {
             if (error) {
                 console.warn({ error: error.message, materialurl });
             } else {

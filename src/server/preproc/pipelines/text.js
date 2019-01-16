@@ -8,13 +8,14 @@ module.exports = {
     },
     "spouts": [
         {
-            "name": "video-input",
+            "name": "text-input",
             "type": "inproc",
             "working_dir": "./spouts",
             "cmd": "kafka-spout.js",
             "init": {
                 "kafka_host": config.kafka.host,
-                "topic": "video-topic"
+                "topic": "text.topic",
+                "groupId": 'textGroup'
             }
         }
     ],
@@ -25,7 +26,7 @@ module.exports = {
             "working_dir": "./bolts",
             "cmd": "material-format.js",
             "inputs": [{
-                "source": "video-input"
+                "source": "text-input"
             }],
             "init": {
                 "fields": [
@@ -55,44 +56,26 @@ module.exports = {
             "init": {}
         },
         {
-            "name": "video-dfxp-extraction",
+            "name": "text-content-extraction",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "extraction-dfxp.js",
+            "cmd": "extraction-text.js",
             "inputs": [{
                 "source": "material-type",
             }],
             "init": {}
         },
-        // {
-        //     "name": "video-content-extraction",
-        //     "type": "inproc",
-        //     "working_dir": "./bolts",
-        //     "cmd": "extraction-ttp.js",
-        //     "inputs": [{
-        //         "source": "material-type"
-        //     }],
-        //     "init": {
-        //         "user": config.preproc.ttp.user,
-        //         "token": config.preproc.ttp.token
-        //     },
-        //     "disabled": true
-        // },
         {
             "name": "wikification",
             "type": "inproc",
             "working_dir": "./bolts",
             "cmd": "extraction-wikipedia.js",
-            "inputs": [
-            //     {
-            //     "source": "video-content-extraction"
-            // },
-            {
-                "source": "video-dfxp-extraction"
+            "inputs": [{
+                "source": "text-content-extraction",
             }],
             "init": {
                 "userKey": config.preproc.wikifier.userKey,
-                "wikifierUrl": config.preproc.wikifier.wikifierUrl
+                "wikifierUrl": config.preproc.wikifier.wikifierUrl,
             }
         },
         {
@@ -101,7 +84,7 @@ module.exports = {
             "working_dir": "./bolts",
             "cmd": "material-validator.js",
             "inputs": [{
-                "source": "wikification"
+                "source": "wikification",
             }],
             "init": {}
         },
@@ -151,14 +134,9 @@ module.exports = {
                 "source": "material-format",
                 "stream_id": "stream_partial"
             },{
-                "source": "video-dfxp-extraction",
+                "source": "text-content-extraction",
                 "stream_id": "stream_partial"
-            },
-            // {
-            //     "source": "video-content-extraction",
-            //     "stream_id": "stream_partial"
-            // },
-            {
+            },{
                 "source": "wikification",
                 "stream_id": "stream_partial"
             },{
@@ -169,22 +147,7 @@ module.exports = {
                 "postgres_table": "oer_materials_partial",
                 "pg": config.pg
             }
-        },
-
-        /****************************************
-         * Storing partial OER materials
-         */
-
-        {
-            "name": "material-console",
-            "working_dir": ".",
-            "type": "sys",
-            "cmd": "console",
-            "inputs": [{
-                "source": "material-format"
-            }],
-            "init": {}
-        },
+        }
     ],
     "variables": {}
 };

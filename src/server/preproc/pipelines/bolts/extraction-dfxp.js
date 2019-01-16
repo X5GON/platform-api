@@ -20,6 +20,7 @@ class ExtractionDFXP {
         this._context = context;
 
         this._prefix = `[ExtractionDFXP ${this._name}]`;
+        this._dfxpFolder = config.dfxp_folder;
         // use other fields from config to control your execution
         callback();
     }
@@ -38,12 +39,12 @@ class ExtractionDFXP {
         // get the raw text associated with the videos
         try {
             let slug = material.provideruri.split('/')[3];
-            let promise = dfxp2srt(slug, `../../../../data/videolectures/data`);
+            let promise = dfxp2srt(slug, this._dfxpFolder);
 
             // get the responses
             promise.then(transcripts => {
                 // set placeholders for the values
-                let originDfxp, originText, transcriptions = {};
+                let originDfxp, originText, transcriptions = { };
 
                 // iterate through the transcripts and save them
                 for (let transcript of transcripts) {

@@ -85,19 +85,19 @@ class ExtractionTTP {
                 // save the timeout object for later reference
                 self._setTimeout = setTimeout(function () {
                     rp({
+                        method: 'GET',
                         uri: `${self._url}/status`,
-                        qs: Object.assign({ }, this._options, { id }),
+                        qs: Object.assign({ }, self._options, { id }),
                         json: true
                     })
                     .then(xparams => resolve(xparams))
-                    .catch(e => reject(e));
+                    .catch(error => reject(error));
 
                 }, self._timeout);
             });
 
-            // check for the process status
-            return request.then(processStatus => {
-                const { status_code, id: processId } = processStatus;
+            // check for the process status code
+            return request.then(({ status_code }) => {
 
                 if (status_code === 6) {
                     // handle successful process
@@ -114,7 +114,7 @@ class ExtractionTTP {
                         status_code_msg: status_code < 100 ?
                             'unexpected-process-message' :
                             'Error on TTP side',
-                        process_id: processId,
+                        process_id: id,
                         status_code
                     };
                 }
@@ -127,7 +127,7 @@ class ExtractionTTP {
         /////////////////////////////////////////////////////////////
 
 
-        if (Object.keys(this._languages).includes(material.language)) {
+        if (Object.keys(self._languages).includes(material.language)) {
             /////////////////////////////////////////////////////////
             // FIRST STEP
             // Prepare material options, send them to TTP and wait
@@ -139,33 +139,93 @@ class ExtractionTTP {
                                 Date.now();
 
 
+            // create the speakers list
+            let speakers;
+            if (material.author && typeof material.author === 'string') {
+                // Expectation: material.author = 'author 1, author 2, author 3'
+                // split the string of authors and create an array
+                speakers = material.author
+                            .split(',')
+                            .map(author => ({
+                                speaker_id:   author.trim(),
+                                speaker_name: author.trim()
+                            }));
+
+            } else if (material.author && typeof material.author === 'object') {
+                // Expectation: material.author = ['author 1', 'author 2']
+                // map the authors into the manifest file
+                speakers = material.author
+                            .map(author => ({
+                                speaker_id:   author.trim(),
+                                speaker_name: author.trim()
+                            }));
+
+            } else {
+                // there were no authors provided, create an unknown speaker id
+                speakers = [{
+                    speaker_id:   'unknown',
+                    speaker_name: 'unknown'
+                }];
+            }
+
+            // create the requested langs object
+            let requested_langs = self._languages;
+            const constructedLanguages = Object.keys(requested_langs)
+                                .filter(lang => lang !== 'en');
+
+            // TODO: remove once the sl-en translation is enabled
+            if (material.language === 'sl') {
+                requested_langs = {
+                    sl: { sub: {} }
+                };
+            } else if (constructedLanguages.includes(material.language)) {
+
+                // for non-english lnaguages, we need to set up translation paths
+                for (let language of constructedLanguages) {
+                    // if the language is not the material language or english
+                    if (language !== 'en' && language !== material.language) {
+                        // set the translation path for the given language
+                        delete requested_langs[language].sub;
+                        requested_langs[language].tlpath = [
+                            { 'l': 'en' },
+                            { 'l': language }
+                        ];
+                    }
+                }
+            }
+
             // setup options for sending the video to TPP
-            const options = Object.assign({ }, this._options, {
+            const options = Object.assign({ }, self._options, {
                 manifest: {
                     media: {
                         url: material.materialurl
-                    }
-                },
-                metadata: {
-                    // external_id equals to material url
-                    external_id: external_id,
-                    language: material.language,
-                    title: material.title,
-                    speakers: [{
-                        speaker_id: material.author || 'unknown',
-                        speaker_name: material.author || 'unknown'
-                    }]
-                },
-                // transcription and translation languages
-                requested_langs: this._languages
+                    },
+                    metadata: {
+                        // external_id equals to material url
+                        external_id: external_id,
+                        language: material.language,
+                        title: material.title,
+                        speakers
+                    },
+                    // transcription and translation languages
+                    requested_langs
+                }
             });
 
+            // store the allowed languages and formats
+            const languages = Object.keys(self._languages);
+            const formats = Object.keys(self._formats);
 
-            // send request to TTP
+            ///////////////////////////////////////////////
+            // Start the TTP process
+
             rp({
                 method: 'POST',
                 uri: `${self._url}/ingest/new`,
                 body: options,
+                headers: {
+                    'Content-Type': 'application/json'
+                },
                 json: true
             }).then(({ rcode, id }) => {
                 if (rcode === 0) {
@@ -175,18 +235,14 @@ class ExtractionTTP {
                     // something went wrong with the upload - terminate process
                     throw new Error(`[status_code: ${rcode}] Error when uploading process_id=${id}`);
                 }
-            }).then(processResponse => {
+            }).then(response => {
                 /////////////////////////////////////////////////////////
                 // SECOND STEP
                 // If the material has been processed, make a request
                 // for all transcriptions and translations
 
-                if (processResponse.process_completed) {
+                if (response.process_completed) {
                     // get processed values - transcriptions and translations
-
-                    const languages = Object.keys(this._languages);
-                    const formats = Object.keys(this._formats);
-
                     let requests = [];
                     // iterate through all languages
                     for (let lang of languages) {
@@ -195,7 +251,7 @@ class ExtractionTTP {
                             // prepare the requests to get the transcriptions and translations
                             let request = rp({
                                 uri: `${self._url}/get`,
-                                qs: Object.assign({ }, this._options, {
+                                qs: Object.assign({ }, self._options, {
                                     id: external_id,
                                     format,
                                     lang
@@ -210,7 +266,7 @@ class ExtractionTTP {
                     return Promise.all(requests);
 
                 } else {
-                    const { status_code_msg, status_code, process_id } = processResponse;
+                    const { status_code_msg, status_code, process_id } = response;
                     // the process has not been successfully completed
                     throw new Error(`[status_code: ${status_code}] ${status_code_msg} for process_id=${process_id}`);
                 }
@@ -239,11 +295,12 @@ class ExtractionTTP {
                         let index = langId * formats.length + formatId;
 
                         try {
-                            // try if the response is a JSON
-                            const response = JSON.parse(transcriptionList[index]);
-                            // if object - contains error message
+                            // try if the response is a JSON. If goes through,
+                            // the response contains the error
+                            JSON.parse(transcriptionList[index]);
+
                         }catch (err) {
-                            // if error - the response is a string
+                            // if here, the response is a text file, dfxp or plain
                             if (typeof transcriptionList[index] === 'string') {
                                 transcription[format] = transcriptionList[index];
                             }
@@ -264,27 +321,23 @@ class ExtractionTTP {
                 }
 
                 // save transcriptions into the material's metadata field
-                material.materialmetadata.dfxp = dfxp;
-                material.materialmetadata.rawText = rawText;
+                material.materialmetadata.dfxp           = dfxp;
+                material.materialmetadata.rawText        = rawText;
                 material.materialmetadata.transcriptions = transcriptions;
 
                 // send material to the next component
-                return this._onEmit(material, stream_id, callback);
+                return self._onEmit(material, stream_id, callback);
 
             }).catch(e => {
-                // TODO: log error message and store the not completed material
-                material.message = `${this._prefix} ${e.message}`;
-                return this._onEmit(material, 'stream_partial', callback);
+                // log error message and store the not completed material
+                material.message = `${self._prefix} ${e.message}`;
+                return self._onEmit(material, 'stream_partial', callback);
             });
 
         } else {
-            // TODO: handle videos for which we don't know the language
-            // probably store them in a different table - one containing
-            // one containing incomplete & unhandled materials
-
-            // TODO: log material
-            material.message = `${this._prefix} Not supported language.`;
-            return this._onEmit(material, 'stream_partial', callback);
+            // log the unsupported TTP language
+            material.message = `${self._prefix} Not TTP supported language=${material.language}.`;
+            return self._onEmit(material, 'stream_partial', callback);
         }
     }
 }

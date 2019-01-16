@@ -46,6 +46,7 @@ class ExtractionText {
     }
 
     receive(material, stream_id, callback) {
+
         if (material.type && !this._invalidTypes.includes(material.type.ext)) {
             // extract raw text from materialURL
             textract.fromUrl(material.materialurl, (error, text) => {
