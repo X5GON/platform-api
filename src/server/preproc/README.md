@@ -39,8 +39,8 @@ The folder structure is as follows:
 
 | folder name | description |
 | ----------- | ----------- |
-| `pipelines` | Contains components and scripts for running a particular processing pipeline |
-| `retrievers`| Contains different OER material retrievers as well as the basic retriever used as an example |
+| pipelines   | Contains components and scripts for running a particular processing pipeline |
+| retrievers  | Contains different OER material retrievers as well as the basic retriever used as an example |
 
 ## Processing Pipelines
 
@@ -72,7 +72,7 @@ Each pipeline contains the following components:
 - **Material Storing.** Stores the material in the appropriate database. If there were any errors during this
     process, we store the error and the material in a different table for future exploration.
 
-Components of the pipeline are stored in the `pipelines` folder.
+Components of the pipeline are stored in the [pipelines](pipelines/) folder.
 
 ## Retrievers
 
