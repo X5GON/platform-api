@@ -1,39 +1,7 @@
-# Material Processing Pipeline Folder
+# OER Processing Pipeline
 
 This folder contains the code base for OER material processing pipeline. The
 pipeline is created using qtopology which is a distributed stream processing layer.
-
-**Disclaimer**: The pipeline is NOT yet finished. Feature/information extraction
-methods are still missing as well as the components that handle Wikification and
-DMoz classification. The latter will be added shortly while the information
-extraction components are still pending.
-
-The folder structure is as follows:
-
-| folder name | description |
-| ----------- | ----------- |
-| `config`    | This folder contains the configurations that are used within the pre-processing pipeline. Since this data is private the folder needs to be created by the developer and populated with the configuration files. Examples of the configurations are found bellow.|
-
-## Config Folder
-
-The `config` folder needs to be created by the developer. It contains private
-and vulnerable data such as tokens, usernames and passwords to access databases
-and make API calls. To ensure this data is not leaked, we added all configuration
-folders to the `.gitignore` file and present how the configuration files should
-look like.
-
-### Wikifier Configuration
-
-To extract Wikipedia concepts from OER materials we will use Wikifier. For it to
-work the developer will need to create a file `/config/wikiconfig.js`
-containing the following lines:
-
-```javascript
-module.exports = {
-    wikifierUrl: 'url-to-wikifier',
-    userKey: 'generated-user-key'
-};
-```
 
 ## Prerequisites
 
@@ -54,10 +22,65 @@ sudo apt-get -y install docker.io
 sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker
 ```
 
-Docker Hub contains a container called [spotify/kafka](https://hub.docker.com/r/spotify/kafka/)
-which includes Apache Kafka. Running the following command should start a docker
-container (in dettach mode `[-d]`). This is required before starting the pipeline.
+Docker Hub contains a container called
+[eriknovak/kafka-x5gon](https://hub.docker.com/r/eriknovak/kafka-x5gon)
+which includes Apache Kafka adapted for the X5GON platform. Running the following
+command should start a docker container (in dettach mode `[-d]`).
+
+**NOTE:** It is required to run the Kafka container before starting the pipeline.
 
 ```bash
-sudo docker run -p 2181:2181 -p 9092:9092 -d --env ADVERTISED_HOST=localhost --env ADVERTISED_PORT=9092 --name kafka -h kafka spotify/kafka
+sudo docker run -p 2181:2181 -p 9092:9092 -d --env ADVERTISED_HOST=localhost --restart unless-stopped --env ADVERTISED_PORT=9092 --name kafka-x5gon -h kafka-x5gon eriknovak/kafka-x5gon
 ```
+
+## Folder Structure
+
+The folder structure is as follows:
+
+| folder name | description |
+| ----------- | ----------- |
+| `pipelines` | Contains components and scripts for running a particular processing pipeline |
+| `retrievers`| Contains different OER material retrievers as well as the basic retriever used as an example |
+
+## Processing Pipelines
+
+The processing pipelines accept Open Educational Materials of a particular *type* nad process it accordingly. The two types that are currently supported are:
+
+- text
+- video/audio
+
+Figure 1 shows the material processing pipeline architecture.
+
+![preprocessing pipeline](imgs/X5GON-processing-pipeline.png)
+<p style="text-align:center;"><i>Figure 1:</i> The material processing pipeline architecture. It shows how we acquire materials via different APIs and send it to the appropriate pipeline based on the material's type.</p>
+
+
+Each pipeline contains the following components:
+
+- **Format.** Formats the acquired materials into a common schema.
+- **Content Extraction.** Extracts the content from the material. This is done based on the material type:
+    - **Text.** We use *textract*, a Nodejs library that is able to extract raw text from the text material.
+    - **Video/Audio.** We use the *Transcription and Translation Platform* (TTP) which automatically generates
+        transcriptions (subtitles) and translates the video content.
+
+- **Content Enrichment.** Enriches the content by extracting additional features from the material.
+    - **Wikification.** We use *wikifier*, an online service for extracting wikipedia concepts associated with      the provided text.
+    - **DMOZ Classification (TODO).** We still need to develop the DMOZ classification model to acquire the         different topics the material is associated with.
+
+- **Validation.** Validates if the material object contains all of the required values.
+
+- **Material Storing.** Stores the material in the appropriate database. If there were any errors during this
+    process, we store the error and the material in a different table for future exploration.
+
+Components of the pipeline are stored in the `pipelines` folder.
+
+## Retrievers
+
+The retrievers are responsible for retrieving materials from OER providers that are registered in the
+X5GON Network. For each provider we need to develop its own retriever, custom for their API.
+
+The currenlty available retrievers are for the following OER providers:
+
+- [Videolectures.NET](http://videolectures.net/)
+
+
