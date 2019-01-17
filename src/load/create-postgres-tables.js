@@ -119,8 +119,7 @@ const dbCreates = {
 /* DB updates
  * Template: {version: <int>, update: `string (SQL query)`}
  */
-const dbUpdates = [
-    {version: 1, update: `CREATE TABLE ${schema}.banana ( ver integer PRIMARY KEY);`}];
+const dbUpdates = [];
 
 // latest pg version
 const latestVersion = dbUpdates.length;
@@ -138,7 +137,7 @@ function prepareSchema(callback) {
             pg.execute(createSchemaString, [], function (err, r) {
                 if (err) {
                     console.log(`Error creating schema:${err}`);
-                    return process.exit();
+                    return process.exit(1);
                 }
                 callback();
             });
@@ -151,13 +150,13 @@ function prepareSchema(callback) {
 
 /**
  * Check if tables exists, create them otherwise
- * @param maincallback
+ * @param mainCallback
  */
-function prepareTables(maincallback) {
+function prepareTables(mainCallback) {
     pg.execute(tablesExistString, [], function (err, res) {
         if (err) {
             console.log('Error checking tables:' + err);
-            return process.exit();
+            return process.exit(1);
         }
         
         // delete already existing tables from dbCreates object
@@ -178,7 +177,7 @@ function prepareTables(maincallback) {
                     if (err) {
                         console.log('Error creating tables:' +
                             tableCreateKey + ': ' + err);
-                        return process.exit();
+                        return process.exit(1);
                     }
                     callback();
                 });
@@ -188,11 +187,11 @@ function prepareTables(maincallback) {
                 // All tasks are done now
                 if (err) {
                     console.log('There was err. Not doing anything');
-                    return process.exit();
+                    return process.exit(1);
                 }
                 else {
                     console.log('Tables created');
-                    maincallback();
+                    mainCallback();
                 }
             }
         );
@@ -266,7 +265,7 @@ function updateTables (callback) {
         // check the current version of the db
         if (err) {
             console.error('Problem checking version:' + err);
-            return process.exit();
+            return process.exit(1);
         }
 
         if (r.length > 0) {
