@@ -23,7 +23,7 @@ class KafkaConsumer {
      * @param {String} host - The host address of the kafka service.
      * @param {String} topic - The topic kafka consumer is listening to.
      */
-    constructor(host, topic) {
+    constructor(host, topic, groupId) {
         // the message container
         this._data = [];
 
@@ -31,7 +31,7 @@ class KafkaConsumer {
         const options = {
             kafkaHost: host,
             ssl: true,
-            groupId: 'InputGroup',
+            groupId,
             sessionTimeout: 15000,
             protocol: ['roundrobin'],
             fromOffset: 'earliest',

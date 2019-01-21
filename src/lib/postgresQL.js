@@ -84,7 +84,8 @@ class PostgreSQL {
      */
     _getConditions(conditions, idx) {
         let self = this;
-        let condition, params = [];
+        let condition, params = [],
+            limitOffset = { };
         if (conditions instanceof Array) {
             // get all conditions together
             let conditionKeys = [ ];
@@ -99,11 +100,15 @@ class PostgreSQL {
             condition = (conditionKeys.join(' OR '));
         } else {
             let { keys, values } = self._extractKeysAndValues(conditions, idx);
-            // join the conditions and prepare the params
-            params = params.concat(values);
-            condition = keys.join(' AND ');
+            if (keys === 'limit' || keys === 'offset') {
+                limitOffset[keys] = values;
+            } else {
+                // join the conditions and prepare the params
+                params = params.concat(values);
+                condition = keys.join(' AND ');
+            }
         }
-        return { condition, params };
+        return { condition, params, limitOffset };
     }
 
     /**
@@ -132,12 +137,12 @@ class PostgreSQL {
      * @description Closes the pool connections.
      * @returns {Null}
      */
-    close() {
+    close(callback) {
         let self = this;
         if (callback && typeof(callback) === 'function') {
-            self.pool.end().then(callback);
+            self._pool.end().then(callback);
         } else {
-            self.pool.end();
+            self._pool.end();
         }
     }
 
@@ -272,11 +277,19 @@ class PostgreSQL {
         let self = this;
 
         // set the conditions and parameters
-        let { condition, params } = self._getConditions(conditions, 1);
+        let { condition, params, limitOffset } = self._getConditions(conditions, 1);
+
+        let limitations = '';
+        if (Object.keys(limitOffset).length) {
+            limitations = Object.keys(limitOffset)
+                .map(key => `${key.toUpperCase()} ${limitOffset[key]}`)
+                .join(' ');
+        }
+
         // prepare the query command
         let query = params.length ?
-            `SELECT * FROM ${table} WHERE ${condition};` :
-            `SELECT * FROM ${table};`;
+            `SELECT * FROM ${table} WHERE ${condition} ${limitations};` :
+            `SELECT * FROM ${table} ${limitations};`;
 
         // execute the query
         return self.execute(query, params, callback);
@@ -314,13 +327,13 @@ class PostgreSQL {
         let self = this;
 
         // get the values used to update the records
-        const { keys, params: { valParams }, index } = self._getValues(values, 1);
-
-        // get conditions
-        const { condition, params: { condParams } } = self._getConditions(conditions, index);
-        const params = valParams.concat(condParams);
+        const { keys, params: updateParams, index } = self._getValues(values, 1);
+        // get conditions and associated values
+        const { condition, params: conditionParams } = self._getConditions(conditions, index);
+        // get joint parameters
+        const params = updateParams.concat(conditionParams);
         // prepare query and params
-        const query = `UPDATE ${table} SET ${keys.join(', ')} WHERE ${condition} RETURNING *;`;
+        const query = `UPDATE ${table} SET ${keys.join(', ')} ${condition ? `WHERE ${condition}` : ''} RETURNING *;`;
 
         // execute the query
         return self.execute(query, params, callback);
@@ -337,7 +350,7 @@ class PostgreSQL {
 
         // get the conditions and prepare the query
         let { condition, params } = self._getConditions(conditions, 1);
-        const query = `DELETE FROM ${table} WHERE ${condition};`;
+        const query = `DELETE FROM ${table} ${condition ? `WHERE ${condition}` : ''} RETURNING *;`;
 
         // execute the query
         return self.execute(query, params, callback);
@@ -368,7 +381,7 @@ class PostgreSQL {
         }
         // create the query command
         const query = `INSERT INTO ${table} (${recordKeys.join(',')}) VALUES (${recordValIds})
-           ON CONFLICT (${conditionKeys.join(', ')}) DO UPDATE SET ${keys.join(', ')};`;
+           ON CONFLICT (${conditionKeys.join(', ')}) DO UPDATE SET ${keys.join(', ')} RETURNING *;`;
 
         // execute the query
         return self.execute(query, params, callback);

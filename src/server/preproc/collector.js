@@ -17,21 +17,21 @@ class OERCollector {
      */
     constructor() {
         // set kafka consumer & producers
-        this._consumer = new KafkaConsumer(config.kafka.host, 'retrieval-topic');
-        this._producer = new KafkaProducer(config.kafka.host);
+        this._consumer = new KafkaConsumer(config.kafka.host, 'retrieval.topic', 'retrievalGroup');
+        this._producer = new KafkaProducer(config.kafka.host, config.kafka.topics);
 
         // crawling configuration
         this.defaultFrequency = 7 * 24 * 60 * 60 * 1000; // one week
 
         // initialize different retrievers
         this._apis = [];
-        // go through retriever configurations
-        for (let repository of config.preproc.retrievers) {
-            repository.config.frequency = this.defaultFrequency;
-            repository.config.callback = this._sendMaterials();
-            repository.config.pg = pg;
-            this.addAPI(repository);
-        }
+        // // go through retriever configurations
+        // for (let repository of config.preproc.retrievers) {
+        //     repository.config.frequency = this.defaultFrequency;
+        //     repository.config.callback = this._sendMaterials();
+        //     repository.config.pg = pg;
+        //     this.addAPI(repository);
+        // }
     }
 
     /**
@@ -113,11 +113,11 @@ class OERCollector {
     }
 
     /**
-     * Process the next message in the retrieval-topic.
+     * Process the next message in the retrieval.topic.
      */
     next() {
         let self = this;
-        // get message sent to retrieval-topics
+        // get message sent to retrieval.topics
         const log = this._consumer.next();
         if (!log) { console.log('No messages'); return; }
 
@@ -167,9 +167,10 @@ class OERCollector {
                 // send material to the appropriate pipeline
                 // TODO: check/integrate an appropriate type selection
                 if (material.type.mime && material.type.mime.includes('video')) {
-                    // self._producer.send('video-topic', material);
+                    console.log(material);
+                    self._producer.send('video.topic', material);
                 } else {
-                    // self._producer.send('text-topic', material);
+                    self._producer.send('text.topic', material);
                 }
             }
         };

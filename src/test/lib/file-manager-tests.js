@@ -18,14 +18,14 @@ describe('file-manager.js: file manager methods unit tests.', function () {
 
     describe('Require module.', function () {
 
-        it ('Should not throw an error when requiring the module', function (done) {
+        it('Should not throw an error when requiring the module', function (done) {
             assert.doesNotThrow(function () {
                 require('../../lib/file-manager');
             });
             done();
         });
 
-        it ('Should have seven methods available', function (done) {
+        it('Should have seven methods available', function (done) {
             const fileManager = require('../../lib/file-manager');
             assert.equal(7, Object.keys(fileManager).length);
             done();
