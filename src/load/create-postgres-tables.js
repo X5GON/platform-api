@@ -43,20 +43,8 @@ let commands = [
     'CREATE INDEX IF NOT EXISTS oer_materials_type_idx ON oer_materials(type);',
 
     'ALTER TABLE oer_materials ADD COLUMN IF NOT EXISTS license varchar;',
-    'ALTER TABLE oer_materials_update ADD CONSTRAINT materialurl_unique UNIQUE (materialUrl);',
-    ///////////////////////////////////////////////////////
-    // oer materials partial table and metadata
-    `CREATE TABLE IF NOT EXISTS oer_materials_partial (id serial PRIMARY KEY,
-        title varchar, description varchar, providerUri varchar, materialUrl varchar,
-        author varchar, language varchar, dateCreated timestamp with time zone,
-        dateRetrieved timestamp with time zone, type jsonb, providerMetadata jsonb,
-        materialMetadata jsonb, license varchar, message varchar);`,
+    'ALTER TABLE oer_materials ADD CONSTRAINT oer_materials_materialurl_unique UNIQUE (materialUrl);',
 
-    'CREATE INDEX IF NOT EXISTS oer_materials_partial_materialUrl_idx ON oer_materials_partial(materialUrl);',
-    'CREATE INDEX IF NOT EXISTS oer_materials_partial_type_idx ON oer_materials_partial(type);',
-
-    'ALTER TABLE oer_materials_partial ADD COLUMN IF NOT EXISTS license varchar;',
-    'ALTER TABLE oer_materials_partial ADD COLUMN IF NOT EXISTS message varchar;',
     ///////////////////////////////////////////////////////
     // oer materials development table and metadata
     `CREATE TABLE IF NOT EXISTS oer_materials_dev (id serial PRIMARY KEY, title varchar NOT NULL,
@@ -70,6 +58,24 @@ let commands = [
     'CREATE INDEX IF NOT EXISTS oer_materials_dev_type_idx ON oer_materials_dev(type);',
 
     'ALTER TABLE oer_materials_dev ADD COLUMN IF NOT EXISTS license varchar;',
+    'ALTER TABLE oer_materials_dev ADD CONSTRAINT oer_materials_dev_materialurl_unique UNIQUE (materialUrl);',
+
+    ///////////////////////////////////////////////////////
+    // oer materials partial table and metadata
+    `CREATE TABLE IF NOT EXISTS oer_materials_partial (id serial PRIMARY KEY,
+        title varchar, description varchar, providerUri varchar, materialUrl varchar,
+        author varchar, language varchar, dateCreated timestamp with time zone,
+        dateRetrieved timestamp with time zone, type jsonb, providerMetadata jsonb,
+        materialMetadata jsonb, license varchar, message varchar);`,
+
+    'CREATE INDEX IF NOT EXISTS oer_materials_partial_materialurl_idx ON oer_materials_partial(materialUrl);',
+    'CREATE INDEX IF NOT EXISTS oer_materials_partial_type_idx ON oer_materials_partial(type);',
+
+    'ALTER TABLE oer_materials_partial ADD COLUMN IF NOT EXISTS license varchar;',
+    'ALTER TABLE oer_materials_partial ADD COLUMN IF NOT EXISTS message varchar;',
+
+    'ALTER TABLE oer_materials_partial ADD CONSTRAINT oer_materials_partial_materialurl_unique UNIQUE (materialUrl);',
+
     ///////////////////////////////////////////////////////
     // oer queue - for materials not yet retrieved
     `CREATE TABLE IF NOT EXISTS oer_queue (id serial NOT NULL,
