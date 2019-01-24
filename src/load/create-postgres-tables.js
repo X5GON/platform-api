@@ -136,7 +136,7 @@ const dbCreates = {
             ON ${schema}.oer_queue(inserted);`,
 
     version:
-        `CREATE TABLE ${schema}.version ( ver integer PRIMARY KEY);`
+        `CREATE TABLE ${schema}.version (ver integer PRIMARY KEY);`
 };
 
 /* DB updates
@@ -145,7 +145,7 @@ const dbCreates = {
 const dbUpdates = [{
     version: 1,
     update: `ALTER TABLE ${schema}.oer_materials
-                ADD COLUMN IF NOT EXISTS license varchar;
+                ADD COLUMN license varchar;
 
             ALTER TABLE ${schema}.oer_materials
                 ADD CONSTRAINT oer_materials_materialurl_unique
