@@ -16,7 +16,7 @@ const validator = require('../../../../lib/schema-validator')({
 });
 
 // TODO: initialize kafka producer
-// const producer = new KafkaProducer(config.kafka);
+// const producer = new KafkaProducer(config.kafka.host, config.kafka.topics);
 
 /**
  * @description Adds API routes for logging user activity.
@@ -304,7 +304,7 @@ module.exports = function (pg, logger) {
                 );
             } else {
                 // redirect activity to information retrievers
-                // producer.send('retrieval-topic', activity);
+                // producer.send('retrieval.topic', activity);
                 // log postgres success
                 logger.info('client activity logging successful',
                     logger.formatRequest(req)
