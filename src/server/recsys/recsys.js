@@ -14,6 +14,7 @@ const cookieParser = require('cookie-parser');
 const pg = require('../../lib/postgresQL')(config.pg);
 const Logger = require('../../lib/logging-handler')();
 const dbUpdate = require('../../load/create-postgres-tables');
+const loadModels = require('./scripts/load-material-models');
 
 // get process environment
 const env = process.env.NODE_ENV;
@@ -40,11 +41,13 @@ const PORT = config.recsys.port;
 const server = function(callback) {
     logger.info("Starting DB update.");
     dbUpdate.startDBCreate(function () {
-        logger.info("Starting the server");
-        app.listen(PORT, () => logger.info(`recsys listening on port ${PORT}`));
-        if (callback) {
-            callback();
-        }
+        loadModels.initialModelsImport(function(){
+            logger.info("Starting the server");
+            app.listen(PORT, () => logger.info(`recsys listening on port ${PORT}`));
+            if (callback) {
+                callback();
+            }
+        });
     });
 };
 
