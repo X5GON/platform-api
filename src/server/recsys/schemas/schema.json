@@ -21,6 +21,14 @@
         { "name": "wasVisited", "type": "index", "store": "Activity", "inverse": "content" }
     ]
 }, {
+    "name": "MaterialModel",
+    "fields": [
+        {"name": "uri", "type": "string", "primary": true},
+        {"name": "wikipediaConceptNames", "type": "string_v", "null": true},
+        {"name": "wikipediaConceptSupport", "type": "float_v", "null": true}
+    ],
+    "joins": []
+}, {
     "name": "Users",
     "fields": [
         { "name": "token", "type": "string", "shortstring": true, "primary": true }

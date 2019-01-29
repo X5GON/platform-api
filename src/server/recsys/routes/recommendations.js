@@ -10,6 +10,8 @@ const x5recommend = new (require(path.join(__dirname, '../engine/x5recommend')))
     env
 });
 
+const x5gonCookieName = 'x5gonTrack';
+
 
 /**
  * Adds API routes for the recommendations.
@@ -26,6 +28,7 @@ module.exports = function (pg, logger) {
 
         // get the query parameters
         let query = req.query;
+        query.uuid = req.cookies[x5gonCookieName] ? req.cookies[x5gonCookieName] : null;
 
         if (Object.keys(query).length === 0) {
             // no query parameters were given

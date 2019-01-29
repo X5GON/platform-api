@@ -136,6 +136,7 @@ class PostgreSQL {
         self.pool.connect((err, client, done) => {
             if (err) {
                 console.log(err);
+                console.log('Statement that produced this error: ' + statement);
                 callback(err);
             }
             // execute statement
