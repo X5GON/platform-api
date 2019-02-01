@@ -111,7 +111,6 @@ class NearestNeighbors {
                 // there is no record in the record set containing the url
                 // return an empty record set with weights
                 // TODO: tell the user of the missing record
-                console.log('!queryRec');
                 return [store.newRecordSet(), []]; 
             }
 
