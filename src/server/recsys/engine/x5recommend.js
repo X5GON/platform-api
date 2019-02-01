@@ -12,7 +12,7 @@ const qm = require('qminer');
 // internal modules
 const NearestNeighbor = require('./models/nearest-neighbors');
 const Logger = require('../../../lib/logging-handler')();
-const pg = require('../../../lib/postgresQL')(config.pg);
+const pg = require('../../../lib/postgresQL')(config.pg)
 
 /**
  * @class x5recommend
@@ -316,7 +316,7 @@ class x5recommend {
         let recommendations;
 
         if (!query) {
-            let errorMessage = 'recommendContent Missing query';
+            let errorMessage = 'Missing query';
             self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
                 error: errorMessage, query
             });
@@ -355,7 +355,6 @@ class x5recommend {
             return { error: errorMessage };
         } else if (recommendations.error) {
             // log the error given by the recommendation search
-            let errorMessage = 'Error fetching recommendations';
             self.logger.error(`error [x5recommend.recommendContent]: ${recommendations.error}`, {
                 error: recommendations.error, query
             });
@@ -364,64 +363,6 @@ class x5recommend {
         }
 
       return recommendations;
-    }
-
-    /********************************************
-      * Personalized Recommendation Functions
-      *******************************************/
-
-    /**
-      * @description Get content based recommendations.
-      * @param {Object} query - The object containing the required query parameters.
-      * @param {String} [query.text] - The text parameter. Finds material containing similar text.
-      * @param {String} [query.url] - The url parameter. Finds the material found using the url and
-      * returns material similar to it.
-      * @param {String} [query.type] - The metrics type.
-      * @returns {Array.<Object>} An array of recommended learning material.
-      */
-    recommendPersonalized(query) {
-        let self = this;
-        let recommendations;
-
-        if (!query) {
-            let errorMessage = 'recommendPersonalized: Missing query';
-            self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
-                error: errorMessage, query
-            });
-            // not supported query option - return error
-            return { error: errorMessage };
-        }
-
-        console.log('UUID is given!');
-        return pg.select({uuid: query.uuid}, 'rec_sys_user_model', function(err, res){
-            if (err){
-                console.log('Error fetching user model: ' + err);
-                return {error: 'Error fetching user model'};
-            }
-            
-            res = res[0];
-
-            let wikipediaConceptNames = [];
-            let wikipediaConceptSupport = [];
-            
-            for (let concept in res.concepts){
-                wikipediaConceptNames.push(concept);
-                wikipediaConceptSupport.push(res.concepts[concept]);
-            }
-            
-            query = {
-                uuid: res.uuid,
-                wikipediaConceptNames: wikipediaConceptNames,
-                wikipediaConceptSupport: wikipediaConceptSupport
-            };
-            
-            recommendations = self.userMaterialSimNN.search(query, self.materialModel);     
-            if (!recommendations){
-                recommendations = {error : 'Not implemented yet.'};
-            }
-            
-            return recommendations;
-        });
     }
 
     /********************************************
@@ -436,9 +377,8 @@ class x5recommend {
      */
 
     recommend(query){
-        console.log(query);
-        let recommendations = query.uuid ? this.recommendPersonalized(query) : this.recommendContent(query);
-        console.log(recommendations);
+        let recommendations = this.recommendContent(query);
+
         if (recommendations.error){
             return recommendations;
         }
@@ -471,6 +411,108 @@ class x5recommend {
             textType: detectType(material.mimetype) === 'text',
         }));
 
+    }
+    
+    
+    
+    /********************************************
+      * Personalized Recommendation Functions
+      *******************************************/
+
+    /**
+      * @description Get content based recommendations.
+      * @param {Object} query - The object containing the required query parameters.
+      * @param {String} [query.text] - The text parameter. Finds material containing similar text.
+      * @param {String} [query.url] - The url parameter. Finds the material found using the url and
+      * returns material similar to it.
+      * @param {String} [query.type] - The metrics type.
+      * @returns {Array.<Object>} An array of recommended learning material.
+      */
+    recommendPersonalized(query) {
+        let self = this;
+        let recommendations;
+        
+        return new Promise(function (resolve, reject){
+            if (!query) {
+                let errorMessage = 'recommendPersonalized: Missing query';
+                self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
+                    error: errorMessage, query
+                });
+                // not supported query option - return error
+                resolve({ error: errorMessage });
+                return;
+            }
+            
+            pg.select({uuid: query.uuid}, 'rec_sys_user_model', function(err, res){
+                if (err){
+                    self.logger.error('Error fetching user model: ' + err);
+                    resolve({error: 'Error fetching user model'});
+                    return;
+                }
+                
+                if (!res || res.length == 0){
+                    resolve({error: 'Cookie is not in the database - unable to fetch the user'});
+                    return;
+                }
+                
+                console.log('Result of pg call: ', res);
+                
+                res = res[0];
+                
+                console.log(res);
+
+                let wikipediaConceptNames = [];
+                let wikipediaConceptSupport = [];
+                
+                for (let concept in res.concepts){
+                    wikipediaConceptNames.push(concept);
+                    wikipediaConceptSupport.push(res.concepts[concept]);
+                }
+                
+                query = {
+                    uuid: res.uuid,
+                    wikipediaConceptNames: wikipediaConceptNames,
+                    wikipediaConceptSupport: wikipediaConceptSupport
+                };
+                
+                recommendations = self.userMaterialSimNN.search(query, self.materialModel);
+                if (!recommendations){
+                    recommendations = {error : 'Error fetching recommendations'};
+                    resolve(recommendations);
+                    return;
+                }
+                
+               /**
+                * Detects the type of the material.
+                * @param {String} mimetype - The mimetype of the material.
+                * @returns {String} The type of the material.
+                */
+                function detectType(mimetype) {
+                    let mime = mimetype.split('/');
+                    if (mime[0] === 'video') {
+                        return 'video';
+                    } else {
+                        return 'text';
+                    }
+                }
+                
+                recommendations = recommendations[0].map((material, id) => ({
+                    weight: recommendations[1][id],
+                    url: material.url,
+                    title: material.title,
+                    description: material.description,
+                    provider: material.provider,
+                    language: material.language,
+                    type: detectType(material.mimetype),
+                    videoType: detectType(material.mimetype) === 'video',
+                    audioType: detectType(material.mimetype) === 'audio',
+                    textType: detectType(material.mimetype) === 'text',
+                }));
+                
+                resolve(recommendations);
+                return;
+            });
+        });
     }
 }
 module.exports = x5recommend;

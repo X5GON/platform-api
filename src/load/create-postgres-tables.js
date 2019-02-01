@@ -139,8 +139,11 @@ const dbCreates = {
         `CREATE TABLE ${schema}.rec_sys_material_model
             (id serial PRIMARY KEY,
              providerUri varchar UNIQUE NOT NULL,
-             language jsonb,
-             type jsonb,
+             title varchar,
+             provider varchar,
+             description varchar,
+             language varchar,
+             type varchar,             
              concepts jsonb);
          
         ALTER TABLE ${schema}.rec_sys_material_model OWNER

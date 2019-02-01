@@ -116,16 +116,28 @@ pg.selectLarge({ }, 'oer_materials_update', 10, (error, results) => {
                         wikipediaConceptSupport.push(material.concepts[concept]);
                     }
                 }
-                let uri = material.provideruri;
+                let url = material.provideruri;
+                let title = material.title;// ? material.title : null;
+                let description = material.description;// ? material.description : null;
+                let provider = material.provider;// ? material.provider : null;
+                let mimetype = material.type;// ? material.type : null;
+                console.log(mimetype);
+                let language = material.language;// ? material.language : null;
                 let record = {
-                    uri,
+                    url,
+                    title,
+                    description,
+                    provider,
+                    mimetype,
+                    language,
                     wikipediaConceptNames,
                     wikipediaConceptSupport
                 };
                 
                 // push to the recommendation model
+                console.log(record);
                 x5recommend.pushRecordMaterialModel(record);
-                logger.info(`pushed record with id=${material.id}`, { uri });
+                logger.info(`pushed record with id=${material.id}`, { url });
             }
         }, (error) => {
             if (error) {

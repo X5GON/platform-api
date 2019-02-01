@@ -91,9 +91,6 @@ class NearestNeighbors {
      */
     search(query, store, maxCount=100, minSim=0.05) {
         let self = this;
-        
-        console.log('Inside search');
-        console.log('Query keys: ', Object.keys(query));
 
         try {
             // transform the query json into a sparse vector
@@ -101,20 +98,20 @@ class NearestNeighbors {
             let queryRec;
             if (query.hasOwnProperty('uuid') && query.hasOwnProperty('wikipediaConceptNames') && 
                 query.hasOwnProperty('wikipediaConceptSupport')) {
-                    queryRec = store.newRecord({uri: query.uuid, wikipediaConceptNames: query.wikipediaConceptNames, 
+                    queryRec = store.newRecord({uri: query.uuid, title: null, description: null, provider: null, 
+                        mimetype: null, language: null, wikipediaConceptNames: query.wikipediaConceptNames, 
                         wikipediaConceptSupport: query.wikipediaConceptSupport});
             } else {
                 queryRec = query.url ? 
                     store.recordByName(query.url) :
                     store.newRecord({ description: query.text });
             }
-            
-            //console.log(queryRec);
         
             if (!queryRec) { 
                 // there is no record in the record set containing the url
                 // return an empty record set with weights
                 // TODO: tell the user of the missing record
+                console.log('!queryRec');
                 return [store.newRecordSet(), []]; 
             }
 

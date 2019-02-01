@@ -55,27 +55,39 @@ function prepareMaterialModels(callback) {
             }
             let toUpdate = Object.keys(oerMaterials);
             oerMaterials = null;
-            //console.log(toUpdate.length);
+            console.log(toUpdate.length);
             async.eachSeries(toUpdate, function(provideruri, callback){
-                let query = `SELECT language, materialmetadata, type FROM ${schema}.oer_materials_update WHERE 
+                let query = `SELECT * FROM ${schema}.oer_materials_update WHERE 
                     provideruri='${provideruri}';`;
+                   
                 pg.execute(query, [], function(err, result){
                     if (err){
                         console.log('Error fetching material metadata:' + err + '\nQuery: '+ query);
                         callback(err);
                     }
-                    //console.log(result);
-                    let type = {}, language = {}, wiki = {};
+                    let type = {}, language = {}, wiki = {}, title = null, description = null, provider = null;
                     let supportLen = 0;
                     for (let i = 0; i < result.length; i++){
-                        if (!type.hasOwnProperty(result[i].type.ext)){
-                            type[result[i].type.ext] = 0;
+                        //console.log(Object.keys(result[i]));
+                        if (!type.hasOwnProperty(result[i].type.mime)){
+                            type[result[i].type.mime] = 0;
                         }
-                        type[result[i].type.ext] += 1;
+                        type[result[i].type.mime] += 1;
                         if (!language.hasOwnProperty(result[i].language)){
                             language[result[i].language] = 0;
                         }
                         language[result[i].language] += 1;
+                        if (!title){
+                            title = result[i].title;
+                        }
+                        if (!description){
+                            description = result[i].description;
+                        }
+                        if (!provider){
+                            if (result[i].hasOwnProperty('providermetadata')){
+                                provider = result[i].providermetadata.title;
+                            }
+                        }
                         for (let j = 0; j < result[i].materialmetadata.wikipediaConcepts.length; j++){
                             let concept = (result[i].materialmetadata.wikipediaConcepts[j].secName ? 
                                 result[i].materialmetadata.wikipediaConcepts[j].secName : 
@@ -91,12 +103,40 @@ function prepareMaterialModels(callback) {
                     for (let concept in wiki){
                             wiki[concept] /= supportLen;
                     }
+                    
+                    //get most common type of the material
+                    let maxKey = null;
+                    for (let key in type){
+                        if (!maxKey){
+                            maxKey = key;
+                        }
+                        else if (type[key] > type[maxKey]){
+                            maxKey = key;
+                        }
+                    }
+                    type = maxKey;
+                    
+                    //get most common language of the material
+                    maxKey = null;
+                    for (let key in language){
+                        if (!maxKey){
+                            maxKey = key;
+                        }
+                        else if (language[key] > language[maxKey]){
+                            maxKey = key;
+                        }
+                    }
+                    language = maxKey;                    
+                    
                     //console.log(provideruri, type, language, JSON.stringify(wiki));
                     let values = {
                         provideruri: provideruri,
                         type: type,
                         language: language,
-                        concepts: wiki
+                        concepts: wiki,
+                        title: title,
+                        description: description,
+                        provider: provider
                     };
                     
                     pg.insert(values, `${schema}.rec_sys_material_model`, function(err, result){
@@ -243,20 +283,13 @@ function prepareUserModels(callback){
 function initialModelsImport(callback) {
     console.log('Checking whether to update models');
     prepareMaterialModels(function () {
-        prepareUserModels(function () {
+        //prepareUserModels(function () {
             console.log('DONE (initialModelsImport)');
             pg.close();
             if (callback && typeof(callback) === 'function'){
                     callback();
                 }
-            /*updateTables(function () {
-                console.log('DONE');
-                pg.close();
-                if (callback && typeof(callback) === 'function'){
-                    callback();
-                }
-            });*/
-        });
+        //});
     });
 }//startDbCreate
 exports.initialModelsImport = initialModelsImport;
