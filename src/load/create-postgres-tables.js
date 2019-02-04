@@ -168,7 +168,7 @@ const dbCreates = {
             ON ${schema}.rec_sys_user_model(uuid);`,
 
     version:
-        `CREATE TABLE ${schema}.version ( ver integer PRIMARY KEY);`
+        `CREATE TABLE ${schema}.version (ver integer PRIMARY KEY);`
 };
 
 /* DB updates
@@ -226,7 +226,7 @@ function prepareTables(mainCallback) {
             let tableName = res[i].table_name;
             delete dbCreates[tableName];
         }
-        
+
         // create a list of all non-existing tables to loop through with async
         let tableCreates = Object.keys(dbCreates);
         async.eachSeries(tableCreates,

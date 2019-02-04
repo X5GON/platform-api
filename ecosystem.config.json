@@ -47,11 +47,11 @@
         "cwd": "./src/server/preproc/pipelines/",
         "env": {
             "NODE_ENV": "dev",
-            "TOPOLOGY": "preprocessing-text"
+            "TOPOLOGY": "text"
         },
         "env_production": {
             "NODE_ENV": "prod",
-            "TOPOLOGY": "preprocessing-text"
+            "TOPOLOGY": "text"
         },
         "instances": "1",
         "exec_mode": "cluster",
@@ -63,11 +63,11 @@
         "cwd": "./src/server/preproc/pipelines/",
         "env": {
             "NODE_ENV": "dev",
-            "TOPOLOGY": "preprocessing-video"
+            "TOPOLOGY": "video-automatic"
         },
         "env_production": {
             "NODE_ENV": "prod",
-            "TOPOLOGY": "preprocessing-video"
+            "TOPOLOGY": "video-automatic"
         },
         "instances": "1",
         "exec_mode": "cluster",

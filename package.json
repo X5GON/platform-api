@@ -51,6 +51,7 @@
     "qminer": "^9.1.2",
     "qtopology": "^2.0.5",
     "request": "^2.85.0",
+    "request-promise-native": "^1.0.5",
     "socket.io": "^2.1.1",
     "textract": "^2.2.0",
     "winston": "^2.4.0",

@@ -4,30 +4,26 @@
  * formats into a common schema.
  */
 
-// external libraries
-const http = require('http');
-const https = require('https');
-const fileType = require('file-type');
-
-// internal libraries
-const Logger = require('../../../../lib/logging-handler')();
-// create a logger instance for logging wikification process
-const logger = Logger.createGroupInstance('material-format', 'preproc');
-
-
 /**
  * Formats Material into a common schema.
  */
 class MaterialFormat {
 
-    constructor(context) {
+    constructor() {
         this._name = null;
         this._onEmit = null;
+        this._context = null;
     }
 
     init(name, config, context, callback) {
         this._name = name;
+        this._context = context;
         this._onEmit = config.onEmit;
+        this._prefix = `[MaterialFormat ${this._name}]`;
+
+        // get fields to be extracted
+        this._fields = config.fields;
+
         // use other fields from config to control your execution
         callback();
     }
@@ -42,62 +38,18 @@ class MaterialFormat {
     }
 
     receive(material, stream_id, callback) {
-        // log the begining of material formating
-        logger.info('starting formating material', { material });
+        // set placeholder
+        let formatMaterial = { };
 
-        // TODO: get material attributes
-
-        // TODO: create the object containing the material format
-        const formatedMaterial = {
-            title: material.title,
-            description: material.description,
-            providerUri: material.providerUri,
-            materialUrl: material.materialUrl,
-            author: material.author,
-            language: material.language,
-            type: material.type,
-            dateCreated: material.dateCreated,
-            dateRetrieved: material.dateRetrieved,
-            providerMetadata: material.providerMetadata,
-            materialMetadata: { }
-        };
-
-        if (formatedMaterial.type) {
-            // send formated material to the next component
-            logger.info('material format successful', { material, formatedMaterial });
-            return this._onEmit(formatedMaterial, stream_id, callback);
-        } else if (material.materialUrl.indexOf('http://') === 0) {
-            http.get(material.materialUrl, res => {
-                this._handleResponse(res, material, formatedMaterial, stream_id, callback);
-            });
-        } else if (material.materialUrl.indexOf('https://') === 0) {
-            https.get(material.materialUrl, res => {
-                this._handleResponse(res, material, formatedMaterial, stream_id, callback);
-            });
-        } else {
-            logger.error('materialUrl is not valid', { material });
-            return callback();
+        // extract material fields and assign them to the formatted example
+        for (let field of this._fields) {
+            formatMaterial[field.name] = material[field.name] || field.default;
         }
+        // send the formatted material to next component
+        return this._onEmit(formatMaterial, stream_id, callback);
     }
-
-    _handleResponse(response, material, formatedMaterial, stream_id, callback) {
-        if (response.statusCode !== 200) {
-            logger.warn(`Request denied with code ${response.statusCode}`, { material });
-            logger.info('material format successful', { material, formatedMaterial });
-            // send formated material to the next component
-            return this._onEmit(formatedMaterial, stream_id, callback);
-        } else {
-            response.on('data', chunk => {
-                response.destroy();
-                formatedMaterial.type = fileType(chunk);
-                // log material formating process
-                logger.info('material format successful', { material, formatedMaterial });
-                // send formated material to the next component
-                return this._onEmit(formatedMaterial, stream_id, callback);
-            });
-        }
-    }
-
 }
 
-exports.create = function (context) { return new MaterialFormat(context); };
+exports.create = function (context) {
+    return new MaterialFormat(context);
+};

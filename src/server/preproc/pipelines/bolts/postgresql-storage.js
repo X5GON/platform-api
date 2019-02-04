@@ -1,34 +1,29 @@
 /********************************************************************
  * PostgresQL storage process
- * This component receives the verified OER material object and stores
- * it into postgresQL database.
+ * This component receives the verified OER material object and
+ * stores it into postgresQL database.
  */
 
-// configurations
-const config = require('../../../../config/config');
-
-// internal libraries
-const Logger = require('../../../../lib/logging-handler')();
-// create a logger instance for logging wikification process
-const logger = Logger.createGroupInstance('postgresql-storage', 'preproc');
-
-// postgres library
-const pg = require('../../../../lib/postgresQL')(config.pg);
-
-/**
- * Stores the OER material into PostgresQL database.
- */
 class PostgresqlStorage {
 
-    constructor(context) {
+    constructor() {
         this._name = null;
         this._onEmit = null;
+        this._context = null;
     }
 
     init(name, config, context, callback) {
         this._name = name;
+        this._context = context;
         this._onEmit = config.onEmit;
-        // use other fields from config to control your execution
+        this._prefix = `[PostgresqlStorage ${this._name}]`;
+
+        // create the postgres connection
+        this._pg = require('../../../../lib/postgresQL')(config.pg);
+
+        // the postgres table in which we wish to insert
+        this._postgresTable = config.postgres_table;
+
         callback();
     }
 
@@ -37,32 +32,30 @@ class PostgresqlStorage {
     }
 
     shutdown(callback) {
-        // prepare for gracefull shutdown, e.g. save state
-
         // close connection to postgres database
-        pg.close();
+        this._pg.close();
+
         // shutdown component
         callback();
     }
 
     receive(material, stream_id, callback) {
-        // log material insertion
-        logger.info('start inserting material into oer_material database', { materialUrl: material.materialUrl });
         // takes the material and insert it into the OER material table
-        pg.insert(material, 'oer_materials', (error, result) => {
+        const materialurl = material.materialurl;
+        this._pg.upsert(material, { materialurl: {} }, this._postgresTable, (error, result) => {
             if (error) {
-                // error when parsing response
-                logger.error('error [postgresql.insert]: unable to insert material',
-                    { error: error.message, materialUrl: material.materialUrl }
-                );
+                console.warn({ error: error.message, materialurl });
             } else {
-                // log successful material insertion
-                logger.info('material inserted into oer_material database', { materialUrl: material.materialUrl });
+                console.log(`material inserted into ${this._postgresTable} database`,
+                    { materialurl: material.materialurl }
+                );
             }
-            // this is the end of the pre-processing pipeline
+            // this is the end of the material processing pipeline
             return callback();
         });
     }
 }
 
-exports.create = function (context) { return new PostgresqlStorage(context); };
+exports.create = function (context) {
+    return new PostgresqlStorage(context);
+};
