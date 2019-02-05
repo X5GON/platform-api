@@ -94,13 +94,19 @@ class NearestNeighbors {
 
         try {
             // transform the query json into a sparse vector
-            // this step here might be tricky!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             let queryRec;
             if (query.hasOwnProperty('uuid') && query.hasOwnProperty('wikipediaConceptNames') && 
                 query.hasOwnProperty('wikipediaConceptSupport')) {
-                    queryRec = store.newRecord({uri: query.uuid, title: null, description: null, provider: null, 
-                        mimetype: null, language: null, wikipediaConceptNames: query.wikipediaConceptNames, 
-                        wikipediaConceptSupport: query.wikipediaConceptSupport});
+                queryRec = store.newRecord({
+                    uri: query.uuid,
+                    title: null,
+                    description: null,
+                    provider: null, 
+                    mimetype: null,
+                    language: null,
+                    wikipediaConceptNames: query.wikipediaConceptNames, 
+                    wikipediaConceptSupport: query.wikipediaConceptSupport
+                });
             } else {
                 queryRec = query.url ? 
                     store.recordByName(query.url) :

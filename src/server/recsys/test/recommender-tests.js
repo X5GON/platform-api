@@ -161,8 +161,9 @@ describe('recommender-tests.js: Recommender engine model unit tests.', function 
             assert.deepEqual(expected, recommendations);
             done();
         });
-
-        /*it('Should handle a text and url query as url query', function (done) {
+        
+        // this test fails because URL from query is different that provider uris used to index the material
+        it('Should handle a text and url query as url query', function (done) {
             let urlQuery = {
                 url: 'http://videolectures.net/kdd2016_broder_deep_learning/'
             };
@@ -178,7 +179,7 @@ describe('recommender-tests.js: Recommender engine model unit tests.', function 
             assert.equal(true, true);
             done();
         });
-    */
+    
 
     }); // describe L2
     

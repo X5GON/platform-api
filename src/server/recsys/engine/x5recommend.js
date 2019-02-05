@@ -455,12 +455,7 @@ class x5recommend {
                     return;
                 }
                 
-                console.log('Result of pg call: ', res);
-                
                 res = res[0];
-                
-                console.log(res);
-
                 let wikipediaConceptNames = [];
                 let wikipediaConceptSupport = [];
                 

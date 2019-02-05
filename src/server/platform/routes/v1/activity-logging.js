@@ -300,7 +300,6 @@ module.exports = function (pg, logger) {
         pg.insert(activity, 'client_activity', (error) => {
             if (error) {
                 // log postgres error
-                console.log(activity);
                 logger.error('error [postgres.insert]: client activity logging failed',
                     logger.formatRequest(req, { error: error.message })
                 );

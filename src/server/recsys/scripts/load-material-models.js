@@ -109,8 +109,7 @@ function prepareMaterialModels(callback) {
                         }
                     }
                     language = maxKey;                    
-                    
-                    //console.log(provideruri, type, language, JSON.stringify(wiki));
+
                     let values = {
                         provideruri: provideruri,
                         type: type,
