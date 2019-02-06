@@ -1,13 +1,13 @@
 // configurations
-const config = require('../../../config/config');
+const config = require('../config/config');
 
 // external modules
 const async = require('async');
 
 // internal modules
-const pg = require('../../../lib/postgresQL')(config.pg);
-const Logger = require('../../../lib/logging-handler')();
-const updateHelper = require('../../../lib/update-user-models');
+const pg = require('../lib/postgresQL')(config.pg);
+const Logger = require('../lib/logging-handler')();
+const updateHelper = require('../lib/update-user-models');
 
 // check if config.schema is defined
 const schema = config.pg.schema;
@@ -190,6 +190,7 @@ function initialModelsImport(callback) {
     console.log('Checking whether to update models');
     prepareMaterialModels(function () {
         prepareUserModels(function () {
+            //tu narediš še buildRecSys
             console.log('DONE (initialModelsImport)');
             pg.close();
             if (callback && typeof(callback) === 'function'){

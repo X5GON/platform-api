@@ -10,16 +10,6 @@ let agent = require('supertest').agent(server);
 describe('server-tests.js: Recommender engine server unit tests.', function () {
     this.slow(300);
     
-    /*********************************
-     * Tests broke during the refactoring of the start procedure.
-     * TODO: Fix the tests so that before test starts the server and other tests test the functionalities.
-     * *******************************/
-    
-    /*
-    before(function(done){
-        server.server(done);
-    });
-    
     after(function (done) {
         server.close(done);
     });
@@ -129,7 +119,6 @@ describe('server-tests.js: Recommender engine server unit tests.', function () {
             .set('Accept', 'application/json')
             .expect(200, done);
     });
-    */
 
 });
 
