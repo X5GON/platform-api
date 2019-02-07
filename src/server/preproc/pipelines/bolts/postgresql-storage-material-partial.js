@@ -48,7 +48,6 @@ class PostgresqlMaterialPartial {
 
         self._pg.insert(oer_materials_partial, 'oer_materials_partial', (error, result) => {
             if (error) { console.log(e); return callback(error); }
-            console.log('partial material stored');
             return callback();
         }); // self._pg.insert(oer_materials_partial)
 

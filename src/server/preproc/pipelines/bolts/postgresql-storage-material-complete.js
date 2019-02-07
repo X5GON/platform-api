@@ -126,7 +126,6 @@ class PostgresqlMaterialComplete {
 
             async.series(tasks, function (e, res) {
                 if (e) { console.log(e); return callback(e); }
-                console.log('complete material stored');
                 return callback();
             });
 

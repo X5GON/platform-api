@@ -99,11 +99,8 @@ class PostgresqlStorageUserActivites {
             // user activites reference on other records
             user_activities.cookie_id = ids[0];
             user_activities.url_id    = ids[1];
-            console.log(ids);
             // insert user activity data
             self._pg.insert(user_activities, 'user_activities', function (e, res) {
-                console.log(res);
-
                 if (e) { return callback(e); }
                 return callback(null);
             });
