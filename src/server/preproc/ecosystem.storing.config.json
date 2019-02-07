@@ -1,0 +1,51 @@
+{
+    "apps": [{
+        "name": "STORING_MATERIAL_COMPLETE",
+        "script": "pipeline.js",
+        "cwd": "./pipelines/",
+        "env": {
+            "NODE_ENV": "dev",
+            "TOPOLOGY": "storing-material-complete"
+        },
+        "env_production": {
+            "NODE_ENV": "prod",
+            "TOPOLOGY": "storing-material-complete"
+        },
+        "instances": "2",
+        "exec_mode": "cluster",
+        "autorestart": true,
+        "max_restarts": 20
+    }, {
+        "name": "STORING_MATERIAL_PARTIAL",
+        "script": "pipeline.js",
+        "cwd": "./pipelines/",
+        "env": {
+            "NODE_ENV": "dev",
+            "TOPOLOGY": "storing-material-partial"
+        },
+        "env_production": {
+            "NODE_ENV": "prod",
+            "TOPOLOGY": "storing-material-partial"
+        },
+        "instances": "1",
+        "exec_mode": "cluster",
+        "autorestart": true,
+        "max_restarts": 20
+    }, {
+        "name": "STORING_USERACTIVITY_CONNECT",
+        "script": "pipeline.js",
+        "cwd": "./pipelines/",
+        "env": {
+            "NODE_ENV": "dev",
+            "TOPOLOGY": "storing-user-activities"
+        },
+        "env_production": {
+            "NODE_ENV": "prod",
+            "TOPOLOGY": "storing-user-activites"
+        },
+        "instances": "1",
+        "exec_mode": "cluster",
+        "autorestart": true,
+        "max_restarts": 20
+    }]
+}

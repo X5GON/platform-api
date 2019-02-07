@@ -4,6 +4,8 @@
  * stores it into postgresQL database.
  */
 
+const async = require('async');
+
 class PostgresqlStorage {
 
     constructor() {
@@ -50,8 +52,16 @@ class PostgresqlStorage {
                     { materialurl: material.materialurl }
                 );
             }
-            // this is the end of the material processing pipeline
-            return callback();
+
+            if (this._postgresTable !== 'oer_materials_partial') {
+               this._pg.delete({ materialurl }, 'oer_materials_partial', (error, result) => {
+                    // this is the end of the material processing pipeline
+                    return callback();
+                });
+            } else {
+                return callback();
+            }
+
         });
     }
 }

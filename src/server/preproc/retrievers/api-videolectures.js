@@ -201,19 +201,19 @@ class VideolecturesAPI extends BasicRESTAPI {
             // go through the materials and check if they already exist
             for (let material of materials) {
                 // check if material is in the database
-                const provideruri = `${self._domain}/${material.slug}/`;
-                self._pg.select({ provideruri }, 'oer_materials', (xerror, results) => {
+                const url = `${self._domain}/${material.slug}/`;
+                self._pg.select({ url }, 'urls', (xerror, results) => {
                     if (xerror) { return self._processCb(xerror); }
 
                     // TODO: handle existing materials
                     if (results.length) {
-                        const yerror = new Error(`[API-Videolectures _checkMaterialDb] material already in dataset url=${provideruri}`);
+                        const yerror = new Error(`[API-Videolectures _checkMaterialDb] material already in dataset url=${url}`);
                         console.log(yerror.message);
                         return;
                     }
 
                     // get the material and send it to the callback
-                    self.get(`${self._domain}/${material.slug}/`, self._processCb);
+                    self.get(url, self._processCb);
                 });
             }
         };

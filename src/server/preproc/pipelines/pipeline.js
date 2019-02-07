@@ -4,7 +4,7 @@ const qtopology = require('qtopology');
 // load preprocessing pipeline configuration
 
 const TOPOLOGY = process.env.TOPOLOGY;
-let config = require(`./${TOPOLOGY}`);
+let config = require(`./ontologies/${TOPOLOGY}`);
 
 // compile the pipeline - inject variables and perform checks
 let compiler = new qtopology.TopologyCompiler(config);

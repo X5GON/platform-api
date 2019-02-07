@@ -4,7 +4,7 @@
  */
 
 // internal libraries
-const dfxp2srt = require('../../../../lib/python-dfxp2srt');
+const dfxp2srt = require('../../../../lib/dfxp2srt-wrapper');
 
 class ExtractionDFXP {
 
@@ -58,7 +58,6 @@ class ExtractionDFXP {
                 }
 
                 // assign the extracted attributes to the material
-                material.materialmetadata.dfxp = originDfxp;
                 material.materialmetadata.rawText = originText;
                 material.materialmetadata.transcriptions = transcriptions;
 

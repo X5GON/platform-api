@@ -1,0 +1,35 @@
+{
+    "apps": [{
+        "name": "PROCESSING_MATERIAL_TEXT",
+        "script": "pipeline.js",
+        "cwd": "./pipelines/",
+        "env": {
+            "NODE_ENV": "dev",
+            "TOPOLOGY": "processing-material-text"
+        },
+        "env_production": {
+            "NODE_ENV": "prod",
+            "TOPOLOGY": "processing-material-text"
+        },
+        "instances": "5",
+        "exec_mode": "cluster",
+        "autorestart": true,
+        "max_restarts": 20
+    }, {
+        "name": "PROCESSING_MATERIAL_VIDEO",
+        "script": "pipeline.js",
+        "cwd": "./pipelines/",
+        "env": {
+            "NODE_ENV": "dev",
+            "TOPOLOGY": "processing-material-video-manual"
+        },
+        "env_production": {
+            "NODE_ENV": "prod",
+            "TOPOLOGY": "processing-material-video-automatic"
+        },
+        "instances": "3",
+        "exec_mode": "cluster",
+        "autorestart": true,
+        "max_restarts": 20
+    }]
+}

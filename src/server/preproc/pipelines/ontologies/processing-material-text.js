@@ -1,5 +1,5 @@
 // configurations
-const config = require('../../../config/config');
+const config = require('../../../../config/config');
 
 module.exports = {
     "general": {
@@ -8,14 +8,14 @@ module.exports = {
     },
     "spouts": [
         {
-            "name": "video-input",
+            "name": "text-input",
             "type": "inproc",
             "working_dir": "./spouts",
             "cmd": "kafka-spout.js",
             "init": {
                 "kafka_host": config.kafka.host,
-                "topic": "video.topic",
-                "groupId": 'videoGroup'
+                "topic": "PROCESSING.MATERIAL.TEXT",
+                "groupId": "textGroup"
             }
         }
     ],
@@ -26,7 +26,7 @@ module.exports = {
             "working_dir": "./bolts",
             "cmd": "material-format.js",
             "inputs": [{
-                "source": "video-input"
+                "source": "text-input"
             }],
             "init": {
                 "fields": [
@@ -39,7 +39,6 @@ module.exports = {
                     { "name": "type" },
                     { "name": "datecreated" },
                     { "name": "dateretrieved" },
-                    { "name": "providermetadata" },
                     { "name": "materialmetadata", "default": {} },
                     { "name": "license" }
                 ]
@@ -56,16 +55,14 @@ module.exports = {
             "init": {}
         },
         {
-            "name": "video-dfxp-extraction",
+            "name": "text-content-extraction",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "extraction-dfxp.js",
+            "cmd": "extraction-text.js",
             "inputs": [{
                 "source": "material-type",
             }],
-            "init": {
-                "dfxp_folder": "../../../../data/videolectures/data"
-            }
+            "init": {}
         },
         {
             "name": "wikification",
@@ -73,11 +70,11 @@ module.exports = {
             "working_dir": "./bolts",
             "cmd": "extraction-wikipedia.js",
             "inputs": [{
-                "source": "video-dfxp-extraction"
+                "source": "text-content-extraction",
             }],
             "init": {
                 "userKey": config.preproc.wikifier.userKey,
-                "wikifierUrl": config.preproc.wikifier.wikifierUrl
+                "wikifierUrl": config.preproc.wikifier.wikifierUrl,
             }
         },
         {
@@ -86,57 +83,45 @@ module.exports = {
             "working_dir": "./bolts",
             "cmd": "material-validator.js",
             "inputs": [{
-                "source": "wikification"
+                "source": "wikification",
             }],
             "init": {}
         },
 
         /****************************************
-         * Storing OER materials into the
-         * production and development tables
+         * Send the completely processed materials
+         * to kafka distribution
          */
 
         {
-            "name": "postgresql-storage-production",
+            "name": "kafka-material-complete-topic",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "postgresql-storage.js",
+            "cmd": "kafka-material-complete.js",
             "inputs": [{
                 "source": "material-validator",
             }],
             "init": {
-                "postgres_table": "oer_materials_update",
-                "pg": config.pg
-            }
-        },
-        {
-            "name": "postgresql-storage-development",
-            "type": "inproc",
-            "working_dir": "./bolts",
-            "cmd": "postgresql-storage.js",
-            "inputs": [{
-                "source": "material-validator",
-            }],
-            "init": {
-                "postgres_table": "oer_materials_dev",
-                "pg": config.pg
+                "kafka_host": config.kafka.host,
+                "kafka_topic": "STORING.MATERIAL.COMPLETE"
             }
         },
 
         /****************************************
-         * Storing partial OER materials
+         * Send the partially processed materials
+         * to kafka distribution
          */
 
         {
-            "name": "postgresql-storage-partial",
+            "name": "kafka-material-partial-topic",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "postgresql-storage.js",
+            "cmd": "kafka-material-partial.js",
             "inputs": [{
                 "source": "material-format",
                 "stream_id": "stream_partial"
             },{
-                "source": "video-dfxp-extraction",
+                "source": "text-content-extraction",
                 "stream_id": "stream_partial"
             },{
                 "source": "wikification",
@@ -146,8 +131,8 @@ module.exports = {
                 "stream_id": "stream_partial"
             }],
             "init": {
-                "postgres_table": "oer_materials_partial",
-                "pg": config.pg
+                "kafka_host": config.kafka.host,
+                "kafka_topic": "STORING.MATERIAL.PARTIAL"
             }
         }
     ],

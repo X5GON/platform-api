@@ -17,21 +17,25 @@ class OERCollector {
      */
     constructor() {
         // set kafka consumer & producers
-        this._consumer = new KafkaConsumer(config.kafka.host, 'retrieval.topic', 'retrievalGroup');
-        this._producer = new KafkaProducer(config.kafka.host, config.kafka.topics);
+        this._consumer = new KafkaConsumer(config.kafka.host, 'STORING.USERACTIVITY.CONNECT', 'connectGroup');
+        this._producer = new KafkaProducer(config.kafka.host);
 
         // crawling configuration
         this.defaultFrequency = 7 * 24 * 60 * 60 * 1000; // one week
 
+        // define topic names
+        this._text_topic  = 'PROCESSING.MATERIAL.TEXT';
+        this._video_topic = 'PROCESSING.MATERIAL.VIDEO';
+
         // initialize different retrievers
         this._apis = [];
-        // // go through retriever configurations
-        // for (let repository of config.preproc.retrievers) {
-        //     repository.config.frequency = this.defaultFrequency;
-        //     repository.config.callback = this._sendMaterials();
-        //     repository.config.pg = pg;
-        //     this.addAPI(repository);
-        // }
+        // go through retriever configurations
+        for (let repository of config.preproc.retrievers) {
+            repository.config.frequency = this.defaultFrequency;
+            repository.config.callback = this._sendMaterials();
+            repository.config.pg = pg;
+            this.addAPI(repository);
+        }
     }
 
     /**
@@ -119,10 +123,10 @@ class OERCollector {
         let self = this;
         // get message sent to retrieval.topics
         const log = this._consumer.next();
-        if (!log) { console.log('No messages'); return; }
+        if (!log) { return null; }
 
         // check if material is in the database
-        pg.select({ materialUrl: log.url }, 'oer_materials', (error, results) => {
+        pg.select({ url: log.url }, 'urls', (error, results) => {
             if (error) {
                 // log postgres error
                 logger.error('error [postgres.select]: unable to select a material',
@@ -167,10 +171,9 @@ class OERCollector {
                 // send material to the appropriate pipeline
                 // TODO: check/integrate an appropriate type selection
                 if (material.type.mime && material.type.mime.includes('video')) {
-                    console.log(material);
-                    self._producer.send('video.topic', material);
+                    self._producer.send(self._video_topic, material);
                 } else {
-                    self._producer.send('text.topic', material);
+                    self._producer.send(self._text_topic, material);
                 }
             }
         };
@@ -214,6 +217,5 @@ process.on('uncaughtException', shutdown);
 
 // handles message
 process.on('message', (msg) => {
-    console.log(msg);
     process.send(collectors._apis.map(api => api.name));
 });

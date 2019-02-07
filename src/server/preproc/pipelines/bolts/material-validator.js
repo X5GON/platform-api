@@ -49,34 +49,12 @@ const materialSchema = {
             "description": "The extension and type of the OER material",
             "type": ["object", "string", "null"]
         },
-        "providermetadata": {
-            "description": "The provider metadata",
-            "type": "object",
-            "properties": {
-                "title": {
-                    "description": "The name of the OER provider",
-                    "type": "string"
-                },
-                "url": {
-                    "description": "The url where the OER provider is found",
-                    "type": "string"
-                }
-            },
-            "required": [
-                "title",
-                "url"
-            ]
-        },
         "materialmetadata": {
             "description": "The material metadata extracted by platform",
             "type": "object",
             "properties": {
                 "rawText": {
                     "description": "The raw content of the OER material in the origin language",
-                    "type": "string"
-                },
-                "dfxp": {
-                    "description": "The dfxp file associated with the video OER material",
                     "type": "string"
                 },
                 "wikipediaConcepts": {
@@ -124,7 +102,6 @@ const materialSchema = {
         "provideruri",
         "materialurl",
         "language",
-        "providermetadata",
         "materialmetadata"
     ]
 };
