@@ -205,21 +205,21 @@ class PostgreSQL {
 
             /**
              * This function designates what to do with the values read by the cursor.
-             * @param {Function} callback - The async callback.
+             * @param {Function} xcallback - The async callback.
              * @private
              */
-            function _batchFunction(callback) {
+            function _batchFunction(xcallback) {
                 cursor.read(batchSize, (xerror, rows) => {
                     if (xerror) {
                         lastBatch = 0;
+                        return xcallback(xerror);
                     } else {
                         lastBatch = rows.length;
                         if (rows.length > 0 && batchCallback) {
                             // activate the batch callback function
-                            batchCallback(null, rows);
+                            return batchCallback(null, rows, xcallback);
                         }
                     }
-                    return callback(xerror);
                 });
             }
 

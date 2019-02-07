@@ -9,6 +9,7 @@ const env = process.env.NODE_ENV || 'dev';
 
 // the common configurations
 const common = {
+    environment: env,
     platform: {
         google: {
             reCaptcha: {
@@ -37,9 +38,6 @@ const common = {
             user: process.env.PREPROC_TTP_USER,
             token: process.env.PREPROC_TTP_TOKEN,
         }
-    },
-    kafka: {
-        topics: ['video.topic', 'text.topic']
     }
 };
 

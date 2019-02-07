@@ -21,11 +21,11 @@ module.exports = function (slug, path='./') {
             };
 
             // get language of the dfxp
-            const match = filename.match(/(\w{2}).tx.|(\w{2}).tl./);
+            const match = filename.match(/(\w{2})\.tx\.|(\w{2})\.tl\./);
             const lang = match[1] || match[2];
 
             // initialize process for running the python script
-            PythonShell.run('dfxp2srt.py', options, (error, results) => {
+            PythonShell.run('./python/dfxp2srt.py', options, (error, results) => {
                 if (error) { return reject(error); }
                 let dfxp = fileManager.getFileContent(filename);
                 let plain = results ? results.toString() : '';
