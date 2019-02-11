@@ -12,10 +12,10 @@
 const async = require('async');
 
 // configuration data
-const config = require('../config/config');
+const config = require('@config/config');
 
 // postgresql connection to the database
-const pg = require('../lib/postgresQL')(config.pg);
+const pg = require('@lib/postgresQL')(config.pg);
 
 
 /////////////////////////////////////////////////
@@ -1100,10 +1100,7 @@ function startDBCreate(callback) {
             console.log(`Error when creating database= ${error.message}`);
             return process.exit(1);
         })
-        .then(() => {
-            // close the postgresql connection
-            pg.close();
-        });
+        .then(() => { pg.close(); });
 } // startDBCreate(callback)
 
 
@@ -1112,3 +1109,5 @@ function startDBCreate(callback) {
 /////////////////////////////////////////////////
 
 exports.startDBCreate = startDBCreate;
+
+// startDBCreate();
