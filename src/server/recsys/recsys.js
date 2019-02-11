@@ -3,7 +3,7 @@
  */
 
 // configurations
-const config = require('../../config/config');
+const config = require('@config/config');
 
 // external modules
 const express = require('express');
@@ -11,8 +11,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 // internal modules
-const pg = require('../../lib/postgresQL')(config.pg);
-const Logger = require('../../lib/logging-handler')();
+const pg = require('@lib/postgresQL')(config.pg);
+const Logger = require('@lib/logging-handler')();
 const dbUpdate = require('../../load/create-postgres-tables');
 
 // get process environment

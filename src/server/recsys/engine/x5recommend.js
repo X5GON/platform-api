@@ -9,7 +9,7 @@ const qm = require('qminer');
 
 // internal modules
 const NearestNeighbor = require('./models/nearest-neighbors');
-const Logger = require('../../../lib/logging-handler')();
+const Logger = require('@lib/logging-handler')();
 
 /**
  * @class x5recommend

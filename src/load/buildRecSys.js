@@ -7,17 +7,17 @@
  */
 
 // configurations
-const config = require('../config/config');
+const config = require('@config/config');
 
 // external modules
 const qm = require('qminer');
 
 // internal modules
-const Logger = require('../lib/logging-handler')();
+const Logger = require('@lib/logging-handler')();
 // create a logger instance for logging recommendation requests
 const logger = Logger.createGroupInstance('recommendation-model-build', 'x5recommend');
 // initialize connection with postgresql
-const pg = require('../lib/postgresQL')(config.pg);
+const pg = require('@lib/postgresQL')(config.pg);
 
 /********************************************
  * Run Script
@@ -30,7 +30,7 @@ let x5recommend = new (require('../server/recsys/engine/x5recommend'))({
 });
 
 
-pg.selectLarge({ }, 'oer_materials', 10, (error, results) => {
+pg.selectLarge({ }, 'oer_materials', 10, (error, results, cb) => {
     // handle error and close the postgres connection
     if (error) {
         logger.error('error when retrieving from postgres', { error: error.message });
@@ -88,7 +88,7 @@ pg.selectLarge({ }, 'oer_materials', 10, (error, results) => {
         // push to the recommendation model
         x5recommend.pushRecordContent(record);
         logger.info(`pushed record with id=${material.id}`, { url });
-
+        cb();
     }
 }, (error) => {    // write the material jsons
     if (error) {
