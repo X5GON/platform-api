@@ -21,7 +21,7 @@ class PostgresqlMaterialComplete {
         this._prefix = `[PostgresqlMaterialComplete ${this._name}]`;
 
         // create the postgres connection
-        this._pg = require('../../../../lib/postgresQL')(config.pg);
+        this._pg = require('@lib/postgresQL')(config.pg);
 
         callback();
     }
@@ -39,7 +39,6 @@ class PostgresqlMaterialComplete {
 
     receive(message, stream_id, callback) {
         let self = this;
-        console.log('complete material collected');
 
         // get sent values
         const {
@@ -125,7 +124,7 @@ class PostgresqlMaterialComplete {
             ///////////////////////////////////////////
 
             async.series(tasks, function (e, res) {
-                if (e) { console.log(e); return callback(e); }
+                if (e) { return callback(e); }
                 return callback();
             });
 

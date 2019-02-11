@@ -5,7 +5,7 @@
  */
 
 // internal modules
-const KafkaProducer = require('../../../../lib/kafka-producer');
+const KafkaProducer = require('@lib/kafka-producer');
 
 /**
  * @class KafkaSender
@@ -56,7 +56,6 @@ class KafkaMaterialPartial {
             oer_materials_partial: material
         };
 
-        console.log('Sending partial material', material.materialurl);
         // send the message to the database topics
         this._producer.send(this._kafka_topic, message);
         return callback();

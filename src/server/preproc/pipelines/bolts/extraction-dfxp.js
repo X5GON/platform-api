@@ -4,7 +4,7 @@
  */
 
 // internal libraries
-const dfxp2srt = require('../../../../lib/dfxp2srt-wrapper');
+const dfxp2srt = require('@lib/dfxp2srt-wrapper');
 
 class ExtractionDFXP {
 

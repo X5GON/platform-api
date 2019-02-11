@@ -4,8 +4,6 @@
  * stores it into postgresQL database.
  */
 
-const async = require('async');
-
 class PostgresqlStorage {
 
     constructor() {
@@ -21,7 +19,7 @@ class PostgresqlStorage {
         this._prefix = `[PostgresqlStorage ${this._name}]`;
 
         // create the postgres connection
-        this._pg = require('../../../../lib/postgresQL')(config.pg);
+        this._pg = require('@lib/postgresQL')(config.pg);
 
         // the postgres table in which we wish to insert
         this._postgresTable = config.postgres_table;

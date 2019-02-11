@@ -20,7 +20,7 @@ class PostgresqlMaterialPartial {
         this._prefix = `[PostgresqlMaterialPartial ${this._name}]`;
 
         // create the postgres connection
-        this._pg = require('../../../../lib/postgresQL')(config.pg);
+        this._pg = require('@lib/postgresQL')(config.pg);
 
         callback();
     }
@@ -38,7 +38,6 @@ class PostgresqlMaterialPartial {
 
     receive(message, stream_id, callback) {
         let self = this;
-        console.log('partial material collected');
 
         // get sent values
         const {
@@ -46,8 +45,8 @@ class PostgresqlMaterialPartial {
         } = message;
 
 
-        self._pg.insert(oer_materials_partial, 'oer_materials_partial', (error, result) => {
-            if (error) { console.log(e); return callback(error); }
+        self._pg.upsert(oer_materials_partial, { materialurl: null }, 'oer_materials_partial', (error, result) => {
+            if (error) { return callback(error); }
             return callback();
         }); // self._pg.insert(oer_materials_partial)
 
