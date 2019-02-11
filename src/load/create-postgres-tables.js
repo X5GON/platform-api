@@ -1,11 +1,11 @@
-// configurations
-const config = require('../config/config');
-
 // external modules
 const async = require('async');
 
+// configurations
+const config = require('@config/config');
+
 // prepare postgresql connection to the database
-const pg = require('../lib/postgresQL')(config.pg);
+const pg = require('@lib/postgresQL')(config.pg);
 
 // check if config.schema is defined
 const schema = config.pg.schema;
