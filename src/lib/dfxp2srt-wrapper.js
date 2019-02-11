@@ -13,7 +13,7 @@ module.exports = function (slug, path='./') {
     let promises = [];
     const dfxpPath = `${path}/${slug[0]}/${slug}`;
     // execute on all files that contain .tx. in the name
-    fileManager.executeOnFiles(dfxpPath, /.tx.|.tl./g, (filename) => {
+    fileManager.executeOnFiles(dfxpPath, /\.dfxp/g, (filename) => {
         let promise = new Promise((resolve, reject) => {
             const options = {
                 scriptPath: __dirname,

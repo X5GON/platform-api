@@ -63,7 +63,7 @@ module.exports = {
                 "source": "material-type",
             }],
             "init": {
-                "dfxp_folder": "../../../../data/videolectures/data"
+                "dfxp_folder": "../../../../data/"
             }
         },
         {
