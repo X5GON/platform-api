@@ -29,13 +29,13 @@ class OERCollector {
 
         // initialize different retrievers
         this._apis = [];
-        // go through retriever configurations
-        for (let repository of config.preproc.retrievers) {
-            repository.config.frequency = this.defaultFrequency;
-            repository.config.callback = this._sendMaterials();
-            repository.config.pg = pg;
-            this.addAPI(repository);
-        }
+        // // go through retriever configurations
+        // for (let repository of config.preproc.retrievers) {
+        //     repository.config.frequency = this.defaultFrequency;
+        //     repository.config.callback = this._sendMaterials();
+        //     repository.config.pg = pg;
+        //     this.addAPI(repository);
+        // }
     }
 
     /**
@@ -124,7 +124,6 @@ class OERCollector {
         // get message sent to retrieval.topics
         const log = this._consumer.next();
         if (!log) { return null; }
-
         // check if material is in the database
         pg.select({ url: log.url }, 'urls', (error, results) => {
             if (error) {
@@ -202,7 +201,7 @@ function shutdown(error) {
     // shutting down the process
     collectors._consumer.stop(() => {
         console.log('Stopped retrieving requests');
-        process.exit(0);
+        return process.exit(0);
     });
 }
 
