@@ -4,16 +4,16 @@
  *
  */
 
-let server = require('../recsys');
+let server = require('../recsys.js');
 let agent = require('supertest').agent(server);
 
 describe('server-tests.js: Recommender engine server unit tests.', function () {
     this.slow(300);
-
+    
     after(function (done) {
         server.close(done);
     });
-
+ 
     it('GET should return bad request (status 400), when the request is empty', function (done) {
         agent
             .get('/api/v1/recommend/content')

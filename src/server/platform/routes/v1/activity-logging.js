@@ -14,6 +14,7 @@ const cors = require('cors');
 const validator = require('../../../../lib/schema-validator')({
     userActivitySchema: require('../../schemas/user-activity-schema')
 });
+const updateHelper = require('../../../../lib/update-user-models');
 
 // TODO: initialize kafka producer
 // const producer = new KafkaProducer(config.kafka.host, config.kafka.topics);
@@ -309,6 +310,10 @@ module.exports = function (pg, logger) {
                 logger.info('client activity logging successful',
                     logger.formatRequest(req)
                 );
+                // update user model
+                if (activity.uuid != 'unknown:not-tracking'){
+                    updateHelper.updateUserModel(activity);   
+                }
             }
             // send beacon image to user
             return res.sendFile(beaconPath, options);

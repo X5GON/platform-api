@@ -11,9 +11,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 // internal modules
-const pg = require('@lib/postgresQL')(config.pg);
-const Logger = require('@lib/logging-handler')();
-const dbUpdate = require('../../load/create-postgres-tables');
+const pg = require('../../lib/postgresQL')(config.pg);
+const Logger = require('../../lib/logging-handler')();
 
 // get process environment
 const env = process.env.NODE_ENV;
@@ -36,17 +35,8 @@ app.use('/api/v1/', require('./routes/recommendations')(pg, logger));
 // parameters used on the express app
 const PORT = config.recsys.port;
 
-// start the server
-const server = function(callback) {
-    logger.info("Starting DB update.");
-    dbUpdate.startDBCreate(function () {
-        logger.info("Starting the server");
-        app.listen(PORT, () => logger.info(`recsys listening on port ${PORT}`));
-        if (callback) {
-            callback();
-        }
-    });
-};
+// start the server without https
+const server = app.listen(PORT, () => logger.info(`recsys listening on port ${PORT}`));
 
 // export the server for testing
-module.exports = server();
+module.exports = server;

@@ -92,17 +92,8 @@ io.on('connection', function(socket) {
 // parameters used on the express app
 const PORT = config.platform.port;
 
-// start the server
-const server = function(callback) {
-    logger.info('Starting DB update');
-    // execute database creation and update
-    dbUpdate.startDBCreate(function () {
-        logger.info('Starting the server');
-        // start the server
-        http.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));
-        if (callback) { callback(); }
-    });
-};
+// start the server without https
+const server = http.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));
 
 // export the server for testing
-module.exports = server();
+module.exports = server;

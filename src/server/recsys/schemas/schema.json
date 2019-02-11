@@ -21,6 +21,19 @@
         { "name": "wasVisited", "type": "index", "store": "Activity", "inverse": "content" }
     ]
 }, {
+    "name": "MaterialModel",
+    "fields": [
+        { "name": "url", "type": "string", "primary": true},
+        { "name": "title", "type": "string" },
+        { "name": "description", "type": "string", "null": true },
+        { "name": "provider", "type": "string", "shortstring": true },
+        { "name": "mimetype", "type": "string", "null": true },
+        { "name": "language", "type": "string", "shortstring": true },
+        { "name": "wikipediaConceptNames", "type": "string_v", "null": true},
+        { "name": "wikipediaConceptSupport", "type": "float_v", "null": true}
+    ],
+    "joins": []
+}, {
     "name": "Users",
     "fields": [
         { "name": "token", "type": "string", "shortstring": true, "primary": true }

@@ -29,78 +29,132 @@ let x5recommend = new (require('../server/recsys/engine/x5recommend'))({
     path: '../../data/recsys'
 });
 
+function build(callback){
+    pg.selectLarge({ }, 'oer_materials_update', 10, (error, results) => {
+        // handle error and close the postgres connection
+        if (error) {
+            logger.error('error when retrieving from postgres', { error: error.message });
+            return;
+        }
+        for (let material of results) {
+            logger.info(`next record being processed id=${material.id}`);
+            // extract values from postgres record
+            let {
+                title,
+                description,
+                materialurl: url,
+                author: authors,
+                language,
+                type: { ext: extension, mime: mimetype },
+                providermetadata: { title: provider },
+                materialmetadata: { rawText: rawContent, wikipediaConcepts }
+            } = material;
 
-pg.selectLarge({ }, 'oer_materials', 10, (error, results, cb) => {
-    // handle error and close the postgres connection
-    if (error) {
-        logger.error('error when retrieving from postgres', { error: error.message });
-        return;
-    }
-    for (let material of results) {
-        logger.info(`next record being processed id=${material.id}`);
-        // extract values from postgres record
-        let {
-            title,
-            description,
-            materialurl: url,
-            author: authors,
-            language,
-            type: { ext: extension, mime: mimetype },
-            providermetadata: { title: provider },
-            materialmetadata: { rawText: rawContent, wikipediaConcepts }
-        } = material;
+
+            if (authors) { authors = authors.substring(1, authors.length -1).split(','); }
+
+            let wikipediaConceptNames    = [];
+            let wikipediaConceptPageRank = [];
+            let wikipediaConceptCosine   = [];
+
+            // prepare wikipedia concepts if they exist
+            if (wikipediaConcepts) {
+                wikipediaConcepts.forEach(concept => {
+                    // set the wikipedia concepts for the record
+                    let uri = concept.secUri ? concept.secUri : concept.uri;
+                    wikipediaConceptNames.push(uri);
+                    wikipediaConceptPageRank.push(concept.pageRank);
+                    wikipediaConceptCosine.push(concept.cosine);
+                });
+            }
 
 
-        if (authors) { authors = authors.substring(1, authors.length -1).split(','); }
+            // create new record and
+            let record = {
+                url,
+                title,
+                description,
+                rawContent,
+                provider,
+                authors,
+                extension,
+                mimetype,
+                language,
+                wikipediaConceptNames,
+                wikipediaConceptPageRank,
+                wikipediaConceptCosine
+            };
 
-        let wikipediaConceptNames    = [];
-        let wikipediaConceptPageRank = [];
-        let wikipediaConceptCosine   = [];
+            // push to the recommendation model
+            x5recommend.pushRecordContent(record);
+            logger.info(`pushed record with id=${material.id}`, { url });
 
-        // prepare wikipedia concepts if they exist
-        if (wikipediaConcepts) {
-            wikipediaConcepts.forEach(concept => {
-                // set the wikipedia concepts for the record
-                let uri = concept.secUri ? concept.secUri : concept.uri;
-                wikipediaConceptNames.push(uri);
-                wikipediaConceptPageRank.push(concept.pageRank);
-                wikipediaConceptCosine.push(concept.cosine);
+        }
+    }, (error) => {    // write the material jsons
+        if (error) {
+            logger.error('error when processing data from postgres', { error: error.message });
+            logger.info('closing models and connections');
+            x5recommend.close();
+            // close the connection with postgres
+            logger.info('closed');
+        } else {
+            logger.info('Processing material models.');
+            pg.selectLarge({}, 'rec_sys_material_model', 10, (error, results) => {
+                if (error) {
+                    logger.error('error when retrieving from postgres', { error: error.message });
+                    return;
+                }
+                for (let material of results){
+                    logger.info(`next record being processed id=${material.id}`);
+                    let wikipediaConceptNames = [];
+                    let wikipediaConceptSupport = [];
+
+                    // prepare wikipedia concepts if they exist
+                    if (material.concepts) {
+                        for (let concept in material.concepts){
+                            wikipediaConceptNames.push(concept);
+                            wikipediaConceptSupport.push(material.concepts[concept]);
+                        }
+                    }
+                    let url = material.provideruri;
+                    let title = material.title;// ? material.title : null;
+                    let description = material.description;// ? material.description : null;
+                    let provider = material.provider;// ? material.provider : null;
+                    let mimetype = material.type;// ? material.type : null;
+                    console.log(mimetype);
+                    let language = material.language;// ? material.language : null;
+                    let record = {
+                        url,
+                        title,
+                        description,
+                        provider,
+                        mimetype,
+                        language,
+                        wikipediaConceptNames,
+                        wikipediaConceptSupport
+                    };
+
+                    // push to the recommendation model
+                    console.log(record);
+                    x5recommend.pushRecordMaterialModel(record);
+                    logger.info(`pushed record with id=${material.id}`, { url });
+                }
+            }, (error) => {
+                if (error) {
+                    logger.error('error when processing data from postgres', { error: error.message });
+                } else {
+                    // build the models
+                    logger.info('building recommendation models');
+                    x5recommend.createModels();
+                    logger.info('recommendation models built successfully');
+                }
+                logger.info('closing models and connections');
+                x5recommend.close();
+                // close the connection with postgres
+                logger.info('closed');
             });
         }
+    });
+}
 
-
-        // create new record and
-        let record = {
-            url,
-            title,
-            description,
-            rawContent,
-            provider,
-            authors,
-            extension,
-            mimetype,
-            language,
-            wikipediaConceptNames,
-            wikipediaConceptPageRank,
-            wikipediaConceptCosine
-        };
-
-        // push to the recommendation model
-        x5recommend.pushRecordContent(record);
-        logger.info(`pushed record with id=${material.id}`, { url });
-        cb();
-    }
-}, (error) => {    // write the material jsons
-    if (error) {
-        logger.error('error when processing data from postgres', { error: error.message });
-    } else {
-        // build the models
-        logger.info('building recommendation models');
-        x5recommend.createModels();
-        logger.info('recommendation models built successfully');
-    }
-    logger.info('closing models and connections');
-    x5recommend.close();
-    // close the connection with postgres
-    logger.info('closed');
-});
+exports.build = build;
