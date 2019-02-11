@@ -27,51 +27,5 @@
         "exec_mode": "cluster",
         "autorestart": true,
         "max_restarts": 10
-    }, {
-        "name": "X5GON_collectors",
-        "script": "collector.js",
-        "cwd": "./src/server/preproc/",
-        "env": {
-            "NODE_ENV": "dev"
-        },
-        "env_production": {
-            "NODE_ENV": "prod"
-        },
-        "instances": "1",
-        "exec_mode": "cluster",
-        "autorestart": true,
-        "max_restarts": 20
-    }, {
-        "name": "X5GON_preproc_pipeline_text",
-        "script": "pipeline.js",
-        "cwd": "./src/server/preproc/pipelines/",
-        "env": {
-            "NODE_ENV": "dev",
-            "TOPOLOGY": "text"
-        },
-        "env_production": {
-            "NODE_ENV": "prod",
-            "TOPOLOGY": "text"
-        },
-        "instances": "1",
-        "exec_mode": "cluster",
-        "autorestart": true,
-        "max_restarts": 20
-    }, {
-        "name": "X5GON_preproc_pipeline_video",
-        "script": "pipeline.js",
-        "cwd": "./src/server/preproc/pipelines/",
-        "env": {
-            "NODE_ENV": "dev",
-            "TOPOLOGY": "video-automatic"
-        },
-        "env_production": {
-            "NODE_ENV": "prod",
-            "TOPOLOGY": "video-automatic"
-        },
-        "instances": "1",
-        "exec_mode": "cluster",
-        "autorestart": true,
-        "max_restarts": 20
     }]
 }
