@@ -134,6 +134,38 @@ const dbCreates = {
 
         CREATE INDEX oer_queue_inserted_idx
             ON ${schema}.oer_queue(inserted);`,
+            
+    rec_sys_material_model:
+        `CREATE TABLE ${schema}.rec_sys_material_model
+            (id serial PRIMARY KEY,
+             providerUri varchar UNIQUE NOT NULL,
+             title varchar,
+             provider varchar,
+             description varchar,
+             language varchar,
+             type varchar,             
+             concepts jsonb);
+         
+        ALTER TABLE ${schema}.rec_sys_material_model OWNER
+            TO ${config.pg.user};
+            
+        CREATE INDEX rec_sys_material_model_providerUri_idx
+            ON ${schema}.rec_sys_material_model(providerUri);`,
+    
+    rec_sys_user_model:
+        `CREATE TABLE ${schema}.rec_sys_user_model
+            (id serial PRIMARY KEY,
+             uuid varchar UNIQUE NOT NULL,
+             visited jsonb,
+             language jsonb,
+             type jsonb,
+             concepts jsonb);
+         
+        ALTER TABLE ${schema}.oer_materials OWNER
+            TO ${config.pg.user};
+            
+        CREATE INDEX rec_sys_user_model_uuid_idx
+            ON ${schema}.rec_sys_user_model(uuid);`,
 
     version:
         `CREATE TABLE ${schema}.version (ver integer PRIMARY KEY);`
@@ -189,7 +221,6 @@ function prepareTables(mainCallback) {
             console.log('Error checking tables:' + err);
             return process.exit(1);
         }
-
         // delete already existing tables from dbCreates object
         for (let i = 0; i < res.length; i++) {
             let tableName = res[i].table_name;
@@ -198,7 +229,6 @@ function prepareTables(mainCallback) {
 
         // create a list of all non-existing tables to loop through with async
         let tableCreates = Object.keys(dbCreates);
-
         async.eachSeries(tableCreates,
             // 2nd param is the function that each item is passed to
             function (tableCreateKey, callback) {
@@ -348,5 +378,3 @@ function startDBCreate(callback) {
     });
 }//startDbCreate
 exports.startDBCreate = startDBCreate;
-
-//startDBCreate();
