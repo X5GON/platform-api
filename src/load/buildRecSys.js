@@ -7,17 +7,17 @@
  */
 
 // configurations
-const config = require('../config/config');
+const config = require('@config/config');
 
 // external modules
 const qm = require('qminer');
 
 // internal modules
-const Logger = require('../lib/logging-handler')();
+const Logger = require('@lib/logging-handler')();
 // create a logger instance for logging recommendation requests
 const logger = Logger.createGroupInstance('recommendation-model-build', 'x5recommend');
 // initialize connection with postgresql
-const pg = require('../lib/postgresQL')(config.pg);
+const pg = require('@lib/postgresQL')(config.pg);
 
 /********************************************
  * Run Script
@@ -29,8 +29,8 @@ let x5recommend = new (require('../server/recsys/engine/x5recommend'))({
     path: '../../data/recsys'
 });
 
-function build(callback){
-    pg.selectLarge({ }, 'oer_materials_update', 10, (error, results) => {
+function build(callback) {
+    pg.selectLarge({ }, 'oer_materials_update', 10, (error, results, cb) => {
         // handle error and close the postgres connection
         if (error) {
             logger.error('error when retrieving from postgres', { error: error.message });
@@ -90,6 +90,7 @@ function build(callback){
             logger.info(`pushed record with id=${material.id}`, { url });
 
         }
+        cb();
     }, (error) => {    // write the material jsons
         if (error) {
             logger.error('error when processing data from postgres', { error: error.message });
@@ -99,7 +100,7 @@ function build(callback){
             logger.info('closed');
         } else {
             logger.info('Processing material models.');
-            pg.selectLarge({}, 'rec_sys_material_model', 10, (error, results) => {
+            pg.selectLarge({}, 'rec_sys_material_model', 10, (error, results, cb) => {
                 if (error) {
                     logger.error('error when retrieving from postgres', { error: error.message });
                     return;
@@ -133,12 +134,13 @@ function build(callback){
                         wikipediaConceptNames,
                         wikipediaConceptSupport
                     };
-                    
+
                     // push to the recommendation model
                     console.log(record);
                     x5recommend.pushRecordMaterialModel(record);
                     logger.info(`pushed record with id=${material.id}`, { url });
                 }
+                cb();
             }, (error) => {
                 if (error) {
                     logger.error('error when processing data from postgres', { error: error.message });
@@ -153,7 +155,7 @@ function build(callback){
                 // close the connection with postgres
                 logger.info('closed');
             });
-        }  
+        }
     });
 }
 
