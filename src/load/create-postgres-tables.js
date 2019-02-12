@@ -134,7 +134,7 @@ const dbCreates = {
 
         CREATE INDEX oer_queue_inserted_idx
             ON ${schema}.oer_queue(inserted);`,
-            
+
     rec_sys_material_model:
         `CREATE TABLE ${schema}.rec_sys_material_model
             (id serial PRIMARY KEY,
@@ -143,15 +143,15 @@ const dbCreates = {
              provider varchar,
              description varchar,
              language varchar,
-             type varchar,             
+             type varchar,
              concepts jsonb);
-         
+
         ALTER TABLE ${schema}.rec_sys_material_model OWNER
             TO ${config.pg.user};
-            
+
         CREATE INDEX rec_sys_material_model_providerUri_idx
             ON ${schema}.rec_sys_material_model(providerUri);`,
-    
+
     rec_sys_user_model:
         `CREATE TABLE ${schema}.rec_sys_user_model
             (id serial PRIMARY KEY,
@@ -160,10 +160,10 @@ const dbCreates = {
              language jsonb,
              type jsonb,
              concepts jsonb);
-         
+
         ALTER TABLE ${schema}.oer_materials OWNER
             TO ${config.pg.user};
-            
+
         CREATE INDEX rec_sys_user_model_uuid_idx
             ON ${schema}.rec_sys_user_model(uuid);`,
 
@@ -174,15 +174,7 @@ const dbCreates = {
 /* DB updates
  * Template: {version: <int>, update: `string (SQL query)`}
  */
-const dbUpdates = [{
-    version: 1,
-    update: `ALTER TABLE ${schema}.oer_materials
-                ADD COLUMN license varchar;
-
-            ALTER TABLE ${schema}.oer_materials
-                ADD CONSTRAINT oer_materials_materialurl_unique
-                UNIQUE (materialUrl);`
-}];
+const dbUpdates = [];
 
 // latest pg version
 const latestVersion = dbUpdates.length;
@@ -356,8 +348,6 @@ function updateTables (callback) {
         );//async
     });
 };//updateTables
-
-
 
 
 /**

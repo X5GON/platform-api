@@ -29,8 +29,8 @@ let x5recommend = new (require('../server/recsys/engine/x5recommend'))({
     path: '../../data/recsys'
 });
 
-function build(callback){
-    pg.selectLarge({ }, 'oer_materials_update', 10, (error, results) => {
+function build(callback) {
+    pg.selectLarge({ }, 'oer_materials_update', 10, (error, results, cb) => {
         // handle error and close the postgres connection
         if (error) {
             logger.error('error when retrieving from postgres', { error: error.message });
@@ -90,6 +90,7 @@ function build(callback){
             logger.info(`pushed record with id=${material.id}`, { url });
 
         }
+        cb();
     }, (error) => {    // write the material jsons
         if (error) {
             logger.error('error when processing data from postgres', { error: error.message });
@@ -99,7 +100,7 @@ function build(callback){
             logger.info('closed');
         } else {
             logger.info('Processing material models.');
-            pg.selectLarge({}, 'rec_sys_material_model', 10, (error, results) => {
+            pg.selectLarge({}, 'rec_sys_material_model', 10, (error, results, cb) => {
                 if (error) {
                     logger.error('error when retrieving from postgres', { error: error.message });
                     return;
@@ -139,6 +140,7 @@ function build(callback){
                     x5recommend.pushRecordMaterialModel(record);
                     logger.info(`pushed record with id=${material.id}`, { url });
                 }
+                cb();
             }, (error) => {
                 if (error) {
                     logger.error('error when processing data from postgres', { error: error.message });
