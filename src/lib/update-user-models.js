@@ -52,63 +52,65 @@ function updateUserModel(activity, callback){
                     callback();
                 }
             }
-            else material = material[0];
-            if (user.length == 0){
-                user = {
-                    uuid: activity.uuid,
-                    language: {},
-                    visited: {
-                        count: 0
-                    },
-                    type: {},
-                    concepts: {}
-                };
-            }
-            else user = user[0];
-            //check if the user has visited the material before
-            if (material && user){
-                if (user.visited.hasOwnProperty(material.provideruri)){
-                    // user has already seen the material - nothing to do
-                    user.visited[material.provideruri] += 1;
-                    return callback();
+            else {
+                material = material[0];
+                if (user.length == 0){
+                    user = {
+                        uuid: activity.uuid,
+                        language: {},
+                        visited: {
+                            count: 0
+                        },
+                        type: {},
+                        concepts: {}
+                    };
                 }
-                //if user has not seen the material
-                let count = user.visited.count;
-                let concepts = JSON.parse(JSON.stringify(user.concepts)); // copy concepts object
-                concepts = multiplyObjects(concepts, count);
-                concepts = addObjects(concepts, material.concepts);
-                concepts = multiplyObjects(concepts, 1 / (count + 1));
-                user.concepts = concepts;
-                
-                user.visited[material.provideruri] = 1;
-                user.visited.count += 1;
-                
-                //handle type and language
-                for (let type in material.type){
-                    if (!user.type.hasOwnProperty(type)){
-                        user.type[type] = 0;
+                else user = user[0];
+                //check if the user has visited the material before
+                if (material && user){
+                    if (user.visited.hasOwnProperty(material.provideruri)){
+                        // user has already seen the material - nothing to do
+                        user.visited[material.provideruri] += 1;
+                        return callback();
                     }
-                    user.type[type] += 1;
+                    //if user has not seen the material
+                    let count = user.visited.count;
+                    let concepts = JSON.parse(JSON.stringify(user.concepts)); // copy concepts object
+                    concepts = multiplyObjects(concepts, count);
+                    concepts = addObjects(concepts, material.concepts);
+                    concepts = multiplyObjects(concepts, 1 / (count + 1));
+                    user.concepts = concepts;
+                    
+                    user.visited[material.provideruri] = 1;
+                    user.visited.count += 1;
+                    
+                    //handle type and language
+                    for (let type in material.type){
+                        if (!user.type.hasOwnProperty(type)){
+                            user.type[type] = 0;
+                        }
+                        user.type[type] += 1;
+                    }
+                    
+                    for (let language in material.language){
+                        if (!user.language.hasOwnProperty(language)){
+                            user.language[language] = 0;
+                        }
+                        user.language[language] += 1;
+                    }
+                    
+                    let conditions = {uuid: activity.uuid};
+                    
+                    pg.upsert(user, conditions, `${schema}.rec_sys_user_model` , function(err){
+                        if (err){
+                            console.log('Error upserting user model: ', + err);
+                            return process.exit(1);
+                        }
+                        if (callback && typeof(callback) === 'function'){
+                            callback();
+                        }
+                    });
                 }
-                
-                for (let language in material.language){
-                    if (!user.language.hasOwnProperty(language)){
-                        user.language[language] = 0;
-                    }
-                    user.language[language] += 1;
-                }
-                
-                let conditions = {uuid: activity.uuid};
-                
-                pg.upsert(user, conditions, `${schema}.rec_sys_user_model` , function(err){
-                    if (err){
-                        console.log('Error upserting user model: ', + err);
-                        return process.exit(1);
-                    }
-                    if (callback && typeof(callback) === 'function'){
-                        callback();
-                    }
-                });
             }
         });
     });
