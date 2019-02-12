@@ -94,9 +94,24 @@ class NearestNeighbors {
 
         try {
             // transform the query json into a sparse vector
-            let queryRec = query.url ? 
-                store.recordByName(query.url) :
-                store.newRecord({ description: query.text });
+            let queryRec;
+            if (query.hasOwnProperty('uuid') && query.hasOwnProperty('wikipediaConceptNames') && 
+                query.hasOwnProperty('wikipediaConceptSupport')) {
+                queryRec = store.newRecord({
+                    uri: query.uuid,
+                    title: null,
+                    description: null,
+                    provider: null, 
+                    mimetype: null,
+                    language: null,
+                    wikipediaConceptNames: query.wikipediaConceptNames, 
+                    wikipediaConceptSupport: query.wikipediaConceptSupport
+                });
+            } else {
+                queryRec = query.url ? 
+                    store.recordByName(query.url) :
+                    store.newRecord({ description: query.text });
+            }
         
             if (!queryRec) { 
                 // there is no record in the record set containing the url
