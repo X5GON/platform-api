@@ -43,13 +43,13 @@ function updateUserModel(activity, callback){
                 console.log('Error fetching material model: ' + err);
                 console.log('Query: ' + query);
                 if (callback && typeof(callback) === 'function'){
-                    callback();
+                    return callback();
                 }
             }
             if (material.length == 0){
                 //material is not stored in db
                 if (callback && typeof(callback) === 'function'){
-                    callback();
+                    return callback();
                 }
             }
             else {
@@ -107,7 +107,7 @@ function updateUserModel(activity, callback){
                             return process.exit(1);
                         }
                         if (callback && typeof(callback) === 'function'){
-                            callback();
+                            return callback();
                         }
                     });
                 }
