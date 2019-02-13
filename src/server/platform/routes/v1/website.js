@@ -1,66 +1,62 @@
-// configurations
-const config = require('../../../../config/config');
-
 // external modules
 const router = require('express').Router();
 const request = require('request');
-
-
-/********************************************
- * Helper functions
- *******************************************/
-
-/**
- * @description Verify user with the given recaptcha response.
- * @param {String} gRecaptchaResponse - The google recaptcha response.
- * @returns {Promise} The promise of the verification.
- * @private
- */
-function _googleVerifyUser(gRecaptchaResponse) {
-    // create a request promise
-    return new Promise((resolve, reject) => {
-        // make a request for captcha validation
-        request.post({
-            url: config.platform.google.reCaptcha.verifyUrl,
-            form: {
-                secret: config.platform.google.reCaptcha.secret,
-                response: gRecaptchaResponse,
-            }
-        }, (error, httpResponse, body) => {
-                // handle error on request
-                if (error) { return reject(error); }
-                // otherwise return the request body
-                return resolve(JSON.parse(body));
-            }
-        );
-    });
-}
-
-/**
- * @description Generates a token for the seed string.
- * @param {String} seed - The seed string used to generate token.
- * @return {String} The token used to indentify the repository.
- */
-function _generateToken(seed) {
-    let token = 0;
-    if (seed.length === 0) return hash;
-    // convert the string into a hash
-    for (let i = 0; i < seed.length; i++) {
-        let char = seed.charCodeAt(i);
-        token = `${token}${char}`;
-        token = token & token; // convert to 32bit integer
-    }
-    // convert the deciman token to hex equivalent
-    return Math.abs(token).toString(36);
-}
-
 
 /**
  * @description Adds API routes for platform website requests.
  * @param {Object} pg - Postgres connection wrapper.
  * @param {Object} logger - The logger object.
  */
-module.exports = function (pg, logger) {
+module.exports = function (pg, logger, config) {
+
+    /********************************************
+     * Helper functions
+     *******************************************/
+
+    /**
+     * @description Generates a token for the seed string.
+     * @param {String} seed - The seed string used to generate token.
+     * @return {String} The token used to indentify the repository.
+     */
+    function _generateToken(seed) {
+        let token = 0;
+        if (seed.length === 0) return hash;
+        // convert the string into a hash
+        for (let i = 0; i < seed.length; i++) {
+            let char = seed.charCodeAt(i);
+            token = `${token}${char}`;
+            token = token & token; // convert to 32bit integer
+        }
+        // convert the deciman token to hex equivalent
+        return Math.abs(token).toString(36);
+    }
+
+
+    /**
+     * @description Verify user with the given recaptcha response.
+     * @param {String} gRecaptchaResponse - The google recaptcha response.
+     * @returns {Promise} The promise of the verification.
+     * @private
+     */
+    function _googleVerifyUser(gRecaptchaResponse) {
+        // create a request promise
+        return new Promise((resolve, reject) => {
+            // make a request for captcha validation
+            request.post({
+                url: config.platform.google.reCaptcha.verifyUrl,
+                form: {
+                    secret: config.platform.google.reCaptcha.secret,
+                    response: gRecaptchaResponse,
+                }
+            }, (error, httpResponse, body) => {
+                    // handle error on request
+                    if (error) { return reject(error); }
+                    // otherwise return the request body
+                    return resolve(JSON.parse(body));
+                }
+            );
+        });
+    }
 
 
     /********************************************
@@ -89,10 +85,10 @@ module.exports = function (pg, logger) {
             req.header('Referrer').split('?')[0] :
             '/application-form';
         // check if the repository already exists - return existing token
-        pg.select({ name, token }, 'repositories', (error, results) => {
+        pg.select({ name, token }, 'providers', (error, results) => {
             if (error) {
-                logger.warn('error when retrieving repository data from table=repositories', {
-                    table: 'repositories',
+                logger.warn('error when retrieving repository data from table=providers', {
+                    table: 'providers',
                     error
                 });
                 res.redirect(`${referrer}?invalid=true`);
@@ -128,7 +124,7 @@ module.exports = function (pg, logger) {
                 if (!validation.success) { return res.redirect('/application-form?invalid=true'); }
 
                 // check if the repository already exists - return existing token
-                pg.select({ name, domain, contact }, 'repositories', (error, results) => {
+                pg.select({ name, domain, contact }, 'providers', (error, results) => {
                     // log error
                     if (error) { console.log(error); }
 
@@ -141,7 +137,7 @@ module.exports = function (pg, logger) {
                         const token = _generateToken(seed);
 
                         // insert repository information to postgres
-                        pg.insert({ name, domain, contact, token }, 'repositories', (xerror, xresults) => {
+                        pg.insert({ name, domain, contact, token }, 'providers', (xerror, xresults) => {
                             // render the form submition
                             return res.redirect(`/oer-provider?name=${name}&providerId=${token}`);
                         });
@@ -309,8 +305,13 @@ module.exports = function (pg, logger) {
     });
 
 
+
+    /********************************************
+     * ERROR PAGE
+     */
+
     router.get('/error', (req, res) => {
-        return res.render('privacy-policy', { });
+        return res.render('error', { title: '404'  });
     });
 
 

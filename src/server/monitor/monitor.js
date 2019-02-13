@@ -6,17 +6,17 @@
  */
 
 // configurations
-const config = require('../../config/config');
+const config = require('@config/config');
 
 // external modules
-const express = require('express');
-const exphbs = require('express-handlebars');
-const bodyParser = require('body-parser');
+const express      = require('express');
+const exphbs       = require('express-handlebars');
+const bodyParser   = require('body-parser');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
+const session      = require('express-session');
 
 // internal modules for monitoring processes
-const PM2Monitor = require('../../lib/pm2-monitor');
+const PM2Monitor = require('@lib/pm2-monitor');
 let monitor = new PM2Monitor();
 
 // create express app

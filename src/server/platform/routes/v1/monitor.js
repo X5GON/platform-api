@@ -1,6 +1,3 @@
-// configurations
-const config = require('../../../../config/config');
-
 // external modules
 const router = require('express').Router();
 const url = require('url');
@@ -8,7 +5,7 @@ const url = require('url');
 /**
  * Adds API routes for platform website requests.
  */
-module.exports = function (monitor) {
+module.exports = function (monitor, config) {
 
     /**
      * @description Checks if the user is accessing the monitor as an admin.
@@ -96,10 +93,6 @@ module.exports = function (monitor) {
         }
 
         return res.render('error', { message, title: '404'  });
-    });
-
-    router.get('/*', (req, res) => {
-        return res.render('error', { title: '404'  });
     });
 
     return router;
