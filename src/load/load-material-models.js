@@ -1,12 +1,12 @@
 // configurations
-const config = require('../config/config');
+const config = require('@config/config');
 
 // external modules
 const async = require('async');
 
 // internal modules
-const pg = require('../lib/postgresQL')(config.pg);
-const updateHelper = require('../lib/update-user-models');
+const pg = require('@lib/postgresQL')(config.pg);
+const updateHelper = require('@lib/update-user-models');
 
 // check if config.schema is defined
 const schema = config.pg.schema;

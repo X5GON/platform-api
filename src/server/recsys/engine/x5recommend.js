@@ -3,7 +3,7 @@
  * Contains all of the recommendation models.
  */
 
-const config = require('../../../config/config');
+const config = require('@config/config');
 
 // external modules
 const path = require('path');
@@ -11,8 +11,8 @@ const qm = require('qminer');
 
 // internal modules
 const NearestNeighbor = require('./models/nearest-neighbors');
-const Logger = require('../../../lib/logging-handler')();
-const pg = require('../../../lib/postgresQL')(config.pg);
+const Logger = require('@lib/logging-handler')();
+const pg = require('@lib/postgresQL')(config.pg);
 
 /**
  * @class x5recommend

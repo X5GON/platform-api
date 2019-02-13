@@ -11,8 +11,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 // internal modules
-const pg = require('../../lib/postgresQL')(config.pg);
-const Logger = require('../../lib/logging-handler')();
+const pg = require('@lib/postgresQL')(config.pg);
+const Logger = require('@lib/logging-handler')();
 
 // get process environment
 const env = process.env.NODE_ENV;
