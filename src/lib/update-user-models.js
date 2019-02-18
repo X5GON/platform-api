@@ -3,7 +3,6 @@ const config = require('../config/config');
 
 // internal modules
 const pg = require('./postgresQL')(config.pg);
-const Logger = require('./logging-handler')();
 
 const schema = config.pg.schema;
 
@@ -36,7 +35,7 @@ function updateUserModel(activity, callback){
             }
         }
         let escapedUri = activity.url.replace('\'', '\'\'');
-        let query = `SELECT * FROM ${schema}.rec_sys_material_model WHERE provideruri LIKE 
+        let query = `SELECT * FROM ${schema}.rec_sys_material_model WHERE provider_uri LIKE
             '${escapedUri}'`;
         pg.execute(query, [], function(err, material){
             if (err){
@@ -68,9 +67,9 @@ function updateUserModel(activity, callback){
                 else user = user[0];
                 //check if the user has visited the material before
                 if (material && user){
-                    if (user.visited.hasOwnProperty(material.provideruri)){
+                    if (user.visited.hasOwnProperty(material.provider_uri)){
                         // user has already seen the material - nothing to do
-                        user.visited[material.provideruri] += 1;
+                        user.visited[material.provider_uri] += 1;
                         return callback();
                     }
                     //if user has not seen the material
@@ -80,10 +79,10 @@ function updateUserModel(activity, callback){
                     concepts = addObjects(concepts, material.concepts);
                     concepts = multiplyObjects(concepts, 1 / (count + 1));
                     user.concepts = concepts;
-                    
-                    user.visited[material.provideruri] = 1;
+
+                    user.visited[material.provider_uri] = 1;
                     user.visited.count += 1;
-                    
+
                     //handle type and language
                     for (let type in material.type){
                         if (!user.type.hasOwnProperty(type)){
@@ -91,16 +90,16 @@ function updateUserModel(activity, callback){
                         }
                         user.type[type] += 1;
                     }
-                    
+
                     for (let language in material.language){
                         if (!user.language.hasOwnProperty(language)){
                             user.language[language] = 0;
                         }
                         user.language[language] += 1;
                     }
-                    
+
                     let conditions = {uuid: activity.uuid};
-                    
+
                     pg.upsert(user, conditions, `${schema}.rec_sys_user_model` , function(err){
                         if (err){
                             console.log('Error upserting user model: ', + err);

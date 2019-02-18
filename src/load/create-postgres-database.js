@@ -85,7 +85,7 @@ const dbCreates = {
             authors         varchar (1000) ARRAY,
             language        char (2) NOT NULL,
             creation_date   timestamp with time zone,
-            retrieved_date  timestamp with time zone NOT NULL,
+            retrieved_date  timestamp with time zone DEFAULT (NOW() AT TIME ZONE 'utc') NOT NULL,
             type            varchar (10) NOT NULL,
             mimetype        varchar (100) NOT NULL,
             license         varchar
@@ -152,7 +152,7 @@ const dbCreates = {
             authors         varchar (1000) ARRAY,
             language        varchar,
             datecreated     timestamp with time zone,
-            dateretrieved   timestamp with time zone,
+            dateretrieved   timestamp with time zone DEFAULT (NOW() AT TIME ZONE 'utc') NOT NULL,
             type             jsonb,
             materialmetadata jsonb,
             license         varchar,
@@ -182,21 +182,19 @@ const dbCreates = {
 
     material_contents:
         `CREATE TABLE ${schema}.material_contents (
-            id              serial PRIMARY KEY,
             language        char (2) NOT NULL,
             type            varchar (40) NOT NULL,
             extension       varchar (20),
             value           jsonb NOT NULL,
 
-            material_id integer NOT NULL,
+            material_id     integer NOT NULL,
+
+            PRIMARY KEY (material_id, language, type, extension),
             FOREIGN KEY (material_id) REFERENCES ${schema}.oer_materials(id) ON UPDATE CASCADE ON DELETE CASCADE
         );
 
         ALTER TABLE ${schema}.material_contents
             OWNER TO ${config.pg.user};
-
-        CREATE INDEX material_contents_id
-            ON ${schema}.material_contents(id);
 
         CREATE INDEX material_contents_language
             ON ${schema}.material_contents(language);
@@ -207,16 +205,10 @@ const dbCreates = {
         CREATE INDEX material_contents_extension
             ON ${schema}.material_contents(extension);
 
-        CREATE INDEX material_contents_value
-            ON ${schema}.material_contents USING GIN(value);
-
 
 
         COMMENT ON TABLE ${schema}.material_contents
             IS 'The table containing open educational resources content';
-
-        COMMENT ON COLUMN ${schema}.material_contents.id
-            IS 'The content ID';
 
         COMMENT ON COLUMN ${schema}.material_contents.language
             IS 'The language in which the content is present';
@@ -228,7 +220,10 @@ const dbCreates = {
             IS 'The content extension';
 
         COMMENT ON COLUMN ${schema}.material_contents.value
-            IS 'The body of the content; The value is stored under the "value" attribute';`,
+            IS 'The body of the content; The value is stored under the "value" attribute';
+
+        COMMENT ON COLUMN ${schema}.material_contents.material_id
+            IS 'The id of the associated record in the oer_materials table';`,
 
 
     series:
@@ -251,7 +246,7 @@ const dbCreates = {
 
     episodes:
         `CREATE TABLE ${schema}.episodes (
-            episode_number  integer,
+            episode_number  integer NOT NULL,
 
             material_id     integer NOT NULL,
             series_id       integer NOT NULL,
@@ -273,10 +268,10 @@ const dbCreates = {
 
     providers:
         `CREATE TABLE ${schema}.providers (
-            id          serial PRIMARY KEY,
-            token       varchar (20) NOT NULL UNIQUE,
+            id          serial NOT NULL PRIMARY KEY,
+            token       varchar (20) UNIQUE NOT NULL,
             name        varchar NOT NULL,
-            domain      varchar NOT NULL UNIQUE,
+            domain      varchar UNIQUE NOT NULL,
             contact     varchar NOT NULL
         );
 
@@ -334,10 +329,11 @@ const dbCreates = {
     urls:
         `CREATE TABLE ${schema}.urls (
             id          serial PRIMARY KEY,
-            url         varchar NOT NULL UNIQUE,
+            url         varchar UNIQUE NOT NULL,
 
             provider_id    integer,
             material_id    integer,
+
             FOREIGN KEY (provider_id) REFERENCES ${schema}.providers(id)     ON UPDATE CASCADE ON DELETE CASCADE,
             FOREIGN KEY (material_id) REFERENCES ${schema}.oer_materials(id) ON UPDATE CASCADE ON DELETE CASCADE
         );
@@ -358,12 +354,16 @@ const dbCreates = {
 
         CREATE FUNCTION set_provider_reference()
         RETURNS TRIGGER AS $$
+        DECLARE
+            provider_id integer;
         BEGIN
-            IF NEW.provider_id IS NULL AND EXISTS (
-                SELECT id FROM providers WHERE LOWER(NEW.url) LIKE '%' || LOWER(providers.domain) || '%'
-            ) THEN
-                NEW.provider_id := (SELECT id FROM providers WHERE LOWER(NEW.url) LIKE '%' || LOWER(providers.domain) || '%');
+
+            SELECT id INTO provider_id FROM providers WHERE LOWER(NEW.url) LIKE '%' || LOWER(providers.domain) || '%';
+
+            IF NEW.provider_id IS NULL AND provider_id IS NOT NULL THEN
+                NEW.provider_id := provider_id;
             END IF;
+
             RETURN NEW;
         END;
         $$ LANGUAGE 'plpgsql';
@@ -385,10 +385,10 @@ const dbCreates = {
             IS 'The actual url address';
 
         COMMENT ON COLUMN ${schema}.urls.provider_id
-            IS 'The id to the provider the url is associated with';
+            IS 'The id to the associated record in the providers table';
 
         COMMENT ON COLUMN ${schema}.urls.material_id
-            IS 'The id to the material to which the url corresponds';`,
+            IS 'The id to the associated record in the oer_materials table';`,
 
 
     contains:
@@ -414,14 +414,17 @@ const dbCreates = {
 
         CREATE FUNCTION set_provider_contains_id()
         RETURNS TRIGGER AS $$
+        DECLARE
+            contains_provider_id integer;
+            container_provider_id integer;
         BEGIN
-            IF NOT EXISTS (
-                SELECT provider_id FROM urls WHERE id=NEW.contains_id AND provider_id IS NOT NULL
-            ) AND EXISTS (
-                SELECT provider_id FROM urls WHERE id=NEW.container_id AND provider_id IS NOT NULL
-            ) THEN
-                UPDATE urls SET provider_id=(SELECT provider_id FROM urls WHERE id=NEW.container_id) WHERE id=NEW.contains_id;
+            SELECT provider_id INTO contains_provider_id  FROM urls WHERE id=NEW.contains_id  AND provider_id IS NOT NULL;
+            SELECT provider_id INTO container_provider_id FROM urls WHERE id=NEW.container_id AND provider_id IS NOT NULL;
+
+            IF contains_provider_id IS NULL AND container_provider_id IS NOT NULL THEN
+                UPDATE urls SET provider_id=container_provider_id WHERE id=NEW.contains_id;
             END IF;
+
             RETURN NULL;
         END;
         $$ LANGUAGE 'plpgsql';
@@ -437,18 +440,18 @@ const dbCreates = {
             IS 'The table containing information the url structure';
 
         COMMENT ON COLUMN ${schema}.contains.container_id
-            IS 'The id of the url that serves as the the container';
+            IS 'The id of the associated record in the urls table that serves as the the container';
 
         COMMENT ON COLUMN ${schema}.contains.contains_id
-            IS 'The id of the url that is found inside the container';`,
+            IS 'The id of the associated record in the urls table that is found inside the container';`,
 
 
     cookies:
         `CREATE TABLE ${schema}.cookies (
             id          serial PRIMARY KEY,
-            uuid        varchar NOT NULL UNIQUE,
-            user_agent  varchar (500) NOT NULL,
-            language    varchar (100) NOT NULL
+            uuid        varchar UNIQUE NOT NULL,
+            user_agent  varchar NOT NULL,
+            language    varchar NOT NULL
         );
 
         ALTER TABLE ${schema}.cookies
@@ -459,9 +462,6 @@ const dbCreates = {
 
         CREATE INDEX cookie_uuid
             ON ${schema}.cookies(uuid);
-
-        CREATE INDEX cookie_user_agent
-            ON ${schema}.cookies(user_agent);
 
         CREATE INDEX cookie_language
             ON ${schema}.cookies(language);
@@ -492,6 +492,7 @@ const dbCreates = {
 
             cookie_id   integer NOT NULL,
             url_id      integer NOT NULL,
+
             FOREIGN KEY (cookie_id) REFERENCES ${schema}.cookies(id) ON UPDATE CASCADE ON DELETE CASCADE,
             FOREIGN KEY (url_id)    REFERENCES ${schema}.urls(id)    ON UPDATE CASCADE ON DELETE CASCADE
         );
@@ -523,10 +524,10 @@ const dbCreates = {
             IS 'The referrer url; from where the user came from';
 
         COMMENT ON COLUMN ${schema}.user_activities.cookie_id
-            IS 'The cookie associated with the user activity';
+            IS 'The id of the associated record in the cookies table';
 
         COMMENT ON COLUMN ${schema}.user_activities.url_id
-            IS 'The id to the url the user visited';`,
+            IS 'The id to the associated record in the urls table';`,
 
 
     features_public:
@@ -534,6 +535,7 @@ const dbCreates = {
             id          serial PRIMARY KEY,
             name        varchar (500) NOT NULL,
             value       jsonb NOT NULL,
+
             qa_required bool DEFAULT FALSE,
             la_required bool DEFAULT FALSE,
             re_required bool DEFAULT FALSE,
@@ -550,9 +552,6 @@ const dbCreates = {
 
         CREATE INDEX features_public_name
             ON ${schema}.features_public(name);
-
-        CREATE INDEX features_public_value
-            ON ${schema}.features_public USING GIN(value);
 
         CREATE INDEX features_public_qa_required
             ON ${schema}.features_public(qa_required);
@@ -593,7 +592,7 @@ const dbCreates = {
             IS 'The id of the record to which the feature is assocated with';
 
         COMMENT ON COLUMN ${schema}.features_public.table_name
-            IS 'The id of the material to which the feature is assocated with';`,
+            IS 'The name of the table in which the record associated to the feature is stored';`,
 
 
     features_private:
@@ -601,6 +600,7 @@ const dbCreates = {
             id          serial PRIMARY KEY,
             name        varchar (500) NOT NULL,
             value       jsonb NOT NULL,
+
             qa_required bool DEFAULT FALSE,
             la_required bool DEFAULT FALSE,
             re_required bool DEFAULT FALSE,
@@ -654,64 +654,177 @@ const dbCreates = {
             IS 'The indicator if the feature is used in the recommender engine';
 
         COMMENT ON COLUMN ${schema}.features_private.record_id
-            IS 'The id of the material to which the feature is assocated with';`,
+            IS 'The id of the record to which the feature is assocated with';
+
+        COMMENT ON COLUMN ${schema}.features_private.table_name
+            IS 'The name of the table in which the record associated to the feature is stored';`,
 
 
-    user_models:
-        `CREATE TABLE ${schema}.user_models (
-            id          serial PRIMARY KEY,
-            visited     jsonb,
-            languages   jsonb,
-            types       jsonb,
-            concepts    jsonb,
+    rec_sys_material_model:
+        `CREATE TABLE ${schema}.rec_sys_material_model (
+            id           serial PRIMARY KEY,
+            provider_uri varchar UNIQUE NOT NULL,
+            provider     varchar,
+            title        varchar,
+            description  varchar,
+            language     varchar,
+            type         varchar,
+            concepts     jsonb,
 
-            cookie_id   integer NOT NULL,
+            provider_id  integer,
+            url_id       integer,
+
+            FOREIGN KEY (provider_id) REFERENCES ${schema}.providers(id) ON DELETE CASCADE,
+            FOREIGN KEY (url_id)      REFERENCES ${schema}.urls(id)      ON DELETE CASCADE ON UPDATE CASCADE
+        );
+
+        ALTER TABLE ${schema}.rec_sys_material_model
+            OWNER TO ${config.pg.user};
+
+        CREATE INDEX rec_sys_material_model_provider_uri
+            ON ${schema}.rec_sys_material_model(provider_uri);
+
+        CREATE INDEX rec_sys_material_model_provider_id
+            ON ${schema}.rec_sys_material_model(provider_id);
+
+        CREATE INDEX rec_sys_material_model_url_id
+            ON ${schema}.rec_sys_material_model(url_id);
+
+
+
+        CREATE FUNCTION set_url_and_provider_id()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            url_id      integer;
+            provider_id integer;
+        BEGIN
+
+            SELECT id INTO url_id FROM urls WHERE LOWER(NEW.provider_uri)=LOWER(urls.url);
+
+            IF NEW.url_id IS NULL AND url_id IS NOT NULL THEN
+                NEW.url_id := url_id;
+            END IF;
+
+            SELECT urls.provider_id INTO provider_id FROM urls WHERE id=NEW.url_id;
+
+            IF NEW.provider_id IS NULL AND provider_id IS NOT NULL THEN
+                NEW.provider_id := provider_id;
+            END IF;
+
+            RETURN NEW;
+        END;
+        $$ LANGUAGE 'plpgsql';
+
+        CREATE TRIGGER update_rec_sys_material_model_keys
+            BEFORE INSERT OR UPDATE ON ${schema}.rec_sys_material_model
+            FOR EACH ROW
+            EXECUTE PROCEDURE set_url_and_provider_id();
+
+
+
+        COMMENT ON TABLE ${schema}.rec_sys_material_model
+            IS 'The table containing the material models';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_material_model.id
+            IS 'The id of the material model';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_material_model.provider_uri
+            IS 'The url associated with the material model';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_material_model.title
+            IS 'The title of the material model';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_material_model.description
+            IS 'The description of the material model';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_material_model.language
+            IS 'The language(s) of the material model';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_material_model.type
+            IS 'The type(s) of materials in the model';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_material_model.concepts
+            IS 'The wikipedia concepts describing the model';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_material_model.provider_id
+            IS 'The id of the assocaited record in providers table';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_material_model.url_id
+            IS 'The id of the associated record in the urls table';`,
+
+
+    rec_sys_user_model:
+        `CREATE TABLE ${schema}.rec_sys_user_model (
+            id       serial PRIMARY KEY,
+            uuid     varchar UNIQUE NOT NULL,
+            visited  jsonb,
+            language jsonb,
+            type     jsonb,
+            concepts jsonb,
+
+            cookie_id integer NOT NULL,
+
             FOREIGN KEY (cookie_id) REFERENCES ${schema}.cookies(id) ON UPDATE CASCADE ON DELETE CASCADE
         );
 
-        ALTER TABLE ${schema}.user_models
+        ALTER TABLE ${schema}.rec_sys_user_model
             OWNER TO ${config.pg.user};
 
-        CREATE INDEX user_models_id
-            ON ${schema}.user_models(id);
+        CREATE INDEX rec_sys_user_model_uuid
+            ON ${schema}.rec_sys_user_model(uuid);
 
-        CREATE INDEX user_models_visited
-            ON ${schema}.user_models USING GIN(visited);
-
-        CREATE INDEX user_models_languages
-            ON ${schema}.user_models USING GIN(languages);
-
-        CREATE INDEX user_models_types
-            ON ${schema}.user_models USING GIN(types);
-
-        CREATE INDEX user_models_concepts
-            ON ${schema}.user_models USING GIN(concepts);
-
-        CREATE INDEX user_models_cookie_id
-            ON ${schema}.user_models(cookie_id);
+        CREATE INDEX rec_sys_user_model_cookie_id
+            ON ${schema}.rec_sys_user_model(cookie_id);
 
 
 
-        COMMENT ON TABLE ${schema}.user_models
-            IS 'The user models table';
+        CREATE FUNCTION set_cookie_id()
+        RETURNS TRIGGER AS $$
+        DECLARE
+            cookie_id integer;
+        BEGIN
 
-        COMMENT ON COLUMN ${schema}.user_models.id
+            SELECT id INTO cookie_id FROM cookies WHERE LOWER(NEW.uuid)=LOWER(cookies.uuid);
+
+            IF NEW.cookie_id IS NULL AND cookie_id IS NOT NULL THEN
+                NEW.cookie_id := cookie_id;
+            END IF;
+
+            RETURN NEW;
+        END;
+        $$ LANGUAGE 'plpgsql';
+
+        CREATE TRIGGER update_rec_sys_user_model_keys
+            BEFORE INSERT OR UPDATE ON ${schema}.rec_sys_user_model
+            FOR EACH ROW
+            EXECUTE PROCEDURE set_cookie_id();
+
+
+
+        COMMENT ON TABLE ${schema}.rec_sys_user_model
+            IS 'The table containing the user models';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_model.id
             IS 'The id of the user model';
 
-        COMMENT ON COLUMN ${schema}.user_models.visited
-            IS 'The urls the user has visited';
+        COMMENT ON COLUMN ${schema}.rec_sys_user_model.uuid
+            IS 'The user token associated with the user model';
 
-        COMMENT ON COLUMN ${schema}.user_models.languages
-            IS 'The language configuration the users has used';
+        COMMENT ON COLUMN ${schema}.rec_sys_user_model.visited
+            IS 'The visit dates of the user model';
 
-        COMMENT ON COLUMN ${schema}.user_models.types
-            IS 'The types of material the user has viewed';
+        COMMENT ON COLUMN ${schema}.rec_sys_user_model.language
+            IS 'The languages of the viewed materials';
 
-        COMMENT ON COLUMN ${schema}.user_models.concepts
-            IS 'The concepts describing the user interests';
+        COMMENT ON COLUMN ${schema}.rec_sys_user_model.type
+            IS 'The types of the viewed materials';
 
-        COMMENT ON COLUMN ${schema}.user_models.cookie_id
-            IS 'The id of the associated user cookie';`,
+        COMMENT ON COLUMN ${schema}.rec_sys_user_model.concepts
+            IS 'The aggregated concepts of viewed materials. Viewed as user interests';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_model.cookie_id
+            IS 'The id of the associated record in the cookies table';`,
+
 
 
     tools:
@@ -765,6 +878,7 @@ const dbCreates = {
             results     jsonb,
 
             tool_id     integer NOT NULL,
+
             FOREIGN KEY (tool_id) REFERENCES ${schema}.tools(id) ON UPDATE CASCADE ON DELETE CASCADE
         );
 
@@ -807,7 +921,41 @@ const dbCreates = {
             IS 'The results of the experiment';
 
         COMMENT ON COLUMN ${schema}.experiments.tool_id
-            IS 'The id of the tool used in the experiment';`,
+            IS 'The id of the associated record in the tools table; used for the experiment';`,
+
+
+    experiment_results:
+        `CREATE TABLE ${schema}.experiment_results (
+            id          serial PRIMARY KEY,
+            results     jsonb NOT NULL,
+
+            experiment_id integer NOT NULL,
+
+            FOREIGN KEY (experiment_id) REFERENCES ${schema}.experiments(id) ON UPDATE CASCADE ON DELETE CASCADE
+        );
+
+        ALTER TABLE ${schema}.experiment_results
+            OWNER TO ${config.pg.user};
+
+        CREATE INDEX experiment_results_id
+            ON ${schema}.experiment_results(id);
+
+        CREATE INDEX experiment_results_experiment_id
+            ON ${schema}.experiment_results(experiment_id);
+
+
+
+        COMMENT ON TABLE ${schema}.experiment_results
+            IS 'The table containing the experiment results';
+
+        COMMENT ON COLUMN ${schema}.experiment_results.id
+            IS 'The id of the experiment results';
+
+        COMMENT ON COLUMN ${schema}.experiment_results.results
+            IS 'The results of the experiment';
+
+        COMMENT ON COLUMN ${schema}.experiment_results.experiment_id
+            IS 'The id of the associated record in the experiments table';`,
 
 
     database_version:
@@ -933,7 +1081,6 @@ function prepareTables() {
                 // 2nd param is the function that each item is passed to
                 function (tableName, callback) {
                     const sqlStatement = dbCreates[tableName];
-
                     // execute create query from dbCreates for a specific table
                     pg.execute(sqlStatement, [], function (xerror, result) {
                         if (xerror) { return callback(xerror); }
@@ -1097,8 +1244,7 @@ function startDBCreate(callback) {
             }
         })
         .catch(error => {
-            console.log(`Error when creating database= ${error.message}`);
-            return process.exit(1);
+            console.log('Error when creating database', error);
         })
         .then(() => { pg.close(); });
 } // startDBCreate(callback)
@@ -1109,5 +1255,3 @@ function startDBCreate(callback) {
 /////////////////////////////////////////////////
 
 exports.startDBCreate = startDBCreate;
-
-// startDBCreate();

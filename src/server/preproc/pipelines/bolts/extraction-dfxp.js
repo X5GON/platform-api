@@ -38,7 +38,14 @@ class ExtractionDFXP {
 
         // get the raw text associated with the videos
         try {
-            let slug = material.provideruri.split('/')[3];
+            let slug;
+            if (material.provideruri.includes('videolectures')) {
+                slug = material.provideruri.split('/')[3];
+            } else if (material.provideruri.includes('media.upv.es')) {
+                let sections = material.provideruri.split('/');
+                slug = sections[sections.length - 1];
+            }
+
             let promise = dfxp2srt(slug, this._dfxpFolder);
 
             // get the responses

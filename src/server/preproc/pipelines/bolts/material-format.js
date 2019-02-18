@@ -40,7 +40,6 @@ class MaterialFormat {
     receive(material, stream_id, callback) {
         // set placeholder
         let formatMaterial = { };
-
         // extract material fields and assign them to the formatted example
         for (let field of this._fields) {
             formatMaterial[field.name] = material[field.name] || field.default;

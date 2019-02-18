@@ -63,7 +63,7 @@ module.exports = {
                 "source": "material-type",
             }],
             "init": {
-                "dfxp_folder": "../../../../data/"
+                "dfxp_folder": "../../../../data/uos-polimedia/polimedia/"
             }
         },
         {

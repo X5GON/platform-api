@@ -6,9 +6,9 @@
  */
 
 //internal modules
-const dbUpdate = require('./create-postgres-tables');
+const dbUpdate = require('./create-postgres-database');
 const loadModels = require('./load-material-models');
-const buildRecSys = require('./buildRecSys');
+const buildRecSys = require('./recsys-model-build');
 
 dbUpdate.startDBCreate(function(err){
     if (err){
