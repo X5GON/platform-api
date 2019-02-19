@@ -1,24 +1,25 @@
 /********************************************************************
- * Build OER Material Recommender System
+ * Build OER material recommender System
  * This script loads the oer materials from PostgresQL and builds
  * the content based recommendation models using raw content and
  * wikipedia concepts, extracted from the raw content using wikifier
  * (http://wikifier.org).
  */
 
-// configurations
-const config = require('@config/config');
-
 
 // internal modules
 const Logger = require('@lib/logging-handler')();
 // create a logger instance for logging recommendation requests
 const logger = Logger.createGroupInstance('recommendation-model-build', 'x5recommend');
+
+// configurations
+const config = require('@config/config');
+
 // initialize connection with postgresql
 const pg = require('@lib/postgresQL')(config.pg);
-
 // check if config.schema is defined
 const schema = config.pg.schema;
+
 
 /********************************************
  * Run Script
@@ -30,9 +31,11 @@ let x5recommend = new (require('../server/recsys/engine/x5recommend'))({
     path: '../../data/recsys'
 });
 
-
+/**
+ * Builds the recommender engine using data in the database.
+ * @param {Function} callback - The function called at the end of the process.
+ */
 function build(callback) {
-
 
     // select all required values for building the recommender models
     const query = `
@@ -119,6 +122,7 @@ function build(callback) {
         }
         for (let material of results) {
             logger.info(`next record being processed id=${material.id}`);
+
             // extract values from postgres record
             let {
                 title,
@@ -133,9 +137,11 @@ function build(callback) {
                 transcription,
                 wikipedia_concepts: wikipediaConcepts
             } = material;
+
             // get raw text from the material
             let rawContent = text_extraction ? text_extraction : transcription;
 
+            // store wikipedia concepts data
             let wikipediaConceptNames    = [];
             let wikipediaConceptPageRank = [];
             let wikipediaConceptCosine   = [];
@@ -151,8 +157,7 @@ function build(callback) {
                 });
             }
 
-
-            // create new record and
+            // create new record for the recommender engine
             let record = {
                 url,
                 title,
@@ -173,7 +178,9 @@ function build(callback) {
             logger.info(`pushed record with id=${material.id}`, { url });
 
         }
+        // get the next batch of data
         cb();
+
     }, (error) => {    // write the material jsons
         if (error) {
             logger.error('error when processing data from postgres', { error: error.message });
@@ -183,7 +190,8 @@ function build(callback) {
             logger.info('closed');
         } else {
             logger.info('Processing material models.');
-            pg.selectLarge({}, 'rec_sys_material_model', 10, (error, results, cb) => {
+
+            pg.selectLarge({ }, 'rec_sys_material_model', 10, (error, results, cb) => {
                 if (error) {
                     logger.error('error when retrieving from postgres', { error: error.message });
                     return;
@@ -200,12 +208,18 @@ function build(callback) {
                             wikipediaConceptSupport.push(material.concepts[concept]);
                         }
                     }
-                    let url = material.provideruri;
-                    let title = material.title;// ? material.title : null;
-                    let description = material.description;// ? material.description : null;
-                    let provider = material.provider;// ? material.provider : null;
-                    let mimetype = material.type;// ? material.type : null;
-                    let language = material.language;// ? material.language : null;
+
+                    // retrieve the material data
+                    const {
+                        provider_uri: url,
+                        title,
+                        description,
+                        provider,
+                        type: mimetype,
+                        language
+                    } = material;
+
+                    // create the material model in qminer
                     let record = {
                         url,
                         title,
@@ -218,10 +232,10 @@ function build(callback) {
                     };
 
                     // push to the recommendation model
-                    console.log(record);
                     x5recommend.pushRecordMaterialModel(record);
                     logger.info(`pushed record with id=${material.id}`, { url });
                 }
+                // get the next batch of data
                 cb();
             }, (error) => {
                 if (error) {
