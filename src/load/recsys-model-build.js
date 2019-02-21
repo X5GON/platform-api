@@ -250,7 +250,9 @@ function build(callback) {
                 x5recommend.close();
                 // close the connection with postgres
                 logger.info('closed');
-                callback();
+                if (callback && typeof(callback) === 'function') {
+                    return callback();
+                }
             });
         }
     });

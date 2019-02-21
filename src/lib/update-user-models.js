@@ -1,8 +1,8 @@
 // configurations
-const config = require('../config/config');
+const config = require('@config/config');
 
 // internal modules
-const pg = require('./postgresQL')(config.pg);
+const pg = require('@lib/postgresQL')(config.pg);
 
 const schema = config.pg.schema;
 
@@ -40,7 +40,7 @@ function updateUserModel(activity, callback) {
     pg.execute(query, [], function(err, user_model) {
         if (err){
             console.log('Error fetching user model: ' + err);
-            if (callback && typeof(callback) === 'function'){
+            if (callback && typeof(callback) === 'function') {
                 return callback();
             }
         }
@@ -64,19 +64,18 @@ function updateUserModel(activity, callback) {
                 if (callback && typeof(callback) === 'function') {
                     return callback();
                 }
-            }
-            else {
+            } else {
                 let user;
                 const material = material_model[0];
                 if (user_model.length === 0){
                     user = {
                         uuid: activity.uuid,
-                        language: {},
+                        language: { },
                         visited: {
                             count: 0
                         },
-                        type: {},
-                        concepts: {}
+                        type: { },
+                        concepts: { }
                     };
                 } else { user = user_model[0]; }
                 //check if the user has visited the material before
@@ -97,21 +96,19 @@ function updateUserModel(activity, callback) {
                     user.visited[material.provider_uri] = 1;
                     user.visited.count += 1;
 
-                    //handle type and language
-                    for (let type in material.type){
-                        if (!user.type.hasOwnProperty(type)){
-                            user.type[type] = 0;
-                        }
-                        user.type[type] += 1;
+                    // handle type
+                    if (!user.type.hasOwnProperty(material.type)){
+                        user.type[material.type] = 0;
                     }
+                    user.type[material.type] += 1;
 
-                    for (let language in material.language){
-                        if (!user.language.hasOwnProperty(language)){
-                            user.language[language] = 0;
-                        }
-                        user.language[language] += 1;
+                    // handle language
+                    if (!user.language.hasOwnProperty(material.language)){
+                        user.language[material.language] = 0;
                     }
+                    user.language[material.language] += 1;
 
+                    console.log('Processing user:', activity.uuid, 'url:', material.provider_uri);
                     pg.upsert(user, { uuid: null }, `${schema}.rec_sys_user_model` , function(err){
                         if (err) {
                             console.log('Error upserting user model: ', + err);

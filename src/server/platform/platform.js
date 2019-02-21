@@ -2,8 +2,7 @@
  * Runs the X5GON platform server
  */
 
-// configurations
-const config = require('@config/config');
+
 
 // external modules
 const express      = require('express');
@@ -12,11 +11,13 @@ const bodyParser   = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session      = require('express-session');
 
-// internal modules
-const pg       = require('@lib/postgresQL')(config.pg);
-const Logger   = require('@lib/logging-handler')();
-const dbUpdate = require('../../load/create-postgres-database');
 
+// configurations
+const config = require('@config/config');
+
+// internal modules
+const pg     = require('@lib/postgresQL')(config.pg);
+const Logger = require('@lib/logging-handler')();
 // create a logger instance for logging API requests
 const logger = Logger.createGroupInstance('api-requests', 'api');
 

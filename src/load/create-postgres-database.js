@@ -182,6 +182,7 @@ const dbCreates = {
 
     material_contents:
         `CREATE TABLE ${schema}.material_contents (
+            id              serial,
             language        char (2) NOT NULL,
             type            varchar (40) NOT NULL,
             extension       varchar (20),
@@ -268,11 +269,11 @@ const dbCreates = {
 
     providers:
         `CREATE TABLE ${schema}.providers (
-            id          serial NOT NULL PRIMARY KEY,
-            token       varchar (20) UNIQUE NOT NULL,
+            id          serial PRIMARY KEY NOT NULL,
+            token       varchar (20) UNIQUE,
             name        varchar NOT NULL,
             domain      varchar UNIQUE NOT NULL,
-            contact     varchar NOT NULL
+            contact     varchar
         );
 
         ALTER TABLE ${schema}.providers

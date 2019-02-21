@@ -323,13 +323,14 @@ function prepareUserModels() {
                     SELECT
                         known_cookies.uuid AS uuid,
                         ${schema}.user_activities.url_id AS url_id
-                    FROM known_cookies LEFT JOIN ${schema}.user_activities
+                    FROM known_cookies RIGHT JOIN ${schema}.user_activities
                     ON ${schema}.user_activities.cookie_id=known_cookies.id
+                    WHERE known_cookies.uuid IS NOT NULL
                 ),
 
                 cookie_url AS (
                     SELECT
-                        cookie_activities.*,
+                        cookie_activities.uuid AS uuid,
                         ${schema}.urls.url AS url
                     FROM cookie_activities LEFT JOIN ${schema}.urls
                     ON cookie_activities.url_id=${schema}.urls.id
