@@ -25,7 +25,7 @@ describe('recommender-tests.js: Recommender engine model unit tests.', function 
     let recsys;
 
     it('Should load the recommender engine', function (done) {
-        let SLOW_TIME = 20000;
+        let SLOW_TIME = 200000;
         this.slow(SLOW_TIME);
 
         recsys = new x5recommend({
@@ -161,7 +161,7 @@ describe('recommender-tests.js: Recommender engine model unit tests.', function 
             assert.deepEqual(expected, recommendations);
             done();
         });
-        
+
         // this test fails because URL from query is different that provider uris used to index the material
         it('Should handle a text and url query as url query', function (done) {
             let urlQuery = {
@@ -179,10 +179,10 @@ describe('recommender-tests.js: Recommender engine model unit tests.', function 
             assert.equal(true, true);
             done();
         });
-    
+
 
     }); // describe L2
-    
+
     describe('Personalized recommendations.', function () { // describe L2
 
         //TODO: personalized recommendations are returned as promises - write tests that handle promises.

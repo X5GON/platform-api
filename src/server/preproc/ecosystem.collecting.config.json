@@ -1,0 +1,17 @@
+{
+    "apps": [{
+        "name": "PROCESSING_MATERIAL_COLLECTOR",
+        "script": "collector.js",
+        "cwd": ".",
+        "env": {
+            "NODE_ENV": "dev"
+        },
+        "env_production": {
+            "NODE_ENV": "prod"
+        },
+        "instances": "1",
+        "exec_mode": "cluster",
+        "autorestart": true,
+        "max_restarts": 20
+    }]
+}

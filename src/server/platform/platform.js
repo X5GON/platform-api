@@ -2,27 +2,27 @@
  * Runs the X5GON platform server
  */
 
-// configurations
-const config = require('../../config/config');
+
 
 // external modules
-const fs = require('fs');
-const express = require('express');
-const exphbs = require('express-handlebars');
-const bodyParser = require('body-parser');
+const express      = require('express');
+const exphbs       = require('express-handlebars');
+const bodyParser   = require('body-parser');
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
+const session      = require('express-session');
+
+
+// configurations
+const config = require('@config/config');
 
 // internal modules
-const pg = require('../../lib/postgresQL')(config.pg);
-const Logger = require('../../lib/logging-handler')();
-const dbUpdate = require('../../load/create-postgres-tables');
-
+const pg     = require('@lib/postgresQL')(config.pg);
+const Logger = require('@lib/logging-handler')();
 // create a logger instance for logging API requests
 const logger = Logger.createGroupInstance('api-requests', 'api');
 
 // internal modules for monitoring processes
-const PM2Monitor = require('../../lib/pm2-monitor');
+const PM2Monitor = require('@lib/pm2-monitor');
 let monitor = new PM2Monitor();
 
 // create express app
@@ -66,13 +66,13 @@ app.engine('hbs', exphbs({
 app.set('view engine', 'hbs');
 
 // redirect specific requests to other services
-require('./routes/proxy')(app);
+require('./routes/proxies')(app, config);
 
 // cookie parser
 app.use(cookieParser(config.platform.sessionSecret));
 
 // sets the API routes
-require('./routes/route.handler')(app, pg, logger, monitor);
+require('./routes/route.handler')(app, pg, logger, config, monitor);
 
 // configure socket connections
 io.on('connection', function(socket) {

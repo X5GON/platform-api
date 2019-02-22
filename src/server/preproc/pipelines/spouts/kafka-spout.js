@@ -85,7 +85,6 @@ class KafkaConsumer {
         }
     }
 
-
     /**
      * @description Get the next message.
      * @returns {Null|Object} The message object if present. Otherwise, returns null.

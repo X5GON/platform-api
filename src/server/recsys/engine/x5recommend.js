@@ -3,7 +3,7 @@
  * Contains all of the recommendation models.
  */
 
-const config = require('../../../config/config');
+const config = require('@config/config');
 
 // external modules
 const path = require('path');
@@ -11,8 +11,8 @@ const qm = require('qminer');
 
 // internal modules
 const NearestNeighbor = require('./models/nearest-neighbors');
-const Logger = require('../../../lib/logging-handler')();
-const pg = require('../../../lib/postgresQL')(config.pg)
+const Logger = require('@lib/logging-handler')();
+const pg = require('@lib/postgresQL')(config.pg);
 
 /**
  * @class x5recommend
@@ -110,7 +110,7 @@ class x5recommend {
         self.content.push(record);
         return self.content.length;
     }
-    
+
     /**
      * @description Adds a new instance to the MaterialModel store.
      * @param {Object} record - The record being added to material model store.
@@ -237,7 +237,7 @@ class x5recommend {
             modelPath: path.join(self.params.path, '/contentWikiCosineNN.dat')
         });
     }
-    
+
         /**
      * @description Create the Nearest Neighbor model for MaterialModel store based on
      * Wikipedia concept support metrics.
@@ -412,9 +412,9 @@ class x5recommend {
         }));
 
     }
-    
-    
-    
+
+
+
     /********************************************
       * Personalized Recommendation Functions
       *******************************************/
@@ -431,7 +431,7 @@ class x5recommend {
     recommendPersonalized(query) {
         let self = this;
         let recommendations;
-        
+
         return new Promise(function (resolve, reject){
             if (!query) {
                 let errorMessage = 'recommendPersonalized: Missing query';
@@ -442,41 +442,41 @@ class x5recommend {
                 resolve({ error: errorMessage });
                 return;
             }
-            
+
             pg.select({uuid: query.uuid}, 'rec_sys_user_model', function(err, res){
                 if (err){
                     self.logger.error('Error fetching user model: ' + err);
                     resolve({error: 'Error fetching user model'});
                     return;
                 }
-                
+
                 if (!res || res.length == 0){
                     resolve({error: 'Cookie is not in the database - unable to fetch the user'});
                     return;
                 }
-                
+
                 res = res[0];
                 let wikipediaConceptNames = [];
                 let wikipediaConceptSupport = [];
-                
+
                 for (let concept in res.concepts){
                     wikipediaConceptNames.push(concept);
                     wikipediaConceptSupport.push(res.concepts[concept]);
                 }
-                
+
                 query = {
                     uuid: res.uuid,
                     wikipediaConceptNames: wikipediaConceptNames,
                     wikipediaConceptSupport: wikipediaConceptSupport
                 };
-                
+
                 recommendations = self.userMaterialSimNN.search(query, self.materialModel);
                 if (!recommendations){
                     recommendations = {error : 'Error fetching recommendations'};
                     resolve(recommendations);
                     return;
                 }
-                
+
                /**
                 * Detects the type of the material.
                 * @param {String} mimetype - The mimetype of the material.
@@ -490,7 +490,7 @@ class x5recommend {
                         return 'text';
                     }
                 }
-                
+
                 recommendations = recommendations[0].map((material, id) => ({
                     weight: recommendations[1][id],
                     url: material.url,
@@ -503,7 +503,7 @@ class x5recommend {
                     audioType: detectType(material.mimetype) === 'audio',
                     textType: detectType(material.mimetype) === 'text',
                 }));
-                
+
                 resolve(recommendations);
                 return;
             });

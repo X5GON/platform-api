@@ -1,6 +1,3 @@
-// configurations
-const config = require('../../../../config/config');
-
 // external modules
 const router = require('express').Router();
 const request = require('request');
@@ -14,7 +11,17 @@ const request = require('request');
  * @param {Object} pg - Postgres connection wrapper.
  * @param {Object} logger - The logger object.
  */
-module.exports = function (pg, logger) {
+module.exports = function (pg, logger, config) {
+
+    /********************************************
+     * Helper functions
+     *******************************************/
+
+    // TODO: write helper functions
+
+    /**********************************
+     * Routes
+     *********************************/
 
     /**
      * @api {GET} /api/v1/search Recommendations in JSON

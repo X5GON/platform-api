@@ -19,7 +19,7 @@ class PostgresqlStorage {
         this._prefix = `[PostgresqlStorage ${this._name}]`;
 
         // create the postgres connection
-        this._pg = require('../../../../lib/postgresQL')(config.pg);
+        this._pg = require('@lib/postgresQL')(config.pg);
 
         // the postgres table in which we wish to insert
         this._postgresTable = config.postgres_table;
@@ -50,8 +50,16 @@ class PostgresqlStorage {
                     { materialurl: material.materialurl }
                 );
             }
-            // this is the end of the material processing pipeline
-            return callback();
+
+            if (this._postgresTable !== 'oer_materials_partial') {
+               this._pg.delete({ materialurl }, 'oer_materials_partial', (error, result) => {
+                    // this is the end of the material processing pipeline
+                    return callback();
+                });
+            } else {
+                return callback();
+            }
+
         });
     }
 }

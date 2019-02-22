@@ -8,7 +8,9 @@
 // external libraries
 const http = require('http');
 const https = require('https');
-const fileType = require('file-type');
+// file type detection/extraction libraries
+const fileTypeManual   = require('mime-types');
+const fileTypeResponse = require('file-type');
 
 /**
  * Formats Material into a common schema.
@@ -46,21 +48,37 @@ class MaterialFormat {
         const materialType = material.type;
 
         if (materialType && materialType.ext && materialType.mime) {
-            console.log('Already has type', materialType);
             // material type was already determined
             return this._onEmit(material, stream_id, callback);
 
-        } else if (materialUrl && materialUrl.indexOf('http://') === 0) {
-            // make an http request and handle appropriately handle the objects
-            return this._makeProtocolRequest(http, material, stream_id, callback);
+        } else if (materialUrl) {
+            // get the extension of the material
+            const splitUrl = materialUrl.split('.');
+            const ext = splitUrl[splitUrl.length - 1].toLowerCase();
+            // get the mimetype from the extension
+            const mime = fileTypeManual.lookup(ext);
 
-        } else if (materialUrl && materialUrl.indexOf('https://') === 0) {
-            // make an https request and handle appropriately handle the objects
-            return this._makeProtocolRequest(https, material, stream_id, callback);
+            if (mime) {
+                // was able to extract a valid mimetype from the extension
+                material.type = { ext, mime };
+                // the mimetype has been extracted from the extension
+                return this._onEmit(material, stream_id, callback);
 
+            } else if (materialUrl.indexOf('http://') === 0) {
+                // make an http request and handle appropriately handle the objects
+                return this._makeProtocolRequest(http, material, stream_id, callback);
+
+            } else if (materialUrl.indexOf('https://') === 0) {
+                // make an https request and handle appropriately handle the objects
+                return this._makeProtocolRequest(https, material, stream_id, callback);
+            } else {
+                // cannot detect the protocol for getting materials
+                material.message = `${this._profix} Cannot detect protocol for getting materials`;
+                return this._onEmit(material, 'stream_partial', callback);
+            }
         } else {
-            // unable to get format of the material
-            material.message = `${this._prefix} No type or valid material URL`;
+            // unable to get the url of the material
+            material.message = `${this._prefix} No material url provided`;
             return this._onEmit(material, 'stream_partial', callback);
         }
     }
@@ -83,7 +101,7 @@ class MaterialFormat {
             this._handleHTTPResponse(response, material, stream_id, callback);
         }).on('error', error => {
             // send formated material to the next component
-            material.message = `${self._prefix} Error when making an http request= ${error.message}`;
+            material.message = `${self._prefix} Error when making an http(s) request= ${error.message}`;
             return self._onEmit(material, 'stream_partial', callback);
         });
     }
@@ -105,12 +123,11 @@ class MaterialFormat {
         } else {
             response.on('data', () => {
                 // get the minimum number of bytes to detect type
-                const chunk = response.read(fileType.minimumBytes);
+                const chunk = response.read(fileTypeResponse.minimumBytes);
                 // destroy the response of the http(s)
                 response.destroy();
                 // assign the material type
-                material.type = fileType(chunk);
-                console.log('Updated type', material.type);
+                material.type = fileTypeResponse(chunk);
                 // send formated material to the next component
                 return this._onEmit(material, stream_id, callback);
             });

@@ -9,8 +9,8 @@ const assert = require('assert');
 const async = require('async');
 
 // get configuration and create pg connection
-const config = require('../../config/config');
-const pg = require('../../lib/postgresQL')(config.pg);
+const config = require('@config/config');
+const pg     = require('@lib/postgresQL')(config.pg);
 
 
 describe('postgresQL.js: db methods unit tests.', function () {
@@ -212,10 +212,11 @@ describe('postgresQL.js: db methods unit tests.', function () {
 
         it('Should get all records', function (done) {
             let count = 0;
-            pg.selectLarge({}, 'test_table', 10, (error, response) => {
+            pg.selectLarge({}, 'test_table', 10, (error, response, cb) => {
                 assert.equal(error, null);
                 assert.ok(response.length <= 10);
                 count += response.length;
+                cb();
             },(error) => {
                 assert.equal(error, null);
                 assert.equal(count, 2);

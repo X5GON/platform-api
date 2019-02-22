@@ -1,9 +1,8 @@
 // configurations
-const config = require('../config/config');
+const config = require('@config/config');
 
 // internal modules
-const pg = require('./postgresQL')(config.pg);
-const Logger = require('./logging-handler')();
+const pg = require('@lib/postgresQL')(config.pg);
 
 const schema = config.pg.schema;
 
@@ -26,19 +25,33 @@ function multiplyObjects(objectA, num){
     return objectA;
 }//function multiplyObjects
 
-function updateUserModel(activity, callback){
-    let query = `SELECT * FROM ${schema}.rec_sys_user_model WHERE uuid='${activity.uuid}'`;
-    pg.execute(query, [], function(err, user){
+function updateUserModel(activity, callback) {
+
+    const {
+        uuid,
+        url
+    } = activity;
+
+    let query = `
+        SELECT *
+        FROM ${schema}.rec_sys_user_model
+        WHERE uuid='${uuid}';`;
+
+    pg.execute(query, [], function(err, user_model) {
         if (err){
             console.log('Error fetching user model: ' + err);
-            if (callback && typeof(callback) === 'function'){
-                callback();
+            if (callback && typeof(callback) === 'function') {
+                return callback();
             }
         }
-        let escapedUri = activity.url.replace('\'', '\'\'');
-        let query = `SELECT * FROM ${schema}.rec_sys_material_model WHERE provideruri LIKE 
-            '${escapedUri}'`;
-        pg.execute(query, [], function(err, material){
+        let escapedUri = url.replace('\'', '\'\'');
+
+        let query = `
+            SELECT *
+            FROM ${schema}.rec_sys_material_model
+            WHERE provider_uri LIKE '%${escapedUri}%'`;
+
+        pg.execute(query, [], function(err, material_model){
             if (err){
                 console.log('Error fetching material model: ' + err);
                 console.log('Query: ' + query);
@@ -46,31 +59,30 @@ function updateUserModel(activity, callback){
                     return callback();
                 }
             }
-            if (material.length == 0){
+            if (material_model.length === 0){
                 //material is not stored in db
-                if (callback && typeof(callback) === 'function'){
+                if (callback && typeof(callback) === 'function') {
                     return callback();
                 }
-            }
-            else {
-                material = material[0];
-                if (user.length == 0){
+            } else {
+                let user;
+                const material = material_model[0];
+                if (user_model.length === 0){
                     user = {
                         uuid: activity.uuid,
-                        language: {},
+                        language: { },
                         visited: {
                             count: 0
                         },
-                        type: {},
-                        concepts: {}
+                        type: { },
+                        concepts: { }
                     };
-                }
-                else user = user[0];
+                } else { user = user_model[0]; }
                 //check if the user has visited the material before
-                if (material && user){
-                    if (user.visited.hasOwnProperty(material.provideruri)){
+                if (material && user) {
+                    if (user.visited.hasOwnProperty(material.provider_uri)){
                         // user has already seen the material - nothing to do
-                        user.visited[material.provideruri] += 1;
+                        user.visited[material.provider_uri] += 1;
                         return callback();
                     }
                     //if user has not seen the material
@@ -80,36 +92,36 @@ function updateUserModel(activity, callback){
                     concepts = addObjects(concepts, material.concepts);
                     concepts = multiplyObjects(concepts, 1 / (count + 1));
                     user.concepts = concepts;
-                    
-                    user.visited[material.provideruri] = 1;
+
+                    user.visited[material.provider_uri] = 1;
                     user.visited.count += 1;
-                    
-                    //handle type and language
-                    for (let type in material.type){
-                        if (!user.type.hasOwnProperty(type)){
-                            user.type[type] = 0;
-                        }
-                        user.type[type] += 1;
+
+                    // handle type
+                    if (!user.type.hasOwnProperty(material.type)){
+                        user.type[material.type] = 0;
                     }
-                    
-                    for (let language in material.language){
-                        if (!user.language.hasOwnProperty(language)){
-                            user.language[language] = 0;
-                        }
-                        user.language[language] += 1;
+                    user.type[material.type] += 1;
+
+                    // handle language
+                    if (!user.language.hasOwnProperty(material.language)){
+                        user.language[material.language] = 0;
                     }
-                    
-                    let conditions = {uuid: activity.uuid};
-                    
-                    pg.upsert(user, conditions, `${schema}.rec_sys_user_model` , function(err){
-                        if (err){
+                    user.language[material.language] += 1;
+
+                    console.log('Processing user:', activity.uuid, 'url:', material.provider_uri);
+                    pg.upsert(user, { uuid: null }, `${schema}.rec_sys_user_model` , function(err){
+                        if (err) {
                             console.log('Error upserting user model: ', + err);
-                            return process.exit(1);
+                            return callback(err);
                         }
                         if (callback && typeof(callback) === 'function'){
                             return callback();
                         }
                     });
+                } else {
+                    if (callback && typeof(callback) === 'function'){
+                        return callback();
+                    }
                 }
             }
         });

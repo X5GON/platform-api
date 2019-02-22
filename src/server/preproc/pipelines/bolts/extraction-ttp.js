@@ -126,7 +126,6 @@ class ExtractionTTP {
         // Start Processing materials
         /////////////////////////////////////////////////////////////
 
-
         if (Object.keys(self._languages).includes(material.language)) {
             /////////////////////////////////////////////////////////
             // FIRST STEP
@@ -321,7 +320,6 @@ class ExtractionTTP {
                 }
 
                 // save transcriptions into the material's metadata field
-                material.materialmetadata.dfxp           = dfxp;
                 material.materialmetadata.rawText        = rawText;
                 material.materialmetadata.transcriptions = transcriptions;
 
