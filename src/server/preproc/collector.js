@@ -17,7 +17,7 @@ class OERCollector {
      */
     constructor() {
         // set kafka consumer & producers
-        this._consumer = new KafkaConsumer(config.kafka.host, 'STORING.USERACTIVITY.CONNECT', 'connectGroup');
+        this._consumer = new KafkaConsumer(config.kafka.host, 'STORING.USERACTIVITY.CONNECT', config.kafka.groupId);
         this._producer = new KafkaProducer(config.kafka.host);
 
         // crawling configuration
@@ -29,13 +29,13 @@ class OERCollector {
 
         // initialize different retrievers
         this._apis = [];
-        // // go through retriever configurations
-        // for (let repository of config.preproc.retrievers) {
-        //     repository.config.frequency = this.defaultFrequency;
-        //     repository.config.callback = this._sendMaterials();
-        //     repository.config.pg = pg;
-        //     this.addAPI(repository);
-        // }
+        // go through retriever configurations
+        for (let repository of config.preproc.retrievers) {
+            repository.config.frequency = this.defaultFrequency;
+            repository.config.callback = this._sendMaterials();
+            repository.config.pg = pg;
+            this.addAPI(repository);
+        }
     }
 
     /**
