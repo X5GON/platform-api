@@ -326,16 +326,26 @@ class x5recommend {
 
         if (query.url && query.type === 'cosine') {
             // get recommendations based on wikipedia concepts using url & cosine metrics
-            recommendations = self.contentWikiCosineNN.search({ url: query.url }, self.content);
+            recommendations = self.contentWikiCosineNN.search({
+                url: query.url,
+                type: query.type
+            }, self.content);
+
         } else if (query.url) {
             // get recommendations based on wikipedia concepts using url
-            recommendations = self.contentWikiNN.search({ url: query.url }, self.content);
+            recommendations = self.contentWikiNN.search({
+                url: query.url,
+                type: query.type
+            }, self.content);
         }
 
         if (query.text && (!recommendations || (recommendations && !recommendations[0].length))) {
             // there were no recommendations found for given url
             // - try with content based recommendations
-            recommendations = self.contentTextNN.search({ text: query.text }, self.content);
+            recommendations = self.contentTextNN.search({
+                text: query.text,
+                type: query.type
+            }, self.content);
         }
 
         if ((query.url || query.text) && !recommendations) {

@@ -54,29 +54,30 @@
       <div class="navigation py-3 {{#if (query.types.active 'all')}} active {{/if}}">
         <a class="link p-3"
           {{#unless (query.types.active 'all')}}
-            {{#if false}}href="/search?text={{query.query}}&page={{query.page}}&type=all"{{/if}}
-          {{/unless}}>All</a>
+            href="/search?text={{query.query}}&page=1&type=all"
+          {{/unless}}>All
+        </a>
       </div>
       <div class="navigation py-3 {{#if (query.types.active 'video')}} active {{/if}}">
         <a class="link p-3"
-          data-toggle="tooltip" data-placement="bottom" title="Coming soon"
           {{#unless (query.types.active 'video')}}
-            {{#if false}}href="/search?text={{query.query}}&page={{query.page}}&type=video"{{/if}}
-          {{/unless}}>Video</a>
+            href="/search?text={{query.query}}&page=1&type=video"
+          {{/unless}}>Video
+        </a>
       </div>
       <div class="navigation py-3 {{#if (query.types.active 'audio')}} active {{/if}}">
         <a class="link p-3"
-          data-toggle="tooltip" data-placement="bottom" title="Coming soon"
           {{#unless (query.types.active 'audio')}}
-            {{#if false}}href="/search?text={{query.query}}&page={{query.page}}&type=audio"{{/if}}
-          {{/unless}}>Audio</a>
+            href="/search?text={{query.query}}&page=1&type=audio"
+          {{/unless}}>Audio
+        </a>
       </div>
       <div class="navigation py-3 {{#if (query.types.active 'text')}} active {{/if}}">
         <a class="link p-3"
-          data-toggle="tooltip" data-placement="bottom" title="Coming soon"
           {{#unless (query.types.active 'text')}}
-            {{#if false}}href="/search?text={{query.query}}&page={{query.page}}&type=text"{{/if}}
-          {{/unless}}>Text</a>
+            href="/search?text={{query.query}}&page=1&type=text"
+          {{/unless}}>Text
+        </a>
       </div>
     </div>
 
