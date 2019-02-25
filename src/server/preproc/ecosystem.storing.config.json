@@ -41,7 +41,7 @@
         },
         "env_production": {
             "NODE_ENV": "prod",
-            "TOPOLOGY": "storing-user-activites"
+            "TOPOLOGY": "storing-user-activities"
         },
         "instances": "1",
         "exec_mode": "cluster",
