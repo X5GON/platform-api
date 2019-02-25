@@ -15,7 +15,7 @@ module.exports = {
             "init": {
                 "kafka_host": config.kafka.host,
                 "topic": "PROCESSING.MATERIAL.TEXT",
-                "groupId": "textGroup"
+                "groupId": config.kafka.groupId
             }
         }
     ],
