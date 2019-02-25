@@ -30,6 +30,9 @@ class VideolecturesAPI extends BasicRESTAPI {
      * @param {Function} cb - Function specifying what to do with the data.
      */
     get(url, cb) {
+
+        let self = this;
+
         if (!url) {
             const error = new Error('[API-Videolectures get] url not provided');
             return cb(error);
@@ -69,13 +72,35 @@ class VideolecturesAPI extends BasicRESTAPI {
                         const display = file.type_display;
                         if (display && (display.includes('Slide Presentation') || display.includes('generic video source'))) {
                             const oerMaterial = this._prepareMaterial(materials, file);
-                            OERMaterials.push(oerMaterial);
+
+                            // TODO: check if the material is already in the database
+                            OERMaterials.push(new Promise((resolve, reject) => {
+
+                                self._pg.select({ url: oerMaterial.materialurl }, 'urls', (xerror, results) => {
+                                    if (xerror) { return reject(xerror); }
+
+                                    if (results.length === 0) {
+                                        // the material is not in the database yet
+                                        return resolve(oerMaterial);
+                                    } else {
+                                        // the material can be skipped, already in database
+                                        return resolve(null);
+                                    }
+                                });
+                            }));
                         }
 
                     }
                 }
-                // return the material through the callback
-                return cb(null, OERMaterials);
+
+                // wait for the materials
+                Promise.all(OERMaterials).then(materials => {
+                    const newMaterials = materials.filter(material => material);
+                    // return the material through the callback
+                    return cb(null, newMaterials);
+
+                }).catch(error => cb(error));
+
             }).catch(error => cb(error));
 
         }).catch(error => cb(error));
@@ -138,6 +163,7 @@ class VideolecturesAPI extends BasicRESTAPI {
      * @returns {Object} The formatted material object from Videolectures.
      */
     _prepareMaterial(material, file) {
+
         // get values from the material and file object that are used
         const { title, description, slug, authors, language, time } = material;
         const { src, ext, mimetype } = file;
@@ -157,7 +183,7 @@ class VideolecturesAPI extends BasicRESTAPI {
                 title: 'Videolectures.NET',
                 url: this._domain
             },
-            license: 'Creative Commons Attribution-Noncommercial-No Derivative Works 3.0'
+            license: 'CC BY-NC-ND 3.0'
         };
     }
 
@@ -202,19 +228,8 @@ class VideolecturesAPI extends BasicRESTAPI {
             for (let material of materials) {
                 // check if material is in the database
                 const url = `${self._domain}/${material.slug}/`;
-                self._pg.select({ url }, 'urls', (xerror, results) => {
-                    if (xerror) { return self._processCb(xerror); }
-
-                    // TODO: handle existing materials
-                    if (results.length) {
-                        const yerror = new Error(`[API-Videolectures _checkMaterialDb] material already in dataset url=${url}`);
-                        console.log(yerror.message);
-                        return;
-                    }
-
-                    // get the material and send it to the callback
-                    self.get(url, self._processCb);
-                });
+                // get the material and send it to the callback
+                self.get(url, self._processCb);
             }
         };
     }
