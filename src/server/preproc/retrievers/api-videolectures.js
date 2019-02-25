@@ -30,6 +30,9 @@ class VideolecturesAPI extends BasicRESTAPI {
      * @param {Function} cb - Function specifying what to do with the data.
      */
     get(url, cb) {
+
+        let self = this;
+
         if (!url) {
             const error = new Error('[API-Videolectures get] url not provided');
             return cb(error);
@@ -180,7 +183,7 @@ class VideolecturesAPI extends BasicRESTAPI {
                 title: 'Videolectures.NET',
                 url: this._domain
             },
-            license: 'Creative Commons Attribution-Noncommercial-No Derivative Works 3.0'
+            license: 'CC BY-NC-ND 3.0'
         };
     }
 
