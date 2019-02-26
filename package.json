@@ -56,7 +56,8 @@
     "socket.io": "^2.1.1",
     "textract": "^2.4.0",
     "winston": "^2.4.0",
-    "winston-daily-rotate-file": "^1.7.2"
+    "winston-daily-rotate-file": "^1.7.2",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "apidoc": "^0.17.6",
