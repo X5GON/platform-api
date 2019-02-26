@@ -36,7 +36,8 @@ function _sendToKafka(material) {
     }
 
     let topic = material.type.mime && material.type.mime.includes('video') ?
-        'PROCESSING.MATERIAL.VIDEO' : (material.type.mime && material.type.mime.includes('image') ? 'STORING.MATERIAL.PARTIAL' : 'PROCESSING.MATERIAL.TEXT' );
+        'PROCESSING.MATERIAL.VIDEO' : (material.type.mime && material.type.mime.includes('image') ?
+        'STORING.MATERIAL.PARTIAL' : 'PROCESSING.MATERIAL.TEXT' );
 
     // send the material into the processing pipeline
     producer.send(topic, material, function (error) {
@@ -70,21 +71,27 @@ function parseXMLFromUrl(url){
                                         if (item.hasOwnProperty('video:video')){
                                             for (let video of item['video:video']){                                        
                                                 let material = {
-                                                    title: video['video:title'] ? video['video:title'][0] : null,
-                                                    description: video['video:description'] ? video['video:description'][0] : null,
-                                                    provideruri: item['loc'] ? item['loc'][0] : null,
-                                                    authors: video['video:uploader'] ? [video['video:uploader'][0]['_']] : [],
+                                                    title: video['video:title'] ? 
+                                                        video['video:title'][0] : null,
+                                                    description: video['video:description'] ? 
+                                                        video['video:description'][0] : null,
+                                                    provideruri: item['loc'] ? 
+                                                        item['loc'][0] : null,
+                                                    authors: video['video:uploader'] ? 
+                                                        [video['video:uploader'][0]['_']] : [],
                                                     language: 'de',
-                                                    time: video['video:publication_date'] ? video['video:publication_date'][0] : null,
+                                                    time: video['video:publication_date'] ? 
+                                                        video['video:publication_date'][0] : null,
                                                     licence: null
-                                                }; //title, description, provider uri, authors, language, time
+                                                }; 
                                                 let ext = video['video:content_loc'][0].split('.');
-                                                ext = ext[ext.length - 1];                                       
+                                                ext = ext[ext.length - 1];
                                                 let file = {
-                                                    src: video['video:content_loc'] ? video['video:content_loc'][0] : null,
+                                                    src: video['video:content_loc'] ?
+                                                        video['video:content_loc'][0] : null,
                                                     ext: ext ? ext : null,
                                                     mimetype: 'video/' + ext
-                                                }; //src, ext, mimetype*/
+                                                };
                                                 let prepared = _prepareMaterial(material, file);
                                                 //send prepared to kafka
                                                 _sendToKafka(prepared);
@@ -101,7 +108,8 @@ function parseXMLFromUrl(url){
                                             description: null,
                                             provideruri: item['id'] ? item['id'][0] : null,
                                             authors: item['dc:creator'],
-                                            language: item['dc:language'] ? item['dc:language'][0].substring(0, 2) : null,
+                                            language: item['dc:language'] ? 
+                                                item['dc:language'][0].substring(0, 2) : null,
                                             time: item['updated'] ? item['updated'][0] : null, 
                                             updated: item['updated'] ? item['updated'][0] : null,
                                             licence: null
@@ -128,7 +136,8 @@ function parseXMLFromUrl(url){
                                 }
                             }    
                             else{
-                                console.log('Unknow XML Schema. Please implement a parser for that schema.');
+                                console.log('Unknow XML Schema.' + 
+                                    'Please implement a parser for that schema.');
                             }
                         }
 
