@@ -182,7 +182,7 @@ module.exports = function (pg, logger, config) {
             queryParams.page = parseInt(queryParams.page) || 1;
 
             let queryString = Object.keys(queryParams).map(key => `${key}=${encodeURIComponent(queryParams[key])}`).join('&');
-            request(`http://localhost:${config.platform.port}/api/v1/recommend/content?${queryString}`, (error, httpRequest, body) => {
+            request(`http://localhost:${config.platform.port}/api/v1/recommend/materials?${queryString}`, (error, httpRequest, body) => {
                 // set query parameters
                 let query = {
                     query: queryParams.text,
@@ -209,9 +209,6 @@ module.exports = function (pg, logger, config) {
                             let abstract = recommendation.description.split(' ').slice(0, 30).join(' ');
                             if (recommendation.description !== abstract) { recommendation.description = `${abstract} ...`; }
                         }
-                        // determine material type
-                        recommendation.type = recommendation.videoType ? 'video' :
-                            recommendation.audioType ? 'audio' : 'file-alt';
                         // embed url
                         recommendation.embedUrl = recommendation.provider === 'Videolectures.NET' ?
                             `${recommendation.url}iframe/1/` : recommendation.url;
@@ -289,9 +286,12 @@ module.exports = function (pg, logger, config) {
             fontSize
         };
 
+        console.log(query);
+
         let options = { layout: 'empty', style };
-        let queryString = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
-        request(`http://localhost:${config.platform.port}/api/v1/recommend/content?${queryString}`, (error, httpRequest, body) => {
+        let queryString = Object.keys(query).map(key => `${key}=${encodeURIComponent(query[key])}`).join('&');
+        console.log(queryString);
+        request(`http://localhost:${config.platform.port}/api/v1/recommend/bundles?${queryString}`, (error, httpRequest, body) => {
             try {
                 const recommendations = JSON.parse(body);
                 options.empty = recommendations.length !== 0 || recommendations.error ? false : true;
@@ -311,7 +311,7 @@ module.exports = function (pg, logger, config) {
      */
 
     router.get('/error', (req, res) => {
-        return res.render('error', { title: '404'  });
+        return res.render('error', { title: '404' });
     });
 
 

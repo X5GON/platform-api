@@ -15,7 +15,7 @@ module.exports = {
             "init": {
                 "kafka_host": config.kafka.host,
                 "topic": "STORING.USERACTIVITY.CONNECT",
-                "groupId": "userActivityGroup"
+                "groupId": config.kafka.groupId
             }
         }
     ],

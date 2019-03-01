@@ -218,6 +218,8 @@ class PostgreSQL {
                         if (rows.length > 0 && batchCallback) {
                             // activate the batch callback function
                             return batchCallback(null, rows, xcallback);
+                        } else if (batchCallback) {
+                            return batchCallback(null, [], xcallback);
                         }
                     }
                 });
