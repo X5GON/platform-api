@@ -31,11 +31,19 @@ class NearestNeighbors {
         // initialize instance based on mode
         if (self.params.mode === 'load') {
             // load model from a file
-            self._loadModel(self.params.base, self.params.modelPath);
+            self._loadModel(
+                self.params.base,
+                self.params.modelPath,
+                self.params.store
+            );
         } else if (self.params.mode === 'create') {
             // create the model from scratch
-            self._createModel(self.params.base, self.params.modelPath,
-                self.params.store, self.params.features);
+            self._createModel(
+                self.params.base,
+                self.params.modelPath,
+                self.params.store,
+                self.params.features
+            );
         } else {
             throw `Value of parameter 'mode' is not supported: ${self.params.mode}`;
         }
@@ -55,7 +63,8 @@ class NearestNeighbors {
         // create feature space for nearest neighbors
         self.featureSpace = new qm.FeatureSpace(base, features);
 
-        const allRecords = store.allRecords;
+        self.store = store;
+        const allRecords = self.store;
         // update the feature space and extract record matrix
         self.featureSpace.updateRecords(allRecords);
 
@@ -107,8 +116,10 @@ class NearestNeighbors {
      * @param {String} modelPath - The Nearest Neighbors model file name.
      * @private
      */
-    _loadModel(base, modelPath) {
+    _loadModel(base, modelPath, store) {
         let self = this;
+
+        self.store = store;
         // load Nearest Neighbor feature space and matrix
         const fin = qm.fs.openRead(modelPath);
         self.featureSpace = new qm.FeatureSpace(base, fin);
@@ -135,28 +146,43 @@ class NearestNeighbors {
      * @return {Array.<Object>} An array where the first element is a record set
      * of relevant solutions and the second element is an array of similarity measures.
      */
-    search(query, store, maxCount=100, minSim=0.05) {
+    search(query, maxCount=20, minSim=0.05) {
         let self = this;
+
+        const store = self.store;
 
         try {
             // transform the query json into a sparse vector
             let queryRec;
-            if (query.hasOwnProperty('uuid') && query.hasOwnProperty('wikipediaConceptNames') &&
+
+            if (query.hasOwnProperty('uuid') &&
+                query.hasOwnProperty('wikipediaConceptNames') &&
                 query.hasOwnProperty('wikipediaConceptSupport')) {
+
+                const {
+                    uuid: uri,
+                    wikipediaConceptNames,
+                    wikipediaConceptSupport
+                } = query;
+
+                // create a user interests record
                 queryRec = store.newRecord({
-                    uri: query.uuid,
-                    title: null,
-                    description: null,
-                    provider: null,
-                    mimetype: null,
-                    language: null,
-                    wikipediaConceptNames: query.wikipediaConceptNames,
-                    wikipediaConceptSupport: query.wikipediaConceptSupport
+                    uri,
+                    // title: null,
+                    // description: null,
+                    // provider: null,
+                    // mimetype: null,
+                    // language: null,
+                    wikipediaConceptNames,
+                    wikipediaConceptSupport
                 });
-            } else {
-                queryRec = query.url ?
-                    store.recordByName(query.url) :
-                    store.newRecord({ description: query.text });
+
+            } else if (query.url && store.recordByName(query.url)) {
+                // get material by url
+                queryRec = store.recordByName(query.url);
+            } else if (query.text) {
+                // create instance with provided text
+                queryRec = store.newRecord({ description: query.text });
             }
 
             if (!queryRec) {
