@@ -180,6 +180,7 @@ module.exports = function (pg, logger, config) {
             let queryParams = req.query;
             queryParams.type = queryParams.type || 'all';
             queryParams.page = parseInt(queryParams.page) || 1;
+            queryParams.count = parseInt(queryParams.count) || 10000;
 
             let queryString = Object.keys(queryParams).map(key => `${key}=${encodeURIComponent(queryParams[key])}`).join('&');
             request(`http://localhost:${config.platform.port}/api/v1/recommend/materials?${queryString}`, (error, httpRequest, body) => {
@@ -206,12 +207,17 @@ module.exports = function (pg, logger, config) {
                     recommendations.forEach(recommendation => {
                         if (recommendation.description) {
                             // slice the description into a more digestive element
-                            let abstract = recommendation.description.split(' ').slice(0, 30).join(' ');
-                            if (recommendation.description !== abstract) { recommendation.description = `${abstract} ...`; }
+                            let abstract = recommendation.description.split('.').slice(0, 2).join('. ');
+
+                            for (let word of queryParams.text.split(' ')) {
+                                const pattern = new RegExp(word, 'gi');
+                                abstract = abstract.replace(pattern, str => `<b>${str}</b>`);
+                            }
+
+                            if (recommendation.description !== abstract) { recommendation.description = `${abstract}. ...`; }
                         }
                         // embed url
-                        recommendation.embedUrl = recommendation.provider === 'Videolectures.NET' ?
-                            `${recommendation.url}iframe/1/` : recommendation.url;
+                        recommendation.embedUrl = recommendation.url;
                     });
 
                     // save recommendations

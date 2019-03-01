@@ -9,6 +9,15 @@ body {
     color: #323232;
 }
 
+@media screen and (min-width: 1360px) {
+    main {
+        background-image: url('/img/oer-global-network.svg');
+        background-position: 95% 20px;
+        background-repeat: no-repeat;
+        background-size: 67%;
+    }
+}
+
 header .navbar {
     background-color: #eaeaea;
 }
