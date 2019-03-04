@@ -70,7 +70,7 @@ class NearestNeighbors {
 
         // create matrix with all materials
         self.matrix = self.featureSpace.extractSparseMatrix(allRecords);
-        // create matrix of video materials
+        // store material ids of other types
         self.videoMaterialIds = new qm.la.IntVector();
         self.audioMaterialIds = new qm.la.IntVector();
         self.textMaterialIds  = new qm.la.IntVector();
@@ -97,17 +97,21 @@ class NearestNeighbors {
 
         // save the model in the `modelPath` file
         let fout = qm.fs.openWrite(modelPath);
-        // save the feature space and
+
+        // save the feature space
         self.featureSpace.save(fout);
-        // feature matrices of the content
+
+        // feature matrices
         self.matrix.save(fout);
         self.matrixVideo.save(fout);
         self.matrixAudio.save(fout);
         self.matrixText.save(fout);
+
         // content type ids
         self.videoMaterialIds.save(fout);
         self.audioMaterialIds.save(fout);
         self.textMaterialIds.save(fout);
+
         // close the file
         fout.close();
     }
@@ -122,7 +126,7 @@ class NearestNeighbors {
         let self = this;
 
         self.store = store;
-        // load Nearest Neighbor feature space and matrix
+        // load Nearest Neighbor feature space
         const fin = qm.fs.openRead(modelPath);
         self.featureSpace = new qm.FeatureSpace(base, fin);
         // load the feature matrices
@@ -150,7 +154,7 @@ class NearestNeighbors {
      */
     search(query, maxCount=20, minSim=0.10) {
         let self = this;
-
+        // get store
         const store = self.store;
 
         try {
