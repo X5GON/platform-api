@@ -148,7 +148,7 @@ class NearestNeighbors {
      * @return {Array.<Object>} An array where the first element is a record set
      * of relevant solutions and the second element is an array of similarity measures.
      */
-    search(query, maxCount=20, minSim=0.15) {
+    search(query, maxCount=20, minSim=0.10) {
         let self = this;
 
         const store = self.store;
