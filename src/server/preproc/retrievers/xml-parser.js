@@ -10,23 +10,44 @@ const producer = new KafkaProducer(config.kafka.host);
 
 function _prepareMaterial(material, file) {
     // get values from the material and file object that are used
-    const { title, description, provideruri, authors, language, time, license } = material;
-    const { src, ext, mimetype } = file;
+    const {
+        title,
+        description,
+        provideruri: originalProviderUri,
+        authors,
+        language,
+        time,
+        license
+    } = material;
+
+    const {
+        src,
+        ext,
+        mimetype
+    } = file;
+
+
+    let provideruri = originalProviderUri;
+    if (originalProviderUri.includes('video4.virtuos.uos.de') && mimetype.includes('video')) {
+        const sections = originalProviderUri.split('/');
+        const id = sections[sections.length - 1];
+        provideruri = `https://video4.virtuos.uos.de/engage/ui/watch.html?id=${id}`;
+    }
 
     // return the material object
     return {
         title,
         description,
-        provideruri: provideruri,
+        provideruri,
         materialurl: src,
         author: authors.join(','),
-        language: language,
+        language,
         type: { ext, mime: mimetype },
         datecreated: time,
         dateretrieved: (new Date()).toISOString(),
-        license: license
+        license
     };
-};
+}
 
 function _sendToKafka(material) {
     //check if material is ready for Kafka
@@ -37,15 +58,15 @@ function _sendToKafka(material) {
 
     let topic = material.type.mime && material.type.mime.includes('video') ?
         'PROCESSING.MATERIAL.VIDEO' : (material.type.mime && material.type.mime.includes('image') ?
-        'STORING.MATERIAL.PARTIAL' : 'PROCESSING.MATERIAL.TEXT' );
+        'STORING.MATERIAL.PARTIAL' : 'PROCESSING.MATERIAL.TEXT');
 
     // send the material into the processing pipeline
     producer.send(topic, material, function (error) {
         if (error) { console.log(error); }
     });
-}; 
+}
 
-function parseXMLFromUrl(url){
+function parseXMLFromUrl(url) {
     return new Promise ((resolve, reject) => {
         https.get(url, function(res){
             var bodyChunks = [];
@@ -69,21 +90,21 @@ function parseXMLFromUrl(url){
                                     for (let item of result['url']){
                                         // process each item
                                         if (item.hasOwnProperty('video:video')){
-                                            for (let video of item['video:video']){                                        
+                                            for (let video of item['video:video']){
                                                 let material = {
-                                                    title: video['video:title'] ? 
+                                                    title: video['video:title'] ?
                                                         video['video:title'][0] : null,
-                                                    description: video['video:description'] ? 
+                                                    description: video['video:description'] ?
                                                         video['video:description'][0] : null,
-                                                    provideruri: item['loc'] ? 
+                                                    provideruri: item['loc'] ?
                                                         item['loc'][0] : null,
-                                                    authors: video['video:uploader'] ? 
+                                                    authors: video['video:uploader'] ?
                                                         [video['video:uploader'][0]['_']] : [],
                                                     language: 'de',
-                                                    time: video['video:publication_date'] ? 
+                                                    time: video['video:publication_date'] ?
                                                         video['video:publication_date'][0] : null,
                                                     license: null
-                                                }; 
+                                                };
                                                 let ext = video['video:content_loc'][0].split('.');
                                                 ext = ext[ext.length - 1];
                                                 let file = {
@@ -108,9 +129,9 @@ function parseXMLFromUrl(url){
                                             description: null,
                                             provideruri: item['id'] ? item['id'][0] : null,
                                             authors: item['dc:creator'],
-                                            language: item['dc:language'] ? 
+                                            language: item['dc:language'] ?
                                                 item['dc:language'][0].substring(0, 2) : null,
-                                            time: item['updated'] ? item['updated'][0] : null, 
+                                            time: item['updated'] ? item['updated'][0] : null,
                                             updated: item['updated'] ? item['updated'][0] : null,
                                             license: null
                                         };
@@ -126,7 +147,7 @@ function parseXMLFromUrl(url){
                                                     src: link['href'] ? link['href'] : null,
                                                     ext: ext ? ext : null,
                                                     mimetype: link['type'] ? link['type'] : null
-                                                }
+                                                };
                                                 let prepared = _prepareMaterial(material, file);
                                                 // send prepared to kafka
                                                 _sendToKafka(prepared);
@@ -134,9 +155,9 @@ function parseXMLFromUrl(url){
                                         }
                                     }
                                 }
-                            }    
+                            }
                             else{
-                                console.log('Unknow XML Schema.' + 
+                                console.log('Unknow XML Schema.' +
                                     'Please implement a parser for that schema.');
                             }
                         }
@@ -144,19 +165,18 @@ function parseXMLFromUrl(url){
                     }
                     resolve('Finished parsing XML from URL: ' + url);
                 });
-            })
+            });
         });
     });
-}; // returns promise
+} // returns promise
 
 exports.parseXMLFromUrl = parseXMLFromUrl; //make it accessible from outside
 
-let urls = ['https://video4.virtuos.uos.de/feeds/atom/1.0/oer', 'https://mediathek.hhu.de/sitemap'];
+let urls = ['https://video4.virtuos.uos.de/feeds/atom/1.0/oer'/*, 'https://mediathek.hhu.de/sitemap'*/];
 
 async.eachSeries(urls, (url, callback) => {
     //console.log(urls, url);
     parseXMLFromUrl(url).then((res) => {
-        console.log(res);
         if (callback && typeof callback == 'function'){
             callback(null);
         }
