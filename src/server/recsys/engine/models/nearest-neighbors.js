@@ -64,8 +64,8 @@ class NearestNeighbors {
         self.featureSpace = new qm.FeatureSpace(base, features);
 
         self.store = store;
-        const allRecords = self.store;
         // update the feature space and extract record matrix
+        const allRecords = self.store.allRecords;
         self.featureSpace.updateRecords(allRecords);
 
         // create matrix with all materials
@@ -85,6 +85,8 @@ class NearestNeighbors {
                 self.audioMaterialIds.push(id);
             } else if (mimetypes.text.includes(mimetype)) {
                 self.textMaterialIds.push(id);
+            } else {
+                console.log('Missing mimetype', mimetype);
             }
         }
 
@@ -146,7 +148,7 @@ class NearestNeighbors {
      * @return {Array.<Object>} An array where the first element is a record set
      * of relevant solutions and the second element is an array of similarity measures.
      */
-    search(query, maxCount=20, minSim=0.05) {
+    search(query, maxCount=20, minSim=0.15) {
         let self = this;
 
         const store = self.store;

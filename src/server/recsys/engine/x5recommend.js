@@ -338,7 +338,8 @@ class x5recommend {
         const {
             url,
             text,
-            type
+            type,
+            count
         } = userQuery;
 
         // if none of the parameters are provided
@@ -367,9 +368,9 @@ class x5recommend {
             query = { text, type };
         }
 
-
+        const maxCount = count ? count : 20;
         // get material recommendations
-        let recommendations = model.search(query);
+        let recommendations = model.search(query, maxCount);
 
         if (!recommendations) {
             let errorMessage = 'Empty query object';
@@ -413,7 +414,6 @@ class x5recommend {
 
         let model,
             query;
-
         // get the model of the respected type
         if (url && self.materialModel.recordByName(url)) {
             // decide on the model
@@ -433,9 +433,9 @@ class x5recommend {
             return Promise.reject({ error: errorMessage });
         }
 
-
+        const maxCount = count ? count : 20;
         // get material recommendations
-        let recommendations = model.search(query);
+        let recommendations = model.search(query, maxCount);
 
         if (!recommendations) {
             let errorMessage = 'Empty query object';
@@ -509,7 +509,7 @@ class x5recommend {
                     wikipediaConceptSupport: wikipediaConceptSupport
                 };
 
-                let recommendations = self.userMaterialSimNN.search(query, self.materialModel);
+                let recommendations = self.userMaterialSimNN.search(query);
 
                 if (!recommendations) {
                     recommendations = {

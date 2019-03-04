@@ -36,7 +36,8 @@
         "video/x-amt-showrun",
         "video/mp4",
         "video/x-m4v",
-        "video/rm"
+        "video/rm",
+        "video/divx"
     ],
     "audio": [
         "audio/aiff",
