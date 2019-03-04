@@ -10,7 +10,7 @@ const producer = new KafkaProducer(config.kafka.host);
 
 function _prepareMaterial(material, file) {
     // get values from the material and file object that are used
-    const { title, description, provideruri, authors, language, time, licence } = material;
+    const { title, description, provideruri, authors, language, time, license } = material;
     const { src, ext, mimetype } = file;
 
     // return the material object
@@ -24,7 +24,7 @@ function _prepareMaterial(material, file) {
         type: { ext, mime: mimetype },
         datecreated: time,
         dateretrieved: (new Date()).toISOString(),
-        license: licence
+        license: license
     };
 };
 
@@ -82,7 +82,7 @@ function parseXMLFromUrl(url){
                                                     language: 'de',
                                                     time: video['video:publication_date'] ? 
                                                         video['video:publication_date'][0] : null,
-                                                    licence: null
+                                                    license: null
                                                 }; 
                                                 let ext = video['video:content_loc'][0].split('.');
                                                 ext = ext[ext.length - 1];
@@ -112,7 +112,7 @@ function parseXMLFromUrl(url){
                                                 item['dc:language'][0].substring(0, 2) : null,
                                             time: item['updated'] ? item['updated'][0] : null, 
                                             updated: item['updated'] ? item['updated'][0] : null,
-                                            licence: null
+                                            license: null
                                         };
                                         if (item.hasOwnProperty('link')){
                                             for (let link of item['link']){
