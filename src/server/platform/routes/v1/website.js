@@ -292,11 +292,8 @@ module.exports = function (pg, logger, config) {
             fontSize
         };
 
-        console.log(query);
-
         let options = { layout: 'empty', style };
         let queryString = Object.keys(query).map(key => `${key}=${encodeURIComponent(query[key])}`).join('&');
-        console.log(queryString);
         request(`http://localhost:${config.platform.port}/api/v1/recommend/bundles?${queryString}`, (error, httpRequest, body) => {
             try {
                 const recommendations = JSON.parse(body);

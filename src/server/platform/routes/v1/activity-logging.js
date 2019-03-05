@@ -312,7 +312,7 @@ module.exports = function (pg, logger) {
                 );
                 // update user model
                 if (activity.uuid != 'unknown:not-tracking'){
-                    updateHelper.updateUserModel(activity);   
+                    updateHelper.updateUserModel(activity);
                 }
             }
             // send beacon image to user
