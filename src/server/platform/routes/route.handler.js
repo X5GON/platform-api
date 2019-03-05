@@ -21,8 +21,8 @@ module.exports = function (app, pg, logger, config, monitor) {
     app.use('/api/v1', require('./v1/query/user-activities')(pg, logger, config));
 
     // website routes
-    app.use('/',       require('./v1/monitor')(monitor, config));
-    app.use('/',       require('./v1/website')(pg, logger, config));
+    app.use('/', require('./v1/monitor')(monitor, config));
+    app.use('/', require('./v1/website')(pg, logger, config));
 
     // error routes
     app.get('/*', (req, res) => {

@@ -143,8 +143,7 @@ function build(callback) {
 
             // store wikipedia concepts data
             let wikipediaConceptNames    = [];
-            let wikipediaConceptPageRank = [];
-            let wikipediaConceptCosine   = [];
+            let wikipediaConceptSupport  = [];
 
             // prepare wikipedia concepts if they exist
             if (wikipediaConcepts) {
@@ -152,8 +151,7 @@ function build(callback) {
                     // set the wikipedia concepts for the record
                     let uri = concept.secUri ? concept.secUri : concept.uri;
                     wikipediaConceptNames.push(uri);
-                    wikipediaConceptPageRank.push(concept.pageRank);
-                    wikipediaConceptCosine.push(concept.cosine);
+                    wikipediaConceptSupport.push(concept.supportLen);
                 });
             }
 
@@ -169,8 +167,7 @@ function build(callback) {
                 mimetype,
                 language,
                 wikipediaConceptNames,
-                wikipediaConceptPageRank,
-                wikipediaConceptCosine
+                wikipediaConceptSupport
             };
 
             // push to the recommendation model
@@ -203,7 +200,7 @@ function build(callback) {
 
                     // prepare wikipedia concepts if they exist
                     if (material.concepts) {
-                        for (let concept in material.concepts){
+                        for (let concept in material.concepts) {
                             wikipediaConceptNames.push(concept);
                             wikipediaConceptSupport.push(material.concepts[concept]);
                         }

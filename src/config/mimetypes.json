@@ -34,7 +34,10 @@
         "video/vosaic",
         "video/x-amt-demorun",
         "video/x-amt-showrun",
-        "video/mp4"
+        "video/mp4",
+        "video/x-m4v",
+        "video/rm",
+        "video/divx"
     ],
     "audio": [
         "audio/aiff",
@@ -57,7 +60,6 @@
         "audio/x-vnd.audioexplosion.mjuicemediafile",
         "audio/mod",
         "audio/x-mod",
-        "audio/mpeg",
         "audio/x-mpeg",
         "audio/mpeg3",
         "audio/x-mpeg-3",
@@ -157,6 +159,11 @@
 
         "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.oasis.opendocument.text",
+
+        "application/vnd.oasis.opendocument.presentation",
+        "application/vnd.oasis.opendocument.spreadsheet",
 
         "application/excel",
         "application/x-excel",
