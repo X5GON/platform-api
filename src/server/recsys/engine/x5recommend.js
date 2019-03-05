@@ -217,18 +217,18 @@ class x5recommend {
      * Wikipedia concept consine metrics.
      * @private
      */
-    _createContentWikiCosineNNModel() {
+    _createContentWikiSupportNNModel() {
         let self = this;
         // create the content nearest neighbor model
-        self.contentWikiCosineNN = new NearestNeighbor({
+        self.contentWikiSupportNN = new NearestNeighbor({
             mode: 'create',
             base: self.base,
-            modelPath: path.join(self.params.path, '/contentWikiCosineNN.dat'),
+            modelPath: path.join(self.params.path, '/contentWikiSupportNN.dat'),
             store: self.content,
             features: [{
                 type: 'multinomial', source: 'Content',
                 field: 'wikipediaConceptNames',
-                valueField: 'wikipediaConceptCosine'
+                valueField: 'wikipediaConceptSupport'
             }]
         });
     }
@@ -238,14 +238,14 @@ class x5recommend {
      * Wikipedia concept consine metrics.
      * @private
      */
-    _loadContentWikiCosineNNModel() {
+    _loadContentWikiSupportNNModel() {
         let self = this;
         // load the nearest neighbor model used for content recommendation
-        self.contentWikiCosineNN = new NearestNeighbor({
+        self.contentWikiSupportNN = new NearestNeighbor({
             mode: 'load',
             base: self.base,
             store: self.content,
-            modelPath: path.join(self.params.path, '/contentWikiCosineNN.dat')
+            modelPath: path.join(self.params.path, '/contentWikiSupportNN.dat')
         });
     }
 
@@ -293,7 +293,7 @@ class x5recommend {
         let self = this;
         self._createContentTextNNModel();
         self._createContentWikiNNModel();
-        self._createContentWikiCosineNNModel();
+        self._createContentWikiSupportNNModel();
         self._createUserMaterialSimNNModel();
     }
 
@@ -305,7 +305,7 @@ class x5recommend {
         let self = this;
         self._loadContentTextNNModel();
         self._loadContentWikiNNModel();
-        self._loadContentWikiCosineNNModel();
+        self._loadContentWikiSupportNNModel();
         self._loadUserMaterialSimNNModel();
     }
 
@@ -358,8 +358,8 @@ class x5recommend {
             query;
         if (url && (self.content.recordByName(url) || !text)) {
             // decide on the model
-            model = type === 'cosine' ?
-                self.contentWikiCosineNN :
+            model = type === 'support' ?
+                self.contentWikiSupportNN :
                 self.contentWikiNN;
             // setup the query
             query = { url, type };
@@ -409,7 +409,8 @@ class x5recommend {
         const {
             url,
             text,
-            type
+            type,
+            count
         } = userQuery;
 
         let model,
@@ -596,8 +597,30 @@ class x5recommend {
      * @param {Object} params - An object containing material metadata.
      * @param {Number} weight - The indicator of relevance.
      */
-    _materialFormat({ url, title, description, provider, language, mimetype }, weight) {
+    _materialFormat(material, weight) {
         let self = this;
+
+        const {
+            url,
+            title,
+            description,
+            provider,
+            language,
+            mimetype,
+            wikipediaConceptName,
+            wikipediaConceptSupport
+        } = material;
+
+        // get the top 3 wikipedia concepts
+        let sort = wikipediaConceptSupport.sortPerm(false);
+        const maxCount = 3 > sort.perm.length ? sort.perm.length : 3;
+        // store wikipedia names
+        let wikipedia = [];
+        for (let i = 0; i < maxCount; i++) {
+            let maxId = sort.perm[i];
+            wikipedia.push(wikipediaConceptName[maxId]);
+        }
+
         // format the material
         return {
             weight,
@@ -606,6 +629,7 @@ class x5recommend {
             description,
             provider,
             language,
+            wikipedia,
             type: self._detectType(mimetype)
         };
     }

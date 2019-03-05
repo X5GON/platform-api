@@ -12,7 +12,7 @@
         { "name": "mimetype", "type": "string", "null": true },
         { "name": "language", "type": "string", "shortstring": true },
         { "name": "wikipediaConceptNames", "type": "string_v", "null": true },
-        { "name": "wikipediaConceptPageRank", "type": "float_v", "null": true },
+        { "name": "wikipediaConceptSupport", "type": "float_v", "null": true },
         { "name": "wikipediaConceptCosine", "type": "float_v", "null": true }
     ],
     "joins": [
