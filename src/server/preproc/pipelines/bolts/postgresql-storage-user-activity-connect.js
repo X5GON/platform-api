@@ -4,6 +4,8 @@
  * stores it into postgresQL database.
  */
 
+// helper for updating user models with the provided activity
+const updateUserModels = require('@lib/update-user-models');
 
 class PostgresqlStorageUserActivites {
 
@@ -102,7 +104,17 @@ class PostgresqlStorageUserActivites {
             // insert user activity data
             self._pg.insert(user_activities, 'user_activities', function (e, res) {
                 if (e) { return callback(e); }
+
+                /////////////////////////////////
+                // Update User Models
+                /////////////////////////////////
+                if (uuid.includes('unknown')) {
+                    updateUserModels.updateUserModel(message);
+                }
+
+                // go to next record
                 return callback(null);
+
             });
         }).catch(e => callback(e));
 

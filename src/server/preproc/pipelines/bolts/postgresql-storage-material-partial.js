@@ -44,15 +44,10 @@ class PostgresqlMaterialPartial {
             oer_materials_partial
         } = message;
 
-        if (oer_materials_partial) {
-            self._pg.upsert(oer_materials_partial, { materialurl: null }, 'oer_materials_partial', (error, result) => {
-                if (error) { return callback(error); }
-                return callback();
-            }); // self._pg.insert(oer_materials_partial)
-        } else {
-            // there was no material
+        self._pg.upsert(oer_materials_partial, { materialurl: null }, 'oer_materials_partial', (error, result) => {
+            if (error) { return callback(error); }
             return callback();
-        }
+        }); // self._pg.insert(oer_materials_partial)
     }
 }
 

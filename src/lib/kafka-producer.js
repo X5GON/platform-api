@@ -8,6 +8,7 @@ class KafkaProducer {
 
     constructor(host) {
         let self = this;
+
         const options = {
             kafkaHost: host
         };
@@ -32,7 +33,7 @@ class KafkaProducer {
                     self._messages = self._messages.slice(1);
                     // send the message to the corresponsing topic
                     self._producer.send([message], (xerror, data) => {
-                        if (xerror) { console.log(xerror); return; }
+                        if (xerror) { console.log(xerror); }
                     });
                 }
             }
@@ -51,14 +52,14 @@ class KafkaProducer {
 
         // get set callback value
         let callback = cb && typeof(cb) === 'function' ?
-            cb : function () { return null; };
+            cb : function (error) { if (error) console.log(error); };
 
 
         // prepare the message in string
         const messages = JSON.stringify(msg);
         if (self._ready) {
             // the producer is ready to send the messages
-            const payload = [{ topic, messages }];
+            const payload = [{ topic, messages, attributes: 1 }];
             self._producer.send(payload, (xerror, data) => {
                 if (xerror) { return callback(xerror); }
                 return callback(null);

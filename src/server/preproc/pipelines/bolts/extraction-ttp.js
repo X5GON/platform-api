@@ -172,13 +172,7 @@ class ExtractionTTP {
             const constructedLanguages = Object.keys(requested_langs)
                                 .filter(lang => lang !== 'en');
 
-            // TODO: remove once the sl-en translation is enabled
-            if (material.language === 'sl') {
-                requested_langs = {
-                    sl: { sub: {} }
-                };
-            } else if (constructedLanguages.includes(material.language)) {
-
+            if (constructedLanguages.includes(material.language)) {
                 // for non-english lnaguages, we need to set up translation paths
                 for (let language of constructedLanguages) {
                     // if the language is not the material language or english
