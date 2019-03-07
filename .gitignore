@@ -81,6 +81,8 @@ data
 backup
 examples
 
+*.pyc
+
 # temporary ignore visualizations
 src/server/visualizations
 
