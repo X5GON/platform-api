@@ -109,7 +109,11 @@ class PostgresqlStorageUserActivites {
                 // Update User Models
                 /////////////////////////////////
                 if (uuid.includes('unknown')) {
-                    updateUserModels.updateUserModel(message);
+                    const activity = {
+                        uuid,
+                        urls: [url]
+                    };
+                    updateUserModels.updateUserModel(activity);
                 }
 
                 // go to next record
