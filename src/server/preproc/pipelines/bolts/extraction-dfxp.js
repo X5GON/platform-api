@@ -37,21 +37,24 @@ class ExtractionDFXP {
     receive(material, stream_id, callback) {
 
         // get the raw text associated with the videos
+        let slug;
+        if (material.provideruri.includes('videolectures')) {
+            slug = material.provideruri.split('/')[3];
+        } else if (material.provideruri.includes('media.upv.es')) {
+            let sections = material.provideruri.split('/');
+            slug = sections[sections.length - 1];
+        } else if (material.provideruri.includes('virtuos')) {
+            let sections = material.provideruri.split('=');
+            slug = sections[sections.length - 1];
+        }
+
         try {
-            let slug;
-            if (material.provideruri.includes('videolectures')) {
-                slug = material.provideruri.split('/')[3];
-            } else if (material.provideruri.includes('media.upv.es')) {
-                let sections = material.provideruri.split('/');
-                slug = sections[sections.length - 1];
-            }
-
-            let promise = dfxp2srt(slug, this._dfxpFolder);
-
+            // get promises
+            let promises = dfxp2srt(slug, this._dfxpFolder);
             // get the responses
-            promise.then(transcripts => {
+            Promise.all(promises).then(transcripts => {
                 // set placeholders for the values
-                let originDfxp, originText, transcriptions = { };
+                let originText, transcriptions = { };
 
                 // iterate through the transcripts and save them
                 for (let transcript of transcripts) {
@@ -60,26 +63,21 @@ class ExtractionDFXP {
 
                     if (material.language === lang) {
                         originText = plain;
-                        originDfxp = dfxp;
                     }
                 }
 
                 // assign the extracted attributes to the material
                 material.materialmetadata.rawText = originText;
                 material.materialmetadata.transcriptions = transcriptions;
-
                 // send the material to the next component
                 return this._onEmit(material, stream_id, callback);
-            }).catch(error => {
-                // unable to process the material
-                material.message = `${this._prefix} ${error.message}`;
-                return this._onEmit(material, 'stream_partial', callback);
             });
         } catch (error) {
-            // unable to process the material
-            material.message = `${this._prefix} ${error.message}`;
-            return this._onEmit(material, 'stream_partial', callback);
+             // unable to process the material
+             material.message = `${this._prefix} ${error.message}`;
+             return this._onEmit(material, 'stream_partial', callback);
         }
+
     }
 }
 

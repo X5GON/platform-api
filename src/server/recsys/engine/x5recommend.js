@@ -393,6 +393,16 @@ class x5recommend {
     }
 
 
+    /**
+     * @description Get bundle based recommendations.
+     * @param {Object} userQuery - The object containing the required query parameters.
+     * @param {String} [userQuery.text] - The text parameter. Finds material containing similar text.
+     * @param {String} [userQuery.url] - The url parameter. Finds the material found using the url and
+     * returns material similar to it.
+     * @param {String} [userQuery.type] - The metrics type.
+     * @param {String} [userQuery.count] - The number of recommendations to provide.
+     * @returns {Array.<Object>} An array of recommended learning material.
+     */
     recommendBundles(userQuery) {
         let self = this;
 
@@ -416,7 +426,7 @@ class x5recommend {
         let model,
             query;
         // get the model of the respected type
-        if (url && self.materialModel.recordByName(url)) {
+        if (url && (self.materialModel.recordByName(url) || !text)) {
             // decide on the model
             model = self.userMaterialSimNN;
             // setup the query
@@ -544,7 +554,6 @@ class x5recommend {
     recommend(query, type='materials') {
         const self = this;
 
-
         let recommendations;
         if (type === 'materials') {
             recommendations = self.recommendMaterials(query);
@@ -553,7 +562,7 @@ class x5recommend {
         } else if (type === 'personal') {
             recommendations = self.recommendPersonalized(query);
         } else {
-            return Promise.resolve([[],[]]);
+            recommendations = Promise.resolve([[],[]]);
         }
 
         // return an object
@@ -607,7 +616,7 @@ class x5recommend {
             provider,
             language,
             mimetype,
-            wikipediaConceptName,
+            wikipediaConceptNames,
             wikipediaConceptSupport
         } = material;
 
@@ -618,7 +627,10 @@ class x5recommend {
         let wikipedia = [];
         for (let i = 0; i < maxCount; i++) {
             let maxId = sort.perm[i];
-            wikipedia.push(wikipediaConceptName[maxId]);
+            wikipedia.push({
+                concept: wikipediaConceptNames[maxId],
+                support: wikipediaConceptSupport[maxId]
+            });
         }
 
         // format the material

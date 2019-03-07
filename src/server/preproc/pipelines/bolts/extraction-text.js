@@ -9,6 +9,11 @@
 // external libraries
 const textract = require('textract');
 
+const textConfig = {
+    preserveLineBreaks: true,
+    includeAltText: true
+};
+
 /**
  * Formats Material into a common schema.
  */
@@ -49,7 +54,7 @@ class ExtractionText {
 
         if (material.type && !this._invalidTypes.includes(material.type.ext)) {
             // extract raw text from materialURL
-            textract.fromUrl(material.materialurl, (error, text) => {
+            textract.fromUrl(material.materialurl, textConfig, (error, text) => {
                 if (error) {
                     material.message = `${this._prefix} Not able to extract text.`;
                     return this._onEmit(material, 'stream_partial', callback);

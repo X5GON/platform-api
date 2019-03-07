@@ -21,7 +21,7 @@ module.exports = function (pg, logger, config) {
     // parameters used within the routes
     const x5gonCookieName = 'x5gonTrack';
 
-    // TODO: initialize kafka producer
+    // initialize kafka producer
     const producer = new KafkaProducer(config.kafka.host);
 
     /**
@@ -331,7 +331,7 @@ module.exports = function (pg, logger, config) {
             // get the user id from the X5GON tracker
             uuid = req.cookies[x5gonCookieName] ?
                 req.cookies[x5gonCookieName] :
-                'unknown:not-tracking';
+                'unknown';
         }
 
         // prepare the acitivity object

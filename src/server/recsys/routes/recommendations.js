@@ -81,13 +81,13 @@ module.exports = function (pg, logger) {
             // send the recommendations to the user
             return res.status(200).send(results);
         }).catch(error => {
-            if (error.error) {
-                let errorMessage = 'error when making recommendations: ' + error.error;
+            if (error) {
+                let errorMessage = 'error when making recommendations: ' + error.message;
                 logger.warn('warning [query_parameters]: client requested for recommendation failed',
                     logger.formatRequest(req, { error: errorMessage })
                 );
             }
-            return res.status(400).send({ error: "Bad request: " + error.error });
+            return res.status(400).send({ error: "Bad request: " + error.message });
         });
 
     });

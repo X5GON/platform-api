@@ -21,7 +21,7 @@
         "cwd": "./pipelines/",
         "env": {
             "NODE_ENV": "dev",
-            "TOPOLOGY": "processing-material-video-automatic"
+            "TOPOLOGY": "processing-material-video-manual"
         },
         "env_production": {
             "NODE_ENV": "prod",
