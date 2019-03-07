@@ -183,6 +183,16 @@ a:active,
     box-shadow: none;
 }
 
+#homepage-title {
+    margin-top: 50px;
+    text-align: center;
+    background-color: white;
+}
+
+#homepage-title img {
+    width: 80%;
+}
+
 @media screen and (min-width: 776px) {
     body.main-container {
         background-image: url(/img/oer-global-network.svg);
@@ -190,16 +200,12 @@ a:active,
         background-position: center center;
         background-repeat: no-repeat;
     }
-}
-
-#homepage-title {
-    margin-top: 160px;
-    text-align: center;
-    background-color: white;
-}
-
-#homepage-title img {
-    width: 60%;
+    #homepage-title {
+        margin-top: 160px;
+    }
+    #homepage-title img {
+        width: 60%;
+    }
 }
 
 .card {
