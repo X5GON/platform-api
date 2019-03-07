@@ -65,7 +65,7 @@ module.exports = function (pg, logger, config) {
 
     router.get('/', (req, res) => {
         // currently redirect to form page
-        res.redirect('/application-form');
+        return res.render('homepage', { layout: 'submain', title: 'Home' });
     });
 
     // send application form page
@@ -298,6 +298,7 @@ module.exports = function (pg, logger, config) {
             try {
                 const recommendations = JSON.parse(body);
                 options.empty = recommendations.length !== 0 || recommendations.error ? false : true;
+                options.query = query;
                 options.recommendations = recommendations;
                 return res.render('recommendations', options);
             } catch(xerror) {

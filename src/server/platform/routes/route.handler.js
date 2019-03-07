@@ -13,7 +13,12 @@ module.exports = function (app, pg, logger, config, monitor) {
     // service REST API
     app.use('/api/v1', require('./v1/connect/connect')(pg, logger, config));
 
+    // search REST API
     app.use('/api/v1', require('./v1/recommender/search')(pg, logger, config));
+
+    // storing REST API
+    app.use('/api/v1/storing', require('./v1/storing/selections')(pg, logger, config));
+    app.use('/api/v1/storing', require('./v1/storing/transitions')(pg, logger, config));
 
     // query REST API
     app.use('/api/v1', require('./v1/query/oer-materials')(pg, logger, config));

@@ -21,7 +21,7 @@ module.exports = function (pg, logger, config) {
     // parameters used within the routes
     const x5gonCookieName = 'x5gonTrack';
 
-    // TODO: initialize kafka producer
+    // initialize kafka producer
     const producer = new KafkaProducer(config.kafka.host);
 
     /**

@@ -54,14 +54,14 @@ module.exports = function (pg, logger, config) {
             oer_materials_query AS (
                 SELECT
                     ${schema}.oer_materials.*,
-                    urls_extended.url AS url,
 
+                    urls_extended.url             AS url,
                     urls_extended.provider_id     AS provider_id,
                     urls_extended.provider_name   AS provider_name,
                     urls_extended.provider_domain AS provider_domain,
 
                     COUNT(*) OVER() AS full_count
-                FROM ${schema}.oer_materials RIGHT JOIN urls_extended
+                FROM ${schema}.oer_materials LEFT JOIN urls_extended
                 ON ${schema}.oer_materials.id=urls_extended.material_id
 
                 ${LANGUAGES.length ? `WHERE ${schema}.oer_materials.language IN (${LANGUAGES.join(',')})` : ''}
@@ -155,7 +155,6 @@ module.exports = function (pg, logger, config) {
                 oer_materials_query.type,
                 oer_materials_query.mimetype,
                 oer_materials_query.license,
-                oer_materials_query.full_count,
 
                 oer_materials_query.provider_id,
                 oer_materials_query.provider_name,
@@ -177,7 +176,6 @@ module.exports = function (pg, logger, config) {
                 oer_materials_query.type,
                 oer_materials_query.mimetype,
                 oer_materials_query.license,
-                oer_materials_query.full_count,
 
                 oer_materials_query.provider_id,
                 oer_materials_query.provider_name,
@@ -240,7 +238,7 @@ module.exports = function (pg, logger, config) {
 
         // calculate number of pages
         const NEXT_OFFSET = OFFSET + LIMIT;
-        const MAX_OFFSET = Math.floor(fullCount / LIMIT);
+        const MAX_OFFSET = Math.floor(fullCount / LIMIT) * LIMIT;
 
         // construct create the domain
         const domain  = `https://platform.x5gon.org`;
@@ -468,7 +466,7 @@ module.exports = function (pg, logger, config) {
 
 
     // check parameter validity
-    function checkParameters(req, res, next) {
+    router.get((req, res, next) => {
 
         // set error message container
         let error_msgs = [];
@@ -493,14 +491,13 @@ module.exports = function (pg, logger, config) {
             });
         }
 
-
         /**********************************
          * continue with request
          *********************************/
 
         // continue the request
         return next();
-    }
+    });
 
 
     /**********************************
@@ -601,7 +598,6 @@ module.exports = function (pg, logger, config) {
 
     });
 
-    router.get('/oer_materials/:material_id', checkParameters);
     router.get('/oer_materials/:material_id', (req, res) => {
         // get material id
         const { material_id } = req.params;
@@ -650,7 +646,6 @@ module.exports = function (pg, logger, config) {
 
     });
 
-    router.get('/oer_materials/:material_id/contents', checkParameters);
     router.get('/oer_materials/:material_id/contents', (req, res) => {
 
         // get material id
@@ -699,7 +694,6 @@ module.exports = function (pg, logger, config) {
 
     });
 
-    router.get('/oer_materials/:material_id/contents/:content_id', checkParameters);
     router.get('/oer_materials/:material_id/contents/:content_id', (req, res) => {
         // get material and content ids
         const {
