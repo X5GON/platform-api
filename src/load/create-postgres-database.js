@@ -827,6 +827,115 @@ const dbCreates = {
             IS 'The id of the associated record in the cookies table';`,
 
 
+    rec_sys_user_selections:
+        `CREATE TABLE ${schema}.rec_sys_user_selections (
+            id          serial  PRIMARY KEY,
+            query       jsonb   NOT NULL,
+            results     jsonb   NOT NULL,
+            selection   integer NOT NULL,
+            uuid        varchar,
+
+            cookie_id   integer,
+            FOREIGN KEY (cookie_id) REFERENCES ${schema}.cookies(id) ON UPDATE CASCADE ON DELETE CASCADE
+        );
+
+        ALTER TABLE ${schema}.rec_sys_user_selections
+            OWNER TO ${config.pg.user};
+
+        CREATE INDEX rec_sys_user_selections_id
+            ON ${schema}.rec_sys_user_selections(id);
+
+        CREATE INDEX rec_sys_user_selections_query
+            ON ${schema}.rec_sys_user_selections USING GIN(query);
+
+
+
+        CREATE TRIGGER update_rec_sys_user_selections_keys
+            BEFORE INSERT OR UPDATE ON ${schema}.rec_sys_user_selections
+            FOR EACH ROW
+            EXECUTE PROCEDURE set_cookie_id();
+
+
+
+        COMMENT ON TABLE ${schema}.rec_sys_user_selections
+            IS 'The table containing the user selections from the recommender engine';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_selections.id
+            IS 'The id of the user selection';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_selections.query
+            IS 'The query provided by the user';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_selections.results
+            IS 'The query results';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_selections.selection
+            IS 'The user selection within the query';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_selections.uuid
+            IS 'The user identifier extracted from the token that did the selection';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_selections.cookie_id
+            IS 'The id of the user cookie that did the selection';`,
+
+
+    rec_sys_user_transitions:
+        `CREATE TABLE ${schema}.rec_sys_user_transitions (
+            id                  serial PRIMARY KEY,
+            uuid                varchar,
+            from_url            varchar NOT NULL,
+            to_url              varchar NOT NULL,
+
+            cookie_id               integer,
+            from_material_model_id  integer,
+            to_material_model_id    integer,
+            FOREIGN KEY (cookie_id)              REFERENCES ${schema}.cookies(id)                ON UPDATE CASCADE ON DELETE CASCADE,
+            FOREIGN KEY (from_material_model_id) REFERENCES ${schema}.rec_sys_material_model(id) ON UPDATE CASCADE ON DELETE CASCADE,
+            FOREIGN KEY (to_material_model_id)   REFERENCES ${schema}.rec_sys_material_model(id) ON UPDATE CASCADE ON DELETE CASCADE
+        );
+
+        ALTER TABLE ${schema}.rec_sys_user_transitions
+            OWNER TO ${config.pg.user};
+
+        CREATE INDEX rec_sys_user_transitions_id
+            ON ${schema}.rec_sys_user_transitions(id);
+
+        CREATE INDEX rec_sys_user_transitions_from_material_model_id
+            ON ${schema}.rec_sys_user_transitions(from_material_model_id);
+
+        CREATE INDEX rec_sys_user_transitions_to_material_model_id
+            ON ${schema}.rec_sys_user_transitions(to_material_model_id);
+
+        CREATE INDEX rec_sys_user_transitions_uuid
+            ON ${schema}.rec_sys_user_transitions(uuid);
+
+
+
+        CREATE TRIGGER update_rec_sys_user_transitions_keys
+            BEFORE INSERT OR UPDATE ON ${schema}.rec_sys_user_transitions
+            FOR EACH ROW
+            EXECUTE PROCEDURE set_cookie_id();
+
+
+
+        COMMENT ON TABLE ${schema}.rec_sys_user_transitions
+            IS 'The table containing the user transitions triggered by selection on the recommender engine';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_transitions.id
+            IS 'The id of the user transition';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_transitions.from_material_model_id
+            IS 'The url from which the user transitioned';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_transitions.to_material_model_id
+            IS 'The url to which the user transitioned';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_transitions.uuid
+            IS 'The transitioned user identifier extracted from the token';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_transitions.cookie_id
+            IS 'The id of the user cookie that triggered the transition';`,
+
 
     tools:
         `CREATE TABLE ${schema}.tools (

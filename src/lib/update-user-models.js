@@ -62,7 +62,7 @@ function updateUserModel(activity, cb) {
     // extract activity data
     const {
         uuid,
-        url
+        urls
     } = activity;
 
     // get corresponding user model
@@ -78,86 +78,85 @@ function updateUserModel(activity, cb) {
         }
 
         // escape the provider uri and query for material models
-        let escapedUri = url.replace('\'', '\'\'');
+        let escapedUris = urls.map(url => url.replace('\'', '\'\''));
 
         let query = `
             SELECT *
             FROM ${schema}.rec_sys_material_model
-            WHERE provider_uri LIKE '%${escapedUri}%'`;
+            WHERE provider_uri SIMILAR TO '%(${escapedUris.join('|')})%'`;
 
-        pg.execute(query, [], function(xerror, material_model) {
+        let user;
+        if (user_model.length === 0) {
+            user = {
+                uuid: activity.uuid,
+                language: { },
+                visited: {
+                    count: 0
+                },
+                type: { },
+                concepts: { }
+            };
+        } else { user = user_model[0]; }
+
+        pg.executeLarge(query, [], 10, function(xerror, material_models, cb) {
             if (xerror) {
                 console.log('Error fetching material model: ' + xerror);
                 console.log('Query: ' + query);
                 return callback(xerror);
-
-            }
-
-            if (material_model.length === 0) {
-                //material is not stored in db
-                return callback();
             }
 
             // get or create user model
-            let user;
-            const material = material_model[0];
-            if (user_model.length === 0) {
-                user = {
-                    uuid: activity.uuid,
-                    language: { },
-                    visited: {
-                        count: 0
-                    },
-                    type: { },
-                    concepts: { }
-                };
-            } else { user = user_model[0]; }
-
-            // check if the user has visited the material before
-            if (material && user) {
-                if (user.visited.hasOwnProperty(material.provider_uri)) {
-                    // user has already seen the material - nothing to do
-                    user.visited[material.provider_uri] += 1;
-                    return callback();
-                }
-                // if user has not seen the material
-                const count = user.visited.count;
-
-                let concepts = JSON.parse(JSON.stringify(user.concepts)); // copy concepts object
-                concepts = multiplyObjects(concepts, count);
-                concepts = addObjects(concepts, material.concepts);
-                concepts = multiplyObjects(concepts, 1 / (count + 1));
-                user.concepts = concepts;
-
-                // update visited count and url
-                user.visited[material.provider_uri] = 1;
-                user.visited.count += 1;
-
-                // update the type profile of the user
-                if (!user.type.hasOwnProperty(material.type)) {
-                    user.type[material.type] = 0;
-                }
-                user.type[material.type] += 1;
-
-                // update the language profile of the user
-                if (!user.language.hasOwnProperty(material.language)) {
-                    user.language[material.language] = 0;
-                }
-                user.language[material.language] += 1;
-
-                console.log('Processing user:', activity.uuid, 'url:', material.provider_uri);
-                // insert or update the user model to the database
-                pg.upsert(user, { uuid: null }, `${schema}.rec_sys_user_model` , function(yerror) {
-                    if (yerror) {
-                        console.log('Error upserting user model: ', + yerror);
-                        return callback(yerror);
+            for (let material of material_models) {
+                // check if the user has visited the material before
+                if (material && user) {
+                    if (user.visited.hasOwnProperty(material.provider_uri)) {
+                        // user has already seen the material - nothing to do
+                        user.visited[material.provider_uri] += 1;
+                        return callback();
                     }
-                    return callback();
+                    // if user has not seen the material
+                    const count = user.visited.count;
 
-                });
-            } else {
+                    let concepts = JSON.parse(JSON.stringify(user.concepts)); // copy concepts object
+                    concepts = multiplyObjects(concepts, count);
+                    concepts = addObjects(concepts, material.concepts);
+                    concepts = multiplyObjects(concepts, 1 / (count + 1));
+                    user.concepts = concepts;
+
+                    // update visited count and url
+                    user.visited[material.provider_uri] = 1;
+                    user.visited.count += 1;
+
+                    // update the type profile of the user
+                    if (!user.type.hasOwnProperty(material.type)) {
+                        user.type[material.type] = 0;
+                    }
+                    user.type[material.type] += 1;
+
+                    // update the language profile of the user
+                    if (!user.language.hasOwnProperty(material.language)) {
+                        user.language[material.language] = 0;
+                    }
+                    user.language[material.language] += 1;
+                }
+            }
+            // get the next batch of materials
+            cb();
+        }, (error) => {
+            if (error) {
+                console.log('Error', error);
+                return callback(error);
+            }
+
+            console.log('Processing user:', activity.uuid, 'url count:', urls.length);
+            // insert or update the user model to the database
+            pg.upsert(user, { uuid: null }, `${schema}.rec_sys_user_model` , function(yerror) {
+                if (yerror) {
+                    console.log('Error upserting user model: ', + yerror);
+                    return callback(yerror);
+                }
                 return callback();
-            } // if (matertial && user)
+            });
 
         }); // pg.execute('rec_sys_material_model')
 
