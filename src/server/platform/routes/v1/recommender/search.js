@@ -52,7 +52,7 @@ module.exports = function (pg, logger, config) {
     router.get('/search', (req, res) => {
         const query = req.query;
         let queryString = Object.keys(query).map(key => `${key}=${encodeURIComponent(query[key])}`).join('&');
-        request(`http://localhost:${config.platform.port}/api/v1/recommend/content?${queryString}`, (error, httpRequest, body) => {
+        request(`http://localhost:${config.platform.port}/api/v1/recommend/materials?${queryString}`, (error, httpRequest, body) => {
             let options = { };
             try {
                 const recommendations = JSON.parse(body);

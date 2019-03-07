@@ -67,10 +67,6 @@
     text-decoration: none;
 }
 
-#search-container {
-    width: 600px;
-}
-
 #search-input {
     margin-top: 160px;
     text-align: center;
@@ -80,6 +76,11 @@
 #search-input img {
     width: 80%;
 
+}
+
+#search-options-elements,
+#search-container {
+    width: 600px;
 }
 
 #search-options-elements {

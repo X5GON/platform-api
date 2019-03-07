@@ -180,9 +180,10 @@ module.exports = function (pg, logger, config) {
             let queryParams = req.query;
             queryParams.type = queryParams.type || 'all';
             queryParams.page = parseInt(queryParams.page) || 1;
+            queryParams.count = parseInt(queryParams.count) || 10000;
 
             let queryString = Object.keys(queryParams).map(key => `${key}=${encodeURIComponent(queryParams[key])}`).join('&');
-            request(`http://localhost:${config.platform.port}/api/v1/recommend/content?${queryString}`, (error, httpRequest, body) => {
+            request(`http://localhost:${config.platform.port}/api/v1/recommend/materials?${queryString}`, (error, httpRequest, body) => {
                 // set query parameters
                 let query = {
                     query: queryParams.text,
@@ -206,15 +207,17 @@ module.exports = function (pg, logger, config) {
                     recommendations.forEach(recommendation => {
                         if (recommendation.description) {
                             // slice the description into a more digestive element
-                            let abstract = recommendation.description.split(' ').slice(0, 30).join(' ');
-                            if (recommendation.description !== abstract) { recommendation.description = `${abstract} ...`; }
+                            let abstract = recommendation.description.split('.').slice(0, 2).join('. ');
+
+                            for (let word of queryParams.text.split(' ')) {
+                                const pattern = new RegExp(word, 'gi');
+                                abstract = abstract.replace(pattern, str => `<b>${str}</b>`);
+                            }
+
+                            if (recommendation.description !== abstract) { recommendation.description = `${abstract}. ...`; }
                         }
-                        // determine material type
-                        recommendation.type = recommendation.videoType ? 'video' :
-                            recommendation.audioType ? 'audio' : 'file-alt';
                         // embed url
-                        recommendation.embedUrl = recommendation.provider === 'Videolectures.NET' ?
-                            `${recommendation.url}iframe/1/` : recommendation.url;
+                        recommendation.embedUrl = recommendation.url;
                     });
 
                     // save recommendations
@@ -289,9 +292,12 @@ module.exports = function (pg, logger, config) {
             fontSize
         };
 
+        console.log(query);
+
         let options = { layout: 'empty', style };
-        let queryString = Object.keys(query).map(key => `${key}=${query[key]}`).join('&');
-        request(`http://localhost:${config.platform.port}/api/v1/recommend/content?${queryString}`, (error, httpRequest, body) => {
+        let queryString = Object.keys(query).map(key => `${key}=${encodeURIComponent(query[key])}`).join('&');
+        console.log(queryString);
+        request(`http://localhost:${config.platform.port}/api/v1/recommend/bundles?${queryString}`, (error, httpRequest, body) => {
             try {
                 const recommendations = JSON.parse(body);
                 options.empty = recommendations.length !== 0 || recommendations.error ? false : true;
@@ -311,7 +317,7 @@ module.exports = function (pg, logger, config) {
      */
 
     router.get('/error', (req, res) => {
-        return res.render('error', { title: '404'  });
+        return res.render('error', { title: '404' });
     });
 
 

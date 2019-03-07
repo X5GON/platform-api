@@ -4,9 +4,11 @@
  */
 
 const config = require('@config/config');
+const mimetypes = require('@config/mimetypes');
 
 // external modules
 const path = require('path');
+const fs = require('fs');
 const qm = require('qminer');
 
 // internal modules
@@ -17,7 +19,7 @@ const pg = require('@lib/postgresQL')(config.pg);
 /**
  * @class x5recommend
  * @classdesc The x5recommend class - handling the recommendation requests given by
- * the x5gon project users.
+ * the x5gon project users.mimetypes
  */
 class x5recommend {
 
@@ -55,6 +57,7 @@ class x5recommend {
      */
     _loadBase() {
         let self = this;
+
         // set the base parameters
         let baseParams = {
             dbPath: path.normalize(self.params.path),
@@ -72,6 +75,11 @@ class x5recommend {
         } else if (self.params.mode === 'readOnly') {
             // open database in readOnly mode - don't allow changing store records
             baseParams.mode = 'openReadOnly';
+            // remove the lock file if present
+            const lockPath = path.normalize(path.join(self.params.path, 'lock'));
+            if (fs.existsSync(lockPath)) {
+                fs.unlinkSync(lockPath);
+            }
         } else {
             // unsupported qminer mode - log the error
             let errorMessage = `Value of parameter 'mode' is not supported: ${self.params.mode}`;
@@ -163,6 +171,7 @@ class x5recommend {
         self.contentTextNN = new NearestNeighbor({
             mode: 'load',
             base: self.base,
+            store: self.content,
             modelPath: path.join(self.params.path, '/contentTextNN.dat')
         });
     }
@@ -198,7 +207,8 @@ class x5recommend {
         self.contentWikiNN = new NearestNeighbor({
             mode: 'load',
             base: self.base,
-            modelPath: path.join(self.params.path, '/contentWikiNN.dat')
+            store: self.content,
+            modelPath: path.join(self.params.path, '/contentWikiNN.dat'),
         });
     }
 
@@ -207,18 +217,18 @@ class x5recommend {
      * Wikipedia concept consine metrics.
      * @private
      */
-    _createContentWikiCosineNNModel() {
+    _createContentWikiSupportNNModel() {
         let self = this;
         // create the content nearest neighbor model
-        self.contentWikiCosineNN = new NearestNeighbor({
+        self.contentWikiSupportNN = new NearestNeighbor({
             mode: 'create',
             base: self.base,
-            modelPath: path.join(self.params.path, '/contentWikiCosineNN.dat'),
+            modelPath: path.join(self.params.path, '/contentWikiSupportNN.dat'),
             store: self.content,
             features: [{
                 type: 'multinomial', source: 'Content',
                 field: 'wikipediaConceptNames',
-                valueField: 'wikipediaConceptCosine'
+                valueField: 'wikipediaConceptSupport'
             }]
         });
     }
@@ -228,13 +238,14 @@ class x5recommend {
      * Wikipedia concept consine metrics.
      * @private
      */
-    _loadContentWikiCosineNNModel() {
+    _loadContentWikiSupportNNModel() {
         let self = this;
         // load the nearest neighbor model used for content recommendation
-        self.contentWikiCosineNN = new NearestNeighbor({
+        self.contentWikiSupportNN = new NearestNeighbor({
             mode: 'load',
             base: self.base,
-            modelPath: path.join(self.params.path, '/contentWikiCosineNN.dat')
+            store: self.content,
+            modelPath: path.join(self.params.path, '/contentWikiSupportNN.dat')
         });
     }
 
@@ -270,6 +281,7 @@ class x5recommend {
         self.userMaterialSimNN = new NearestNeighbor({
             mode: 'load',
             base: self.base,
+            store: self.materialModel,
             modelPath: path.join(self.params.path, '/userMaterialSimNN.dat')
         });
     }
@@ -281,7 +293,7 @@ class x5recommend {
         let self = this;
         self._createContentTextNNModel();
         self._createContentWikiNNModel();
-        self._createContentWikiCosineNNModel();
+        self._createContentWikiSupportNNModel();
         self._createUserMaterialSimNNModel();
     }
 
@@ -293,7 +305,7 @@ class x5recommend {
         let self = this;
         self._loadContentTextNNModel();
         self._loadContentWikiNNModel();
-        self._loadContentWikiCosineNNModel();
+        self._loadContentWikiSupportNNModel();
         self._loadUserMaterialSimNNModel();
     }
 
@@ -303,66 +315,219 @@ class x5recommend {
 
     /**
      * @description Get content based recommendations.
-     * @param {Object} query - The object containing the required query parameters.
-     * @param {String} [query.text] - The text parameter. Finds material containing similar text.
-     * @param {String} [query.url] - The url parameter. Finds the material found using the url and
+     * @param {Object} userQuery - The object containing the required query parameters.
+     * @param {String} [userQuery.text] - The text parameter. Finds material containing similar text.
+     * @param {String} [userQuery.url] - The url parameter. Finds the material found using the url and
      * returns material similar to it.
-     * @param {String} [query.type] - The metrics type.
+     * @param {String} [userQuery.type] - The metrics type.
      * @returns {Array.<Object>} An array of recommended learning material.
      */
-    recommendContent(query) {
+    recommendMaterials(userQuery) {
         let self = this;
-        // distinguish between the url and title & description query methods
-        let recommendations;
 
-        if (!query) {
+        // distinguish between the url and title & description query methods
+        if (!userQuery) {
             let errorMessage = 'Missing query';
-            self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
-                error: errorMessage, query
+            self.logger.error(`error [x5recommend.recommendMaterials]: ${errorMessage}`, {
+                error: errorMessage, query: userQuery
             });
             // not supported query option - return error
-            return { error: errorMessage };
+            return Promise.reject({ error: errorMessage });
         }
 
-        if (query.url && query.type === 'cosine') {
-            // get recommendations based on wikipedia concepts using url & cosine metrics
-            recommendations = self.contentWikiCosineNN.search({ url: query.url }, self.content);
-        } else if (query.url) {
-            // get recommendations based on wikipedia concepts using url
-            recommendations = self.contentWikiNN.search({ url: query.url }, self.content);
+        const {
+            url,
+            text,
+            type,
+            count
+        } = userQuery;
+
+        // if none of the parameters are provided
+        if (!url && !text) {
+            // log the error for unsupported parameters
+            let errorMessage = 'Unsupported recommendation parameters';
+            self.logger.error(`error [x5recommend.recommendMaterials]: ${errorMessage}`, {
+                error: errorMessage, query: userQuery
+            });
+            // not supported query option - return error
+            return Promise.reject({ error: errorMessage });
         }
 
-        if (query.text && (!recommendations || (recommendations && !recommendations[0].length))) {
-            // there were no recommendations found for given url
-            // - try with content based recommendations
-            recommendations = self.contentTextNN.search({ text: query.text }, self.content);
+        // get the model of the respected type
+        let model,
+            query;
+        if (url && (self.content.recordByName(url) || !text)) {
+            // decide on the model
+            model = type === 'support' ?
+                self.contentWikiSupportNN :
+                self.contentWikiNN;
+            // setup the query
+            query = { url, type };
+        } else if (text) {
+            model = self.contentTextNN;
+            query = { text, type };
         }
 
-        if ((query.url || query.text) && !recommendations) {
+        const maxCount = count ? count : 20;
+        // get material recommendations
+        let recommendations = model.search(query, maxCount);
+
+        if (!recommendations) {
+            let errorMessage = 'Empty query object';
+            self.logger.error(`error [x5recommend.recommendMaterials]: ${errorMessage}`, {
+                error: errorMessage, query: userQuery
+            });
+            // not supported query option - return error
+            return Promise.reject({ error: errorMessage });
+
+        } else if (recommendations.error) {
+            // log the error given by the recommendation search
+            self.logger.error(`error [x5recommend.recommendMaterials]: ${recommendations.error}`, {
+                error: recommendations.error, query: userQuery
+            });
+            // not supported query option - return error
+            return Promise.reject({ error: recommendations.error });
+        }
+
+        return Promise.resolve(recommendations);
+    }
+
+
+    recommendBundles(userQuery) {
+        let self = this;
+
+        // distinguish between the url and title & description query methods
+        if (!userQuery) {
+            let errorMessage = 'Missing query';
+            self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
+                error: errorMessage, query: userQuery
+            });
+            // not supported query option - return error
+            return Promise.reject({ error: errorMessage });
+        }
+
+        const {
+            url,
+            text,
+            type,
+            count
+        } = userQuery;
+
+        let model,
+            query;
+        // get the model of the respected type
+        if (url && self.materialModel.recordByName(url)) {
+            // decide on the model
+            model = self.userMaterialSimNN;
+            // setup the query
+            query = { url, type };
+        } else if (text) {
+            model = self.contentTextNN;
+            query = { text, type };
+        } else {
             // log the error for unsupported parameters
             let errorMessage = 'Unsupported recommendation parameters';
             self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
-                error: errorMessage, query
+                error: errorMessage, query: userQuery
             });
             // not supported query option - return error
-            return { error: errorMessage };
-        } else if (!recommendations) {
+            return Promise.reject({ error: errorMessage });
+        }
+
+        const maxCount = count ? count : 20;
+        // get material recommendations
+        let recommendations = model.search(query, maxCount);
+
+        if (!recommendations) {
             let errorMessage = 'Empty query object';
             self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
-                error: errorMessage, query
+                error: errorMessage, query: userQuery
             });
             // not supported query option - return error
-            return { error: errorMessage };
+            return Promise.reject({ error: errorMessage });
+
         } else if (recommendations.error) {
             // log the error given by the recommendation search
             self.logger.error(`error [x5recommend.recommendContent]: ${recommendations.error}`, {
-                error: recommendations.error, query
+                error: recommendations.error, query: userQuery
             });
             // not supported query option - return error
-            return { error: errorMessage };
+            return Promise.reject({ error: errorMessage });
         }
 
-      return recommendations;
+        return Promise.resolve(recommendations);
+    }
+
+
+    /********************************************
+     * Personalized Recommendation Functions
+     ********************************************/
+
+    /**
+      * @description Get content based recommendations.
+      * @param {Object} query - The object containing the required query parameters.
+      * @param {String} [query.text] - The text parameter. Finds material containing similar text.
+      * @param {String} [query.url] - The url parameter. Finds the material found using the url and
+      * returns material similar to it.
+      * @param {String} [query.type] - The metrics type.
+      * @returns {Array.<Object>} An array of recommended learning material.
+      */
+    recommendPersonalized(query) {
+        let self = this;
+
+        return new Promise(function (resolve, reject) {
+            if (!query) {
+                let errorMessage = 'recommendPersonalized: Missing query';
+                self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
+                    error: errorMessage, query
+                });
+                // not supported query option - return error
+                return reject({ error: errorMessage });
+            }
+
+            pg.select({ uuid: query.uuid }, 'rec_sys_user_model', function(error, results) {
+                if (error) {
+                    self.logger.error('Error fetching user model: ' + error);
+                    return reject(error);
+                }
+
+                if (!results || results.length === 0) {
+                    return reject({ error: 'Cookie is not in the database - unable to fetch the user' });
+                }
+
+                results = results[0];
+                let wikipediaConceptNames = [];
+                let wikipediaConceptSupport = [];
+
+                for (let concept in results.concepts) {
+                    wikipediaConceptNames.push(concept);
+                    wikipediaConceptSupport.push(results.concepts[concept]);
+                }
+
+                query = {
+                    uuid: results.uuid,
+                    wikipediaConceptNames: wikipediaConceptNames,
+                    wikipediaConceptSupport: wikipediaConceptSupport
+                };
+
+                let recommendations = self.userMaterialSimNN.search(query);
+
+                if (!recommendations) {
+                    recommendations = {
+                        error: 'Error fetching recommendations'
+                    };
+                    return reject(recommendations);
+                }
+
+                // format recommendations
+                recommendations = recommendations[0].map((material, id) =>
+                    self._materialFormat(material, recommendations[1][id])
+                );
+
+                return resolve(recommendations);
+            });
+        });
+
     }
 
     /********************************************
@@ -376,138 +541,99 @@ class x5recommend {
      * @returns {Array.<Object>} An array of recommended learning material.
      */
 
-    recommend(query){
-        let recommendations = this.recommendContent(query);
+    recommend(query, type='materials') {
+        const self = this;
 
-        if (recommendations.error){
-            return recommendations;
+
+        let recommendations;
+        if (type === 'materials') {
+            recommendations = self.recommendMaterials(query);
+        } else if (type === 'bundle') {
+            recommendations = self.recommendBundles(query);
+        } else if (type === 'personal') {
+            recommendations = self.recommendPersonalized(query);
+        } else {
+            return Promise.resolve([[],[]]);
         }
 
-        /**
-         * Detects the type of the material.
-         * @param {String} mimetype - The mimetype of the material.
-         * @returns {String} The type of the material.
-         */
-        function detectType(mimetype) {
-            let mime = mimetype.split('/');
-            if (mime[0] === 'video') {
-                return 'video';
-            } else {
-                return 'text';
+        // return an object
+        return recommendations.then(results => {
+            if (results.error) {
+                return results;
             }
-        }
 
-        // return the list of recommended materials with their weights
-        return recommendations[0].map((material, id) => ({
-            weight: recommendations[1][id],
-            url: material.url,
-            title: material.title,
-            description: material.description,
-            provider: material.provider,
-            language: material.language,
-            type: detectType(material.mimetype),
-            videoType: detectType(material.mimetype) === 'video',
-            audioType: detectType(material.mimetype) === 'audio',
-            textType: detectType(material.mimetype) === 'text',
-        }));
+            // return the list of recommended materials with their weights
+            return results[0].map((material, id) =>
+                self._materialFormat(material, results[1][id])
+            );
+        });
 
     }
-
 
 
     /********************************************
-      * Personalized Recommendation Functions
-      *******************************************/
+     * Helper Functions
+     ********************************************/
 
     /**
-      * @description Get content based recommendations.
-      * @param {Object} query - The object containing the required query parameters.
-      * @param {String} [query.text] - The text parameter. Finds material containing similar text.
-      * @param {String} [query.url] - The url parameter. Finds the material found using the url and
-      * returns material similar to it.
-      * @param {String} [query.type] - The metrics type.
-      * @returns {Array.<Object>} An array of recommended learning material.
-      */
-    recommendPersonalized(query) {
-        let self = this;
-        let recommendations;
-
-        return new Promise(function (resolve, reject){
-            if (!query) {
-                let errorMessage = 'recommendPersonalized: Missing query';
-                self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
-                    error: errorMessage, query
-                });
-                // not supported query option - return error
-                resolve({ error: errorMessage });
-                return;
+     * Detects the type of the material.
+     * @param {String} mimetype - The mimetype of the material.
+     * @returns {String} The type of the material.
+     */
+    _detectType(mimetype) {
+        // iterate through mimetypes
+        for (let type in mimetypes) {
+            if (mimetypes[type].includes(mimetype)) {
+                return type;
             }
-
-            pg.select({uuid: query.uuid}, 'rec_sys_user_model', function(err, res){
-                if (err){
-                    self.logger.error('Error fetching user model: ' + err);
-                    resolve({error: 'Error fetching user model'});
-                    return;
-                }
-
-                if (!res || res.length == 0){
-                    resolve({error: 'Cookie is not in the database - unable to fetch the user'});
-                    return;
-                }
-
-                res = res[0];
-                let wikipediaConceptNames = [];
-                let wikipediaConceptSupport = [];
-
-                for (let concept in res.concepts){
-                    wikipediaConceptNames.push(concept);
-                    wikipediaConceptSupport.push(res.concepts[concept]);
-                }
-
-                query = {
-                    uuid: res.uuid,
-                    wikipediaConceptNames: wikipediaConceptNames,
-                    wikipediaConceptSupport: wikipediaConceptSupport
-                };
-
-                recommendations = self.userMaterialSimNN.search(query, self.materialModel);
-                if (!recommendations){
-                    recommendations = {error : 'Error fetching recommendations'};
-                    resolve(recommendations);
-                    return;
-                }
-
-               /**
-                * Detects the type of the material.
-                * @param {String} mimetype - The mimetype of the material.
-                * @returns {String} The type of the material.
-                */
-                function detectType(mimetype) {
-                    let mime = mimetype.split('/');
-                    if (mime[0] === 'video') {
-                        return 'video';
-                    } else {
-                        return 'text';
-                    }
-                }
-
-                recommendations = recommendations[0].map((material, id) => ({
-                    weight: recommendations[1][id],
-                    url: material.url,
-                    title: material.title,
-                    description: material.description,
-                    provider: material.provider,
-                    language: material.language,
-                    type: detectType(material.mimetype),
-                    videoType: detectType(material.mimetype) === 'video',
-                    audioType: detectType(material.mimetype) === 'audio',
-                    textType: detectType(material.mimetype) === 'text',
-                }));
-
-                resolve(recommendations);
-                return;
-            });
-        });
+        }
+        // there was no type detected
+        return null;
     }
+
+
+    /**
+     * Formats the materials.
+     * @param {Object} params - An object containing material metadata.
+     * @param {Number} weight - The indicator of relevance.
+     */
+    _materialFormat(material, weight) {
+        let self = this;
+
+        const {
+            url,
+            title,
+            description,
+            provider,
+            language,
+            mimetype,
+            wikipediaConceptName,
+            wikipediaConceptSupport
+        } = material;
+
+        // get the top 3 wikipedia concepts
+        let sort = wikipediaConceptSupport.sortPerm(false);
+        const maxCount = 3 > sort.perm.length ? sort.perm.length : 3;
+        // store wikipedia names
+        let wikipedia = [];
+        for (let i = 0; i < maxCount; i++) {
+            let maxId = sort.perm[i];
+            wikipedia.push(wikipediaConceptName[maxId]);
+        }
+
+        // format the material
+        return {
+            weight,
+            url,
+            title,
+            description,
+            provider,
+            language,
+            wikipedia,
+            type: self._detectType(mimetype)
+        };
+    }
+
+
 }
 module.exports = x5recommend;
