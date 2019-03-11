@@ -10,7 +10,7 @@
     "minify:snippet": "cd src/server/platform/scripts && node minify-snippet.js",
     "start:recsys": "cd src/server/recsys && node recsys.js",
     "start:recsysInspect": "cd src/server/recsys && node inspect recsys.js",
-    "postgres:create": "cd src/load && node create-postgres-tables.js",
+    "postgres:create": "cd src/load && node create-postgres-database.js",
     "test": "cd src/test && NODE_ENV=test mocha all-tests.js",
     "test:lib": "cd src/test/lib && NODE_ENV=test mocha *.js",
     "test:recsys": "cd src/server/recsys/test && NODE_ENV=test mocha *.js",
