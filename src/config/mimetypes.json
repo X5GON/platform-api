@@ -37,7 +37,8 @@
         "video/mp4",
         "video/x-m4v",
         "video/rm",
-        "video/divx"
+        "video/divx",
+        "video/mov"
     ],
     "audio": [
         "audio/aiff",
