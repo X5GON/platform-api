@@ -1,6 +1,6 @@
 # X5GON
 
-## Cross Modal, Cross Cultural, Cross Lingual, Cross Domain, and Cross Site Global OER Network
+### Cross Modal, Cross Cultural, Cross Lingual, Cross Domain, and Cross Site Global OER Network
 
 The X5GON project stands for easily implemented freely available innovative technology elements that
 will converge currently scattered Open Educational Resources (OER) available in various modalities
