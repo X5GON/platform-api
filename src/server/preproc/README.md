@@ -11,27 +11,9 @@ The material processing pipeline is dependent on Apache Kafka. One can install
 an instance of Apache Kafka on their machine - what we prefer is to use a docker
 container which includes Apache Kafka.
 
-#### Running Docker on Linux
+#### Installing and Running Docker
 
-In the command line run the following commands. This will install and link Docker
-to your account.
-
-```bash
-sudo apt-get update
-sudo apt-get -y install docker.io
-sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker
-```
-
-Docker Hub contains a container called
-[eriknovak/kafka-x5gon](https://hub.docker.com/r/eriknovak/kafka-x5gon)
-which includes Apache Kafka adapted for the X5GON platform. Running the following
-command should start a docker container (in dettach mode `[-d]`).
-
-**NOTE:** It is required to run the Kafka container before starting the pipeline.
-
-```bash
-sudo docker run -p 2181:2181 -p 9092:9092 -d --env ADVERTISED_HOST=localhost --env ADVERTISED_PORT=9092 --restart unless-stopped --name kafka-x5gon -h kafka-x5gon eriknovak/kafka-x5gon
-```
+It is required to have a running kafka container before running the processing pipeline. How to do this is described in the project index [readme](../../../README.md).
 
 ## Folder Structure
 
@@ -52,11 +34,12 @@ and process it accordingly. The two types that are currently supported are:
 
 Figure 1 shows the material processing pipeline architecture.
 
-![preprocessing pipeline](imgs/X5GON-processing-pipeline.png)
+![preprocessing pipeline](readme-imgs/kafka-pipeline.png)
 *Figure 1:* The material processing pipeline architecture. It shows how we acquire
 materials via different APIs and send it to the appropriate pipeline based on the
 material's type.
 
+### Pipeline Components
 
 Each pipeline contains the following components:
 

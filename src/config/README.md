@@ -40,6 +40,9 @@ PROD_PG_PASSWORD=postgres-password
 PROD_PG_SCHEMA=postgres-database-schema(optional)
 PROD_PG_VERSION=postgres-database-version(optional)
 
+# kafka messaging system options
+PROD_KAFKA_HOST=kafka-host-ip(optional)
+PROD_KAFKA_GROUP=kafka-group(optional)
 
 #######################################
 ### Development variables
@@ -60,6 +63,10 @@ DEV_PG_PASSWORD=postgres-password
 DEV_PG_SCHEMA=postgres-database-schema(optional)
 DEV_PG_VERSION=postgres-database-version(optional)
 
+# kafka messaging system options
+DEV_KAFKA_HOST=kafka-host-ip(optional)
+DEV_KAFKA_GROUP=kafka-group(optional)
+
 #######################################
 ### Test variables
 #######################################
@@ -79,6 +86,9 @@ TEST_PG_PASSWORD=postgres-password
 TEST_PG_SCHEMA=postgres-database-schema(optional)
 TEST_PG_VERSION=postgres-database-version(optional)
 
+# kafka messaging system options
+TEST_KAFKA_HOST=kafka-host-ip(optional)
+TEST_KAFKA_GROUP=kafka-group(optional)
 
 ######################################
 # Common variables

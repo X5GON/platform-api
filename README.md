@@ -1,7 +1,5 @@
 # X5GON
 
-[![Build Status](https://travis-ci.com/JozefStefanInstitute/x5gon.svg?branch=master)](https://travis-ci.com/JozefStefanInstitute/x5gon)
-
 ## Cross Modal, Cross Cultural, Cross Lingual, Cross Domain, and Cross Site Global OER Network
 
 The X5GON project stands for easily implemented freely available innovative technology elements that
@@ -13,7 +11,18 @@ All of the source code is found in the `src` folder. The folder is structured su
 similar roles or functionalities are found in subfolders making it easier to navigate through the
 project.
 
+The repositories contains the following components:
+
+- **Platform baseline.** Sets up the service which connects all other
+  components. Link: [src/server/platform](./src/server/platform)
+- **Recommender engine.** The service providing material and user
+  recommendations. Link: [src/server/recsys](./src/server/recsys)
+- **Material processing pipeline.** A service for retrieving and processing
+  OER materials. Link: [src/server/preproc](./src/server/preproc)
+
 ## Prerequisites
+
+- Create `.env` file in the `src/config` folder. See instructions described in this [readme](./src/config/readme).
 
 - node.js v6.0 and npm 5.3 or higher
 
@@ -73,8 +82,6 @@ npm run start:platform
 pm2 start ecosystem.platform.config.json
 ```
 
-The source code of the platform component is found in [src/server/platform](./src/server/platform).
-
 #### Recommender Engine Component
 
 Before starting the recommender engine component, first build the recommender models
@@ -86,5 +93,3 @@ npm run start:recsys
 # or with node process messenger
 pm2 start ecosystem.recsys.config.json
 ```
-
-The source code of the recommender engine component is found in [src/server/recsys](./src/server/recsys).
