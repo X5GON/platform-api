@@ -13,7 +13,7 @@ container which includes Apache Kafka.
 
 #### Installing and Running Docker
 
-It is required to have a running kafka container before running the processing pipeline. How to do this is described in the project index [readme](../../../README.md).
+It is required to have a running kafka container before running the processing pipeline. How to do this is described in the project index [README](../../../README.md).
 
 ## Folder Structure
 
