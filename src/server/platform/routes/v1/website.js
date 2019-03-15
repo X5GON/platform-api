@@ -299,6 +299,7 @@ module.exports = function (pg, logger, config) {
                 const recommendations = JSON.parse(body);
                 options.empty = recommendations.length !== 0 || recommendations.error ? false : true;
                 options.query = query;
+                console.log(options);
                 options.recommendations = recommendations;
                 return res.render('recommendations', options);
             } catch(xerror) {

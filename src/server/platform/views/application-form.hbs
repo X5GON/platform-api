@@ -50,7 +50,7 @@
 
             {{! recaptcha }}
             <div class="form-group">
-              <div id="g-recaptcha" aria-describedby="recaptcha-help"></div>
+              <div class="g-recaptcha" aria-describedby="recaptcha-help" data-sitekey={{recaptchaSiteKey}}></div>
               {{#if invalid}}
               <small class="form-text">
                 You need to activate reCAPTCHA to validate you are not a robot!
