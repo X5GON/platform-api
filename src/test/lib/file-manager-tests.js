@@ -27,7 +27,7 @@ describe('file-manager.js: file manager methods unit tests.', function () {
 
         it('Should have seven methods available', function (done) {
             const fileManager = require('../../lib/file-manager');
-            assert.equal(7, Object.keys(fileManager).length);
+            assert.equal(8, Object.keys(fileManager).length);
             done();
         });
 
