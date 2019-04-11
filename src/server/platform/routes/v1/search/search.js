@@ -13,15 +13,17 @@ const request = require('request');
  */
 module.exports = function (pg, logger, config) {
 
-    /********************************************
-     * Helper functions
-     *******************************************/
+
+    ////////////////////////////////////////
+    // Helper functions
+    ////////////////////////////////////////
 
     // TODO: write helper functions
 
-    /**********************************
-     * Routes
-     *********************************/
+
+    ////////////////////////////////////////
+    // API for Material Search
+    ////////////////////////////////////////
 
     /**
      * @api {GET} /api/v1/search Recommendations in JSON
@@ -50,22 +52,52 @@ module.exports = function (pg, logger, config) {
      *      https://platform.x5gon.org/api/v1/search?url=https://platform.x5gon.org/materialUrl&text=deep+learning
      */
     router.get('/search', (req, res) => {
+
         const query = req.query;
         let queryString = Object.keys(query).map(key => `${key}=${encodeURIComponent(query[key])}`).join('&');
+
         request(`http://localhost:${config.platform.port}/api/v1/recommend/materials?${queryString}`, (error, httpRequest, body) => {
-            let options = { };
+
+            let options = { empty: true };
+
+
+            if (error) {
+                // error when making material request
+                logger.error('[error] request for materials',
+                    logger.formatRequest(req, {
+                        error: {
+                            message: error.message,
+                            stack: error.stack
+                        }
+                    })
+                );
+                return res.status(400).send(options);
+            }
+
             try {
                 const recommendations = JSON.parse(body);
                 options.empty = recommendations.length === 0 || recommendations.error ? true : false;
                 options.recommendations = recommendations;
                 return res.status(200).send(options);
-            } catch(xerror) {
-                options.empty = true;
+            } catch (xerror) {
+                 // error when processing materials
+                 logger.error('[error] processing materials',
+                    logger.formatRequest(req, {
+                        error: {
+                            message: xerror.message,
+                            stack: xerror.stack
+                        }
+                    })
+                );
                 return res.status(400).send(options);
             }
         });
     });
 
+
+    ////////////////////////////////////////
+    // End of Router
+    ////////////////////////////////////////
 
     return router;
 };

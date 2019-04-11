@@ -9,7 +9,7 @@ const cors = require('cors');
 // internal modules
 const KafkaProducer = require('@lib/kafka-producer');
 const validator = require('@lib/schema-validator')({
-    userActivitySchema: require('../../../schemas/user-activity-schema')
+    userActivitySchema: require('@platform_schemas/user-activity-schema')
 });
 
 /**
@@ -187,15 +187,17 @@ module.exports = function (pg, logger, config) {
             }
         };
 
+        // calidate the request parameters with the user activity schema
+        const validation = validator.validateSchema(userParameters, validator.schemas.userActivitySchema);
+
         // validate query schema
-        if (!Object.keys(userParameters).length ||
-            !validator.validateSchema(userParameters, validator.schemas.userActivitySchema)) {
+        if (!Object.keys(userParameters).length || !validation.matching) {
             options.headers['x-snippet-status'] = 'failure';
             // TODO: add a good description of what went wrong
             options.headers['x-snippet-message'] = 'check if all parameters are set and if the date-time is in the correct format';
         }
         // return options and user parameters
-        return { options, userParameters };
+        return { options, userParameters, validation };
     }
 
     /**
@@ -273,23 +275,19 @@ module.exports = function (pg, logger, config) {
      *  }
      */
     router.get('/snippet/log/production', (req, res) => {
-        // log client activity
-        logger.info('client requested activity logging',
-            logger.formatRequest(req)
-        );
 
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, '../../../snippet/images/beacon.png');
         // get the options - snippet status headers
-        const { options, userParameters } = _evaluateLog(req);
+        const { options, userParameters, validation } = _evaluateLog(req);
+        // the user parameters object is either empty or is not in correct schema
+        const provider = userParameters.cid ? userParameters.cid : 'unknown';
         // validate query schema
-        if (options.headers['x-snippet-status'] === 'failure') {
-            // the user parameters object is either empty or is not in correct schema
-            const provider = userParameters.cid ? userParameters.cid : 'unknown';
+        if (!validation.matching) {
             // log user parameters error
-            logger.error('error [route_body]: client activity logging failed',
+            logger.error('[error] client activity logging not in correct format',
                 logger.formatRequest(req, {
-                    error: 'The body of the request is not in valid schema',
+                    error: validation.errors,
                     provider
 
                 })
@@ -299,12 +297,10 @@ module.exports = function (pg, logger, config) {
         }
 
         if (_isBot(req)) {
-            // the user parameters object is either empty or is not in correct schema
-            const provider = userParameters.cid ? userParameters.cid : 'unknown';
             // log user parameters error
-            logger.warn('warn [route_body]: client activity logging failed',
+            logger.warn('[warn] client is a bot',
                 logger.formatRequest(req, {
-                    error: 'The request has been provided by a bot',
+                    error: validation.errors,
                     provider
                 })
             );

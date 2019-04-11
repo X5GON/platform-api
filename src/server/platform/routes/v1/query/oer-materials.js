@@ -446,6 +446,11 @@ module.exports = function (pg, logger, config) {
          *********************************/
 
         if (error_msgs.length) {
+            logger.warn('[warn] query parameters not in correct format',
+                logger.formatRequest(req, {
+                    error: error_msgs
+                })
+            );
             // notify the users of the parameters change
             return res.status(400).send({
                 errors: { msgs: error_msgs }
@@ -485,6 +490,11 @@ module.exports = function (pg, logger, config) {
          *********************************/
 
         if (error_msgs.length) {
+            logger.warn('[warn] query parameters not in correct format',
+                logger.formatRequest(req, {
+                    error: error_msgs
+                })
+            );
             // notify the users of the parameters change
             return res.status(400).send({
                 errors: { msgs: error_msgs }
@@ -556,7 +566,14 @@ module.exports = function (pg, logger, config) {
         // execute the user query
         pg.execute(query, [], function (error, records) {
             if (error) {
-                console.log(error);
+                logger.error('[error] postgresql error',
+                    logger.formatRequest(req, {
+                        error: {
+                            message: error.message,
+                            stack: error.stack
+                        }
+                    })
+                );
                 // something went wrong on server side
                 return res.status(500).send({
                     errors: {
@@ -608,7 +625,14 @@ module.exports = function (pg, logger, config) {
         // execute the user query
         pg.execute(query, [], function (error, records) {
             if (error) {
-                console.log(error);
+                logger.error('[error] postgresql error',
+                    logger.formatRequest(req, {
+                        error: {
+                            message: error.message,
+                            stack: error.stack
+                        }
+                    })
+                );
                 // something went wrong on server side
                 return res.status(500).send({
                     errors: {
@@ -662,7 +686,14 @@ module.exports = function (pg, logger, config) {
         // execute the user query
         pg.execute(query, [], function (error, records) {
             if (error) {
-                console.log(error);
+                logger.error('[error] postgresql error',
+                    logger.formatRequest(req, {
+                        error: {
+                            message: error.message,
+                            stack: error.stack
+                        }
+                    })
+                );
                 // something went wrong on server side
                 return res.status(500).send({
                     errors: {
@@ -711,7 +742,14 @@ module.exports = function (pg, logger, config) {
         // execute the user query
         pg.execute(query, [], function (error, records) {
             if (error) {
-                console.log(error);
+                logger.error('[error] postgresql error',
+                    logger.formatRequest(req, {
+                        error: {
+                            message: error.message,
+                            stack: error.stack
+                        }
+                    })
+                );
                 // something went wrong on server side
                 return res.status(500).send({
                     errors: {

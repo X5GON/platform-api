@@ -13,8 +13,10 @@ const qm = require('qminer');
 
 // internal modules
 const NearestNeighbor = require('./models/nearest-neighbors');
-const Logger = require('@lib/logging-handler')();
+const Logger = require('@lib/logger');
 const pg = require('@lib/postgresQL')(config.pg);
+
+const { environment } = config;
 
 /**
  * @class x5recommend
@@ -39,7 +41,7 @@ class x5recommend {
         if (!self.params.env) { self.params.env = 'production'; }
         // set the recommender requests logger
         self.logger = Logger.createGroupInstance(`recommendation-requests-${self.params.env}`,
-            'x5recommend', self.params.env !== 'test');
+            'x5recommend', environment === 'dev');
 
         // load database
         self._loadBase();

@@ -141,7 +141,7 @@ class MaterialValidator {
     receive(material, stream_id, callback) {
         // validate the provided material
         const validation = this._validator.validateSchema(material, materialSchema);
-        const stream_direction = validation ? stream_id : 'stream_partial';
+        const stream_direction = validation.matching ? stream_id : 'stream_partial';
 
         // send material to the next component
         return this._onEmit(material, stream_direction, callback);
