@@ -28,8 +28,13 @@ module.exports = function (pg, logger) {
         if (Object.keys(req.query).length === 0) {
             // no query parameters were given
             let errorMessage = 'user did not provide any of the query parameters: text, url';
-            logger.warn('warning [query_parameters]: client requested for recommendation failed',
-                logger.formatRequest(req, { error: errorMessage })
+            // error when making material request
+            logger.warn('[warn] missing parameters, text or url',
+                logger.formatRequest(req, {
+                    error: {
+                        message: errorMessage,
+                    }
+                })
             );
             // send error response
             return res.status(400).send({ error: "Bad request: " + errorMessage });
@@ -67,26 +72,28 @@ module.exports = function (pg, logger) {
 
     // GET recommendation based on query
     router.get('/recommend/materials', (req, res) => {
-        logger.info('client requested for recommendation',
-            logger.formatRequest(req)
-        );
-
         let query = req.query;
         // get the recommended material
         let recommendations = x5recommend.recommend(query, 'materials');
 
         recommendations.then(results => {
-            // log the recommendation success
-            logger.info('client requested for recommendation successful');
+            // // error when making material request
+            // logger.info('[info] recommendation material results',
+            //     logger.formatRequest(req, { results })
+            // );
             // send the recommendations to the user
             return res.status(200).send(results);
         }).catch(error => {
-            if (error) {
-                let errorMessage = 'error when making recommendations: ' + error.message;
-                logger.warn('warning [query_parameters]: client requested for recommendation failed',
-                    logger.formatRequest(req, { error: errorMessage })
-                );
-            }
+            // error when making material request
+            logger.error('[error] recommendation material',
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack,
+                    }
+                })
+            );
+            // returning the results
             return res.status(400).send({ error: "Bad request: " + error.message });
         });
 
@@ -96,27 +103,28 @@ module.exports = function (pg, logger) {
 
     // POST recommendation based on query
     router.post('/recommend/materials', (req, res) => {
-        logger.info('client requested for recommendation',
-            logger.formatRequest(req)
-        );
-
         // get the query parameters
         let query = req.body;
         // get the recommended material
         let recommendations = x5recommend.recommend(query, 'materials');
 
         recommendations.then(results => {
-            // log the recommendation success
-            logger.info('client requested for recommendation successful');
+            // // log the recommendation success
+            // logger.info('[info] recommendation material results',
+            //     logger.formatRequest(req, { results })
+            // );
             // send the recommendations to the user
             return res.status(200).send(results);
         }).catch(error => {
-            if (error.error) {
-                let errorMessage = 'error when making recommendations: ' + error.error;
-                logger.warn('warning [query_parameters]: client requested for recommendation failed',
-                    logger.formatRequest(req, { error: errorMessage })
-                );
-            }
+            // error when making material results
+            logger.error('[error] recommendation material',
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.error
+                    }
+                })
+            );
+            // returning the results
             return res.status(400).send({ error: "Bad request: " + error.error });
         });
 
@@ -126,26 +134,28 @@ module.exports = function (pg, logger) {
 
     // GET recommendation based on query
     router.get('/recommend/bundles', (req, res) => {
-        logger.info('client requested for recommendation',
-            logger.formatRequest(req)
-        );
-
+        // get the query parameters
         let query = req.query;
         // get the recommended material
         let recommendations = x5recommend.recommend(query, 'bundle');
 
         recommendations.then(results => {
-            // log the recommendation success
-            logger.info('client requested for recommendation successful');
+            // // log the recommendation success
+            // logger.info('[info] recommendation bundle results',
+            //     logger.formatRequest(req, { results })
+            // );
             // send the recommendations to the user
             return res.status(200).send(results);
         }).catch(error => {
-            if (error.error) {
-                let errorMessage = 'error when making recommendations: ' + error.error;
-                logger.warn('warning [query_parameters]: client requested for recommendation failed',
-                    logger.formatRequest(req, { error: errorMessage })
-                );
-            }
+            // error when making material bundles results
+            logger.error('[error] recommendation bundles',
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.error
+                    }
+                })
+            );
+            // returning the results
             return res.status(400).send({ error: "Bad request: " + error.error });
         });
 
@@ -156,28 +166,28 @@ module.exports = function (pg, logger) {
 
     // POST recommendation based on query
     router.post('/recommend/bundles', (req, res) => {
-        logger.info('client requested for recommendation',
-            logger.formatRequest(req)
-        );
-
         // get the query parameters
         let query = req.body;
-
         // get the recommended material
         let recommendations = x5recommend.recommend(query, 'bundle');
 
         recommendations.then(results => {
-            // log the recommendation success
-            logger.info('client requested for recommendation successful');
+            // // log the recommendation success
+            // logger.info('[info] recommendation bundle results',
+            //     logger.formatRequest(req, { results })
+            // );
             // send the recommendations to the user
             return res.status(200).send(results);
         }).catch(error => {
-            if (error.error) {
-                let errorMessage = 'error when making recommendations: ' + error.error;
-                logger.warn('warning [query_parameters]: client requested for recommendation failed',
-                    logger.formatRequest(req, { error: errorMessage })
-                );
-            }
+            // error when making material bundles results
+            logger.error('[error] recommendation bundles',
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.error
+                    }
+                })
+            );
+            // returning the results
             return res.status(400).send({ error: "Bad request: " + error.error });
         });
 
@@ -188,10 +198,6 @@ module.exports = function (pg, logger) {
 
     // GET recommendation based on query
     router.get('/recommend/personalized', (req, res) => {
-        logger.info('client requested for personalized recommendation',
-            logger.formatRequest(req)
-        );
-
         // get the query parameters
         let query = req.query;
         query.uuid = req.cookies[x5gonCookieName] ? req.cookies[x5gonCookieName] : null;
@@ -199,42 +205,60 @@ module.exports = function (pg, logger) {
         // get the recommended material
         let recommendations = x5recommend.recommend(query, 'personal');
 
-        recommendations.then(function(result) {
-            if (result.error){
-                let errorMessage = 'error when making personalized recommendations: ' + result.error;
-                logger.warn('warning [query_parameters]: client requested for recommendation failed',
-                    logger.formatRequest(req, { error: errorMessage })
+        recommendations.then(results => {
+            if (results.error) {
+                // error when making material personalization results
+                logger.warn('[warn] recommendation personalization',
+                    logger.formatRequest(req, {
+                        error: {
+                            message: results.error
+                        }
+                    })
                 );
-                logger.warn('trying content-based recommendations');
+                logger.warn('[warn] trying content-based recommendations');
                 //trying content-based recommendations
                 let contentRecommendations = x5recommend.recommend(query);
                 contentRecommendations.then(function (content) {
-                    if (contentRecommendations.error){
-                        let errorMessage = 'error when making recommendations: ' + recommendations.error;
-                        logger.warn('warning [query_parameters]: client requested for recommendation failed',
-                            logger.formatRequest(req, { error: errorMessage })
+                    if (content.error) {
+                        // error when making material content results
+                        logger.warn('[warn] recommendation content',
+                            logger.formatRequest(req, {
+                                error: {
+                                    message: content.error
+                                }
+                            })
                         );
-                        return res.status(400).send({ error: "Bad request: " + contentRecommendations.error });
+                        // send the error message to the user
+                        return res.status(400).send({ error: "Bad request: " + content.error });
                     }
-                    // log the recommendation success
-                    logger.info('client requested for recommendation successful');
+                    // // log the recommendation success
+                    // logger.info('[info] recommendation material results',
+                    //     logger.formatRequest(req, { results: content })
+                    // );
                     // send the recommendations to the user
-                    return res.status(200).send(contentRecommendations);
+                    return res.status(200).send(content);
                 });
 
             }
 
-            // log the recommendation success
-            logger.info('client requested for recommendation successful');
+            // // log the recommendation success
+            // logger.info('[info] recommendation material results',
+            //     logger.formatRequest(req, { results })
+            // );
             // send the recommendations to the user
-            return res.status(200).send(result);
+            return res.status(200).send(results);
 
-        }).catch(function(err){
-                let errorMessage = 'error when making recommendations: ' + err.error;
-                logger.warn('warning [query_parameters]: client requested for recommendation failed',
-                    logger.formatRequest(req, { error: errorMessage })
+        }).catch(error => {
+                // error when making material personalization results
+                logger.warn('[warn] recommendation personalization/content',
+                    logger.formatRequest(req, {
+                        error: {
+                            message: error.error
+                        }
+                    })
                 );
-                return res.status(400).send({ error: "Bad request: " + err.error });
+                // send the error message to the user
+                return res.status(400).send({ error: "Bad request: " + error.error });
             });
     });
 
