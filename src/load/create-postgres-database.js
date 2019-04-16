@@ -827,58 +827,6 @@ const dbCreates = {
             IS 'The id of the associated record in the cookies table';`,
 
 
-    rec_sys_user_selections:
-        `CREATE TABLE ${schema}.rec_sys_user_selections (
-            id          serial  PRIMARY KEY,
-            query       jsonb   NOT NULL,
-            results     jsonb   NOT NULL,
-            selection   integer NOT NULL,
-            uuid        varchar,
-
-            cookie_id   integer,
-            FOREIGN KEY (cookie_id) REFERENCES ${schema}.cookies(id) ON UPDATE CASCADE ON DELETE CASCADE
-        );
-
-        ALTER TABLE ${schema}.rec_sys_user_selections
-            OWNER TO ${config.pg.user};
-
-        CREATE INDEX rec_sys_user_selections_id
-            ON ${schema}.rec_sys_user_selections(id);
-
-        CREATE INDEX rec_sys_user_selections_query
-            ON ${schema}.rec_sys_user_selections USING GIN(query);
-
-
-
-        CREATE TRIGGER update_rec_sys_user_selections_keys
-            BEFORE INSERT OR UPDATE ON ${schema}.rec_sys_user_selections
-            FOR EACH ROW
-            EXECUTE PROCEDURE set_cookie_id();
-
-
-
-        COMMENT ON TABLE ${schema}.rec_sys_user_selections
-            IS 'The table containing the user selections from the recommender engine';
-
-        COMMENT ON COLUMN ${schema}.rec_sys_user_selections.id
-            IS 'The id of the user selection';
-
-        COMMENT ON COLUMN ${schema}.rec_sys_user_selections.query
-            IS 'The query provided by the user';
-
-        COMMENT ON COLUMN ${schema}.rec_sys_user_selections.results
-            IS 'The query results';
-
-        COMMENT ON COLUMN ${schema}.rec_sys_user_selections.selection
-            IS 'The user selection within the query';
-
-        COMMENT ON COLUMN ${schema}.rec_sys_user_selections.uuid
-            IS 'The user identifier extracted from the token that did the selection';
-
-        COMMENT ON COLUMN ${schema}.rec_sys_user_selections.cookie_id
-            IS 'The id of the user cookie that did the selection';`,
-
-
     rec_sys_user_transitions:
         `CREATE TABLE ${schema}.rec_sys_user_transitions (
             id                  serial PRIMARY KEY,
@@ -1122,7 +1070,15 @@ const dbCreates = {
  * @description The array containing database updates.
  * @type {db_update[]}
  */
-const dbUpdates = [];
+const dbUpdates = [{
+    version: 1,
+    update: `
+        ALTER TABLE ${schema}.rec_sys_user_transitions
+        ADD COLUMN recommended_urls varchar ARRAY,
+        ADD COLUMN selected_position integer,
+        ADD COLUMN num_of_recommendations integer;
+    `
+}];
 
 // get the requested database version
 const pgVersion = config.pg.version === '*' ?
