@@ -142,7 +142,7 @@ module.exports = function (pg, logger, config) {
      *      "x-snippet-status": "failure"
      *      "x-snippet-message": "check if all parameters are set and if the date-time is in the correct format"
      */
-    router.get('/connect', (req, res) => {
+    router.get('/connect/visit', (req, res) => {
         // check and convert to boolean
         const testing = req.query.test === 'true' || false;
         if (testing) {
@@ -158,6 +158,22 @@ module.exports = function (pg, logger, config) {
                 query: req.query
             }));
         }
+    });
+
+    /**
+     * @api {GET} /api/v1/connect/video Video activity acquisition
+     * @apiDescription Send video activity snippet information. All parameters should
+     * be encoded by the `encodeURIComponent` function
+     * @apiName GetConnectVideo
+     * @apiGroup UserActivity
+     * @apiVersion 1.0.0
+     */
+    router.get('/connect/video', (req, res) => {
+        // redirect to the video storing
+        res.redirect(url.format({
+            pathname: '/api/v1/snippet/log/video',
+            query: req.query
+        }));
     });
 
     /**
@@ -287,9 +303,8 @@ module.exports = function (pg, logger, config) {
             // log user parameters error
             logger.error('[error] client activity logging not in correct format',
                 logger.formatRequest(req, {
-                    error: validation.errors,
+                    error: { validation: validation.errors },
                     provider
-
                 })
             );
             // send beacon image to user
@@ -300,8 +315,8 @@ module.exports = function (pg, logger, config) {
             // log user parameters error
             logger.warn('[warn] client is a bot',
                 logger.formatRequest(req, {
-                    error: validation.errors,
-                    provider
+                    provider,
+                    userAgent: req.get('user-agent')
                 })
             );
             // send beacon image to user
@@ -338,14 +353,68 @@ module.exports = function (pg, logger, config) {
             referrer: userParameters.rf,
             visitedOn: userParameters.dt,
             userAgent: req.get('user-agent'),
-            language: req.get('accept-language')
+            language: req.get('accept-language'),
+            type: 'visit'
         };
 
         // redirect activity to information retrievers
-        producer.send('STORING.USERACTIVITY.CONNECT', activity);
+        producer.send('STORING.USERACTIVITY.VISIT', activity);
         // send beacon image to user
         return res.sendFile(beaconPath, options);
 
+
+    });
+
+    /**
+     * @api {GET} /api/v1/snippet/log/video Video activities acquisition
+     * @apiDescription Sends video activity information FOR PRODUCTION.
+     * All parameters should be encoded by the `encodeURIComponent` function
+     * @apiName GetSnippetLogVideoActivity
+     * @apiGroup UserActivity
+     * @apiVersion 1.0.0
+     */
+    router.get('/snippet/log/video', (req, res) => {
+        // the beacon used to acquire user activity data
+        let beaconPath = path.join(__dirname, '../../../snippet/images/beacon.png');
+        // get the options - snippet status headers
+        const { options, userParameters } = _evaluateLog(req);
+        // the user parameters object is either empty or is not in correct schema
+        const provider = userParameters.cid ? userParameters.cid : 'unknown';
+
+        if (_isBot(req)) {
+            // log user parameters error
+            logger.warn('[warn] client is a bot',
+                logger.formatRequest(req, {
+                    provider,
+                    userAgent: req.get('user-agent')
+                })
+            );
+            // send beacon image to user
+            return res.sendFile(beaconPath, options);
+        }
+
+        // get the user id from the X5GON tracker
+        const uuid = req.cookies[x5gonCookieName] ?
+            req.cookies[x5gonCookieName] :
+            'unknown';
+
+        // create video activity object
+        const video = {
+            uuid,
+            userAgent: req.get('user-agent'),
+            language: req.get('accept-language'),
+            type: 'video'
+        };
+
+        // copy all query parameters to the object
+        for (let key in req.query) {
+            video[key] = req.query[key];
+        }
+
+        // redirect activity to information retrievers
+        producer.send('STORING.USERACTIVITY.VIDEO', video);
+        // send beacon image to user
+        return res.sendFile(beaconPath, options);
 
     });
 

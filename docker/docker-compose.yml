@@ -21,6 +21,7 @@ services:
         STORING.MATERIAL.PARTIAL:3:1
         STORING.RECSYS.TRANSITIONS:3:1
         STORING.RECSYS.SELECTIONS:3:1
-        STORING.USERACTIVITY.CONNECT:3:1
+        STORING.USERACTIVITY.VISIT:3:1
+        STORING.USERACTIVITY.VIDEO:3:1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
