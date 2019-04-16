@@ -197,11 +197,7 @@ module.exports = function (monitor, config) {
                 break;
         }
 
-<<<<<<< HEAD
-        return res.render('error', { message, title: '404' });
-=======
         return res.render('error', { message, title: '404'  });
->>>>>>> 24afbd90fca93627c3ec37914989b61b0fd1c2a3
     });
 
     return router;
