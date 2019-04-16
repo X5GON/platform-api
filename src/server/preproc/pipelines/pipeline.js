@@ -3,7 +3,8 @@ const qtopology = require('qtopology');
 
 // load preprocessing pipeline configuration
 
-let config = require(`./${process.env.TOPOLOGY}`);
+const TOPOLOGY = process.env.TOPOLOGY;
+let config = require(`./ontologies/${TOPOLOGY}`);
 
 // compile the pipeline - inject variables and perform checks
 let compiler = new qtopology.TopologyCompiler(config);
@@ -12,8 +13,9 @@ config = compiler.getWholeConfig();
 
 // create the pipeline topology
 let topology = new qtopology.TopologyLocal();
-topology.init('uuid.oer-processing', config, (error) => {
+topology.init(`uuid.${TOPOLOGY}`, config, (error) => {
     if (error) { console.log(error); return; }
+
     // the topology has initialized - run topology
     console.log('Topology running!');
     topology.run();

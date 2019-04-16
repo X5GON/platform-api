@@ -1,0 +1,85 @@
+<header>
+  <nav class="navbar navbar-expand-sm pb-0">
+    <span class="navbar-brand mb-0 h-1">
+      <a href="https://www.x5gon.org/">
+        <img src="https://www.x5gon.org/wp-content/themes/x5gon/dist/assets/img/logo.svg" alt="X5GON">
+      </a>
+    </span>
+
+    <div id="search-container" class="form-inline pl-0">
+      <form class="input-group w-100" action="/search" method="get">
+        <input type="text" name="text" id="search-query" class="form-control rounded-0" value="{{query.query}}">
+        <div class="input-group-append">
+          <button type="submit" class="btn btn-secondary rounded-0" onClick="return empty()">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+        <input type="hidden" name="page" value="1" />
+        <input type="hidden" name="type" value="{{query.types.selectedType}}" />
+      </form>
+    </div>
+
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        {{! home link }} {{! TODO add a proper home page }}
+      </ul>
+
+      <a class="ml-2" href="/oer-provider/login" data-toggle="tooltip"
+        data-placement="bottom" title="Provider login">
+        <span class="fa-stack">
+          <i class="link-background fas fa-circle fa-stack-2x"></i>
+          <i class="link-symbol fas fa-sign-in-alt fa-stack-1x fa-inverse"></i>
+        </span>
+      </a>
+
+      <a class="ml-2" href="/join" data-toggle="tooltip"
+        data-placement="bottom" title="Join the X5GON network">
+        <span class="fa-stack">
+          <i class="link-background fas fa-circle fa-stack-2x"></i>
+          <i class="link-symbol fas fa-handshake fa-stack-1x fa-inverse"></i>
+        </span>
+      </a>
+
+      <a class="ml-2 btn btn-outline-secondary btn-sm rounded-0"
+        href="https://www.x5gon.org/#subscribe">
+          Subscribe
+      </a>
+
+    </div>
+  </nav>
+
+  <nav class="navbar navbar-expand-sm py-0">
+    <div id="search-options-elements">
+      <div class="navigation py-3 {{#if (query.types.active 'all')}} active {{/if}}">
+        <a class="link p-3"
+          {{#unless (query.types.active 'all')}}
+            href="/search?text={{query.query}}&page=1&type=all"
+          {{/unless}}>All
+        </a>
+      </div>
+      <div class="navigation py-3 {{#if (query.types.active 'video')}} active {{/if}}">
+        <a class="link p-3"
+          {{#unless (query.types.active 'video')}}
+            href="/search?text={{query.query}}&page=1&type=video"
+          {{/unless}}>Video
+        </a>
+      </div>
+      <div class="navigation py-3 {{#if (query.types.active 'audio')}} active {{/if}}">
+        <a class="link p-3"
+          {{#unless (query.types.active 'audio')}}
+            href="/search?text={{query.query}}&page=1&type=audio"
+          {{/unless}}>Audio
+        </a>
+      </div>
+      <div class="navigation py-3 {{#if (query.types.active 'text')}} active {{/if}}">
+        <a class="link p-3"
+          {{#unless (query.types.active 'text')}}
+            href="/search?text={{query.query}}&page=1&type=text"
+          {{/unless}}>Text
+        </a>
+      </div>
+
+    </div>{{!-- #search-options-elements --}}
+  </nav>{{!-- .navbar .nvabar-expand-sm --}}
+</header>

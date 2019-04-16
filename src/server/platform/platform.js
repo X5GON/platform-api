@@ -2,32 +2,34 @@
  * Runs the X5GON platform server
  */
 
-// configurations
-const config = require('../../config/config');
+
 
 // external modules
+<<<<<<< HEAD
 const express = require('express');
 const exphbs = require('express-handlebars');
 const bodyParser = require('body-parser');
+=======
+const express      = require('express');
+const exphbs       = require('express-handlebars');
+const bodyParser   = require('body-parser');
+>>>>>>> 24afbd90fca93627c3ec37914989b61b0fd1c2a3
 const cookieParser = require('cookie-parser');
-const session = require('express-session');
+const session      = require('express-session');
+
+// configurations
+const config = require('@config/config');
 
 // internal modules
-const pg = require('../../lib/postgresQL')(config.pg);
-const Logger = require('../../lib/logging-handler')();
+const pg     = require('@lib/postgresQL')(config.pg);
+const Logger = require('@lib/logger');
 
-// create a logger instance for logging API requests
-const logger = Logger.createGroupInstance('api-requests', 'api');
-
-// internal modules for monitoring processes
-const PM2Monitor = require('../../lib/pm2-monitor');
-let monitor = new PM2Monitor();
+// create a logger for platform requests
+const logger = Logger.createGroupInstance('requests', 'platform', config.environment === 'dev');
 
 // create express app
 let app = express();
 let http = require('http').Server(app);
-// initialize socket
-let io = require('socket.io')(http);
 
 // configure application
 app.use(bodyParser.json());     // to support JSON-encoded bodies
@@ -74,29 +76,34 @@ app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 
 // redirect specific requests to other services
-require('./routes/proxy')(app);
+require('./routes/proxies')(app, config);
 
 // cookie parser
 app.use(cookieParser(config.platform.sessionSecret));
 
 // sets the API routes
-require('./routes/route.handler')(app, pg, logger, monitor);
+require('./routes/route.handler')(app, pg, logger, config /*, monitor */);
 
-// configure socket connections
-io.on('connection', function(socket) {
-    console.log('a user connected');
-    socket.on('disconnect', function () {
-        console.log('user disconnected');
-    });
+// // internal modules for monitoring processes
+// const PM2Monitor = require('@lib/pm2-monitor');
+// let monitor = new PM2Monitor();
+// // initialize socket
+// let io = require('socket.io')(http);
+// // configure socket connections
+// io.on('connection', function(socket) {
+//     console.log('a user connected');
+//     socket.on('disconnect', function () {
+//         console.log('user disconnected');
+//     });
 
-    setInterval(() => {
-        monitor.listProcesses((error, list) => {
-            return error ?
-                io.emit('monitor-process-error', { error }) :
-                io.emit('monitor-process', list);
-        });
-    }, 1000);
-});
+//     setInterval(() => {
+//         monitor.listProcesses((error, list) => {
+//             return error ?
+//                 io.emit('pm2-process-error', { error }) :
+//                 io.emit('pm2-process', list);
+//         });
+//     }, 1000);
+// });
 
 // parameters used on the express app
 const PORT = config.platform.port;

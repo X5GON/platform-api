@@ -1,3 +1,7 @@
+#======================================
+# NODE IGNORE LIST
+#======================================
+
 # Logs
 logs
 *.log
@@ -54,6 +58,21 @@ typings/
 # Yarn Integrity file
 .yarn-integrity
 
+
+
+#======================================
+# IDE IGNORE LIST
+#======================================
+
+# visual studio configs
+.vscode
+
+
+
+#======================================
+# PROJECT IGNORE LIST
+#======================================
+
 # dotenv environment variables file
 .env
 
@@ -61,6 +80,11 @@ typings/
 data
 backup
 examples
+
+*.pyc
+
+# temporary ignore visualizations
+src/server/visualizations
 
 # ignore minified files
 src/server/**/*.min.js

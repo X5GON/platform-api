@@ -1,13 +1,13 @@
-const assert = require('assert');
-const fileManager = require('../../lib/file-manager');
-const Logger = require('../../lib/logging-handler');
-const winston = require('winston');
-const path = require('path');
-const fs = require('fs');
+const assert      = require('assert');
+const fileManager = require('@lib/file-manager');
+const Logger      = require('@lib/logger');
+const winston     = require('winston');
+const path        = require('path');
+const fs          = require('fs');
 
-describe('logging-handler.js: logging handler methods unit tests.', function () {
+describe('logger.js: logging handler methods unit tests.', function () {
 
-    after(function(){   
+    after(function(){
         fileManager.removeFolder(path.join(__dirname, '../../../logs/Sub-test'));
     });
 
@@ -98,7 +98,7 @@ describe('logging-handler.js: logging handler methods unit tests.', function () 
                 assert.throws(function (xdone) {
                     logger.createInstance('log-file', 'banana');
                     xdone();
-                });                          
+                });
                 done();
             });
 
@@ -119,7 +119,7 @@ describe('logging-handler.js: logging handler methods unit tests.', function () 
                 assert.throws(function (xdone) {
                     loggerTesting.transports.console;
                     xdone();
-                });           
+                });
                 done();
             });
         });
@@ -137,7 +137,7 @@ describe('logging-handler.js: logging handler methods unit tests.', function () 
                 assert.throws(function (xdone) {
                     loggerTesting.transports.console;
                     xdone();
-                });          
+                });
                 done();
             });
 
@@ -176,7 +176,7 @@ describe('logging-handler.js: logging handler methods unit tests.', function () 
                 assert.equal(loggerTesting.transports['log-file-error'].level, 'error');
                 assert.equal(loggerTesting.transports['log-file-warn'].level, 'warn');
                 done();
-            });  
+            });
 
             it('Should return error if no parameters are given', function (done) {
                 assert.throws(function (xdone) {

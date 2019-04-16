@@ -9,8 +9,19 @@
   <meta name="author" content="Erik Novak">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"> {{! link to the bootstrap css files }}
 
-  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/img/favicon-16x16.png">
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-138153355-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-138153355-1');
+  </script>
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-16x16.png">
   <link rel="stylesheet" href="/css/prism.css">
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
@@ -23,7 +34,7 @@
 
   <link rel="stylesheet" href="/css/common.css">
   <link rel="stylesheet" href="/css/body-spacing.css">
-  <link rel="stylesheet" href="/css/application-form.css">
+  <link rel="stylesheet" href="/css/join.css">
   <link rel="stylesheet" href="/css/oer-provider.css">
   <link rel="stylesheet" href="/css/privacy-policy.css">
   <link rel="stylesheet" href="/css/recommendations.css"> {{! link to the bootstrap js files }}
@@ -50,7 +61,7 @@
 <body class="pt-0">
   {{! navigation for every page }}
   {{#if options}}
-    {{> header-search }}
+    {{> header-search-results }}
   {{else}}
     {{> header-search-index }}
   {{/if}}

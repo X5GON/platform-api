@@ -16,6 +16,21 @@ exports.removeFile = function(fileName) {
 };
 
 /**
+ * @description Removes the file.
+ * @param {String} oldPath - Name of the file to be moved.
+ * @param {String} newPath - New destination of the file.
+ */
+exports.moveFile = function(oldPath, newPath) {
+    // check if file exists
+    if (fs.existsSync(oldPath)) {
+        // move the file to other folder
+        fs.renameSync(oldPath, newPath);
+    }else {
+        throw Error(`File does not exist: ${oldPath}`);
+    }
+};
+
+/**
  * @description Removes the folder and it's content.
  * @param {String} sourcePath - The folder to be removed.
  */
@@ -121,13 +136,14 @@ exports.executeOnFiles = function (startPath, filter, callback) {
     for (let file of files) {
         let filename = path.join(startPath, file);
         let stat = fs.lstatSync(filename);
+
         // check if file is a directory
         if (stat.isDirectory()) {
             // recursive check if it contains files
             exports.executeOnFiles(filename, filter, callback);
         }
         // if file name matches the filter - execute callback
-        else if (filter.test(file)) { callback(filename); }
+        else if (file.match(filter)) { callback(filename); }
     }
 };
 

@@ -17,10 +17,22 @@
               <body>
                 <tr>
                   <td class="align-top p-1 pt-2 text-center">
-                    <span class="fa-stack fa-lg">
-                      <i class="fas fa-circle fa-stack-2x"></i>
-                      <i class="fas fa-{{document.type}} fa-stack-1x fa-inverse"></i>
-                    </span>
+                    {{#if (isEqual document.type 'video')}}
+                      <span class="fa-stack fa-lg">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fas fa-video fa-stack-1x fa-inverse"></i>
+                      </span>
+                    {{else if (isEqual document.type 'audio')}}
+                      <span class="fa-stack fa-lg">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fas fa-headphones-alt fa-stack-1x fa-inverse"></i>
+                      </span>
+                    {{else if (isEqual document.type 'text')}}
+                      <span class="fa-stack fa-lg">
+                        <i class="fas fa-circle fa-stack-2x"></i>
+                        <i class="fas fa-file-alt fa-stack-1x fa-inverse"></i>
+                      </span>
+                    {{/if}}
                     <span class="inspect badge badge-secondary rounded-0"
                       data-title="{{document.title}}"
                       data-embed="{{document.embedUrl}}"
@@ -37,7 +49,7 @@
                     <span class="material-link url">{{document.url}}</span>
                     <br>
                     {{#if document.description }}
-                      <p class="material-description mb-0">{{document.description}}</p>
+                      <p class="material-description mb-0">{{{document.description}}}</p>
                     {{else}} {{/if}}
                     <div class="row mt-2">
                       <div class="col-12">

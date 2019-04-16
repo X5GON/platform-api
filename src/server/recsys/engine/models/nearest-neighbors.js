@@ -1,11 +1,12 @@
 /************************************************
  * The Nearest Neighbor recommendation model.
- * It returns documents similar to the query 
+ * It returns documents similar to the query
  * parameter.
  */
 
 // external modules
-const qm = require("qminer");
+const qm = require('qminer');
+const mimetypes = require('@config/mimetypes');
 
 /**
  * The Nearest Neighbors model class.
@@ -30,11 +31,19 @@ class NearestNeighbors {
         // initialize instance based on mode
         if (self.params.mode === 'load') {
             // load model from a file
-            self._loadModel(self.params.base, self.params.modelPath);
+            self._loadModel(
+                self.params.base,
+                self.params.modelPath,
+                self.params.store
+            );
         } else if (self.params.mode === 'create') {
             // create the model from scratch
-            self._createModel(self.params.base, self.params.modelPath,
-                self.params.store, self.params.features);
+            self._createModel(
+                self.params.base,
+                self.params.modelPath,
+                self.params.store,
+                self.params.features
+            );
         } else {
             throw `Value of parameter 'mode' is not supported: ${self.params.mode}`;
         }
@@ -53,14 +62,58 @@ class NearestNeighbors {
         let self = this;
         // create feature space for nearest neighbors
         self.featureSpace = new qm.FeatureSpace(base, features);
+
+        self.store = store;
         // update the feature space and extract record matrix
-        self.featureSpace.updateRecords(store.allRecords);
-        self.matrix = this.featureSpace.extractSparseMatrix(store.allRecords);
+        const allRecords = self.store.allRecords;
+        self.featureSpace.updateRecords(allRecords);
+
+        // create matrix with all materials
+        self.matrix = self.featureSpace.extractSparseMatrix(allRecords);
+        // store material ids of other types
+        self.videoMaterialIds = new qm.la.IntVector();
+        self.audioMaterialIds = new qm.la.IntVector();
+        self.textMaterialIds  = new qm.la.IntVector();
+
+
+        for (let id = 0; id < allRecords.length; id++) {
+            const mimetype = allRecords[id].mimetype;
+            // check the type the material falls into
+            if (mimetypes.video.includes(mimetype)) {
+                self.videoMaterialIds.push(id);
+            } else if (mimetypes.audio.includes(mimetype)) {
+                self.audioMaterialIds.push(id);
+            } else if (mimetypes.text.includes(mimetype)) {
+                self.textMaterialIds.push(id);
+            } else {
+                console.log('Missing mimetype', mimetype);
+            }
+        }
+
+        // create feature matrix of different material types
+        self.matrixVideo = self.matrix.getColSubmatrix(self.videoMaterialIds);
+        self.matrixAudio = self.matrix.getColSubmatrix(self.audioMaterialIds);
+        self.matrixText  = self.matrix.getColSubmatrix(self.textMaterialIds);
 
         // save the model in the `modelPath` file
         let fout = qm.fs.openWrite(modelPath);
-        // save the feature space and feature matrix of the content        
-        self.featureSpace.save(fout); self.matrix.save(fout); fout.close();
+
+        // save the feature space
+        self.featureSpace.save(fout);
+
+        // feature matrices
+        self.matrix.save(fout);
+        self.matrixVideo.save(fout);
+        self.matrixAudio.save(fout);
+        self.matrixText.save(fout);
+
+        // content type ids
+        self.videoMaterialIds.save(fout);
+        self.audioMaterialIds.save(fout);
+        self.textMaterialIds.save(fout);
+
+        // close the file
+        fout.close();
     }
 
     /**
@@ -69,17 +122,27 @@ class NearestNeighbors {
      * @param {String} modelPath - The Nearest Neighbors model file name.
      * @private
      */
-    _loadModel(base, modelPath) {
+    _loadModel(base, modelPath, store) {
         let self = this;
-        // load Nearest Neighbor feature space and matrix
+
+        self.store = store;
+        // load Nearest Neighbor feature space
         const fin = qm.fs.openRead(modelPath);
         self.featureSpace = new qm.FeatureSpace(base, fin);
-        self.matrix = new qm.la.SparseMatrix(); self.matrix.load(fin);
+        // load the feature matrices
+        self.matrix      = new qm.la.SparseMatrix(); self.matrix.load(fin);
+        self.matrixVideo = new qm.la.SparseMatrix(); self.matrixVideo.load(fin);
+        self.matrixAudio = new qm.la.SparseMatrix(); self.matrixAudio.load(fin);
+        self.matrixText  = new qm.la.SparseMatrix(); self.matrixText.load(fin);
+        // load the content type ids
+        self.videoMaterialIds = new qm.la.IntVector(); self.videoMaterialIds.load(fin);
+        self.audioMaterialIds = new qm.la.IntVector(); self.audioMaterialIds.load(fin);
+        self.textMaterialIds  = new qm.la.IntVector(); self.textMaterialIds.load(fin);
     }
 
     /**
      * @description Gets Nearest Neighbors of the query.
-     * @param {Object} query - The query object. Can be object containing the text or url 
+     * @param {Object} query - The query object. Can be object containing the text or url
      * attributes. When url is present it searches for the material with that url.
      * @param {Object} [query.url] - The url of the material.
      * @param {Object} [query.text] - The text used to find similar content.
@@ -89,26 +152,77 @@ class NearestNeighbors {
      * @return {Array.<Object>} An array where the first element is a record set
      * of relevant solutions and the second element is an array of similarity measures.
      */
-    search(query, store, maxCount=100, minSim=0.05) {
+    search(query, maxCount=20, minSim=0.10) {
         let self = this;
+        // get store
+        const store = self.store;
 
         try {
             // transform the query json into a sparse vector
-            let queryRec = query.url ? 
-                store.recordByName(query.url) :
-                store.newRecord({ description: query.text });
-        
-            if (!queryRec) { 
+            let queryRec;
+
+            if (query.hasOwnProperty('uuid') &&
+                query.hasOwnProperty('wikipediaConceptNames') &&
+                query.hasOwnProperty('wikipediaConceptSupport')) {
+
+                const {
+                    uuid: uri,
+                    wikipediaConceptNames,
+                    wikipediaConceptSupport
+                } = query;
+
+                // create a user interests record
+                queryRec = store.newRecord({
+                    uri,
+                    // title: null,
+                    // description: null,
+                    // provider: null,
+                    // mimetype: null,
+                    // language: null,
+                    wikipediaConceptNames,
+                    wikipediaConceptSupport
+                });
+
+            } else if (query.url && store.recordByName(query.url)) {
+                // get material by url
+                queryRec = store.recordByName(query.url);
+            } else if (query.text) {
+                // create instance with provided text
+                queryRec = store.newRecord({ description: query.text });
+            }
+
+            if (!queryRec) {
                 // there is no record in the record set containing the url
                 // return an empty record set with weights
                 // TODO: tell the user of the missing record
-                return [store.newRecordSet(), []]; 
+                return [store.newRecordSet(), []];
             }
 
             let vector = self.featureSpace.extractSparseVector(queryRec);
 
+            // placeholder for the matrix and type ids
+            let matrix,
+                typeIds;
+
+            if (query.type === 'video') {
+                // video type materials requested
+                matrix  = self.matrixVideo;
+                typeIds = self.videoMaterialIds;
+            } else if (query.type === 'audio') {
+                // audio type materials requested
+                matrix = self.matrixAudio;
+                typeIds = self.audioMaterialIds;
+            } else if (query.type === 'text') {
+                // text type materials requested
+                matrix = self.matrixText;
+                typeIds = self.textMaterialIds;
+            } else {
+                // search among all materials
+                matrix = self.matrix;
+            }
+
             // calculate similarities between query vector and content
-            let sim = self.matrix.multiplyT(vector);
+            let sim = matrix.multiplyT(vector);
             let sort = sim.sortPerm(false);
             let idVec = qm.la.IntVector();
             let simVec = [ ];
@@ -123,10 +237,12 @@ class NearestNeighbors {
                 let maxid = sort.perm[i];
                 // stop if similarity to small
                 if (sim[maxid] < minSim) { break; }
+
                 // skip the record used to find recommendations
                 if (query.url && maxid === queryRec.$id) { continue; }
+
                 // else remember the content and it's similarity
-                idVec.push(maxid);
+                idVec.push(typeIds ? typeIds[maxid] : maxid);
                 simVec.push(sim[maxid]);
             }
 

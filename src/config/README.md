@@ -4,17 +4,18 @@ This folder contains the configuration files.
 
 ## Environment Variables
 
-To avoid storing vulnerable data in the repository, such as authentication tokens
-and secrets, we have adopted the `.env` approach to feed the vulnerable data to
+To avoid storing vulnerable data in the repository (such as authentication tokens
+and secrets) we have adopted the `.env` approach to feed the vulnerable data to
 different components of the platform.
 
 This approach requires the `dotenv` module (which is installed by running the
-`npm install` command) and a `.env` file saved in this folder. One must create the
-`.env` file by hand since it is added in `.gitignore`.
+`npm install` command) and an `.env` file saved in this folder. One must create the
+`.env` file by hand since it is ignored in the project.
 
 ### .env
-What follows is an example of the `.env` content. To get the right tokens contact
-one of the fellow developers contributing to this project.
+What follows is an example of the `.env` file. To get the right tokens contact
+one of the developers contributing to this project.
+
 
 ```bash
 #######################################
@@ -24,99 +25,89 @@ one of the fellow developers contributing to this project.
 ######################################
 # Platform
 
-# session secret
+# platform session secret
 PROD_PLATFORM_SESSION_SECRET=platform-session-key
 
-# google recaptcha site key and secret - used for OER application form
-PROD_PLATFORM_GOOGLE_RECAPTCHA_SITEKEY=platform-google-recaptcha-sitekey
-PROD_PLATFORM_GOOGLE_RECAPTCHA_SECRET=platform-google-recaptcha-secret
-
-######################################
-# Preprocessing
-
-# videolectures api key - for data retrieval
-PROD_PREPROC_RETRIEVERS_VL_APIKEY=videolectures-apikey
-
-# wikifier url and userkey - required for concept extraction
-PROD_PREPROC_WIKIFIER_URL=http://www.wikifier.org
-PROD_PREPROC_WIKIFIER_USERKEY=wikifier-userkey
-
-######################################
-# Monitor
-
-# session secret
+# monitor session secret
 PROD_MONITOR_SESSION_SECRET=monitor-session-key
-
-# admin token - used to access the monitor
+# monitor admin token - used to access the monitor
 PROD_MONITOR_ADMIN_TOKEN=admin-token
-
-######################################
-# PostgresQL
 
 # postgres database password
 PROD_PG_PASSWORD=postgres-password
 
+# postgres database options
+PROD_PG_SCHEMA=postgres-database-schema(optional)
+PROD_PG_VERSION=postgres-database-version(optional)
+
+# kafka messaging system options
+PROD_KAFKA_HOST=kafka-host-ip(optional)
+PROD_KAFKA_GROUP=kafka-group(optional)
 
 #######################################
 ### Development variables
 #######################################
 
-######################################
-# Platform
-
-# session secret
+# platform session secret
 DEV_PLATFORM_SESSION_SECRET=platform-session-key
 
-DEV_PLATFORM_GOOGLE_RECAPTCHA_SITEKEY=platform-google-recaptcha-sitekey
-DEV_PLATFORM_GOOGLE_RECAPTCHA_SECRET=platform-google-recaptcha-secret
-
-######################################
-# Preprocessing
-DEV_PREPROC_RETRIEVERS_VL_APIKEY=videolectures-apikey
-
-DEV_PREPROC_WIKIFIER_URL=http://www.wikifier.org
-DEV_PREPROC_WIKIFIER_USERKEY=wikifier-userkey
-
-######################################
-# Monitor
+# monitor session secret
 DEV_MONITOR_SESSION_SECRET=monitor-session-key
+# monitor admin token - used to access the monitor
 DEV_MONITOR_ADMIN_TOKEN=admin-token
-
-######################################
-# PostgresQL
 
 # postgres database password
 DEV_PG_PASSWORD=postgres-password
+
+# postgres database options
+DEV_PG_SCHEMA=postgres-database-schema(optional)
+DEV_PG_VERSION=postgres-database-version(optional)
+
+# kafka messaging system options
+DEV_KAFKA_HOST=kafka-host-ip(optional)
+DEV_KAFKA_GROUP=kafka-group(optional)
 
 #######################################
 ### Test variables
 #######################################
 
-######################################
-# Platform
-
-# session secret
+# platform session secret
 TEST_PLATFORM_SESSION_SECRET=platform-session-key
 
-TEST_PLATFORM_GOOGLE_RECAPTCHA_SITEKEY=platform-google-recaptcha-sitekey
-TEST_PLATFORM_GOOGLE_RECAPTCHA_SECRET=platform-google-recaptcha-secret
-
-######################################
-# Preprocessing
-TEST_PREPROC_RETRIEVERS_VL_APIKEY=videolectures-apikey
-
-TEST_PREPROC_WIKIFIER_URL=http://www.wikifier.org
-TEST_PREPROC_WIKIFIER_USERKEY=wikifier-userkey
-
-######################################
-# Monitor
+# monitor session secret
 TEST_MONITOR_SESSION_SECRET=monitor-session-key
+# monitor admin token - used to access the monitor
 TEST_MONITOR_ADMIN_TOKEN=admin-token
-
-######################################
-# PostgresQL
 
 # postgres database password
 TEST_PG_PASSWORD=postgres-password
+
+# postgres database options
+TEST_PG_SCHEMA=postgres-database-schema(optional)
+TEST_PG_VERSION=postgres-database-version(optional)
+
+# kafka messaging system options
+TEST_KAFKA_HOST=kafka-host-ip(optional)
+TEST_KAFKA_GROUP=kafka-group(optional)
+
+######################################
+# Common variables
+######################################
+
+# Google Recaptcha
+GOOGLE_RECAPTCHA_SITEKEY=platform-google-recaptcha-sitekey
+GOOGLE_RECAPTCHA_SECRET=platform-google-recaptcha-secret
+
+# videolectures api key - for data retrieval
+RETRIEVERS_VL_APIKEY=videolectures-apikey
+
+# wikifier url and userkey - required for concept extraction
+PREPROC_WIKIFIER_URL=http://www.wikifier.org
+PREPROC_WIKIFIER_USERKEY=wikifier-userkey
+
+# UPV MLLP-TTP
+PREPROC_TTP_USER=ttp-user
+PREPROC_TTP_TOKEN=ttp-token
+
 ```
 

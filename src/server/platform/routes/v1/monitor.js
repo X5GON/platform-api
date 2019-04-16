@@ -1,6 +1,3 @@
-// configurations
-const config = require('../../../../config/config');
-
 // external modules
 const parser = require('ua-parser-js');
 const router = require('express').Router();
@@ -9,7 +6,7 @@ const url = require('url');
 /**
  * Adds API routes for platform website requests.
  */
-module.exports = function (pg, logger, monitor) {
+module.exports = function (monitor, config) {
 
     /**
      * @description Checks if the user is accessing the monitor as an admin.
@@ -200,7 +197,11 @@ module.exports = function (pg, logger, monitor) {
                 break;
         }
 
+<<<<<<< HEAD
         return res.render('error', { message, title: '404' });
+=======
+        return res.render('error', { message, title: '404'  });
+>>>>>>> 24afbd90fca93627c3ec37914989b61b0fd1c2a3
     });
 
     return router;

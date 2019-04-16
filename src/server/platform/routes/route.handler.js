@@ -4,20 +4,40 @@
  * @param {Object} pg - Postgres wrapper.
  * @param {Object} logger - The logger object.
  */
-module.exports = function (app, pg, logger, monitor) {
+module.exports = function (app, pg, logger, config, monitor) {
 
     ////////////////////////////////////////
     // API Routes
     ////////////////////////////////////////
 
-    app.use('/', require('./v1/website')(pg, logger));                  // website routes
-    app.use('/api/v1', require('./v1/search')(pg, logger));             // search API routes
-    app.use('/api/v1', require('./v1/activity-logging')(pg, logger));   // logging API routes
-    app.use('/', require('./v1/monitor')(pg, logger, monitor));         // monitor API routes
+    // service REST API
+    app.use('/api/v1', require('./v1/connect/connect')(pg, logger, config));
+    app.use('/api/v1', require('./v1/connect/transitions')(pg, logger, config));
+
+    // search REST API
+    app.use('/api/v1', require('./v1/search/search')(pg, logger, config));
+
+    // query REST API
+    app.use('/api/v1', require('./v1/query/oer-materials')(pg, logger, config));
+    app.use('/api/v1', require('./v1/query/oer-providers')(pg, logger, config));
+    app.use('/api/v1', require('./v1/query/user-activities')(pg, logger, config));
+
+
+    ////////////////////////////////////////
+    // Website routes
+    ////////////////////////////////////////
+
+    // app.use('/', require('./v1/monitor')(monitor, config));
+    app.use('/', require('./v1/website')(pg, logger, config));
+
+
+    ////////////////////////////////////////
+    // Catching all false requests
+    ////////////////////////////////////////
 
     app.get('/*', (req, res) => {
+        // error in website request
+        logger.warn('error in website request', logger.formatRequest(req));
         return res.render('error', { title: '404' });
     });
-
-
 };

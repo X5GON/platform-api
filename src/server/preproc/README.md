@@ -1,36 +1,80 @@
-# Material Pre-processing Pipeline Folder
+# OER Processing Pipeline
 
-This folder contains the code base for OER material pre-processing pipeline. The 
+This folder contains the code base for OER material processing pipeline. The
 pipeline is created using qtopology which is a distributed stream processing layer.
 
-**Disclaimer**: The pipeline is NOT yet finished. Feature/information extraction 
-methods are still missing as well as the components that handle Wikification and 
-DMoz classification. The latter will be added shortly while the information 
-extraction components are still pending.
+## Prerequisites
+
+### Apache Kafka and Docker
+
+The material processing pipeline is dependent on Apache Kafka. One can install
+an instance of Apache Kafka on their machine - what we prefer is to use a docker
+container which includes Apache Kafka.
+
+#### Installing and Running Docker
+
+It is required to have a running kafka container before running the processing pipeline. How to do this is described in the project index [readme](../../../README.md).
+
+## Folder Structure
 
 The folder structure is as follows:
 
 | folder name | description |
-| ----------- | ----------- | 
-| `config`    | This folder contains the configurations that are used within the pre-processing pipeline. Since this data is private the folder needs to be created by the developer and populated with the configuration files. Examples of the configurations are found bellow.|
+| ----------- | ----------- |
+| pipelines   | Contains components and scripts for running a particular processing pipeline |
+| retrievers  | Contains different OER material retrievers as well as the basic retriever used as an example |
 
-## Config Folder
+## Processing Pipelines
 
-The `config` folder needs to be created by the developer. It contains private 
-and vulnerable data such as tokens, usernames and passwords to access databases 
-and make API calls. To ensure this data is not leaked, we added all configuration 
-folders to the `.gitignore` file and present how the configuration files should 
-look like.
+The processing pipelines accept Open Educational Materials of a particular *type*
+and process it accordingly. The two types that are currently supported are:
 
-### Wikifier Configuration
+- text
+- video/audio
 
-To extract Wikipedia concepts from OER materials we will use Wikifier. For it to
-work the developer will need to create a file `/config/wikiconfig.js`
-containing the following lines:
+Figure 1 shows the material processing pipeline architecture.
 
-```javascript
-module.exports = {
-    wikifierUrl: 'url-to-wikifier',
-    userKey: 'generated-user-key'
-};
-```
+![preprocessing pipeline](readme-imgs/kafka-pipeline.png)
+*Figure 1:* The material processing pipeline architecture. It shows how we acquire
+materials via different APIs and send it to the appropriate pipeline based on the
+material's type.
+
+### Pipeline Components
+
+Each pipeline contains the following components:
+
+- **Format.** Formats the acquired materials into a common schema.
+- **Content Extraction.** Extracts the content from the material. This is done
+    based on the material type:
+    - **Text.** We use *textract*, a Nodejs library that is able to extract raw
+        text from the text material.
+    - **Video/Audio.** We use the *Transcription and Translation Platform* (TTP)
+        which automatically generates transcriptions (subtitles) and translates
+        the video content.
+
+- **Content Enrichment.** Enriches the content by extracting additional features
+    from the material.
+    - **Wikification.** We use *wikifier*, an online service for extracting
+        wikipedia concepts associated with the provided text.
+    - **DMOZ Classification (TODO).** We still need to develop the DMOZ classification
+        model to acquire the different topics the material is associated with.
+
+- **Validation.** Validates if the material object contains all of the required values.
+
+- **Material Storing.** Stores the material in the appropriate database. If there
+    were any errors during thisprocess, we store the error and the material in a
+    different table for future exploration.
+
+Components of the pipeline are stored in the [pipelines](pipelines/) folder.
+
+## Retrievers
+
+The retrievers are responsible for retrieving materials from OER providers that
+are registered in the X5GON Network. For each provider we need to develop its
+own retriever, custom for their API.
+
+The currenlty available retrievers are for the following OER providers:
+
+- [Videolectures.NET](http://videolectures.net/)
+
+

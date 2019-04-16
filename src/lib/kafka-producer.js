@@ -6,20 +6,39 @@ const k = require('kafka-node');
  */
 class KafkaProducer {
 
-    constructor(config) {
+    constructor(host) {
         let self = this;
+
         const options = {
-            kafkaHost: config.host
+            kafkaHost: host
         };
 
         this._ready = false;
+        this._messages = [];
         const client = new k.KafkaClient(options);
-        this._producer = new k.HighLevelProducer(client);
+        // create a kafka producer
+        self._producer = new k.HighLevelProducer(client);
 
         // make the producer ready
-        this._producer.on('ready', function () {
+        self._producer.on('ready', function () {
+
             self._ready = true;
+            // check if there are any messages not sent
+            if (self._messages.length) {
+                // send all messages
+                while (self._messages.length) {
+                    // get the first element from the array of messages
+                    const message = self._messages[0];
+                    // update the messages array
+                    self._messages = self._messages.slice(1);
+                    // send the message to the corresponsing topic
+                    self._producer.send([message], (xerror, data) => {
+                        if (xerror) { console.log(xerror); }
+                    });
+                }
+            }
         });
+
     }
 
     /**
@@ -27,18 +46,28 @@ class KafkaProducer {
      * @param {String} topic - The topic where the message is sent.
      * @param {Object} msg - The message.
      */
-    send(topic, msg) {
+    send(topic, msg, cb) {
         let self = this;
+
+
+        // get set callback value
+        let callback = cb && typeof(cb) === 'function' ?
+            cb : function (error) { if (error) console.log(error); };
+
+
+        // prepare the message in string
+        const messages = JSON.stringify(msg);
         if (self._ready) {
-            // the producer is ready
-            self._producer.createTopics([topic], false, (error, data) => {
-                if (error) { console.log(error); }
-                const messages = JSON.stringify(msg);
-                const payload = [{ topic, messages }];
-                self._producer.send(payload, (xerror, data) => {
-                    if (xerror) { console.log(xerror); }
-                });
+            // the producer is ready to send the messages
+            const payload = [{ topic, messages, attributes: 1 }];
+            self._producer.send(payload, (xerror, data) => {
+                if (xerror) { return callback(xerror); }
+                return callback(null);
             });
+        } else {
+            // store the topic and message to send afterwards
+            self._messages.push({ topic, messages });
+            return callback(null);
         }
     }
 
