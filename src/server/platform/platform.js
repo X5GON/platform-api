@@ -5,15 +5,9 @@
 
 
 // external modules
-<<<<<<< HEAD
-const express = require('express');
-const exphbs = require('express-handlebars');
-const bodyParser = require('body-parser');
-=======
 const express      = require('express');
 const exphbs       = require('express-handlebars');
 const bodyParser   = require('body-parser');
->>>>>>> 24afbd90fca93627c3ec37914989b61b0fd1c2a3
 const cookieParser = require('cookie-parser');
 const session      = require('express-session');
 
