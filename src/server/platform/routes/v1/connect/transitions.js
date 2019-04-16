@@ -93,15 +93,22 @@ module.exports = function (pg, logger, config) {
         const {
             from,
             to,
-            uuid
+            uuid,
+            position: selected_position,
+            rec_urls
         } = req.query_parameters;
 
         /**********************************
          * send the request to kafka
          *********************************/
+        console.log(req.query_parameters);
+
+        const recommended_urls = rec_urls.split(',');
 
         // send the message to the kafka topic
-        producer.send('STORING.RECSYS.TRANSITIONS', { from, to, uuid });
+        producer.send('STORING.RECSYS.TRANSITIONS', {
+            from, to, selected_position, recommended_urls, uuid
+        });
 
         // redirect the request to the provided url
         res.redirect(to);

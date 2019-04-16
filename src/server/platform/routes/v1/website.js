@@ -400,6 +400,14 @@ module.exports = function (pg, logger, config) {
                 options.empty = recommendations.length !== 0 || recommendations.error ? false : true;
                 options.query = query;
                 options.recommendations = recommendations;
+
+                if (options.query.url) {
+                    // encode query url if present
+                    options.query.url = encodeURIComponent(options.query.url);
+                }
+                // encode all material urls
+                options.recommendations.forEach(material => material.url = encodeURIComponent(material.url));
+                options.recommended_urls = options.recommendations.map(material => material.url);
             } catch (xerror) {
                 // error when processing materials
                 logger.error('[error] processing material bundles',
