@@ -301,7 +301,7 @@ module.exports = function (pg, logger, config) {
             provider_name,
             provider_domain,
 
-            material_content_ids
+            material_content_ids: content_ids
         } = pg_material;
 
         // get material type
@@ -309,18 +309,18 @@ module.exports = function (pg, logger, config) {
 
         // setup material format
         return {
-            id,
+            material_id: id,
             title,
             description,
             url,
             language,
             type,
+            mimetype,
+            content_ids,
             provider: {
-                id:     provider_id,
-                name:   provider_name,
-                domain: provider_domain
-            },
-            material_content_ids
+                provider_name,
+                provider_domain
+            }
         };
 
     }
@@ -337,7 +337,7 @@ module.exports = function (pg, logger, config) {
 
         // setup content format
         return {
-            id,
+            content_id: id,
             type,
             extension,
             value,
@@ -712,14 +712,14 @@ module.exports = function (pg, logger, config) {
              *********************************/
 
             // convert the materials
-            const contents = records.map(content => oerMaterialContentFormat(content));
+            const oer_contents = records.map(content => oerMaterialContentFormat(content));
 
             // send the materials to the user
             return res.status(200).send({
                 oer_materials: {
-                    id: materialId
+                    material_id: materialId
                 },
-                contents
+                oer_contents
             });
         });
 

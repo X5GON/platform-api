@@ -229,6 +229,9 @@ module.exports = function (pg, logger, config) {
         return res.render('privacy-policy', { title: 'Privacy Policy' });
     });
 
+    router.get('/documentation', (req, res) => {
+        return res.render('documentation', { title: 'API Documentation' });
+    });
 
     ////////////////////////////////////////
     // Material Search

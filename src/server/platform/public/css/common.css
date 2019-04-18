@@ -176,6 +176,7 @@ input[type="search"]:focus,
 input[type="tel"]:focus,
 input[type="color"]:focus,
 a:focus,
+a:hover,
 a:active,
 .btn:focus,
 .btn:active {
