@@ -102,7 +102,7 @@ module.exports = function (pg, logger, config) {
          * send the request to kafka
          *********************************/
 
-        const recommended_urls = rec_urls.split(',');
+        const recommended_urls = rec_urls ? rec_urls.split(',') : [];
 
         // send the message to the kafka topic
         producer.send('STORING.RECSYS.TRANSITIONS', {
