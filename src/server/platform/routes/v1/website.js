@@ -416,8 +416,8 @@ module.exports = function (pg, logger, config) {
                 logger.error('[error] processing material bundles',
                     logger.formatRequest(req, {
                         error: {
-                            message: error.message,
-                            stack: error.stack
+                            message: xerror.message,
+                            stack: xerror.stack
                         }
                     })
                 );
