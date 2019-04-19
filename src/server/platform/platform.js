@@ -11,25 +11,19 @@ const bodyParser   = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session      = require('express-session');
 
-
 // configurations
 const config = require('@config/config');
 
 // internal modules
 const pg     = require('@lib/postgresQL')(config.pg);
-const Logger = require('@lib/logging-handler')();
-// create a logger instance for logging API requests
-const logger = Logger.createGroupInstance('api-requests', 'api');
+const Logger = require('@lib/logger');
 
-// internal modules for monitoring processes
-const PM2Monitor = require('@lib/pm2-monitor');
-let monitor = new PM2Monitor();
+// create a logger for platform requests
+const logger = Logger.createGroupInstance('requests', 'platform', config.environment === 'dev');
 
 // create express app
 let app = express();
 let http = require('http').Server(app);
-// initialize socket
-let io = require('socket.io')(http);
 
 // configure application
 app.use(bodyParser.json());     // to support JSON-encoded bodies
@@ -72,23 +66,28 @@ require('./routes/proxies')(app, config);
 app.use(cookieParser(config.platform.sessionSecret));
 
 // sets the API routes
-require('./routes/route.handler')(app, pg, logger, config, monitor);
+require('./routes/route.handler')(app, pg, logger, config /*, monitor */);
 
-// configure socket connections
-io.on('connection', function(socket) {
-    console.log('a user connected');
-    socket.on('disconnect', function () {
-        console.log('user disconnected');
-    });
+// // internal modules for monitoring processes
+// const PM2Monitor = require('@lib/pm2-monitor');
+// let monitor = new PM2Monitor();
+// // initialize socket
+// let io = require('socket.io')(http);
+// // configure socket connections
+// io.on('connection', function(socket) {
+//     console.log('a user connected');
+//     socket.on('disconnect', function () {
+//         console.log('user disconnected');
+//     });
 
-    setInterval(() => {
-        monitor.listProcesses((error, list) => {
-            return error ?
-                io.emit('pm2-process-error', { error }) :
-                io.emit('pm2-process', list);
-        });
-    }, 1000);
-});
+//     setInterval(() => {
+//         monitor.listProcesses((error, list) => {
+//             return error ?
+//                 io.emit('pm2-process-error', { error }) :
+//                 io.emit('pm2-process', list);
+//         });
+//     }, 1000);
+// });
 
 // parameters used on the express app
 const PORT = config.platform.port;

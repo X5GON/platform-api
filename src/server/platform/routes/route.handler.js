@@ -12,25 +12,32 @@ module.exports = function (app, pg, logger, config, monitor) {
 
     // service REST API
     app.use('/api/v1', require('./v1/connect/connect')(pg, logger, config));
+    app.use('/api/v1', require('./v1/connect/transitions')(pg, logger, config));
 
     // search REST API
-    app.use('/api/v1', require('./v1/recommender/search')(pg, logger, config));
-
-    // storing REST API
-    app.use('/api/v1/storing', require('./v1/storing/selections')(pg, logger, config));
-    app.use('/api/v1/storing', require('./v1/storing/transitions')(pg, logger, config));
+    app.use('/api/v1', require('./v1/search/search')(pg, logger, config));
 
     // query REST API
     app.use('/api/v1', require('./v1/query/oer-materials')(pg, logger, config));
     app.use('/api/v1', require('./v1/query/oer-providers')(pg, logger, config));
     app.use('/api/v1', require('./v1/query/user-activities')(pg, logger, config));
 
-    // website routes
-    app.use('/', require('./v1/monitor')(monitor, config));
+
+    ////////////////////////////////////////
+    // Website routes
+    ////////////////////////////////////////
+
+    // app.use('/', require('./v1/monitor')(monitor, config));
     app.use('/', require('./v1/website')(pg, logger, config));
 
-    // error routes
+
+    ////////////////////////////////////////
+    // Catching all false requests
+    ////////////////////////////////////////
+
     app.get('/*', (req, res) => {
-        return res.redirect('/error');
+        // error in website request
+        logger.warn('error in website request', logger.formatRequest(req));
+        return res.render('error', { title: '404' });
     });
 };

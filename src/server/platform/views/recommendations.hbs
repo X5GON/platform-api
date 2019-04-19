@@ -2,11 +2,11 @@
   <div class="recommendations width-restriction"
     style="width:{{style.width}};max-height:{{style.height}};">
     {{#each recommendations as | material index |}}
-    {{!-- {{#if query.url}}
-      <a class="material" href="http://platform.x5gon.org/api/v1/storing/transitions?from={{query.url}}&to={{material.url}}" target="_blank">
-    {{else}} --}}
+    {{#if ../query.url}}
+      <a class="material" href="/api/v1/transitions?from={{../query.url}}&to={{material.url}}&position={{index}}&rec_urls={{../recommended_urls}}" target="_blank">
+    {{else}}
       <a class="material" href="{{material.url}}" target="_blank">
-    {{!-- {{/if}} --}}
+    {{/if}}
       <table class="material-content" style="font-size:{{../style.fontSize}};">
         <body>
           <tr>

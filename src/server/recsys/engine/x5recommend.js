@@ -3,6 +3,7 @@
  * Contains all of the recommendation models.
  */
 
+// configurations and mimetypes
 const config = require('@config/config');
 const mimetypes = require('@config/mimetypes');
 
@@ -13,8 +14,11 @@ const qm = require('qminer');
 
 // internal modules
 const NearestNeighbor = require('./models/nearest-neighbors');
-const Logger = require('@lib/logging-handler')();
+const Logger = require('@lib/logger');
+
+// postgresql connections
 const pg = require('@lib/postgresQL')(config.pg);
+
 
 /**
  * @class x5recommend
@@ -36,10 +40,9 @@ class x5recommend {
         let self = this;
         // parse parameters
         self.params = params;
-        if (!self.params.env) { self.params.env = 'production'; }
         // set the recommender requests logger
-        self.logger = Logger.createGroupInstance(`recommendation-requests-${self.params.env}`,
-            'x5recommend', self.params.env !== 'test');
+        self.logger = Logger.createGroupInstance(`recommendation`, 'x5recommend',
+            config.environment === 'dev');
 
         // load database
         self._loadBase();
@@ -83,7 +86,9 @@ class x5recommend {
         } else {
             // unsupported qminer mode - log the error
             let errorMessage = `Value of parameter 'mode' is not supported: ${self.params.mode}`;
-            self.logger.error(`error [x5recommend._loadBase]: ${errorMessage}`, { error: errorMessage });
+            self.logger.error('[error] x5recommend._loadBase', {
+                error: errorMessage
+            });
             throw Error(errorMessage);
         }
 
@@ -110,6 +115,11 @@ class x5recommend {
         let self = this;
         // TODO: validate record schema
         if (!true /* check record validation */) {
+            // log the difference in schemas
+            self.logger.warn('[warn] x5recommend.pushRecordContent', {
+                error: { message: 'record is not in correct format' },
+                record
+            });
             // record is not in correct format - throw an error
             return new Error('Record not in correct format');
         }
@@ -127,6 +137,11 @@ class x5recommend {
         let self = this;
         // TODO: validate record schema
         if (!true /* check record validation */) {
+            // log the difference in schemas
+            self.logger.warn('[warn] x5recommend.pushRecordMaterialModel', {
+                error: { message: 'record is not in correct format' },
+                record
+            });
             // record is not in correct format - throw an error
             return new Error('Record not in correct format');
         }
@@ -328,8 +343,9 @@ class x5recommend {
         // distinguish between the url and title & description query methods
         if (!userQuery) {
             let errorMessage = 'Missing query';
-            self.logger.error(`error [x5recommend.recommendMaterials]: ${errorMessage}`, {
-                error: errorMessage, query: userQuery
+            self.logger.error('[error] x5recommend.recommendMaterials', {
+                error: { message: errorMessage },
+                query: userQuery
             });
             // not supported query option - return error
             return Promise.reject({ error: errorMessage });
@@ -346,8 +362,9 @@ class x5recommend {
         if (!url && !text) {
             // log the error for unsupported parameters
             let errorMessage = 'Unsupported recommendation parameters';
-            self.logger.error(`error [x5recommend.recommendMaterials]: ${errorMessage}`, {
-                error: errorMessage, query: userQuery
+            self.logger.error('[error] x5recommend.recommendMaterials', {
+                error: { message: errorMessage },
+                query: userQuery
             });
             // not supported query option - return error
             return Promise.reject({ error: errorMessage });
@@ -374,16 +391,18 @@ class x5recommend {
 
         if (!recommendations) {
             let errorMessage = 'Empty query object';
-            self.logger.error(`error [x5recommend.recommendMaterials]: ${errorMessage}`, {
-                error: errorMessage, query: userQuery
+            self.logger.warn('[warn] x5recommend.recommendMaterials', {
+                error: { message: errorMessage },
+                query: userQuery
             });
             // not supported query option - return error
             return Promise.reject({ error: errorMessage });
 
         } else if (recommendations.error) {
             // log the error given by the recommendation search
-            self.logger.error(`error [x5recommend.recommendMaterials]: ${recommendations.error}`, {
-                error: recommendations.error, query: userQuery
+            self.logger.warn('[warn] x5recommend.recommendMaterials', {
+                error: { message: recommendations.error },
+                query: userQuery
             });
             // not supported query option - return error
             return Promise.reject({ error: recommendations.error });
@@ -409,8 +428,9 @@ class x5recommend {
         // distinguish between the url and title & description query methods
         if (!userQuery) {
             let errorMessage = 'Missing query';
-            self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
-                error: errorMessage, query: userQuery
+            self.logger.error('[error] x5recommend.recommendBundles', {
+                error: { message: errorMessage },
+                query: userQuery
             });
             // not supported query option - return error
             return Promise.reject({ error: errorMessage });
@@ -437,8 +457,9 @@ class x5recommend {
         } else {
             // log the error for unsupported parameters
             let errorMessage = 'Unsupported recommendation parameters';
-            self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
-                error: errorMessage, query: userQuery
+            self.logger.error('[error] x5recommend.recommendBundles', {
+                error: { message: errorMessage },
+                query: userQuery
             });
             // not supported query option - return error
             return Promise.reject({ error: errorMessage });
@@ -450,16 +471,18 @@ class x5recommend {
 
         if (!recommendations) {
             let errorMessage = 'Empty query object';
-            self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
-                error: errorMessage, query: userQuery
+            self.logger.warn('[warn] x5recommend.recommendBundles', {
+                error: { message: errorMessage },
+                query: userQuery
             });
             // not supported query option - return error
             return Promise.reject({ error: errorMessage });
 
         } else if (recommendations.error) {
             // log the error given by the recommendation search
-            self.logger.error(`error [x5recommend.recommendContent]: ${recommendations.error}`, {
-                error: recommendations.error, query: userQuery
+            self.logger.warn('[warn] x5recommend.recommendBundles', {
+                error: { message: recommendations.error },
+                query: userQuery
             });
             // not supported query option - return error
             return Promise.reject({ error: errorMessage });
@@ -487,9 +510,10 @@ class x5recommend {
 
         return new Promise(function (resolve, reject) {
             if (!query) {
-                let errorMessage = 'recommendPersonalized: Missing query';
-                self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
-                    error: errorMessage, query
+                let errorMessage = 'Missing query';
+                self.logger.error('[error] x5recommend.recommendPersonalized', {
+                    error: { message: errorMessage },
+                    query
                 });
                 // not supported query option - return error
                 return reject({ error: errorMessage });
@@ -497,11 +521,18 @@ class x5recommend {
 
             pg.select({ uuid: query.uuid }, 'rec_sys_user_model', function(error, results) {
                 if (error) {
-                    self.logger.error('Error fetching user model: ' + error);
+                    self.logger.error('[error] x5recommend.recommendPersonalized', {
+                        error: { message: error.message, stack: error.stack },
+                        query
+                    });
                     return reject(error);
                 }
 
                 if (!results || results.length === 0) {
+                    self.logger.warn('[warn] x5recommend.recommendPersonalized', {
+                        error: { message: 'cookie not available in the database' },
+                        query
+                    });
                     return reject({ error: 'Cookie is not in the database - unable to fetch the user' });
                 }
 
@@ -523,6 +554,10 @@ class x5recommend {
                 let recommendations = self.userMaterialSimNN.search(query);
 
                 if (!recommendations) {
+                    self.logger.warn('[warn] x5recommend.recommendPersonalized', {
+                        error: { message: 'no recommendations acquired' },
+                        query
+                    });
                     recommendations = {
                         error: 'Error fetching recommendations'
                     };

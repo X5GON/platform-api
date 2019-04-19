@@ -42,7 +42,9 @@ class PostgresqlRecsysTransitions {
         const {
             from,
             to,
-            uuid
+            uuid,
+            selected_position,
+            recommended_urls
         } = message;
 
         const fromMaterialModelId = new Promise((resolve, reject) => {
@@ -72,12 +74,16 @@ class PostgresqlRecsysTransitions {
                 from_url:               from,
                 to_url:                 to,
                 from_material_model_id: materialModalIds[0],
-                to_material_model_id:   materialModalIds[1]
+                to_material_model_id:   materialModalIds[1],
+                selected_position,
+                recommended_urls,
+                num_of_recommendations: recommended_urls.length
             };
 
             self._pg.insert(rec_sys_user_transitions, 'rec_sys_user_transitions', function (error, result) {
                 if (error) { return callback(error); }
                 // return the id of the material model
+                console.log(rec_sys_user_transitions);
                 return callback(null);
             });
         }).catch(error => {

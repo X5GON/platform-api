@@ -1,11 +1,11 @@
 const assert      = require('assert');
 const fileManager = require('@lib/file-manager');
-const Logger      = require('@lib/logging-handler');
+const Logger      = require('@lib/logger');
 const winston     = require('winston');
 const path        = require('path');
 const fs          = require('fs');
 
-describe('logging-handler.js: logging handler methods unit tests.', function () {
+describe('logger.js: logging handler methods unit tests.', function () {
 
     after(function(){
         fileManager.removeFolder(path.join(__dirname, '../../../logs/Sub-test'));

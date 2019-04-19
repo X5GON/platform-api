@@ -6,14 +6,15 @@
  * (http://wikifier.org).
  */
 
-
-// internal modules
-const Logger = require('@lib/logging-handler')();
-// create a logger instance for logging recommendation requests
-const logger = Logger.createGroupInstance('recommendation-model-build', 'x5recommend');
-
 // configurations
 const config = require('@config/config');
+
+// internal modules
+const Logger = require('@lib/logger');
+
+// create a logger instance for logging recommendation requests
+const { environment } = config;
+const logger = Logger.createGroupInstance('recommendation-model-build', 'x5recommend', environment === 'dev');
 
 // initialize connection with postgresql
 const pg = require('@lib/postgresQL')(config.pg);

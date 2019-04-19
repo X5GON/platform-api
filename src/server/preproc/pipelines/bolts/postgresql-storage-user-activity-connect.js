@@ -115,7 +115,6 @@ class PostgresqlStorageUserActivites {
                     };
                     updateUserModels.updateUserModel(activity);
                 }
-
                 // go to next record
                 return callback(null);
 

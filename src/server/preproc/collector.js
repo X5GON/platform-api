@@ -17,7 +17,7 @@ class OERCollector {
      */
     constructor() {
         // set kafka consumer & producers
-        this._consumer = new KafkaConsumer(config.kafka.host, 'STORING.USERACTIVITY.CONNECT', config.kafka.groupId);
+        this._consumer = new KafkaConsumer(config.kafka.host, 'STORING.USERACTIVITY.VISIT', config.kafka.groupId);
         this._producer = new KafkaProducer(config.kafka.host);
 
         // crawling configuration
@@ -167,15 +167,12 @@ class OERCollector {
             // TODO: proper error logging
             if (error) { console.log(error); return; }
             for (let material of materials) {
-                console.log('processing material url=', material.materialurl);
                 // send material to the appropriate pipeline
                 // TODO: check/integrate an appropriate type selection
                 if (material.type.mime && material.type.mime.includes('video')) {
                     self._producer.send(self._video_topic, material);
-                    console.log('processing material url=', material.materialurl);
                 } else {
                     self._producer.send(self._text_topic, material);
-                    console.log('processing material url=', material.materialurl);
                 }
             }
         };

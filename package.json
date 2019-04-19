@@ -27,11 +27,12 @@
   },
   "homepage": "https://github.com/JozefStefanInstitute/x5gon#readme",
   "dependencies": {
+    "archiver": "^3.0.0",
     "async": "^2.6.0",
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
-    "dotenv": "^6.0.0",
+    "dotenv": "^7.0.0",
     "express": "^4.16.2",
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
@@ -55,8 +56,8 @@
     "request-promise-native": "^1.0.5",
     "socket.io": "^2.1.1",
     "textract": "^2.4.0",
-    "winston": "^2.4.0",
-    "winston-daily-rotate-file": "^1.7.2",
+    "winston": "^3.2.1",
+    "winston-daily-rotate-file": "^3.8.0",
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
@@ -76,6 +77,8 @@
   },
   "_moduleAliases": {
     "@lib": "src/lib",
-    "@config": "src/config"
+    "@config": "src/config",
+    "@platform_schemas": "src/server/platform/schemas",
+    "@recsys_schemas": "src/server/recsys/schemas"
   }
 }
