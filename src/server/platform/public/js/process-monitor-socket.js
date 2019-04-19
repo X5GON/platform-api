@@ -11,7 +11,7 @@ function statusColor(status) {
 
 let socket = io();
 // get process monitor information
-socket.on('pm2-process', function(msg) {
+socket.on('monitor-process', function(msg) {
 
     // get existing processes
     let rows = $('#process-monitor tbody tr[data-process-head]');

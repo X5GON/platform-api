@@ -41,6 +41,7 @@
     "handlebars": "^4.0.11",
     "handlebars-helper-sri": "0.0.0",
     "helmet": "^3.12.1",
+    "helmet-csp": "^2.7.1",
     "http-proxy-middleware": "^0.18.0",
     "jsonschema": "^1.2.2",
     "kafka-node": "^2.6.1",

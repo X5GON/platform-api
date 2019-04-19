@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const url = require('url');
 const cors = require('cors');
+const csp = require('helmet-csp');
 
 // internal modules
 const KafkaProducer = require('@lib/kafka-producer');

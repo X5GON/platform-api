@@ -27,7 +27,7 @@ module.exports = function (pg, logger, config) {
      * Middleware
      *********************************/
 
-    router.use((req, res, next) => {
+    router.use('/transitions', (req, res, next) => {
 
         // transform query parameters into lowercase
         const query_parameters = {};
@@ -101,7 +101,6 @@ module.exports = function (pg, logger, config) {
         /**********************************
          * send the request to kafka
          *********************************/
-        console.log(req.query_parameters);
 
         const recommended_urls = rec_urls.split(',');
 

@@ -41,8 +41,7 @@ app.use(session({
 // add the public folder
 app.use(express.static(__dirname + '/public/'));
 
-// set rendering engine
-app.engine('hbs', exphbs({
+let hbs = exphbs.create({
     extname: 'hbs',
     defaultLayout: 'main',
     partialsDir: `${__dirname}/views/partials/`,
@@ -54,9 +53,20 @@ app.engine('hbs', exphbs({
             return arg1 === 'online' ? 'text-success' :
                 arg1 === 'launching' ? 'text-warning' :
                 'text-danger';
+        },
+        json: function (obj) {
+            return JSON.stringify(obj);
+        },
+        concat: function (...args) {
+            args.pop(); return args.join('');
         }
     }
-}));
+});
+
+hbs.handlebars = require('handlebars-helper-sri').register(hbs.handlebars);
+
+// set rendering engine
+app.engine('hbs', hbs.engine);
 app.set('view engine', 'hbs');
 
 // redirect specific requests to other services
