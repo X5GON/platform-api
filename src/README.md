@@ -20,5 +20,5 @@ and make API calls. To ensure this data is not leaked, we added all configuratio
 folders to the `.gitignore` file and present how the configuration files should
 look like.
 
-Check the [./config/readme](./config/readme) to find what is required from the
+Check this [README](./config/README.md) to find what is required from the
 developer to create.

@@ -24,7 +24,7 @@ The repositories contains the following components:
 
 ## Prerequisites
 
-- Create `.env` file in the `src/config` folder. See instructions described in this [readme](./src/config/readme).
+- Create `.env` file in the `src/config` folder. See instructions described in this [readme](./src/config/README.md).
 
 - node.js v6.0 and npm 5.3 or higher
 
@@ -64,7 +64,7 @@ npm install
 ## Run Components
 
 Before you run any of the components you must first create an `.env` file containing the process
-environments. For more detail see [src/config/README.md](./src/config/README.md).
+environments. For more detail see [README](./src/config/README.md).
 
 ### Component Initialization
 
