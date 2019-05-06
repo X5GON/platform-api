@@ -407,10 +407,10 @@ module.exports = function (pg, logger, config) {
                 if (options.query.url) {
                     // encode query url if present
                     options.query.url = encodeURIComponent(options.query.url);
+                    options.recommendations.forEach(material => material.url = encodeURIComponent(material.url));
                 }
                 // encode all material urls
-                options.recommendations.forEach(material => material.url = encodeURIComponent(material.url));
-                options.recommended_urls = options.recommendations.map(material => material.url);
+                options.recommended_urls = options.recommendations.map(material => encodeURIComponent(material.url));
             } catch (xerror) {
                 // error when processing materials
                 logger.error('[error] processing material bundles',
