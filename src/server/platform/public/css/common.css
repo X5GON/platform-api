@@ -68,8 +68,6 @@ footer .funding {
 }
 footer .funding .col { margin: 0px; }
 footer .funding p {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
     line-height: 1.6;
 }
 
@@ -257,4 +255,8 @@ h1.card__title {
 
 .card__desc {
     line-height: 1.3;
+}
+
+.img-left {
+    float: left;
 }
