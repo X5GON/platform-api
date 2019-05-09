@@ -135,6 +135,9 @@ module.exports = function (pg, logger, config) {
         const name = body.name;
         const domain = body.domain;
         const contact = body.contact;
+        const referrer = req.header('Referrer') ?
+            req.header('Referrer').split('?')[0] :
+            '/join';
 
         // verify user through google validation
         const gRecaptchaResponse = body["g-recaptcha-response"];
