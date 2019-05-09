@@ -121,7 +121,7 @@ module.exports = function (pg, logger, config) {
                     logger.formatRequest(req)
                 );
                 // render the form submition
-                return res.render('oer-provider', { name, domain, contact, token, snippetLibs, title: 'OER Provider Information' });
+                return res.render('oer-provider', { name, domain, contact, token, title: 'OER Provider Information' });
             }
         });
     });
