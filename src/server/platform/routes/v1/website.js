@@ -77,10 +77,12 @@ module.exports = function (pg, logger, config) {
     router.get('/join', (req, res) => {
         // check if the user was successfully validated by google captcha
         // this is used only when redirected from POST /repository
-        const invalid = req.query.invalid ? req.query.invalid == 'true' : false;
+        const { invalid, unsuccessful } = req.query;
+        // const invalid = req.query.invalid ? req.query.invalid == 'true' : false;
+        // const unsuccessful = req.query.invalid ? req.query.invalid == 'true' : false;
         const recaptchaSiteKey = config.platform.google.reCaptcha.siteKey;
 
-        return res.render('join', { recaptchaSiteKey, invalid, title: 'Join' });
+        return res.render('join', { recaptchaSiteKey, invalid, unsuccessful, title: 'Join' });
     });
 
     router.get('/oer-provider', (req, res) => {
@@ -192,7 +194,7 @@ module.exports = function (pg, logger, config) {
                                     })
                                 );
                                 // redirect user to previous page
-                                return res.redirect(`${referrer}?invalid=true`);
+                                return res.redirect(`${referrer}?unsuccessful=true`);
                             }
 
                             // render the form submition
