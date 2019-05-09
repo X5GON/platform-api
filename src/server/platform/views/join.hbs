@@ -70,11 +70,13 @@
             </form>
           </div>
 
-          <div class="doc url_baseline p-4 mb-3">
-            <p class="information">
-              <b class="doc">Unable to join the repository to the network</b>
-            </p>
-          </div>
+          {{#if unsuccessful}}
+            <div class="doc url_baseline p-4 mb-3">
+              <p class="information">
+                <b class="doc">Unable to join the repository to the network</b>
+              </p>
+            </div>
+          {{/if}}
 
         </div>{{! .col-md }}
 
