@@ -7,12 +7,9 @@
  */
 
 // external libraries
-const textract = require('textract');
+const textract = require('@lib/textract');
 
-const textConfig = {
-    preserveLineBreaks: true,
-    includeAltText: true
-};
+
 
 /**
  * Formats Material into a common schema.
@@ -37,6 +34,9 @@ class ExtractionText {
             'gz'    // zip files
         ];
 
+        // configuration for textract
+        this.textConfig = config.text_config;
+
         // use other fields from config to control your execution
         callback();
     }
@@ -51,10 +51,10 @@ class ExtractionText {
     }
 
     receive(material, stream_id, callback) {
-
+        const self = this;
         if (material.type && !this._invalidTypes.includes(material.type.ext)) {
             // extract raw text from materialURL
-            textract.fromUrl(material.materialurl, textConfig, (error, text) => {
+            textract.fromUrl(material.materialurl, self.textConfig, (error, text) => {
                 if (error) {
                     material.message = `${this._prefix} Not able to extract text.`;
                     return this._onEmit(material, 'stream_partial', callback);

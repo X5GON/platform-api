@@ -62,7 +62,12 @@ module.exports = {
             "inputs": [{
                 "source": "material-type",
             }],
-            "init": {}
+            "init": {
+                "text_config": {
+                    "preserveLineBreaks": true,
+                    "includeAltText": true
+                }
+            }
         },
         {
             "name": "wikification",
