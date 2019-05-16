@@ -78,9 +78,9 @@
     "description": " Cross Modal, Cross Cultural, Cross Lingual, Cross Domain, and Cross Site Global OER Network"
   },
   "_moduleAliases": {
-    "@lib": "src/lib",
-    "@config": "src/config",
-    "@platform_schemas": "src/server/platform/schemas",
-    "@recsys_schemas": "src/server/recsys/schemas"
+    "alias:lib": "src/lib",
+    "alias:config": "src/config",
+    "alias:platform_schemas": "src/server/platform/schemas",
+    "alias:recsys_schemas": "src/server/recsys/schemas"
   }
 }

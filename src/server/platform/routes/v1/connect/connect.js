@@ -8,9 +8,9 @@ const cors = require('cors');
 const csp = require('helmet-csp');
 
 // internal modules
-const KafkaProducer = require('@lib/kafka-producer');
-const validator = require('@lib/schema-validator')({
-    userActivitySchema: require('@platform_schemas/user-activity-schema')
+const KafkaProducer = require('alias:lib/kafka-producer');
+const validator = require('alias:lib/schema-validator')({
+    userActivitySchema: require('alias:platform_schemas/user-activity-schema')
 });
 
 /**

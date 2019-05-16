@@ -8,7 +8,7 @@
 const path = require('path');
 
 // file management module
-const fileManager = require('@lib/file-manager');
+const fileManager = require('alias:lib/file-manager');
 
 // main logging modules
 const { createLogger, format, transports, addColors } = require('winston');

@@ -9,8 +9,8 @@ const assert = require('assert');
 const async = require('async');
 
 // get configuration and create pg connection
-const config = require('@config/config');
-const pg     = require('@lib/postgresQL')(config.pg);
+const config = require('alias:config/config');
+const pg     = require('alias:lib/postgresQL')(config.pg);
 
 
 describe('postgresQL.js: db methods unit tests.', function () {

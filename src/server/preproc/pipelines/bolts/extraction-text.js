@@ -7,7 +7,7 @@
  */
 
 // external libraries
-const textract = require('@lib/textract');
+const textract = require('alias:lib/textract');
 
 
 

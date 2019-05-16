@@ -1,12 +1,12 @@
 // internal modules
-const KafkaConsumer = require('@lib/kafka-consumer');
-const KafkaProducer = require('@lib/kafka-producer');
+const KafkaConsumer = require('alias:lib/kafka-consumer');
+const KafkaProducer = require('alias:lib/kafka-producer');
 
 // configurations
-const config = require('@config/config');
+const config = require('alias:config/config');
 
 // setup connection with the database
-const pg = require('@lib/postgresQL')(config.pg);
+const pg = require('alias:lib/postgresQL')(config.pg);
 
 
 
