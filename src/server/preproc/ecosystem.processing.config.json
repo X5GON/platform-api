@@ -21,13 +21,13 @@
         "cwd": "./pipelines/",
         "env": {
             "NODE_ENV": "dev",
-            "TOPOLOGY": "processing-material-video-manual"
+            "TOPOLOGY": "processing-material-video"
         },
         "env_production": {
             "NODE_ENV": "prod",
-            "TOPOLOGY": "processing-material-video-automatic"
+            "TOPOLOGY": "processing-material-video"
         },
-        "instances": "3",
+        "instances": "5",
         "exec_mode": "cluster",
         "autorestart": true,
         "max_restarts": 20

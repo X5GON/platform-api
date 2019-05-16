@@ -21,7 +21,7 @@ class OERCollector {
         this._producer = new KafkaProducer(config.kafka.host);
 
         // crawling configuration
-        this.defaultFrequency = 7 * 24 * 60 * 60 * 1000; // one week
+        this.defaultFrequency = 2 * 30 * 24 * 60 * 60 * 1000; // two months
 
         // define topic names
         this._text_topic  = 'PROCESSING.MATERIAL.TEXT';
