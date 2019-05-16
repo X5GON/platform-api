@@ -83,7 +83,6 @@ class PostgresqlRecsysTransitions {
             self._pg.insert(rec_sys_user_transitions, 'rec_sys_user_transitions', function (error, result) {
                 if (error) { return callback(error); }
                 // return the id of the material model
-                console.log(rec_sys_user_transitions);
                 return callback(null);
             });
         }).catch(error => {
