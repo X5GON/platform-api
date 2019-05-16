@@ -4,7 +4,7 @@
   "description": "Connecting OER repositories",
   "main": "index.js",
   "scripts": {
-    "postinstall": "link-module-alias && npm run minify:snippet && git checkout -- src/lib/textract && cd src/lib/textract && npm run install:textract",
+    "postinstall": "link-module-alias && npm run minify:snippet && git checkout -- src/lib/textract && npm run install:textract",
     "start:platform": "cd src/server/platform && node platform.js",
     "start:platformInspect": "cd src/server/platform && node inspect platform.js",
     "minify:snippet": "cd src/server/platform/scripts && node minify-snippet.js",
@@ -14,8 +14,7 @@
     "postgres:create": "cd src/load && node create-postgres-database.js",
     "test": "cd src/test && NODE_ENV=test mocha all-tests.js",
     "test:lib": "cd src/test/lib && NODE_ENV=test mocha *.js",
-    "test:recsys": "cd src/server/recsys/test && NODE_ENV=test mocha *.js",
-    "create:apidocs": "apidoc -i src/server -o docs --private false"
+    "test:recsys": "cd src/server/recsys/test && NODE_ENV=test mocha *.js"
   },
   "repository": {
     "type": "git",
@@ -62,19 +61,11 @@
     "xml2js": "^0.4.19"
   },
   "devDependencies": {
-    "apidoc": "^0.17.6",
     "link-module-alias": "^1.1.6",
     "mocha": "^5.2.0",
     "node-minify": "^2.4.1",
     "supertest": "^3.3.0",
     "ua-parser-js": "^0.7.18"
-  },
-  "apidoc": {
-    "title": "X5GON API Documentation",
-    "url": "https://platform.x5gon.org",
-    "version": "1.0.0",
-    "name": "X5GON",
-    "description": " Cross Modal, Cross Cultural, Cross Lingual, Cross Domain, and Cross Site Global OER Network"
   },
   "_moduleAliases": {
     "alias:lib": "src/lib",
