@@ -40,9 +40,8 @@ module.exports = function (pg, logger, config) {
 
 
         // send the message to the kafka topic
-        producer.send('STORING.RECSYS.TRANSITIONS', {
-            from, to, selected_position, recommended_urls, uuid
-        });
+        // TODO: implement the route
+        return res.send(new Error('Route not implemented'));
 
     });
 
