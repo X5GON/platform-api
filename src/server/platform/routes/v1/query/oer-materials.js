@@ -2,7 +2,7 @@
 const router = require('express').Router();
 
 // internal modules
-const mimetypes = require('@config/mimetypes');
+const mimetypes = require('alias:config/mimetypes');
 
 /**
  * @description Adds API routes for logging user activity.

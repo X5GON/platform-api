@@ -5,7 +5,7 @@
  */
 
 // internal modules
-const KafkaProducer = require('@lib/kafka-producer');
+const KafkaProducer = require('alias:lib/kafka-producer');
 
 /**
  * @class KafkaSender

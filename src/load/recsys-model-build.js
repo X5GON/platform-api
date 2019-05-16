@@ -7,17 +7,17 @@
  */
 
 // configurations
-const config = require('@config/config');
+const config = require('alias:config/config');
 
 // internal modules
-const Logger = require('@lib/logger');
+const Logger = require('alias:lib/logger');
 
 // create a logger instance for logging recommendation requests
 const { environment } = config;
 const logger = Logger.createGroupInstance('recommendation-model-build', 'x5recommend', environment === 'dev');
 
 // initialize connection with postgresql
-const pg = require('@lib/postgresQL')(config.pg);
+const pg = require('alias:lib/postgresQL')(config.pg);
 // check if config.schema is defined
 const schema = config.pg.schema;
 

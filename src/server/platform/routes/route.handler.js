@@ -23,6 +23,10 @@ module.exports = function (app, pg, logger, config, monitor) {
     app.use('/api/v1', require('./v1/query/user-activities')(pg, logger, config));
 
 
+    // upload REST API
+    app.use('/api/v1', require('./v1/upload/oer-materials')(pg, logger,config));
+
+
     ////////////////////////////////////////
     // Website routes
     ////////////////////////////////////////

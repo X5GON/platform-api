@@ -4,8 +4,8 @@
  */
 
 // configurations and mimetypes
-const config = require('@config/config');
-const mimetypes = require('@config/mimetypes');
+const config = require('alias:config/config');
+const mimetypes = require('alias:config/mimetypes');
 
 // external modules
 const path = require('path');
@@ -14,10 +14,10 @@ const qm = require('qminer');
 
 // internal modules
 const NearestNeighbor = require('./models/nearest-neighbors');
-const Logger = require('@lib/logger');
+const Logger = require('alias:lib/logger');
 
 // postgresql connections
-const pg = require('@lib/postgresQL')(config.pg);
+const pg = require('alias:lib/postgresQL')(config.pg);
 
 
 /**

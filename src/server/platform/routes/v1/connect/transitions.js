@@ -2,7 +2,7 @@
 const router = require('express').Router();
 
 // internal modules
-const KafkaProducer = require('@lib/kafka-producer');
+const KafkaProducer = require('alias:lib/kafka-producer');
 
 /**
  * @description Adds API routes for logging user activity.

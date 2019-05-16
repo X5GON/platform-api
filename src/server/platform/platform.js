@@ -12,11 +12,11 @@ const cookieParser = require('cookie-parser');
 const session      = require('express-session');
 
 // configurations
-const config = require('@config/config');
+const config = require('alias:config/config');
 
 // internal modules
-const pg     = require('@lib/postgresQL')(config.pg);
-const Logger = require('@lib/logger');
+const pg     = require('alias:lib/postgresQL')(config.pg);
+const Logger = require('alias:lib/logger');
 
 // create a logger for platform requests
 const logger = Logger.createGroupInstance('requests', 'platform', config.environment === 'dev');
@@ -79,7 +79,7 @@ app.use(cookieParser(config.platform.sessionSecret));
 require('./routes/route.handler')(app, pg, logger, config /*, monitor */);
 
 // // internal modules for monitoring processes
-// const PM2Monitor = require('@lib/pm2-monitor');
+// const PM2Monitor = require('alias:lib/pm2-monitor');
 // let monitor = new PM2Monitor();
 // // initialize socket
 // let io = require('socket.io')(http);

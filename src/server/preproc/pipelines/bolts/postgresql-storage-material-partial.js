@@ -20,7 +20,7 @@ class PostgresqlMaterialPartial {
         this._prefix = `[PostgresqlMaterialPartial ${this._name}]`;
 
         // create the postgres connection
-        this._pg = require('@lib/postgresQL')(config.pg);
+        this._pg = require('alias:lib/postgresQL')(config.pg);
 
         callback();
     }
