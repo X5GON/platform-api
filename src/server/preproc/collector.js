@@ -147,8 +147,6 @@ class OERCollector {
                 if (retriever) {
                     // the retriever is present
                     retriever.getMaterial(log.url, self._sendMaterials());
-                } else {
-                    // TODO: store url and provider/source in postgres
                 }
             }
         });
