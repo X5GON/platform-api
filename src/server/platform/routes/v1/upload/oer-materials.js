@@ -47,4 +47,4 @@ module.exports = function (pg, logger, config) {
     });
 
     return router;
-};cd
+};
