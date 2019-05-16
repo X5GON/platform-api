@@ -114,12 +114,12 @@ class VideolecturesAPI extends BasicRESTAPI {
         // make crawling enabled
         self._enabled = true;
 
-        // setup the crawling interval
-        self._interval = setInterval(() => {
-            self._fetchLecture(`${self._domain}/site/api/lectures?apikey=${self._apikey}`,
-                self._checkMaterialDb()
-            );
-        }, self._frequency);
+        // // setup the crawling interval
+        // self._interval = setInterval(() => {
+        //     self._fetchLecture(`${self._domain}/site/api/lectures?apikey=${self._apikey}`,
+        //         self._checkMaterialDb()
+        //     );
+        // }, self._frequency);
 
         // start crawling the materials
         self._fetchLecture(`${self._domain}/site/api/lectures?apikey=${self._apikey}`,
