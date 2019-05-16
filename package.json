@@ -4,8 +4,7 @@
   "description": "Connecting OER repositories",
   "main": "index.js",
   "scripts": {
-    "preinstall": "npm run install:textract",
-    "postinstall": "link-module-alias && npm run minify:snippet",
+    "postinstall": "link-module-alias && npm run minify:snippet && git checkout -- src/lib/textract && cd src/lib/textract && npm run install:textract",
     "start:platform": "cd src/server/platform && node platform.js",
     "start:platformInspect": "cd src/server/platform && node inspect platform.js",
     "minify:snippet": "cd src/server/platform/scripts && node minify-snippet.js",
