@@ -17,14 +17,16 @@ module.exports = function (app, pg, logger, config, monitor) {
     // search REST API
     app.use('/api/v1', require('./v1/search/search')(pg, logger, config));
 
+    // upload REST API
+    app.use('/api/v1', require('./v1/upload/oer-materials')(pg, logger,config));
+
     // query REST API
     app.use('/api/v1', require('./v1/query/oer-materials')(pg, logger, config));
     app.use('/api/v1', require('./v1/query/oer-providers')(pg, logger, config));
     app.use('/api/v1', require('./v1/query/user-activities')(pg, logger, config));
 
 
-    // upload REST API
-    app.use('/api/v1', require('./v1/upload/oer-materials')(pg, logger,config));
+
 
 
     ////////////////////////////////////////
