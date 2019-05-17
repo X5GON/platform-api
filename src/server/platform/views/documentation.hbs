@@ -36,6 +36,11 @@
               </a>
             </li>
             <li>
+              <a class="doc route" href="#post-list-of-oers">
+                POST list of materials
+              </a>
+            </li>
+            <li>
               <a class="doc route" href="#get-info-about-oer">
                 GET specific material
               </a>
@@ -893,6 +898,12 @@
               <td>Get a list of open educational resources</td>
               </a>
             </tr>
+            <tr class="clickable-row" data-href="#post-list-of-oers">
+              <td><b class="doc">POST</b></td>
+              <td>/oer_materials</td>
+              <td>Upload a list of open educational resources</td>
+              </a>
+            </tr>
             <tr class="clickable-row" data-href="#get-info-about-oer">
               <td><b class="doc">GET</b></td>
               <td>/oer_materials/{material_id}</td>
@@ -1221,6 +1232,478 @@
                         The JSON object containing the provider's name and domain.
                       </td>
                     </tr>
+
+                  </tbody>
+                </table>
+
+
+              </td>{{!  colspan="5" }}
+            </tr>{{! .no-top-border }}
+
+
+          </tbody>
+        </table>
+      </div>{{! .table-responsive }}
+
+
+
+      {{!-- Get a list of open educational resources --}}
+      <a class="anchor" id="post-list-of-oers"></a>
+      <h5 class="doc doc__subsection mt-5 mb-3">
+        Upload a list of open educational resources
+      </h5>
+
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th class="doc doc__method request"></td>
+              <th class="doc doc__method route"></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b class="doc">POST</b></td>
+              <td><b>/oer_materials</b></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="information">
+        Uploads a list of open educational resources.
+      </p>
+
+      <h6 class="mt-2">Request body parameters</h6>
+
+      <div class="table-responsive">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th class="doc doc__query name"></th>
+              <th class="doc doc__query type"></th>
+              <th class="doc doc__query title"></th>
+              <th class="doc doc__query optional"></th>
+              <th class="doc doc__query description"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td><b class="doc">api_key</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> String
+              </td>
+              <td>
+                <span class="doc doc--small">Title:</span> API Key
+              </td>
+              <td>
+                <span class="doc doc--small">Optional:</span> false
+              </td>
+              <td>
+                The API key used to submit the OER materials.
+                <b class="doc">NOTE:</b> to obtain an API key, please contact the
+                project administrator.
+              </td>
+            </tr>
+
+            <tr class="no-bottom-border">
+              <td><b class="doc">oer_materials</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> Array
+              </td>
+              <td>
+                <span class="doc doc--small">Title:</span> OER Materials
+              </td>
+              <td>
+                <span class="doc doc--small">Optional:</span> false
+              </td>
+              <td>
+                An array of objects, each representing an open educational resource.
+              </td>
+            </tr>{{! .no-bottom-border }}
+
+            <tr class="no-top-border">
+              <td colspan="5">
+
+                <b class="doc">oer_materials object properties</b>
+
+                <table class="table table-dashed-borders table--second-level">
+                  <thead>
+                    <tr>
+                      <th class="doc doc__query name"></th>
+                      <th class="doc doc__query type"></th>
+                      <th class="doc doc__query title"></th>
+                      <th class="doc doc__query optional"></th>
+                      <th class="doc doc__query description"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <tr>
+                      <td><b class="doc">title</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material Title
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Optional:</span> false
+                      </td>
+                      <td>
+                        The title of the OER material.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">description</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material Description
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Optional:</span> true
+                      </td>
+                      <td>
+                        The description of the OER material.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">provider_uri</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Provider URI
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Optional:</span> false
+                      </td>
+                      <td>
+                        The URL of the webpage on which the material is located.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">material_url</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material URL
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Optional:</span> false
+                      </td>
+                      <td>
+                        The URL of the OER material.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">language</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material Language
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Optional:</span> false
+                      </td>
+                      <td>
+                        The language of the OER material in ISO 639-1 code.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">type</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material Type
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Optional:</span> false
+                      </td>
+                      <td>
+                        An object containing the type information of an open educational resource.
+                      </td>
+                    </tr>
+
+                    <tr class="no-top-border">
+                      <td colspan="5">
+
+                        <b class="doc">type object properties</b>
+
+                        <table class="table table-dashed-borders table--third-level">
+                          <thead>
+                            <tr>
+                              <th class="doc doc__query name"></th>
+                              <th class="doc doc__query type"></th>
+                              <th class="doc doc__query title"></th>
+                              <th class="doc doc__query optional"></th>
+                              <th class="doc doc__query description"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+
+                            <tr>
+                              <td><b class="doc">ext</b></td>
+                              <td>
+                                <span class="doc doc--small">Type:</span> String
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Title:</span> Material Extension
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Optional:</span> false
+                              </td>
+                              <td>
+                                The extension of the material (i.e. .pdf, .mov, etc).
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td><b class="doc">mime</b></td>
+                              <td>
+                                <span class="doc doc--small">Type:</span> String
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Title:</span> Material Mimetype
+                              <td>
+                                <span class="doc doc--small">Optional:</span> false
+                              </td>
+                              <td>
+                                The mimetype of the material.
+                              </td>
+                            </tr>
+
+                          </tbody>
+                        </table>
+
+
+                      </td>{{!  colspan="5" }}
+                    </tr>{{! .no-top-border }}
+
+
+                    <tr>
+                      <td><b class="doc">date_created</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> Datetime
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material Creation Date
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Optional:</span> true
+                      </td>
+                      <td>
+                        The date of the materials creation.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">license</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material License
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Optional:</span> false
+                      </td>
+                      <td>
+                        The material license. Since we are dealing with OER materials,
+                        the license should be CC-BY.
+                      </td>
+                    </tr>
+
+                  </tbody>
+                </table>
+
+
+              </td>{{!  colspan="5" }}
+            </tr>{{! .no-top-border }}
+
+          </tbody>
+        </table>
+      </div>
+
+
+      <h6 class="mt-2">Response body attributes</h6>
+
+      <div class="table-responsive">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th class="doc doc__query name"></th>
+              <th class="doc doc__query type"></th>
+              <th class="doc doc__query title"></th>
+              <th class="doc doc__query optional"></th>
+              <th class="doc doc__query description"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr class="no-bottom-border">
+              <td><b class="doc">num_submitted</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> Integer
+              </td>
+              <td>
+                <span class="doc doc--small">Title:</span> Number of Materials Submitted
+              </td>
+              <td>
+                <span class="doc doc--small">Read only:</span> true
+              </td>
+              <td>
+                Number of successfully submitted materials.
+              </td>
+            </tr>{{! .no-bottom-border }}
+
+             <tr class="no-bottom-border">
+              <td><b class="doc">errors</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> Object
+              </td>
+              <td>
+                <span class="doc doc--small">Title:</span> Submission Errors
+              </td>
+              <td>
+                <span class="doc doc--small">Read only:</span> true
+              </td>
+              <td>
+                The object containing submission error information.
+                <b class="doc">NOTE:</b> only present if there are any errors.
+              </td>
+            </tr>{{! .no-bottom-border }}
+
+            <tr class="no-top-border">
+              <td colspan="5">
+
+                <b class="doc">errors object properties</b>
+
+                <table class="table table-dashed-borders table--second-level">
+                  <thead>
+                    <tr>
+                      <th class="doc doc__query name"></th>
+                      <th class="doc doc__query type"></th>
+                      <th class="doc doc__query title"></th>
+                      <th class="doc doc__query optional"></th>
+                      <th class="doc doc__query description"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <tr>
+                      <td><b class="doc">message</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Error Message
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The submission error message.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">invalid_count</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> Integer
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Invalid Count
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        Number of invalid materials.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">invalid_materials</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> Array
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Invalid Materials
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        An array of not valid material objects format.
+                      </td>
+                    </tr>
+
+                    <tr class="no-top-border">
+                      <td colspan="5">
+
+                        <b class="doc">invalid_materials object properties</b>
+
+                        <table class="table table-dashed-borders table--third-level">
+                          <thead>
+                            <tr>
+                              <th class="doc doc__query name"></th>
+                              <th class="doc doc__query type"></th>
+                              <th class="doc doc__query title"></th>
+                              <th class="doc doc__query optional"></th>
+                              <th class="doc doc__query description"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+
+                            <tr>
+                              <td><b class="doc">material</b></td>
+                              <td>
+                                <span class="doc doc--small">Type:</span> Object
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Title:</span> OER Material
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Read only:</span> true
+                              </td>
+                              <td>
+                                The OER material object with a not valid format.
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td><b class="doc">errors</b></td>
+                              <td>
+                                <span class="doc doc--small">Type:</span> Array
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Title:</span> Material Errors
+                              <td>
+                                <span class="doc doc--small">Read only:</span> true
+                              </td>
+                              <td>
+                                An array of errors telling why is the material object not valid.
+                              </td>
+                            </tr>
+
+                          </tbody>
+                        </table>
+
+
+                      </td>{{!  colspan="5" }}
+                    </tr>{{! .no-top-border }}
 
                   </tbody>
                 </table>

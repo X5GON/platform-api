@@ -1052,7 +1052,41 @@ const dbCreates = {
             IS 'The version number of the database';
 
         COMMENT ON COLUMN ${schema}.database_version.date
-            IS 'The time when the database was update to the provided version';`
+            IS 'The time when the database was update to the provided version';`,
+
+
+    api_keys:
+        `CREATE TABLE ${schema}.api_keys (
+            id           serial PRIMARY KEY,
+            owner        varchar NOT NULL,
+            key          varchar (40) UNIQUE NOT NULL,
+            date_created timestamp with time zone DEFAULT NOW(),
+            actions      jsonb NOT NULL
+        );
+
+        ALTER TABLE ${schema}.api_keys
+            OWNER TO ${config.pg.user};
+
+        CREATE INDEX api_keys_id
+            ON ${schema}.api_keys(id);
+
+        COMMENT ON TABLE ${schema}.api_keys
+            IS 'The database containing api keys';
+
+        COMMENT ON COLUMN ${schema}.api_keys.id
+            IS 'The id of the api key';
+
+        COMMENT ON COLUMN ${schema}.api_keys.owner
+            IS 'The owner of the api key';
+
+        COMMENT ON COLUMN ${schema}.api_keys.key
+            IS 'The api key';
+
+        COMMENT ON COLUMN ${schema}.api_keys.date_created
+            IS 'The creation date of the api key';
+
+        COMMENT ON COLUMN ${schema}.api_keys.actions
+            IS 'The JSON object containing the available actions';`
 
 };
 
@@ -1077,6 +1111,12 @@ const dbUpdates = [{
         ADD COLUMN recommended_urls varchar ARRAY,
         ADD COLUMN selected_position integer,
         ADD COLUMN num_of_recommendations integer;
+    `
+}, {
+    version: 2,
+    update: `
+        ALTER TABLE ${schema}.api_keys
+        RENAME COLUMN actions TO permissions;
     `
 }];
 
