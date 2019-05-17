@@ -31,7 +31,7 @@ module.exports = function (app, pg, logger, config, monitor) {
     // Website routes
     ////////////////////////////////////////
 
-    // app.use('/', require('./v1/monitor')(monitor, config));
+    // app.use('/', require('./v1/admin/monitor')(monitor, config));
     app.use('/', require('./v1/website')(pg, logger, config));
 
 

@@ -9,6 +9,9 @@ const validator = require('alias:lib/schema-validator')({
     oer_material_schema: require('alias:platform_schemas/oer-material-schema')
 });
 
+// import mimetypes for comparison
+const mimetypes = require('alias:config/mimetypes');
+
 /**
  * @description Adds API routes for logging user activity.
  * @param {Object} pg - Postgres connection wrapper.
@@ -27,9 +30,12 @@ module.exports = function (pg, logger, config) {
      * Helper functions
      *********************************/
 
-    // TODO: write helper functions
-
-
+    /**
+     * Checks if the provided API key is valid.
+     * @param {Object} req - Express request.
+     * @param {Object} res - Express response.
+     * @param {Function} next - The next function.
+     */
     function checkAPIKey(req, res, next) {
         const { api_key } = req.body;
 
@@ -79,7 +85,12 @@ module.exports = function (pg, logger, config) {
     }
 
 
-    function _validateMaterial(material, list) {
+    /**
+     * Validates the material sent by the POST request.
+     * @param {Object} material - The material object.
+     * @param {Object[]} list - List of objects
+     */
+    function _sendMaterial(material, list) {
         // validate the material
         const { matching, errors } = validator.validateSchema(
             material,
@@ -91,25 +102,35 @@ module.exports = function (pg, logger, config) {
             // store the invalid material for the user
             list.push({ material, errors: messages });
         } else {
-            if (material.type.mime && material.type.mime.includes('video')) {
+            for (let key of Object.keys(material)) {
+                material[key.replace(/_/g, '')] = material[key];
+            }
+
+            if (material.type.mime && mimetypes.video.includes(material.type.mime)) {
+                logger.info(`[upload] video material = ${material.materialurl}`);
+                // send the video material
                 producer.send(video_topic, material);
-            } else {
+            } else if (material.type.mime && mimetypes.audio.includes(material.type.mime)) {
+                logger.info(`[upload] audio material = ${material.materialurl}`);
+                // send the audio material
+                producer.send(video_topic, material);
+            } else if (material.type.mime && mimetypes.text.includes(material.type.mime)) {
+                logger.info(`[upload] text material = ${material.materialurl}`);
+                // send the text material
                 producer.send(text_topic, material);
+            } else {
+                // store the invalid material for the user
+                const messages = ['Material type not supported'];
+                list.push({ material, errors: messages });
             }
         }
     }
 
     /**********************************
-     * Middleware
-     *********************************/
-
-    router.use(['/upload/oer_materials'], checkAPIKey);
-
-    /**********************************
      * Routes
      *********************************/
 
-    router.post('/upload/oer_materials', (req, res) => {
+    router.post('/upload/oer_materials', checkAPIKey, (req, res) => {
         // get oer_materials
         const { oer_materials } = req.body;
         // prepare variables
@@ -134,12 +155,12 @@ module.exports = function (pg, logger, config) {
         if (Array.isArray(oer_materials)) {
             for (let material of oer_materials) {
                 // validate if material is in correct format
-                _validateMaterial(material, invalid_materials);
+                _sendMaterial(material, invalid_materials);
             }
             num_materials_submitted = oer_materials.length - invalid_materials.length;
         } else if (typeof oer_materials === 'object') {
             // validate if material is in correct format
-            _validateMaterial(oer_materials, invalid_materials);
+            _sendMaterial(oer_materials, invalid_materials);
             num_materials_submitted = 1 - invalid_materials.length;
         } else {
              // log the worng parameter

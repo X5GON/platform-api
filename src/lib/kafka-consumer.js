@@ -34,7 +34,7 @@ class KafkaConsumer {
             groupId,
             sessionTimeout: 15000,
             protocol: ['roundrobin'],
-            fromOffset: 'earliest',
+            fromOffset: 'latest',
             commitOffsetsOnFirstJoin: true,
             outOfRangeOffset: 'earliest',
             migrateHLC: false,

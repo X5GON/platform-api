@@ -4,10 +4,11 @@ const KafkaProducer = require('alias:lib/kafka-producer');
 
 // configurations
 const config = require('alias:config/config');
+// import mimetypes for comparison
+const mimetypes = require('alias:config/mimetypes');
 
 // setup connection with the database
 const pg = require('alias:lib/postgresQL')(config.pg);
-
 
 
 class OERCollector {
@@ -166,13 +167,19 @@ class OERCollector {
         return function (error, materials) {
             // TODO: proper error logging
             if (error) { console.log(error); return; }
+
             for (let material of materials) {
                 // send material to the appropriate pipeline
                 // TODO: check/integrate an appropriate type selection
-                if (material.type.mime && material.type.mime.includes('video')) {
-                    self._producer.send(self._video_topic, material);
-                } else {
-                    self._producer.send(self._text_topic, material);
+                if (material.type.mime && mimetypes.video.includes(material.type.mime)) {
+                    // send the video material
+                    producer.send(video_topic, material);
+                } else if (material.type.mime && mimetypes.audio.includes(material.type.mime)) {
+                    // send the audio material
+                    producer.send(video_topic, material);
+                } else if (material.type.mime && mimetypes.text.includes(material.type.mime)) {
+                    // send the text material
+                    producer.send(text_topic, material);
                 }
             }
         };
