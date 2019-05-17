@@ -130,12 +130,12 @@ module.exports = function (pg, logger, config) {
      * Routes
      *********************************/
 
-    router.post('/upload/oer_materials', checkAPIKey, (req, res) => {
+    router.post('/oer_materials', checkAPIKey, (req, res) => {
         // get oer_materials
         const { oer_materials } = req.body;
         // prepare variables
         let invalid_materials = [];
-        let num_materials_submitted = 0;
+        let num_submitted = 0;
 
         // check for missing parameters
         if (!oer_materials) {
@@ -157,11 +157,11 @@ module.exports = function (pg, logger, config) {
                 // validate if material is in correct format
                 _sendMaterial(material, invalid_materials);
             }
-            num_materials_submitted = oer_materials.length - invalid_materials.length;
+            num_submitted = oer_materials.length - invalid_materials.length;
         } else if (typeof oer_materials === 'object') {
             // validate if material is in correct format
             _sendMaterial(oer_materials, invalid_materials);
-            num_materials_submitted = 1 - invalid_materials.length;
+            num_submitted = 1 - invalid_materials.length;
         } else {
              // log the worng parameter
              logger.warn('[warn] parameter "oer_materials" is of wrong type',
@@ -183,12 +183,12 @@ module.exports = function (pg, logger, config) {
          * Submit to the user the status
          */
         let response = {
-            num_materials_submitted
+            num_materials_submitted: num_submitted
         };
         if (invalid_materials.length) {
             response.errors = {
                 message: 'materials were not of correct format',
-                invalid_materials_count: invalid_materials.length,
+                invalid_count: invalid_materials.length,
                 invalid_materials
             };
         } else {
