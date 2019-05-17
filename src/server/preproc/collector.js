@@ -173,13 +173,13 @@ class OERCollector {
                 // TODO: check/integrate an appropriate type selection
                 if (material.type.mime && mimetypes.video.includes(material.type.mime)) {
                     // send the video material
-                    producer.send(video_topic, material);
+                    this._producer.send(video_topic, material);
                 } else if (material.type.mime && mimetypes.audio.includes(material.type.mime)) {
                     // send the audio material
-                    producer.send(video_topic, material);
+                    this._producer.send(video_topic, material);
                 } else if (material.type.mime && mimetypes.text.includes(material.type.mime)) {
                     // send the text material
-                    producer.send(text_topic, material);
+                    this._producer.send(text_topic, material);
                 }
             }
         };
