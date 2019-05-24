@@ -1086,7 +1086,32 @@ const dbCreates = {
             IS 'The creation date of the api key';
 
         COMMENT ON COLUMN ${schema}.api_keys.actions
-            IS 'The JSON object containing the available actions';`
+            IS 'The JSON object containing the available actions';`,
+
+    admins:
+        `CREATE TABLE ${schema}.admins (
+            id           serial PRIMARY KEY,
+            username     varchar UNIQUE NOT NULL,
+            password     varchar NOT NULL
+        );
+
+        ALTER TABLE ${schema}.admins
+            OWNER TO ${config.pg.user};
+
+        CREATE INDEX admins_id
+            ON ${schema}.admins(id);
+
+        COMMENT ON TABLE ${schema}.admins
+            IS 'The database containing admin credentials';
+
+        COMMENT ON COLUMN ${schema}.admins.id
+            IS 'The id of the admin';
+
+        COMMENT ON COLUMN ${schema}.admins.username
+            IS 'The username of the admin';
+
+        COMMENT ON COLUMN ${schema}.admins.password
+            IS 'The password of the admin';`
 
 };
 

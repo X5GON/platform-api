@@ -4,7 +4,7 @@
  * @param {Object} pg - Postgres wrapper.
  * @param {Object} logger - The logger object.
  */
-module.exports = function (app, pg, logger, config, monitor) {
+module.exports = function (app, pg, logger, config, passport, monitor) {
 
     ////////////////////////////////////////
     // API Routes
@@ -33,6 +33,7 @@ module.exports = function (app, pg, logger, config, monitor) {
     // Website routes
     ////////////////////////////////////////
 
+    app.use('/', require('./v1/admin/admin')(pg, logger, config, passport));
     // app.use('/', require('./v1/admin/monitor')(monitor, config));
     app.use('/', require('./v1/website')(pg, logger, config));
 

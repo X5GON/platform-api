@@ -1,0 +1,32 @@
+<div class="container">
+  <div class="row justify-content-md-center">
+    <div class="col col-md-6 col-lg-4 mt-5">
+
+      <h4 class="text-center">Admin Login</h4>
+
+      <form action="/admin-login" method="post">
+
+        <div class="form-group">
+          <label for="admin-username">Admin Username</label>
+          <input type="text" class="form-control" id="admin-username" name="username"
+            aria-describedby="admin-username-help" placeholder="Enter admin username" required>
+        </div>
+
+        <div class="form-group">
+          <label for="admin-password">Admin Password</label>
+          <input type="password" class="form-control" id="admin-password" name="password"
+            aria-describedby="admin-password-help" placeholder="Enter admin password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block mt-4">Login</button>
+      </form>
+
+      {{#if message}}
+        <small class="form-text text-danger">
+          {{message}}
+        </small>
+      {{/if}}
+
+    </div>{{! .col.col-md-4 }}
+  </div>{{! .row }}
+</div>
