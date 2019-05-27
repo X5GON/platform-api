@@ -2,15 +2,13 @@
  * Runs the X5GON platform server
  */
 
-
-
 // external modules
 const express      = require('express');
-const exphbs       = require('express-handlebars');
 const bodyParser   = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session      = require('express-session');
-
+const passport     = require('passport');
+const flash        = require('connect-flash');
 // configurations
 const config = require('alias:config/config');
 
@@ -25,58 +23,39 @@ const logger = Logger.createGroupInstance('requests', 'platform', config.environ
 let app = express();
 let http = require('http').Server(app);
 
+// add the public folder
+app.use(express.static(__dirname + '/public/'));
+// add session configurations
+app.set('trust proxy', 1);
+app.use(session({
+    secret: config.platform.sessionSecret,
+    saveUninitialized: true,
+    resave: true,
+    cookie: {
+        secure: config.environment === 'prod',
+        ...(config.environment === 'prod' && { domain: '.x5gon.org' })
+    }
+}));
 // configure application
 app.use(bodyParser.json());     // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
     extended: true
 }));
-
-app.use(session({
-    secret: config.platform.sessionSecret,
-    resave: true,
-    saveUninitialized: true,
-    cookie: { domain: '.x5gon.org' }
-}));
-
-// add the public folder
-app.use(express.static(__dirname + '/public/'));
-
-let hbs = exphbs.create({
-    extname: 'hbs',
-    defaultLayout: 'main',
-    partialsDir: `${__dirname}/views/partials/`,
-    helpers: {
-        isEqual: function (arg1, arg2) {
-            return arg1 === arg2;
-        },
-        statusColor: function (arg1) {
-            return arg1 === 'online' ? 'text-success' :
-                arg1 === 'launching' ? 'text-warning' :
-                'text-danger';
-        },
-        json: function (obj) {
-            return JSON.stringify(obj);
-        },
-        concat: function (...args) {
-            args.pop(); return args.join('');
-        }
-    }
-});
-
-hbs.handlebars = require('handlebars-helper-sri').register(hbs.handlebars);
-
-// set rendering engine
-app.engine('hbs', hbs.engine);
-app.set('view engine', 'hbs');
-
+// andd handlebars configurations
+require('./config/handlebars')(app);
 // redirect specific requests to other services
 require('./routes/proxies')(app, config);
-
-// cookie parser
+// configure cookie parser
 app.use(cookieParser(config.platform.sessionSecret));
+app.use(flash());
+// initialize authentication
+app.use(passport.initialize());
+app.use(passport.session({ secret: config.platform.sessionSecret }));
+// passport configuration
+require('./config/passport')(passport, pg);
 
 // sets the API routes
-require('./routes/route.handler')(app, pg, logger, config /*, monitor */);
+require('./routes/route.handler')(app, pg, logger, config, passport, /*, monitor */);
 
 // // internal modules for monitoring processes
 // const PM2Monitor = require('alias:lib/pm2-monitor');
@@ -101,7 +80,6 @@ require('./routes/route.handler')(app, pg, logger, config /*, monitor */);
 
 // parameters used on the express app
 const PORT = config.platform.port;
-
 // start the server without https
 const server = http.listen(PORT, () => logger.info(`platform listening on port ${PORT}`));
 
