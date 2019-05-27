@@ -42,27 +42,45 @@
       {{/if}}
 
       <div class="row">
-        <div class="col-md-6 mb-4">
+        <div class="col-md-6 col-lg-4 mb-4">
           <div class="card h-100 p-2">
             <span class="card__label">Service</span>
             <h1 class="card__title">
-              <a href="/admin/api_keys">API Keys</a>
+              <a href="/admin/oer_providers">Overview: OER Providers</a>
             </h1>
             <p class="card__desc">
-              This service is designed for creation of API Keys for manual
-              import of OER materials.
+              This panel shows the OER providers information along with
+              their tokens, number of processed materials and number of
+              users visits.
             </p>
           </div>
         </div>
 
-        <div class="col-md-6 mb-4">
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100 p-2">
+            <span class="card__label">Service</span>
+            <h1 class="card__title">
+              <a href="/admin/api_keys">Overview: Platform API Keys</a>
+            </h1>
+            <p class="card__desc">
+              This service is designed for creation of API Keys for manual
+              import of OER materials. It shows the API keys that were
+              distributed, including their permission level, creation time
+              and owner.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-12 col-lg-4 mb-4">
           <div class="card h-100 p-2">
             <span class="card__label">Service</span>
             <h1 class="card__title">
               <a href="/admin/monitor/process">Process Monitor</a>
             </h1>
             <p class="card__desc">
-              This service is designed for monitoring the process.
+              This service shows the status of each process that is
+              running in the X5GON platform. One can manually disable
+              and enable processes if required.
             </p>
           </div>
         </div>
