@@ -1088,6 +1088,7 @@ const dbCreates = {
         COMMENT ON COLUMN ${schema}.api_keys.actions
             IS 'The JSON object containing the available actions';`,
 
+
     admins:
         `CREATE TABLE ${schema}.admins (
             id           serial PRIMARY KEY,

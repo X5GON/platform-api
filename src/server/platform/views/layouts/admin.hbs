@@ -34,15 +34,15 @@
     crossorigin="anonymous">
 
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
-    integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
-    crossorigin="anonymous"></script>
+      integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
+      crossorigin="anonymous"></script> {{! link to the google fonts }}
 
   {{! font awesome }}
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css"
     integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt"
     crossorigin="anonymous">
 
-  {{! google fonts }}
+  {{! google fonts}}
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,600,600i&amp;subset=latin-ext"
     rel="stylesheet"> {{! link prism for code factoring}}
 
@@ -52,8 +52,7 @@
   <link rel="stylesheet" href="/css/join.css">
   <link rel="stylesheet" href="/css/privacy-policy.css">
   <link rel="stylesheet" href="/css/documentation.css">
-  <link rel="stylesheet" href="/css/recommendations.css"> {{! link to the bootstrap js files }}
-
+  <link rel="stylesheet" href="/css/admin.css">
   {{! source code styling library }}
   <link rel="stylesheet" href="/css/prism.css">
   <script src="/js/prism.js"></script>
@@ -69,10 +68,56 @@
   {{> header-navigation }}
 
   <main role="main">
+
+    <div class="doc-navigation col-xl-2">
+      <ul>
+        <li>
+          <a class="doc" href="/admin">
+            Control Panel
+          </a>
+        </li>
+        <li>
+          <a class="doc" href="/admin/api_keys">
+            API Keys
+          </a>
+        </li>
+        <li>
+          <a class="doc" href="/admin/monitor/process">
+            Process Monitor
+          </a>
+          {{!-- <ul>
+            <li>
+              <a class="doc route" href="/admin/monitor/process">
+                Monitor: Process
+              </a>
+            </li>
+            <li>
+              <a class="doc route" href="/admin/monitor/materials">
+                Monitor: Materials
+              </a>
+            </li>
+            <li>
+              <a class="doc route" href="/admin/monitor/user-activity-data">
+                Monitor: User Activity Data
+              </a>
+            </li>
+          </ul> --}}
+        </li>
+        <li>
+          <a class="doc" href="/admin-logout">
+            Logout
+          </a>
+        </li>
+      </ul>
+    </div>
+
     {{{body}}}
   </main>
 
   {{> footer }}
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://d3js.org/d3.v3.min.js"></script>
 
 </body>
 

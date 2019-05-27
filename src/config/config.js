@@ -51,11 +51,6 @@ const prod = {
     recsys: {
         port: parseInt(process.env.PROD_RECSYS_PORT) || 3000
     },
-    monitor: {
-        port: parseInt(process.env.PROD_MONITOR_PORT) || 7500,
-        sessionSecret: process.env.PROD_MONITOR_SESSION_SECRET,
-        adminToken: process.env.PROD_MONITOR_ADMIN_TOKEN
-    },
     kafka: {
         host: process.env.PROD_KAFKA_HOST || '127.0.0.1:9092',
         groupId: process.env.PROD_KAFKA_GROUP || 'productionGroup'
@@ -82,11 +77,6 @@ const dev = {
     recsys: {
         port: parseInt(process.env.DEV_RECSYS_PORT) || 3001
     },
-    monitor: {
-        port: parseInt(process.env.DEV_MONITOR_PORT) || 7501,
-        sessionSecret: process.env.DEV_MONITOR_SESSION_SECRET,
-        adminToken: process.env.DEV_MONITOR_ADMIN_TOKEN
-    },
     kafka: {
         host: process.env.DEV_KAFKA_HOST || '127.0.0.1:9092',
         groupId: process.env.DEV_KAFKA_GROUP || 'developmentGroup'
@@ -112,11 +102,6 @@ const test = {
     },
     recsys: {
         port: parseInt(process.env.TEST_RECSYS_PORT) || 3002
-    },
-    monitor: {
-        port: parseInt(process.env.TEST_MONITOR_PORT) || 7502,
-        sessionSecret: process.env.TEST_MONITOR_SESSION_SECRET,
-        adminToken: process.env.TEST_MONITOR_ADMIN_TOKEN
     },
     kafka: {
         host: process.env.TEST_KAFKA_HOST || '127.0.0.1:9092',

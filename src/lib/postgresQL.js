@@ -319,6 +319,34 @@ class PostgreSQL {
     }
 
     /**
+     * @description Counts the rows in the database.
+     * @param {Object | Object[]} conditions - The conditions used to find the rows.
+     * @param {String} table - Table name.
+     * @param {Function} callback - The callback function.
+     */
+    selectCount(conditions, table, callback) {
+        let self = this;
+
+        // set the conditions and parameters
+        let { condition, params, limitOffset } = self._getConditions(conditions, 1);
+
+        let limitations = '';
+        if (Object.keys(limitOffset).length) {
+            limitations = Object.keys(limitOffset)
+                .map(key => `${key.toUpperCase()} ${limitOffset[key]}`)
+                .join(' ');
+        }
+
+        // prepare the query command
+        let query = params.length ?
+            `SELECT COUNT(*) FROM ${table} WHERE ${condition} ${limitations};` :
+            `SELECT COUNT(*) FROM ${table} ${limitations};`;
+
+        // execute the query
+        return self.execute(query, params, callback);
+    }
+
+    /**
      * @description Updates the rows in the database.
      * @param {Object} values - The values used for updating the rows.
      * @param {Object | Object[]} conditions - The conditions used to find the rows.

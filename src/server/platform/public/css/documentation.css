@@ -114,6 +114,11 @@ b.doc {
     font-weight: 600;
 }
 
+b.doc.error {
+    color: #990000;
+    font-weight: 600;
+}
+
 a.anchor {
     display: block;
     position: relative;
@@ -147,11 +152,11 @@ a.doc:hover {
 .table-dashed-borders thead th {
     border: 0px;
 }
-.table-dashed-borders tr.no-bottom-border > td {
+.table-dashed-borders tbody tr.no-bottom-border > td {
     border-bottom: 0px solid;
 }
 
-.table-dashed-borders tr.no-top-border > td {
+.table-dashed-borders tbody tr.no-top-border > td {
     border-top: 0px solid;
 }
 

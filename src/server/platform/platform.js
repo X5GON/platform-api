@@ -15,9 +15,12 @@ const config = require('alias:config/config');
 // internal modules
 const pg     = require('alias:lib/postgresQL')(config.pg);
 const Logger = require('alias:lib/logger');
+const Monitor = require('alias:lib/process-monitor');
 
 // create a logger for platform requests
 const logger = Logger.createGroupInstance('requests', 'platform', config.environment === 'dev');
+// create process monitoring instance
+const monitor = new Monitor();
 
 // create express app
 let app = express();
@@ -53,30 +56,12 @@ app.use(passport.initialize());
 app.use(passport.session({ secret: config.platform.sessionSecret }));
 // passport configuration
 require('./config/passport')(passport, pg);
+// socket.io configuration
+require('./config/sockets')(http, monitor);
 
-// sets the API routes
-require('./routes/route.handler')(app, pg, logger, config, passport, /*, monitor */);
-
-// // internal modules for monitoring processes
-// const PM2Monitor = require('alias:lib/pm2-monitor');
-// let monitor = new PM2Monitor();
-// // initialize socket
-// let io = require('socket.io')(http);
-// // configure socket connections
-// io.on('connection', function(socket) {
-//     console.log('a user connected');
-//     socket.on('disconnect', function () {
-//         console.log('user disconnected');
-//     });
-
-//     setInterval(() => {
-//         monitor.listProcesses((error, list) => {
-//             return error ?
-//                 io.emit('pm2-process-error', { error }) :
-//                 io.emit('pm2-process', list);
-//         });
-//     }, 1000);
-// });
+// sets the API routes - adding the postgresql connection, logger, config file,
+// passport object (for authentication), and monitoring object
+require('./routes/route.handler')(app, pg, logger, config, passport, monitor);
 
 // parameters used on the express app
 const PORT = config.platform.port;

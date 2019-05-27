@@ -1,0 +1,73 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+
+      <h1 class="doc doc__section">Admin Control Panel</h1>
+
+      {{#if stats}}
+        <div class="row">
+          <div class="col-md-6 col-lg-4 mb-5">
+            <div class="stats">
+              <span class="stats__number">
+                {{stats.oer_materials}}
+              </span>
+              <p class="stats__label">
+                <span>OER Materials</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-4 mb-5">
+            <div class="stats">
+              <span class="stats__number">
+                {{stats.user_activities}}
+              </span>
+              <p class="stats__label">
+                <span>User Activities</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-12 col-lg-4 mb-5">
+            <div class="stats">
+              <span class="stats__number">
+                {{stats.unique_users}}
+              </span>
+              <p class="stats__label">
+                <span>Unique Users</span>
+              </p>
+            </div>
+          </div>
+        </div>{{! .row }}
+      {{/if}}
+
+      <div class="row">
+        <div class="col-md-6 mb-4">
+          <div class="card h-100 p-2">
+            <span class="card__label">Service</span>
+            <h1 class="card__title">
+              <a href="/admin/api_keys">API Keys</a>
+            </h1>
+            <p class="card__desc">
+              This service is designed for creation of API Keys for manual
+              import of OER materials.
+            </p>
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+          <div class="card h-100 p-2">
+            <span class="card__label">Service</span>
+            <h1 class="card__title">
+              <a href="/admin/monitor/process">Process Monitor</a>
+            </h1>
+            <p class="card__desc">
+              This service is designed for monitoring the process.
+            </p>
+          </div>
+        </div>
+
+      </div>{{! .row }}
+    </div>{{! .col }}
+  </div>{{! .row }}
+</div>

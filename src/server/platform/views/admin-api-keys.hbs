@@ -1,0 +1,85 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+
+      <h1 class="doc doc__section">API Keys</h1>
+
+      <p class="information">
+        This panel shows the API Keys that were distributed, including their permissions,
+        creation time and owner.
+      </p>
+
+      <div id="api-keys" class="table-responsive mt-4">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th scope="col" class="align-middle doc doc__query owner">
+                <b class="doc">Key Owner</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query key">
+                <b class="doc">API Key</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query permissions">
+                <b class="doc">Permissions</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query created-at">
+                <b class="doc">Created At</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query">
+                <b class="doc">Action</b>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each apiKeys as |api_key|}}
+              <tr id="{{api_key.id}}" data-api-key-head="{{api_key.id}}">
+
+                <td class="align-middle">
+                  <b class="doc">{{api_key.owner}}</b>
+                </td>
+                <td class="text-center align-middle">
+                  {{api_key.key}}
+                </td>
+                <td class="text-center align-middle">
+                  {{api_key.permissions}}
+                </td>
+                <td class="text-center align-middle">
+                  {{api_key.date_created}}
+                </td>
+                <td class="text-center align-middle">
+                  <button type="button" class="btn btn-danger btn-sm"
+                    data-action="delete"
+                    data-api-key-id={{api_key.id}}>
+                    delete
+                  </button>
+                </td>
+              </tr>{{! tr#id=api_key.id }}
+            {{/each}}
+            <tr id="create-new-api-key">
+              <td colspan="3" class="align-middle">
+                <input type="url" class="form-control" name="api-key-owner"
+                  aria-describedby="api-key-owner-help" placeholder="Enter new API Key owner">
+              </td>
+              <td colspan="1" class="text-center align-middle">
+
+              </td>
+              <td class="text-center align-middle">
+                <button type="button" class="btn btn-success btn-sm"
+                  data-action="create"
+                  data-api-key-id="create-new-api-key">
+                  create
+                </button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>{{! .table-dashed-borders }}
+      </div>{{! #api-keys .table-responsive }}
+
+
+    </div>{{! .col }}
+  </div>{{! .row }}
+</div>{{! .container }}
+
+<script src="/js/admin-api-keys-actions.js"></script>
+

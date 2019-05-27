@@ -28,11 +28,6 @@ one of the developers contributing to this project.
 # platform session secret
 PROD_PLATFORM_SESSION_SECRET=platform-session-key
 
-# monitor session secret
-PROD_MONITOR_SESSION_SECRET=monitor-session-key
-# monitor admin token - used to access the monitor
-PROD_MONITOR_ADMIN_TOKEN=admin-token
-
 # postgres database password
 PROD_PG_PASSWORD=postgres-password
 
@@ -51,11 +46,6 @@ PROD_KAFKA_GROUP=kafka-group(optional)
 # platform session secret
 DEV_PLATFORM_SESSION_SECRET=platform-session-key
 
-# monitor session secret
-DEV_MONITOR_SESSION_SECRET=monitor-session-key
-# monitor admin token - used to access the monitor
-DEV_MONITOR_ADMIN_TOKEN=admin-token
-
 # postgres database password
 DEV_PG_PASSWORD=postgres-password
 
@@ -73,11 +63,6 @@ DEV_KAFKA_GROUP=kafka-group(optional)
 
 # platform session secret
 TEST_PLATFORM_SESSION_SECRET=platform-session-key
-
-# monitor session secret
-TEST_MONITOR_SESSION_SECRET=monitor-session-key
-# monitor admin token - used to access the monitor
-TEST_MONITOR_ADMIN_TOKEN=admin-token
 
 # postgres database password
 TEST_PG_PASSWORD=postgres-password

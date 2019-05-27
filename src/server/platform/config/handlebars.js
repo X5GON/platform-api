@@ -15,6 +15,9 @@ module.exports = function (app) {
             isEqual: function (arg1, arg2) {
                 return arg1 === arg2;
             },
+            isNotEqual: function (arg1, arg2) {
+                return arg1 !== arg2;
+            },
             statusColor: function (arg1) {
                 return arg1 === 'online' ? 'text-success' :
                     arg1 === 'launching' ? 'text-warning' :

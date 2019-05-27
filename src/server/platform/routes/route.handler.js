@@ -26,15 +26,11 @@ module.exports = function (app, pg, logger, config, passport, monitor) {
     app.use('/api/v1', require('./v1/query/user-activities')(pg, logger, config));
 
 
-
-
-
     ////////////////////////////////////////
     // Website routes
     ////////////////////////////////////////
 
-    app.use('/', require('./v1/admin/admin')(pg, logger, config, passport));
-    // app.use('/', require('./v1/admin/monitor')(monitor, config));
+    app.use('/', require('./v1/admin/admin')(pg, logger, config, passport, monitor));
     app.use('/', require('./v1/website')(pg, logger, config));
 
 

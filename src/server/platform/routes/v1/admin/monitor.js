@@ -147,58 +147,5 @@ module.exports = function (monitor, config) {
         });
     });
 
-    /**
-     * @api {GET} /monior/api/process/:id/stop Monitor stop process
-     * @apiDescription Stop the process with the given process id
-     * @apiPrivate
-     * @apiName GetMonitorStopId
-     * @apiGroup Monitor
-     *
-     * @apiParam {String} id - The id of the process.
-     */
-    router.get('/monitor/api/process/:id/stop', (req, res) => {
-        const id = parseInt(req.params.id);
-        monitor.stopProcess(id, (error, status) => {
-            if (error) { return res.status(400).send({ error: error.message }); }
-            return res.status(200).send(status);
-        });
-    });
-
-    /**
-     * @api {GET} /monitor/api/process/:id/start Monitor start process
-     * @apiDescription Starts the process with the given process id
-     * @apiPrivate
-     * @apiName GetMonitorStartId
-     * @apiGroup Monitor
-     *
-     * @apiParam {String} id - The id of the process.
-     */
-    router.get('/monitor/api/process/:id/start', (req, res) => {
-        const id = parseInt(req.params.id);
-        monitor.startProcess(id, (error, status) => {
-            if (error) { return res.status(400).send({ error: error.message }); }
-            return res.status(200).send(status);
-        });
-    });
-
-    /**
-     * @api {GET} /monitor/error Return the error page
-     * @apiPrivate
-     * @apiName GetMonitorError
-     * @apiGroup Monitor
-     */
-    router.get('/monitor/error', (req, res) => {
-        const { errorType } = req.query;
-
-        let message = null;
-        switch(errorType) {
-            case 'non-admin':
-                message = 'Non-admin user is accessing admin content';
-                break;
-        }
-
-        return res.render('error', { message, title: '404'  });
-    });
-
     return router;
 };
