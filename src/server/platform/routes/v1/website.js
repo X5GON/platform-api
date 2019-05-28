@@ -87,13 +87,12 @@ module.exports = function (pg, logger, config) {
 
     router.get('/oer-provider', (req, res) => {
         // get token used for accessing data
-        const name = req.query.name;
         const token = req.query.providerId;
         const referrer = req.header('Referrer') ?
             req.header('Referrer').split('?')[0] :
             '/join';
         // check if the repository already exists - return existing token
-        pg.select({ name, token }, 'providers', (error, results) => {
+        pg.selectProviderStats(token, (error, results) => {
             if (error) {
                 // error when retrieving provider data
                 logger.error('[error] postgresql',
@@ -116,14 +115,15 @@ module.exports = function (pg, logger, config) {
                 // redirect user to previous page
                 return res.redirect(`${referrer}?invalid=true`);
             } else {
-                // there are registered repositories in the database
-                const { name, domain, contact, token } = results[0];
                 // provider is not registered in the platform
                 logger.info('[info] provider requested for its information',
                     logger.formatRequest(req)
                 );
                 // render the form submition
-                return res.render('oer-provider', { name, domain, contact, token, title: 'OER Provider Information' });
+                return res.render('oer-provider', {
+                    title: 'OER Provider Information',
+                    ...results[0]
+                });
             }
         });
     });

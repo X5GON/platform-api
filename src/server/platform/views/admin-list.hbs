@@ -1,0 +1,74 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+
+      <h1 class="doc doc__section">Admin List</h1>
+
+      <p class="information">
+        This panel the admin credentials. It is used to create and/or delete admin
+        access credentials.
+      </p>
+
+      <div id="admins" class="table-responsive mt-4">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th scope="col" class="align-middle doc doc__query username">
+                <b class="doc">Username</b>
+              </th>
+              <th scope="col" class="align-middle doc doc__query">
+                <b class="doc">Password</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query action">
+                <b class="doc">Action</b>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each admins as |admin|}}
+              <tr id="{{admin.id}}" data-admin-head="{{admin.id}}">
+
+                <td class="align-middle">
+                  <b class="doc">{{admin.username}}</b>
+                </td>
+                <td class="align-middle">
+                  {{admin.password_hidden}}
+                </td>
+                <td class="text-center align-middle">
+                  <button type="button" class="btn btn-danger btn-sm"
+                    data-action="delete"
+                    data-admin-id={{admin.id}}>
+                    delete
+                  </button>
+                </td>
+              </tr>{{! tr#id=admins.id }}
+            {{/each}}
+            <tr id="create-new-admin">
+              <td class="align-middle">
+                <input type="username" class="form-control" name="admin-username"
+                  aria-describedby="admin-username-help" placeholder="Enter new admin username" required>
+              </td>
+              <td class="align-middle">
+                <input type="password" class="form-control" name="admin-password"
+                  minlength="8" aria-describedby="admin-password-help" placeholder="Enter new admin password" required>
+              </td>
+              <td class="text-center align-middle">
+                <button type="button" class="btn btn-success btn-sm"
+                  data-action="create"
+                  data-admin-id="create-new-admin">
+                  create
+                </button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>{{! .table-dashed-borders }}
+      </div>{{! #admins .table-responsive }}
+
+
+    </div>{{! .col }}
+  </div>{{! .row }}
+</div>{{! .container }}
+
+<script src="/js/admin-list-actions.js"></script>
+

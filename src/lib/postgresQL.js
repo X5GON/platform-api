@@ -319,6 +319,34 @@ class PostgreSQL {
     }
 
     /**
+     * @description Counts the rows in the database.
+     * @param {Object | Object[]} conditions - The conditions used to find the rows.
+     * @param {String} table - Table name.
+     * @param {Function} callback - The callback function.
+     */
+    selectCount(conditions, table, callback) {
+        let self = this;
+
+        // set the conditions and parameters
+        let { condition, params, limitOffset } = self._getConditions(conditions, 1);
+
+        let limitations = '';
+        if (Object.keys(limitOffset).length) {
+            limitations = Object.keys(limitOffset)
+                .map(key => `${key.toUpperCase()} ${limitOffset[key]}`)
+                .join(' ');
+        }
+
+        // prepare the query command
+        let query = params.length ?
+            `SELECT COUNT(*) FROM ${table} WHERE ${condition} ${limitations};` :
+            `SELECT COUNT(*) FROM ${table} ${limitations};`;
+
+        // execute the query
+        return self.execute(query, params, callback);
+    }
+
+    /**
      * @description Updates the rows in the database.
      * @param {Object} values - The values used for updating the rows.
      * @param {Object | Object[]} conditions - The conditions used to find the rows.
@@ -388,6 +416,134 @@ class PostgreSQL {
         // execute the query
         return self.execute(query, params, callback);
     }
+
+    /**********************************
+     * X5GON specific queries
+     *********************************/
+
+    /**
+     * Fixes and formats the number to show its value in an abbriviated form.
+     * @param {Number} number - The number to be formated.
+     * @returns {String} The formated number.
+     */
+    _numberFormat(number) {
+        // get the quotient of different values
+        const billions = number / 1000000000;
+        const millions = number / 1000000;
+        const thousands = number / 1000;
+
+        /**
+         * Fixes the number based on its value.
+         * @param {Number} number - The number to be fixed.
+         * @returns {String} The fixed number.
+         */
+        function toFixed(number) {
+            return number <= 10 ? number.toFixed(2) :
+                number <= 100 ? number.toFixed(1) :
+                number.toFixed(0);
+        }
+        // format based on the quotient
+        if (billions>= 1) {
+            return `${toFixed(billions)}B`;
+        } else if (millions>= 1) {
+            return `${toFixed(millions)}M`;
+        } else if (thousands >= 1) {
+            return `${toFixed(thousands)}k`;
+        } else {
+            return number;
+        }
+    }
+
+    /**
+     * @description Gets the specific provider statistics.
+     * @param {String[]|String} tokens - The providers unique tokens.
+     * @param {Function} callback - The callback function.
+     */
+    selectProviderStats(tokens, callback) {
+        let self = this;
+        /**
+         * Prepares the API key instance for consumption by formating the date_created
+         * and permissions attributes.
+         * @param {Object} instance - The API key object.
+         * @returns {Object} The `instance` object with the prepared values.
+         */
+        function prepareOERProviders(instance) {
+            // beautify the date created value
+            instance.material_count = parseInt(instance.material_count || 0);
+            instance.material_count_clean = self._numberFormat(instance.material_count);
+            instance.visit_count = parseInt(instance.visit_count || 0);
+            instance.visit_count_clean = self._numberFormat(instance.visit_count);
+
+            // return the instance
+            return instance;
+        }
+
+        // add token based contraint
+        let constraint = '';
+        if (Array.isArray(tokens)) {
+            constraint = `WHERE providers.token IN (${tokens.join(',')})`;
+        } else if (typeof tokens === 'string') {
+            constraint = `WHERE providers.token='${tokens}'`;
+        }
+        // create the query string
+        const query = `
+            WITH urls_count AS (
+                SELECT
+                    url_id,
+                    COUNT(*) AS visit_count
+                FROM user_activities
+                WHERE cookie_id IS NOT NULL
+                GROUP BY url_id
+            ),
+            provider_urls_count AS (
+                SELECT
+                    provider_id,
+                    SUM(visit_count) AS visit_count_sum
+                FROM urls
+                LEFT JOIN urls_count ON urls.id=urls_count.url_id
+                GROUP BY provider_id
+            ),
+            materials_per_provider_count AS (
+                SELECT
+                    provider_id,
+                    COUNT(*) AS material_count
+                FROM urls
+                WHERE material_id IS NOT NULL
+                GROUP BY provider_id
+            ),
+            urls_materials_count AS (
+                SELECT
+                    materials_per_provider_count.provider_id AS provider_id,
+                    visit_count_sum,
+                    material_count
+                FROM materials_per_provider_count
+                LEFT JOIN provider_urls_count
+                ON materials_per_provider_count.provider_id=provider_urls_count.provider_id
+            )
+            SELECT
+                id,
+                name,
+                token,
+                domain,
+                contact,
+                material_count,
+                visit_count_sum AS visit_count
+            FROM providers
+            LEFT JOIN urls_materials_count
+            ON providers.id=urls_materials_count.provider_id
+            ${constraint};
+        `;
+
+        // execute the query
+        return self.execute(query, [], function (error, results) {
+            if (error) { return callback(error); }
+            results.forEach(prepareOERProviders);
+            return callback(null, results);
+        });
+    }
+
+
+
 }
 
 module.exports = function (config) {
