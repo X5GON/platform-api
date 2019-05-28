@@ -12,12 +12,11 @@ $(document).ready(function () {
                 $(`#api-keys tbody tr[data-api-key-head="${apiKeyId}"]`).remove();
             });
         } else if (actionType === 'create') {
-            let input = $('#create-new-api-key input');
-            let owner = input.val();
+            let ownerInput = $('#create-new-api-key input');
+            let owner = ownerInput.val();
             if (!owner.length) {
-                // TODO: notify user about the requirement
-                console.log('owner must be set');
-                return;
+                // notify user about the requirement
+                return alert('API key owner must be set!');
             }
 
             $.post('/admin/api_keys/api/create', { owner }).done(data => {
@@ -50,7 +49,7 @@ $(document).ready(function () {
                         .click(bindFuncToApiKeysButton);
                 }
                 // remove the current input value
-                input.val('');
+                ownerInput.val('');
             });
 
         }

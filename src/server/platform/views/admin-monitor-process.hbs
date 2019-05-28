@@ -71,10 +71,8 @@
                 <td class="text-center align-middle" type="restart-time">
                   {{process.pm2_env.restart_time}}
                 </td>
-                <td class="text-center align-middle" type="unstable-restarts">
-                  <b class="doc error">
-                    {{process.pm2_env.unstable_restarts}}
-                  </b>
+                <td class="text-center align-middle doc__number" type="unstable-restarts" data-value="{{process.pm2_env.unstable_restarts}}">
+                  {{process.pm2_env.unstable_restarts}}
                 </td>
                 <td class="text-center align-middle">
                   {{#if (isNotEqual process.name 'X5GON_PLATFORM')}}

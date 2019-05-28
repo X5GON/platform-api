@@ -81,6 +81,15 @@
     width: 30px;
 }
 
+#process-monitor td.doc__number[data-value] {
+    color: #990000;
+    font-weight: 600;
+}
+
+#process-monitor td.doc__number[data-value="0"] {
+    color: #226679;
+    font-weight: 600;
+}
 
 /**********************************************
  * API Keys Table
@@ -120,7 +129,7 @@
  * OER Providers Table
  *********************************************/
 
- #providers .table-dashed-borders thead th {
+#providers .table-dashed-borders thead th {
     border-bottom: 2px solid #5b95a5;
     padding: 0 12px 5px 12px;
 }
@@ -143,4 +152,39 @@
 #providers .doc.doc__query.contact {
     min-width: 280px;
     width: 280px;
+}
+
+#providers td.doc__number[data-value] {
+    color: #226679;
+    font-weight: 600;
+}
+
+#providers td.doc__number[data-value="0"] {
+    color: #990000;
+    font-weight: 600;
+}
+
+
+/**********************************************
+ * OER Providers Table
+ *********************************************/
+
+#admins .table-dashed-borders thead th {
+    border-bottom: 2px solid #5b95a5;
+    padding: 0 12px 5px 12px;
+}
+
+#admins .doc.doc__query.username {
+    min-width: 300px;
+    width: 300px;
+}
+
+#admins .doc.doc__query {
+    min-width: 300px;
+    width: 300px;
+}
+
+#admins .doc.doc__query.action {
+    min-width: 50px;
+    width: 50px;
 }

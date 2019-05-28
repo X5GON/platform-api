@@ -305,14 +305,14 @@ module.exports = function (pg, logger, config, passport, monitor) {
             // render the page
             return res.render('admin-api-keys', {
                 layout: 'admin',
-                title: 'API Keys',
+                title: 'Platform API Keys',
                 apiKeys: bundles
             });
         }).catch(error => {
             // render the page
             return res.render('admin-api-keys', {
                 layout: 'admin',
-                title: 'API Keys',
+                title: 'Platform API Keys',
                 error
             });
         });
@@ -448,6 +448,120 @@ module.exports = function (pg, logger, config, passport, monitor) {
         monitor.startProcess(id, (error, status) => {
             if (error) { return res.status(400).send({ error: error.message }); }
             return res.status(200).send(status);
+        });
+    });
+
+
+    /**********************************
+     * Admins List
+     *********************************/
+
+    /**
+     * Prepares the admin instance for consumption by creating the password_hidden
+     * attribute.
+     * @param {Object} instance - The admin object.
+     * @returns {Object} The `instance` object with the prepared values.
+     */
+    function prepareAdmins(instance) {
+        // beautify the date created value
+        // beautify the permission list
+        instance.password_hidden = instance.password.replace(/./g, '*');
+        // return the instance
+        return instance;
+    }
+
+    router.get('/admin/list', _checkAuthentication, (req, res) => {
+        /**
+         * Gets the API keys from database.
+         * @returns {Promise} The promise of the API keys data.
+         */
+        function retrieveAdminList() {
+            return new Promise((resolve, reject) => {
+                pg.select({}, 'admins', (error, results) => {
+                    if (error) { return reject(error); }
+                    results.forEach(prepareAdmins)
+                    return resolve(results);
+                });
+            });
+        }
+        // get the API keys
+        const admins = retrieveAdminList();
+
+        admins.then(bundles => {
+            // currently redirect to form page
+            return res.render('admin-list', {
+                layout: 'admin',
+                title: 'Admin List',
+                admins: bundles
+            });
+        });
+    });
+
+
+    router.post('/admin/list/api/create', _checkAuthentication, (req, res) => {
+        const { username, password } = req.body;
+
+        // validate that the owner is a string
+        if (typeof username !== 'string') {
+            return res.status(400).send({ error: 'username parameter is not a string' });
+        } else if (typeof password !== 'string') {
+            return res.status(400).send({ error: 'password parameter is not a string' });
+        }
+
+        /**
+         * Deletes the API keys from database.
+         * @param {Integer} id - The id of the API key to delete.
+         * @returns {Promise} The promise of the API keys data will be deleted.
+         */
+        function insertAdmin({ username, password }) {
+            return new Promise((resolve, reject) => {
+                pg.insert({ username, password }, 'admins', (error, results) => {
+                    if (error) { return reject(error); }
+                    results.forEach(prepareAdmins);
+                    return resolve(results);
+                });
+            });
+        }
+
+        // create user API key object
+        const newAdmin = {
+            username,
+            password
+        };
+
+        // delete the API keys
+        const admin = insertAdmin(newAdmin);
+
+        admin.then(results => {
+            return res.status(200).send(results);
+        }).catch(error => {
+            return res.status(400).send({ error: 'Unable to create admin' });
+        });
+    });
+
+
+    router.get('/admin/list/api/:id/delete', _checkAuthentication, (req, res) => {
+        const id = parseInt(req.params.id);
+        /**
+         * Deletes the API keys from database.
+         * @param {Integer} id - The id of the API key to delete.
+         * @returns {Promise} The promise of the API keys data will be deleted.
+         */
+        function deleteAdmin(id) {
+            return new Promise((resolve, reject) => {
+                pg.delete({ id }, 'admins', (error, results) => {
+                    if (error) { return reject(error); }
+                    return resolve(results);
+                });
+            });
+        }
+        // delete the API keys
+        const admin = deleteAdmin(id);
+
+        admin.then(results => {
+            return res.status(200).send(results);
+        }).catch(error => {
+            return res.status(400).send({ error: 'Unable to delete admin' });
         });
     });
 

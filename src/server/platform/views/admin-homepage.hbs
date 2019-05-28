@@ -4,42 +4,10 @@
 
       <h1 class="doc doc__section">Admin Control Panel</h1>
 
-      {{#if stats}}
-        <div class="row">
-          <div class="col-md-6 col-lg-4 mb-5">
-            <div class="stats">
-              <span class="stats__number">
-                {{stats.oer_materials}}
-              </span>
-              <p class="stats__label">
-                <span>OER Materials</span>
-              </p>
-            </div>
-          </div>
-
-          <div class="col-md-6 col-lg-4 mb-5">
-            <div class="stats">
-              <span class="stats__number">
-                {{stats.user_activities}}
-              </span>
-              <p class="stats__label">
-                <span>User Activities</span>
-              </p>
-            </div>
-          </div>
-
-          <div class="col-md-12 col-lg-4 mb-5">
-            <div class="stats">
-              <span class="stats__number">
-                {{stats.unique_users}}
-              </span>
-              <p class="stats__label">
-                <span>Unique Users</span>
-              </p>
-            </div>
-          </div>
-        </div>{{! .row }}
-      {{/if}}
+      <p class="information">
+          The admin control panel is used to have an overview of the processes
+          and activities that happen in the X5GON platform system.
+        </p>
 
       <div class="row">
         <div class="col-md-6 col-lg-4 mb-4">
@@ -84,8 +52,52 @@
             </p>
           </div>
         </div>
-
       </div>{{! .row }}
+
+      {{#if stats}}
+        <h2 class="doc doc__section">Database Statistics</h1>
+        <p class="information">
+          The basic X5GON database statistics - showing the number of OER materials,
+          user activity data (visits) and number of unique users that accessed the
+          registered OER repositories in the X5GON network.
+        </p>
+
+        <div class="row">
+          <div class="col-md-6 col-lg-4 mb-5">
+            <div class="stats">
+              <span class="stats__number">
+                {{stats.oer_materials}}
+              </span>
+              <p class="stats__label">
+                <span>OER Materials</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-4 mb-5">
+            <div class="stats">
+              <span class="stats__number">
+                {{stats.user_activities}}
+              </span>
+              <p class="stats__label">
+                <span>User Activities</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-12 col-lg-4 mb-5">
+            <div class="stats">
+              <span class="stats__number">
+                {{stats.unique_users}}
+              </span>
+              <p class="stats__label">
+                <span>Unique Users</span>
+              </p>
+            </div>
+          </div>
+        </div>{{! .row }}
+      {{/if}}
+
     </div>{{! .col }}
   </div>{{! .row }}
 </div>
