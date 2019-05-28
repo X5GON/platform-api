@@ -1,6 +1,5 @@
 // external modules
 const router = require('express').Router();
-const request = require('request');
 
 /**
  * @description Adds API routes for platform website requests.
@@ -143,79 +142,15 @@ module.exports = function (pg, logger, config, passport, monitor) {
      * Admin OER providers
      *********************************/
 
-    /**
-     * Prepares the API key instance for consumption by formating the date_created
-     * and permissions attributes.
-     * @param {Object} instance - The API key object.
-     * @returns {Object} The `instance` object with the prepared values.
-     */
-    function prepareOERProviders(instance) {
-        // beautify the date created value
-        instance.material_count = parseInt(instance.material_count || 0);
-        instance.visit_count = parseInt(instance.visit_count || 0);
-        // return the instance
-        return instance;
-    }
-
-
     router.get('/admin/oer_providers', _checkAuthentication, (req, res) => {
         /**
          * Gets the API keys from database.
          * @returns {Promise} The promise of the API keys data.
          */
         function retrieveProviders() {
-            // create the query string
-            const query = `
-                WITH urls_count AS (
-                    SELECT
-                        url_id,
-                        COUNT(*) AS visit_count
-                    FROM user_activities
-                    WHERE cookie_id IS NOT NULL
-                    GROUP BY url_id
-                ),
-                provider_urls_count AS (
-                    SELECT
-                        provider_id,
-                        SUM(visit_count) AS visit_count_sum
-                    FROM urls
-                    LEFT JOIN urls_count ON urls.id=urls_count.url_id
-                    GROUP BY provider_id
-                ),
-                materials_per_provider_count AS (
-                    SELECT
-                        provider_id,
-                        COUNT(*) AS material_count
-                    FROM urls
-                    WHERE material_id IS NOT NULL
-                    GROUP BY provider_id
-                ),
-                urls_materials_count AS (
-                    SELECT
-                        materials_per_provider_count.provider_id AS provider_id,
-                        visit_count_sum,
-                        material_count
-                    FROM materials_per_provider_count
-                    LEFT JOIN provider_urls_count
-                    ON materials_per_provider_count.provider_id=provider_urls_count.provider_id
-                )
-                SELECT
-                    name,
-                    token,
-                    domain,
-                    contact,
-                    material_count,
-                    visit_count_sum AS visit_count
-                FROM providers
-                LEFT JOIN urls_materials_count
-                ON providers.id=urls_materials_count.provider_id;
-            `
-
             return new Promise((resolve, reject) => {
-                pg.execute(query, [], (error, results) => {
+                pg.selectProviderStats(null, (error, results) => {
                     if (error) { return reject(error); }
-                    // prepare OER provider results
-                    results.forEach(prepareOERProviders);
                     // return the results
                     return resolve(results);
                 });
@@ -236,12 +171,6 @@ module.exports = function (pg, logger, config, passport, monitor) {
                         .reduce((sum, acc) => sum + acc, 0)
                 )
             };
-
-            // format the number count
-            bundles.forEach(provider => {
-                provider.material_count = numberFormat(provider.material_count);
-                provider.visit_count = numberFormat(provider.visit_count);
-            });
 
             // render the page
             return res.render('admin-oer-providers', {
