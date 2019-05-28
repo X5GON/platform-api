@@ -67,9 +67,9 @@ module.exports = function (pg, logger, config) {
                 });
             } else if (!results[0].permissions.upload.includes('materials')) {
                 // api key does not have permissions
-                logger.warn('[warn] API key does not have required actions',
+                logger.warn('[warn] API key does not have required permissions',
                     logger.formatRequest(req, {
-                        missing_action: 'upload.materials'
+                        missing_permission: 'upload.materials'
                     })
                 );
                 // notify the user about hte

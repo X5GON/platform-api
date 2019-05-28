@@ -64,9 +64,8 @@
           <tbody>
             {{#each providers as |provider|}}
               <tr id="{{provider.id}}" data-provider-head="{{provider.id}}">
-
                 <td class="align-middle">
-                    <b class="doc">{{provider.name}}</b>
+                  <b class="doc">{{provider.name}}</b>
                 </td>
                 <td class="align-middle">
                   <a href="{{provider.domain}}" target="_blank">
@@ -80,10 +79,10 @@
                   {{provider.contact}}
                 </td>
                 <td class="text-center align-middle doc__number" data-value="{{provider.material_count}}">
-                  {{provider.material_count}}
+                  {{provider.material_count_clean}}
                 </td>
                 <td class="text-center align-middle doc__number" data-value="{{provider.visit_count}}">
-                  {{provider.visit_count}}
+                  {{provider.visit_count_clean}}
                 </td>
               </tr>{{! tr#id=provider.id }}
             {{/each}}

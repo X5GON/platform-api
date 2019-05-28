@@ -45,6 +45,7 @@ class PostgresqlStorageUserActivites {
         const {
             uuid,
             url,
+            provider,
             referrer: referrer_url,
             visitedOn: timestamp,
             userAgent: user_agent,
@@ -60,11 +61,6 @@ class PostgresqlStorageUserActivites {
             uuid,
             user_agent,
             language
-        };
-
-        // url logging
-        let urls = {
-            url
         };
 
         // user activities information
@@ -86,10 +82,15 @@ class PostgresqlStorageUserActivites {
         });
 
         const urlPromise = new Promise((resolve, reject) => {
-            self._pg.upsert(urls, { url: null }, 'urls', function (e, res) {
+            self._pg.select({ token: provider }, 'providers', function (e, res) {
                 if (e) { return reject(e); }
-                return resolve(res[0].id);
-            });
+                const provider_id = res.length === 1 ? res[0].id : null;
+                let urls = { url, ...(provider_id && { provider_id }) };
+                self._pg.upsert(urls, { url: null }, 'urls', function (xe, xres) {
+                    if (xe) { return reject(xe); }
+                    return resolve(xres[0].id);
+                });
+            })
         });
 
         ///////////////////////////////////////////
