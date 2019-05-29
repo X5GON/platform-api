@@ -91,6 +91,16 @@ module.exports = function (pg, logger, config) {
         const referrer = req.header('Referrer') ?
             req.header('Referrer').split('?')[0] :
             '/join';
+
+        if (!token) {
+             // provider is not registered in the platform
+             logger.warn('[warn] token was not provided by the user',
+             logger.formatRequest(req)
+         );
+         // redirect user to previous page
+         return res.redirect(`${referrer}?invalid=true`);
+        }
+
         // check if the repository already exists - return existing token
         pg.selectProviderStats(token, (error, results) => {
             if (error) {
@@ -226,7 +236,11 @@ module.exports = function (pg, logger, config) {
 
     router.get('/oer_provider/login', (req, res) => {
         const invalid = req.query.invalid;
-        return res.render('oer-provider-login', { invalid, title: 'Login' });
+        return res.render('oer-provider-login', {
+            layout: 'admin-submain',
+            title: 'OER Provider Login',
+            invalid,
+        });
     });
 
 

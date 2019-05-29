@@ -19,23 +19,37 @@ header .navbar .navbar-brand img {
 }
 
 header .navbar .btn-nav {
-    background-color: white;
-    transition: background .2s;
-    font-weight: 600;
     color: #5b95a5;
+    font-weight: 600;
 }
 
-header .navbar .btn-nav:hover {
+header .navbar-brand .btn-nav {
+    transition: background .2s;
+    border-radius: 0px;
+}
+header .navbar-brand .btn-nav:hover {
     background-color: #f6f6f6;
 }
 
-header .navbar .btn-nav.call-to-action {
+header .navbar .nav-item {
+    background-color: white;
+    transition: background .2s;
+    border-radius: 0px;
+    border-bottom: 3px solid #5b95a5;
+    margin: 0 5px;
+}
+
+header .navbar .nav-item:hover {
+    background-color: #f6f6f6;
+}
+
+header .navbar .nav-item.call-to-action {
     background-color: #5b95a5;
     color: white;
     transition: background .2s;
 }
 
-header .navbar .btn-nav.call-to-action:hover {
+header .navbar .nav-item.call-to-action:hover {
     background-color: #456f7a;
 }
 
@@ -50,6 +64,10 @@ header .navbar a:hover {
 
 header .navbar a .link-symbol {
     color: white;
+}
+
+header .site-nav {
+    background-color: white;
 }
 
 footer {

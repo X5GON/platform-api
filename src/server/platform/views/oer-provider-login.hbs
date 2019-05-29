@@ -1,45 +1,51 @@
 <div class="container">
   <div class="row justify-content-md-center">
-    <div class="col col-md-6 col-lg-4 mt-5">
+    <div class="col col-md-6 col-lg-4 mt-4">
 
-      <h4 class="text-center">OER Provider Login</h4>
+      <div class="application p-3">
+        <h4 class="text-center">OER Provider Login</h4>
 
-      <p class="text-justify">
-        Use the repository name and the token provided by the X5GON platform to login into your OER
-        repository profile.
-      </p>
+        <p class="text-justify">
+          Use the repository name and the token provided by the X5GON platform to login into your OER
+          repository profile.
+        </p>
 
-      <form action="/oer_provider" method="get">
+        <form action="/oer_provider" method="get">
 
-        <div class="form-group">
-          <label for="oer-repository-name">OER Repository Name</label>
-          <input type="text" class="form-control" id="oer-repository-name" name="name"
-            aria-describedby="oer-repository-name-help" placeholder="Enter repository name" required>
-        </div>
+          <div class="form-group">
+            <label for="oer-repository-name">OER Repository Name</label>
+            <input type="text" class="form-control" id="oer-repository-name" name="name"
+              aria-describedby="oer-repository-name-help" placeholder="Enter repository name" required>
+          </div>
 
-        <div class="form-group">
-          <label for="oer-repository-token">Repository Token</label>
-          <input type="password" class="form-control" id="oer-repository-token" name="providerId"
-            aria-describedby="oer-repository-token-help" placeholder="Enter provider id token" required>
-          <small id="oer-repository-token-help" class="form-text text-muted">
-            The token provided by X5GON Platform upon joining the network
+          <div class="form-group">
+            <label for="oer-repository-token">Repository Token</label>
+            <input type="password" class="form-control" id="oer-repository-token" name="providerId"
+              aria-describedby="oer-repository-token-help" placeholder="Enter provider id token" required>
+            <small id="oer-repository-token-help" class="form-text text-muted">
+              The token provided by X5GON Platform upon joining the network
+            </small>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block mt-4">Login</button>
+        </form>
+
+        <p class="mt-2">
+          <small>
+            Not a member?
+            <a href="/join">Join the network</a>
           </small>
-          {{#if invalid}}
-          <small class="form-text text-danger">
-            Repository name and/or token not valid
-          </small>
-          {{/if}}
-        </div>
+        </p>
 
-        <button type="submit" class="btn btn-primary btn-block mt-4">Login</button>
-      </form>
+        {{#if invalid}}
+          <div class="doc url_baseline p-4 mt-3 mb-3">
+            <p class="information text-center">
+              <b class="doc">Repository name and/or token not valid.</b>
+            </p>
+          </div>
+        {{/if}}
 
-      <p class="mt-2">
-        <small>
-          Not a member?
-          <a href="/join">Join the network</a>
-        </small>
-      </p>
+      </div>
     </div>{{! .col.col-md-4 }}
   </div>{{! .row }}
 </div>

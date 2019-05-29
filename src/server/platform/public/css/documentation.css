@@ -4,7 +4,7 @@
 
 .doc-navigation {
     position: fixed;
-    top: 100px;
+    top: 10rem;
     left: 3%;
 }
 
@@ -16,7 +16,13 @@
 
 @media screen and (max-width: 1720px) {
     .doc-navigation {
-        display: none;
+        position: relative;
+        top: 0px;
+        left: 0px;
+        margin-bottom: 20px;
+    }
+    .doc-navigation ul:first-child {
+        padding-inline-start: 0px;
     }
 }
 
