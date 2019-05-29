@@ -85,7 +85,7 @@ module.exports = function (pg, logger, config) {
         return res.render('join', { recaptchaSiteKey, invalid, unsuccessful, title: 'Join' });
     });
 
-    router.get('/oer-provider', (req, res) => {
+    router.get('/oer_provider', (req, res) => {
         // get token used for accessing data
         const token = req.query.providerId;
         const referrer = req.header('Referrer') ?
@@ -129,7 +129,7 @@ module.exports = function (pg, logger, config) {
     });
 
     // send repository
-    router.post('/oer-provider', (req, res) => {
+    router.post('/oer_provider', (req, res) => {
         // get body request
         const body = req.body;
 
@@ -198,14 +198,14 @@ module.exports = function (pg, logger, config) {
                             }
 
                             // render the form submition
-                            return res.redirect(`/oer-provider?name=${name}&providerId=${token}`);
+                            return res.redirect(`/oer_provider?name=${name}&providerId=${token}`);
                         });
 
                     } else {
                         // there are registered repositories in the database
                         const { token } = results[0];
                         // render the form submition
-                        return res.redirect(`/oer-provider?name=${name}&providerId=${token}`);
+                        return res.redirect(`/oer_provider?name=${name}&providerId=${token}`);
                     }
                 });
             })
@@ -224,13 +224,13 @@ module.exports = function (pg, logger, config) {
             });
     });
 
-    router.get('/oer-provider/login', (req, res) => {
+    router.get('/oer_provider/login', (req, res) => {
         const invalid = req.query.invalid;
         return res.render('oer-provider-login', { invalid, title: 'Login' });
     });
 
 
-    router.get('/privacy-policy', (req, res) => {
+    router.get('/privacy_policy', (req, res) => {
         return res.render('privacy-policy', { title: 'Privacy Policy' });
     });
 
