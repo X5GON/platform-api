@@ -65,7 +65,11 @@ module.exports = function (pg, logger, config) {
 
     router.get('/', (req, res) => {
         // currently redirect to form page
-        return res.render('homepage', { layout: 'submain', title: 'Home' });
+        return res.render('homepage', {
+            layout: 'submain',
+            title: 'Home',
+            home: 'active'
+        });
     });
 
     // legacy
@@ -82,15 +86,31 @@ module.exports = function (pg, logger, config) {
         // const unsuccessful = req.query.invalid ? req.query.invalid == 'true' : false;
         const recaptchaSiteKey = config.platform.google.reCaptcha.siteKey;
 
-        return res.render('join', { recaptchaSiteKey, invalid, unsuccessful, title: 'Join' });
+        return res.render('join', {
+            title: 'Join',
+            join: 'active',
+            recaptchaSiteKey,
+            invalid,
+            unsuccessful,
+        });
     });
 
-    router.get('/oer-provider', (req, res) => {
+    router.get('/oer_provider', (req, res) => {
         // get token used for accessing data
         const token = req.query.providerId;
         const referrer = req.header('Referrer') ?
             req.header('Referrer').split('?')[0] :
             '/join';
+
+        if (!token) {
+             // provider is not registered in the platform
+             logger.warn('[warn] token was not provided by the user',
+             logger.formatRequest(req)
+         );
+         // redirect user to previous page
+         return res.redirect(`${referrer}?invalid=true`);
+        }
+
         // check if the repository already exists - return existing token
         pg.selectProviderStats(token, (error, results) => {
             if (error) {
@@ -129,7 +149,7 @@ module.exports = function (pg, logger, config) {
     });
 
     // send repository
-    router.post('/oer-provider', (req, res) => {
+    router.post('/oer_provider', (req, res) => {
         // get body request
         const body = req.body;
 
@@ -198,14 +218,14 @@ module.exports = function (pg, logger, config) {
                             }
 
                             // render the form submition
-                            return res.redirect(`/oer-provider?name=${name}&providerId=${token}`);
+                            return res.redirect(`/oer_provider?name=${name}&providerId=${token}`);
                         });
 
                     } else {
                         // there are registered repositories in the database
                         const { token } = results[0];
                         // render the form submition
-                        return res.redirect(`/oer-provider?name=${name}&providerId=${token}`);
+                        return res.redirect(`/oer_provider?name=${name}&providerId=${token}`);
                     }
                 });
             })
@@ -224,18 +244,25 @@ module.exports = function (pg, logger, config) {
             });
     });
 
-    router.get('/oer-provider/login', (req, res) => {
+    router.get('/oer_provider/login', (req, res) => {
         const invalid = req.query.invalid;
-        return res.render('oer-provider-login', { invalid, title: 'Login' });
+        return res.render('oer-provider-login', {
+            layout: 'admin-submain',
+            title: 'OER Provider Login',
+            invalid,
+        });
     });
 
 
-    router.get('/privacy-policy', (req, res) => {
+    router.get('/privacy_policy', (req, res) => {
         return res.render('privacy-policy', { title: 'Privacy Policy' });
     });
 
     router.get('/documentation', (req, res) => {
-        return res.render('documentation', { title: 'API Documentation' });
+        return res.render('documentation', {
+            title: 'API Documentation',
+            docs: 'active'
+        });
     });
 
     ////////////////////////////////////////
@@ -350,7 +377,10 @@ module.exports = function (pg, logger, config) {
             });
         } else {
             // redirect to search homepage
-            return res.render('search', { layout: 'search' });
+            return res.render('search', {
+                layout: 'search',
+                search: 'active'
+            });
         }
     });
 

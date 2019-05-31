@@ -28,28 +28,29 @@ let http = require('http').Server(app);
 
 // add the public folder
 app.use(express.static(__dirname + '/public/'));
-// add session configurations
-app.set('trust proxy', 1);
-app.use(session({
-    secret: config.platform.sessionSecret,
-    saveUninitialized: true,
-    resave: true,
-    cookie: {
-        secure: config.environment === 'prod',
-        ...(config.environment === 'prod' && { domain: '.x5gon.org' })
-    }
-}));
 // configure application
 app.use(bodyParser.json());     // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
     extended: true
 }));
-// andd handlebars configurations
-require('./config/handlebars')(app);
 // redirect specific requests to other services
 require('./routes/proxies')(app, config);
 // configure cookie parser
 app.use(cookieParser(config.platform.sessionSecret));
+
+// add session configurations
+if (config.environment === 'prod') {
+    app.set('trust proxy', 1);
+}
+app.use(session({
+    secret: config.platform.sessionSecret,
+    saveUninitialized: false,
+    resave: false,
+    cookie: {
+        ...(config.environment === 'prod' && { domain: '.x5gon.org' })
+    }
+}));
+// use flash messages
 app.use(flash());
 // initialize authentication
 app.use(passport.initialize());
@@ -58,7 +59,8 @@ app.use(passport.session({ secret: config.platform.sessionSecret }));
 require('./config/passport')(passport, pg);
 // socket.io configuration
 require('./config/sockets')(http, monitor);
-
+// add handlebars configurations
+require('./config/handlebars')(app);
 // sets the API routes - adding the postgresql connection, logger, config file,
 // passport object (for authentication), and monitoring object
 require('./routes/route.handler')(app, pg, logger, config, passport, monitor);
