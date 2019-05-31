@@ -65,7 +65,11 @@ module.exports = function (pg, logger, config) {
 
     router.get('/', (req, res) => {
         // currently redirect to form page
-        return res.render('homepage', { layout: 'submain', title: 'Home' });
+        return res.render('homepage', {
+            layout: 'submain',
+            title: 'Home',
+            home: 'active'
+        });
     });
 
     // legacy
@@ -82,7 +86,13 @@ module.exports = function (pg, logger, config) {
         // const unsuccessful = req.query.invalid ? req.query.invalid == 'true' : false;
         const recaptchaSiteKey = config.platform.google.reCaptcha.siteKey;
 
-        return res.render('join', { recaptchaSiteKey, invalid, unsuccessful, title: 'Join' });
+        return res.render('join', {
+            title: 'Join',
+            join: 'active',
+            recaptchaSiteKey,
+            invalid,
+            unsuccessful,
+        });
     });
 
     router.get('/oer_provider', (req, res) => {
@@ -249,7 +259,10 @@ module.exports = function (pg, logger, config) {
     });
 
     router.get('/documentation', (req, res) => {
-        return res.render('documentation', { title: 'API Documentation' });
+        return res.render('documentation', {
+            title: 'API Documentation',
+            docs: 'active'
+        });
     });
 
     ////////////////////////////////////////
@@ -364,7 +377,10 @@ module.exports = function (pg, logger, config) {
             });
         } else {
             // redirect to search homepage
-            return res.render('search', { layout: 'search' });
+            return res.render('search', {
+                layout: 'search',
+                search: 'active'
+            });
         }
     });
 

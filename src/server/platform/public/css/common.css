@@ -23,36 +23,6 @@ header .navbar .btn-nav {
     font-weight: 600;
 }
 
-header .navbar-brand .btn-nav {
-    transition: background .2s;
-    border-radius: 0px;
-}
-header .navbar-brand .btn-nav:hover {
-    background-color: #f6f6f6;
-}
-
-header .navbar .nav-item {
-    background-color: white;
-    transition: background .2s;
-    border-radius: 0px;
-    border-bottom: 3px solid #5b95a5;
-    margin: 0 5px;
-}
-
-header .navbar .nav-item:hover {
-    background-color: #f6f6f6;
-}
-
-header .navbar .nav-item.call-to-action {
-    background-color: #5b95a5;
-    color: white;
-    transition: background .2s;
-}
-
-header .navbar .nav-item.call-to-action:hover {
-    background-color: #456f7a;
-}
-
 header .navbar a {
     color: #a7a7a7;
     transition: background .2s;
@@ -66,8 +36,40 @@ header .navbar a .link-symbol {
     color: white;
 }
 
+header .navbar .nav-item {
+    background-color: white;
+    transition: background .2s;
+    border-radius: 0px;
+}
+
+header .navbar .nav-item.active {
+    background-color: #f6f6f6;
+    color: #456f7a;
+}
+
+header .navbar .nav-item:hover {
+    background-color: #f6f6f6;
+}
+
+header .navbar .nav-item.call-to-action {
+    background-color: #43494b;
+    color: white;
+    transition: background .2s;
+}
+
+header .navbar .nav-item.call-to-action:hover {
+    background-color: #456f7a;
+}
+
 header .site-nav {
     background-color: white;
+    border-bottom: 1px solid #eaeaea;
+}
+
+header .navbar-toggler {
+    border: 2px solid #788f95;
+    border-radius: 0px;
+    color: #5b95a5;
 }
 
 footer {
@@ -277,4 +279,11 @@ h1.card__title {
 
 .img-left {
     float: left;
+}
+
+.form-group label {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 2px;
+    margin-top: 5px;
 }
