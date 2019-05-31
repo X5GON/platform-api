@@ -14,7 +14,7 @@ module.exports = function (pg, logger, config, passport, monitor) {
         // if user is authenticated in the session, carry on
         if (req.isAuthenticated()) { return next(); }
         // they aren't, redirect them to the admin login
-        res.redirect('/admin-login');
+        res.redirect('/admin/login');
     }
 
 
@@ -57,7 +57,7 @@ module.exports = function (pg, logger, config, passport, monitor) {
      *********************************/
 
 
-    router.get('/admin-login', (req, res) => {
+    router.get('/admin/login', (req, res) => {
         // if user is authenticated in the session, continue to admin
         if (req.isAuthenticated()) {
             return res.redirect('/admin');
@@ -72,17 +72,17 @@ module.exports = function (pg, logger, config, passport, monitor) {
     });
 
 
-    router.post('/admin-login',
+    router.post('/admin/login',
         // return the admin login page
         passport.authenticate('local', {
             successRedirect: '/admin',
-            failureRedirect: '/admin-login',
+            failureRedirect: '/admin/login',
             failureFlash: 'Invalid username or password.'
         })
     );
 
 
-    router.get('/admin-logout', (req, res) => {
+    router.get('/admin/logout', (req, res) => {
         req.logout();
         res.redirect('/');
     });

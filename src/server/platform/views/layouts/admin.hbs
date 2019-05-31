@@ -68,48 +68,56 @@
   {{> header-navigation }}
 
   <main role="main">
+    <div class="container">
+      <div class="row">
+        <div class="col">
 
-    <div class="doc-navigation col-xl-2">
-      <ul>
-        <li>
-          <a class="doc" href="/admin">
-            Control Panel
-          </a>
-        </li>
-        <li>
-          <b class="doc">
-            Overview
-          </b>
-          <ul>
-            <li>
-              <a class="doc route" href="/admin/oer_providers">
-                OER Providers
-              </a>
-            </li>
-            <li>
-              <a class="doc route" href="/admin/api_keys">
-                Platform API Keys
-              </a>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <a class="doc" href="/admin/monitor/process">
-            Process Monitor
-          </a>
-        </li>
-        <li>
-          <a class="doc" href="/admin/list">
-            Admin List
-          </a>
-        </li>
-        <li>
-          <a class="doc" href="/admin-logout">
-            Logout
-          </a>
-        </li>
-      </ul>
-    </div>
+          <div class="doc-navigation col-xl-2">
+            <ul>
+              <li>
+                <a class="doc" href="/admin">
+                  Control Panel
+                </a>
+              </li>
+              <li>
+                <b class="doc">
+                  Overview
+                </b>
+                <ul>
+                  <li>
+                    <a class="doc route" href="/admin/oer_providers">
+                      OER Providers
+                    </a>
+                  </li>
+                  <li>
+                    <a class="doc route" href="/admin/api_keys">
+                      Platform API Keys
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li>
+                <a class="doc" href="/admin/monitor/process">
+                  Process Monitor
+                </a>
+              </li>
+              <li>
+                <a class="doc" href="/admin/list">
+                  Admin List
+                </a>
+              </li>
+              <li>
+                <a class="doc" href="/admin/logout">
+                  Logout
+                </a>
+              </li>
+            </ul>
+
+          </div>{{! .doc-navigation }}
+
+        </div>{{! .col }}
+      </div>{{! .row }}
+    </div>{{! .container }}
 
     {{{body}}}
   </main>

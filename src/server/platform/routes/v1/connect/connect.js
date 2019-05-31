@@ -264,7 +264,11 @@ module.exports = function (pg, logger, config) {
             let expirationDate = new Date();
             expirationDate.setDate(expirationDate.getDate() + 3650);
             // set the cookie for the user
-            res.cookie(x5gonCookieName, cookieValue, { expires: expirationDate, httpOnly: true });
+            res.cookie(x5gonCookieName, cookieValue, {
+                expires: expirationDate,
+                domain: '.x5gon.org',
+                httpOnly: true
+            });
 
             // set uuid of the user
             uuid = cookieValue;
