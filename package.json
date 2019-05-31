@@ -4,14 +4,12 @@
   "description": "Connecting OER repositories",
   "main": "index.js",
   "scripts": {
-    "postinstall": "link-module-alias && npm run minify:snippet && git checkout -- src/lib/textract && npm run install:textract",
+    "postinstall": "link-module-alias && npm run minify:snippet && git checkout -- src/lib/textract && npm run install:textract && npm run postgres:create",
     "start:platform": "cd src/server/platform && node platform.js",
-    "start:platformInspect": "cd src/server/platform && node inspect platform.js",
+    "start:recsys": "cd src/server/recsys && node recsys.js",
+    "postgres:create": "cd src/load && node -e 'require('./create-postgres-database').startDBCreate();'",
     "minify:snippet": "cd src/server/platform/scripts && node minify-snippet.js",
     "install:textract": "cd src/lib/textract && npm install",
-    "start:recsys": "cd src/server/recsys && node recsys.js",
-    "start:recsysInspect": "cd src/server/recsys && node inspect recsys.js",
-    "postgres:create": "cd src/load && node create-postgres-database.js",
     "test": "cd src/test && NODE_ENV=test mocha all-tests.js",
     "test:lib": "cd src/test/lib && NODE_ENV=test mocha *.js",
     "test:recsys": "cd src/server/recsys/test && NODE_ENV=test mocha *.js"

@@ -11,8 +11,8 @@ module.exports = function (app, pg, logger, config, passport, monitor) {
     ////////////////////////////////////////
 
     // service REST API
-    app.use('/api/v1', require('./v1/connect/connect')(pg, logger, config));
-    app.use('/api/v1', require('./v1/connect/transitions')(pg, logger, config));
+    app.use('/api/v1', require('./v1/connect/connect')(logger, config));
+    app.use('/api/v1', require('./v1/connect/transitions')(logger, config));
 
     // search REST API
     app.use('/api/v1', require('./v1/search/search')(pg, logger, config));

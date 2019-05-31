@@ -6,10 +6,10 @@ const KafkaProducer = require('alias:lib/kafka-producer');
 
 /**
  * @description Adds API routes for logging user activity.
- * @param {Object} pg - Postgres connection wrapper.
  * @param {Object} logger - The logger object.
+ * @param {Object} config - The configuration object.
  */
-module.exports = function (pg, logger, config) {
+module.exports = function (logger, config) {
 
     // parameters used within the routes
     const x5gonCookieName = 'x5gonTrack';
