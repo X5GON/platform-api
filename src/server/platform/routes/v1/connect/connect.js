@@ -12,6 +12,10 @@ const validator = require('alias:lib/schema-validator')({
     userActivitySchema: require('alias:platform_schemas/user-activity-schema')
 });
 
+// module for preparing materials
+const PrepareMaterials = require('alias:lib/prepare-materials');
+const prepareMaterials = new PrepareMaterials();
+
 /**
  * @description Adds API routes for logging user activity.
  * @param {Object} logger - The logger object.
@@ -207,7 +211,8 @@ module.exports = function (logger, config) {
                 req.cookies[x5gonCookieName] :
                 'unknown';
         }
-
+        // get the material from the request
+        const material = prepareMaterials.prepare(req.query);
         // prepare the acitivity object
         let activity = {
             uuid: uuid,
@@ -218,25 +223,8 @@ module.exports = function (logger, config) {
             userAgent: req.get('user-agent'),
             language: req.get('accept-language'),
             type: 'visit',
-            ...(req.query.providertype === 'moodle' && req.query.type !== 'url' && {
-                material: {
-                    title: req.query.title,
-                    description: req.query.description ? req.query.description : null,
-                    provideruri: userParameters.rq,
-                    materialurl: req.query.resurl,
-                    author: req.query.author ? req.query.author : null,
-                    language: req.query.language,
-                    datecreated: (new Date(parseInt(req.query.creation_date))).toISOString(),
-                    dateretrieved: (new Date()).toISOString(),
-                    type: {
-                        // TODO: ext provide using the mime-types module
-                        mimetype: req.query.mimetype
-                    },
-                    license: req.query.license
-                }
-            })
+            ...(material && { material })
         };
-
         // redirect activity to information retrievers
         producer.send('STORING.USERACTIVITY.VISIT', activity);
         // send beacon image to user

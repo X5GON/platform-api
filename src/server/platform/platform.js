@@ -18,7 +18,7 @@ const Logger = require('alias:lib/logger');
 const Monitor = require('alias:lib/process-monitor');
 
 // create a logger for platform requests
-const logger = Logger.createGroupInstance('requests', 'platform', config.environment === 'dev');
+const logger = Logger.createGroupInstance('requests', 'platform', config.environment !== 'prod');
 // create process monitoring instance
 const monitor = new Monitor();
 

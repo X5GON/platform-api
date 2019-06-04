@@ -62,10 +62,10 @@ module.exports = function (pg, logger, config) {
                 // notify the user about hte
                 return res.status(400).send({
                     error: {
-                        msgs: ['provided API key is valid']
+                        msgs: ['provided API key is not valid']
                     }
                 });
-            } else if (!results[0].permissions.upload.includes('materials')) {
+            } else if (!results[0].permissions.upload && !results[0].permissions.upload.includes('materials')) {
                 // api key does not have permissions
                 logger.warn('[warn] API key does not have required permissions',
                     logger.formatRequest(req, {
@@ -101,29 +101,90 @@ module.exports = function (pg, logger, config) {
             const messages = errors.map(err => err.stack);
             // store the invalid material for the user
             list.push({ material, errors: messages });
-        } else {
-            for (let key of Object.keys(material)) {
-                material[key.replace(/_/g, '')] = material[key];
-            }
+            return;
+        }
+        // change the
+        for (let key of Object.keys(material)) {
+            material[key.replace(/_/g, '')] = material[key];
+        }
 
-            if (material.type.mime && mimetypes.video.includes(material.type.mime)) {
-                logger.info(`[upload] video material = ${material.materialurl}`);
-                // send the video material
-                producer.send(video_topic, material);
-            } else if (material.type.mime && mimetypes.audio.includes(material.type.mime)) {
-                logger.info(`[upload] audio material = ${material.materialurl}`);
+        pg.select({ url: material.materialurl }, 'material_process_pipeline', (error, results) => {
+            if (error) {
+                logger.error('[error] postgresql', {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
+                    }
+                });
+                list.push({ material, errors: ['Error on server side'] });
+                return;
+            }
+            if (results.length) {
+                logger.error('[upload] material already in the processing pipeline',
+                    { url: material.materialurl }
+                );
+                // list the material
+                list.push({ material, errors: [`material at location = ${material.materialurl} already in processing`] });
+                return;
+            }
+            // get material mimetype and decide where to send the material metadata
+            const mimetype = material.type.mime;
+            if (mimetype && mimetypes.video.includes(mimetype)) {
+                pg.insert({ url: material.materialurl }, 'material_process_pipeline', (xerror) => {
+                    if (xerror) {
+                        logger.error('[error] postgresql', {
+                            error: {
+                                message: xerror.message,
+                                stack: xerror.stack
+                            }
+                        });
+                        list.push({ material, errors: ['Error on server side'] });
+                        return;
+                    }
+                    logger.info(`[upload] video material = ${material.materialurl}`);
+                    // send the video material
+                    producer.send(video_topic, material);
+                });
+            } else if (mimetype && mimetypes.audio.includes(mimetype)) {
+                pg.insert({ url: material.materialurl }, 'material_process_pipeline', (xerror) => {
+                    if (xerror) {
+                        logger.error('[error] postgresql', {
+                            error: {
+                                message: xerror.message,
+                                stack: xerror.stack
+                            }
+                        });
+                        list.push({ material, errors: ['Error on server side'] });
+                        return;
+                    }
+                    logger.info(`[upload] audio material = ${material.materialurl}`);
+                    // send the video material
+                    producer.send(video_topic, material);
+                });
                 // send the audio material
                 producer.send(video_topic, material);
-            } else if (material.type.mime && mimetypes.text.includes(material.type.mime)) {
-                logger.info(`[upload] text material = ${material.materialurl}`);
-                // send the text material
-                producer.send(text_topic, material);
+            } else if (mimetype && mimetypes.text.includes(mimetype)) {
+                pg.insert({ url: material.materialurl }, 'material_process_pipeline', (xerror) => {
+                    if (xerror) {
+                        logger.error('[error] postgresql', {
+                            error: {
+                                message: xerror.message,
+                                stack: xerror.stack
+                            }
+                        });
+                        list.push({ material, errors: ['Error on server side'] });
+                        return;
+                    }
+                    logger.info(`[upload] text material = ${material.materialurl}`);
+                    // send the text material
+                    producer.send(text_topic, material);
+                });
             } else {
                 // store the invalid material for the user
                 const messages = ['Material type not supported'];
                 list.push({ material, errors: messages });
             }
-        }
+        });
     }
 
     /**********************************

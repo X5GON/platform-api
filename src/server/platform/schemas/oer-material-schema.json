@@ -50,19 +50,11 @@
             "description": "The date when the OER material was created",
             "type": "string"
         },
-        "provider_metadata": {
-            "description": "The timestamp showing the visit time",
-            "type": "object",
-            "properties": {
-                "title": {
-                    "description": "The title of OER provider",
-                    "type": "string"
-                },
-                "url": {
-                    "description": "The url domain of the OER provider",
-                    "type": "string"
-                }
-            }
+        "provider_token": {
+            "description": "The provider token",
+            "type": "string",
+            "minLength": 6,
+            "maxLength": 6
         },
         "license": {
             "description": "The OER material license",
