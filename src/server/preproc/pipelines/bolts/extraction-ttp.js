@@ -140,12 +140,13 @@ class ExtractionTTP {
                                 Date.now();
 
             this._pg.upsert({
+                url: material.materialurl,
                 config: {
                     ttp_external_id: external_id
                 }
             }, {
                 url: material.materialurl
-            }, 'material_process_pipeline');
+            }, 'material_process_pipeline', () => {});
 
             // create the speakers list
             let speakers;
