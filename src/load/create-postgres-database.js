@@ -1112,7 +1112,43 @@ const dbCreates = {
             IS 'The username of the admin';
 
         COMMENT ON COLUMN ${schema}.admins.password
-            IS 'The password of the admin';`
+            IS 'The password of the admin';`,
+
+    material_process_pipeline:
+        `CREATE TABLE ${schema}.material_process_pipeline (
+            id           serial,
+            url          varchar UNIQUE PRIMARY KEY,
+            config       jsonb,
+            status       varchar NOT NULL DEFAULT 'waiting',
+
+            material_id integer,
+
+            FOREIGN KEY (material_id) REFERENCES ${schema}.oer_materials(id) ON UPDATE CASCADE ON DELETE CASCADE
+        );
+
+        ALTER TABLE ${schema}.material_process_pipeline
+            OWNER TO ${config.pg.user};
+
+        CREATE INDEX material_process_pipeline_url
+            ON ${schema}.material_process_pipeline(url);
+
+        COMMENT ON TABLE ${schema}.material_process_pipeline
+            IS 'The database containing the material process information';
+
+        COMMENT ON COLUMN ${schema}.material_process_pipeline.id
+            IS 'The id of the material process';
+
+        COMMENT ON COLUMN ${schema}.material_process_pipeline.url
+            IS 'The url of the material';
+
+        COMMENT ON COLUMN ${schema}.material_process_pipeline.config
+            IS 'The object containing the process configuration';
+
+        COMMENT ON COLUMN ${schema}.material_process_pipeline.status
+            IS 'The status of the process';
+
+        COMMENT ON COLUMN ${schema}.material_process_pipeline.material_id
+            IS 'The id of the material it processed';`
 
 };
 
@@ -1143,6 +1179,18 @@ const dbUpdates = [{
     update: `
         ALTER TABLE ${schema}.api_keys
         RENAME COLUMN actions TO permissions;
+    `
+}, {
+    version: 3,
+    update: `
+        ALTER TABLE ${schema}.oer_materials_partial
+        ADD COLUMN providertoken varchar;
+    `
+}, {
+    version: 4,
+    update: `
+        ALTER TABLE ${schema}.rec_sys_user_transitions
+        ADD COLUMN updated_at timestamp with time zone DEFAULT (NOW() AT TIME ZONE 'utc') NOT NULL;
     `
 }];
 

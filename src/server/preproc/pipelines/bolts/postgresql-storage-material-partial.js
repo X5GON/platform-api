@@ -46,7 +46,9 @@ class PostgresqlMaterialPartial {
 
         self._pg.upsert(oer_materials_partial, { materialurl: null }, 'oer_materials_partial', (error, result) => {
             if (error) { return callback(error); }
-            return callback();
+            self._pg.update({ status: 'error' }, { url: oer_materials_partial.materialurl }, 'material_process_pipeline', () => {
+                return callback();
+            });
         }); // self._pg.insert(oer_materials_partial)
     }
 }

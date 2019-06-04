@@ -23,6 +23,8 @@ class MaterialFormat {
 
         // get fields to be extracted
         this._fields = config.fields;
+        // create the postgres connection
+        this._pg = require('alias:lib/postgresQL')(config.pg);
 
         // use other fields from config to control your execution
         callback();
@@ -44,8 +46,10 @@ class MaterialFormat {
         for (let field of this._fields) {
             formatMaterial[field.name] = material[field.name] || field.default;
         }
-        // send the formatted material to next component
-        return this._onEmit(formatMaterial, stream_id, callback);
+        return this._pg.update({ status: this._prefix }, { url: formatMaterial.materialurl}, 'material_process_pipeline', () => {
+            // send the formatted material to next component
+            return this._onEmit(formatMaterial, stream_id, callback);
+        });
     }
 }
 

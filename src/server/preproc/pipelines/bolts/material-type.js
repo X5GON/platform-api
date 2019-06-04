@@ -29,6 +29,8 @@ class MaterialFormat {
         this._onEmit = config.onEmit;
         this._prefix = `[MaterialFormat ${this._name}]`;
 
+        // create the postgres connection
+        this._pg = require('alias:lib/postgresQL')(config.pg);
         // use other fields from config to control your execution
         callback();
     }
@@ -48,9 +50,10 @@ class MaterialFormat {
         const materialType = material.type;
 
         if (materialType && materialType.ext && materialType.mime) {
-            // material type was already determined
-            return this._onEmit(material, stream_id, callback);
-
+            return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                // material type was already determined
+                return this._onEmit(material, stream_id, callback);
+            });
         } else if (materialUrl) {
             // get the extension of the material
             const splitUrl = materialUrl.split('.');
@@ -74,12 +77,19 @@ class MaterialFormat {
             } else {
                 // cannot detect the protocol for getting materials
                 material.message = `${this._profix} Cannot detect protocol for getting materials`;
-                return this._onEmit(material, 'stream_partial', callback);
+                return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                    // send the formatted material to next component
+                    return this._onEmit(material, 'stream_partial', callback);
+                });
+
             }
         } else {
             // unable to get the url of the material
             material.message = `${this._prefix} No material url provided`;
-            return this._onEmit(material, 'stream_partial', callback);
+            return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                // send the formatted material to next component
+                return this._onEmit(material, 'stream_partial', callback);
+            });
         }
     }
 
@@ -102,7 +112,10 @@ class MaterialFormat {
         }).on('error', error => {
             // send formated material to the next component
             material.message = `${self._prefix} Error when making an http(s) request= ${error.message}`;
-            return self._onEmit(material, 'stream_partial', callback);
+            return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                // send the formatted material to next component
+                return this._onEmit(material, 'stream_partial', callback);
+            });
         });
     }
 
@@ -119,7 +132,10 @@ class MaterialFormat {
         if (statusCode !== 200) {
             // send formated material to the next component
             material.message = `${this._prefix} Error when making a request, invalid status code= ${statusCode}`;
-            return this._onEmit(material, 'stream_partial', callback);
+            return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                // send the formatted material to next component
+                return this._onEmit(material, 'stream_partial', callback);
+            });
         } else {
             response.on('data', () => {
                 // get the minimum number of bytes to detect type
@@ -128,8 +144,11 @@ class MaterialFormat {
                 response.destroy();
                 // assign the material type
                 material.type = fileTypeResponse(chunk);
-                // send formated material to the next component
-                return this._onEmit(material, stream_id, callback);
+                return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                    // send formated material to the next component
+                    return this._onEmit(material, stream_id, callback);
+                });
+
             });
         }
     }

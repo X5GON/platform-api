@@ -49,6 +49,7 @@ class KafkaConsumer {
 
         // setup the listener
         this.consumerGroup.on('message', (message) => {
+            if (message.value === '') { return; }
             // push the new message to the container
             this._data.push(JSON.parse(message.value));
 

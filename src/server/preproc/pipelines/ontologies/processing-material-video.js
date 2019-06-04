@@ -15,7 +15,7 @@ module.exports = {
             "init": {
                 "kafka_host": config.kafka.host,
                 "topic": "PROCESSING.MATERIAL.VIDEO",
-                "groupId": config.kafka.groupId
+                "groupId": `${config.kafka.groupId}-video`
             }
         }
     ],
@@ -40,8 +40,10 @@ module.exports = {
                     { "name": "datecreated" },
                     { "name": "dateretrieved" },
                     { "name": "materialmetadata", "default": {} },
+                    { "name": "providertoken" },
                     { "name": "license" }
-                ]
+                ],
+                "pg": config.pg
             }
         },
         {
@@ -52,7 +54,9 @@ module.exports = {
             "inputs": [{
                 "source": "material-format",
             }],
-            "init": {}
+            "init": {
+                "pg": config.pg
+            }
         },
         {
             "name": "video-content-extraction",
@@ -64,7 +68,8 @@ module.exports = {
             }],
             "init": {
                 "user": config.preproc.ttp.user,
-                "token": config.preproc.ttp.token
+                "token": config.preproc.ttp.token,
+                "pg": config.pg
             }
         },
         {
@@ -77,7 +82,8 @@ module.exports = {
             }],
             "init": {
                 "userKey": config.preproc.wikifier.userKey,
-                "wikifierUrl": config.preproc.wikifier.wikifierUrl
+                "wikifierUrl": config.preproc.wikifier.wikifierUrl,
+                "pg": config.pg
             }
         },
         {
@@ -88,7 +94,9 @@ module.exports = {
             "inputs": [{
                 "source": "wikification"
             }],
-            "init": {}
+            "init": {
+                "pg": config.pg
+            }
         },
 
         /****************************************

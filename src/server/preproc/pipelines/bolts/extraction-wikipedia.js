@@ -278,7 +278,8 @@ class ExtractionWikipedia {
         this._context = context;
         this._onEmit = config.onEmit;
         this._prefix = `[Wikification ${this._name}]`;
-
+        // create the postgres connection
+        this._pg = require('alias:lib/postgresQL')(config.pg);
         // wikifier request object
         this._wikifier = new Wikification(config.userKey, config.wikifierUrl);
 
@@ -304,7 +305,10 @@ class ExtractionWikipedia {
         if (!text) {
             //send it to the next component in the pipeline
             material.message = `${this._prefix} No text provided.`;
-            return this._onEmit(material, 'stream_partial', callback);
+            return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                // send material to the next component
+                return this._onEmit(material, 'stream_partial', callback);
+            });
         }
 
         // process material text and extract wikipedia concepts
@@ -316,7 +320,10 @@ class ExtractionWikipedia {
             if (!wikipediaConcepts.length) {
                 // no wikipedia concepts extracted - send it to partial material table
                 material.message = `${this._prefix} No wikipedia concepts found`;
-                return this._onEmit(material, 'stream_partial', callback);
+                return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                    // send material to the next component
+                    return this._onEmit(material, 'stream_partial', callback);
+                });
             }
 
             // store merged concepts within the material object
@@ -326,13 +333,18 @@ class ExtractionWikipedia {
                 material.language = language;
             }
 
-            //send it to the next component in the pipeline
-            return this._onEmit(material, stream_id, callback);
+            return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                //send it to the next component in the pipeline
+                return this._onEmit(material, stream_id, callback);
+            });
 
         }).catch(error => {
             // there was an error - send the material to partial table
             material.message = `${this._prefix} ${error.message}`;
-            return this._onEmit(material, 'stream_partial', callback);
+            return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                // send material to the next component
+                return this._onEmit(material, 'stream_partial', callback);
+            });
         });
     }
 }

@@ -65,7 +65,11 @@
             {{#each providers as |provider|}}
               <tr id="{{provider.id}}" data-provider-head="{{provider.id}}">
                 <td class="align-middle">
-                  <b class="doc">{{provider.name}}</b>
+                  <a href="/oer_provider?providerId={{provider.token}}">
+                    <b class="doc">
+                      {{provider.name}}
+                    </b>
+                  </a>
                 </td>
                 <td class="align-middle">
                   <a href="{{provider.domain}}" target="_blank">
@@ -96,4 +100,3 @@
 </div>{{! .container }}
 
 <script src="/js/admin-api-keys-actions.js"></script>
-

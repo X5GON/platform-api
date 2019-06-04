@@ -15,7 +15,7 @@ module.exports = {
             "init": {
                 "kafka_host": config.kafka.host,
                 "topic": "PROCESSING.MATERIAL.TEXT",
-                "groupId": config.kafka.groupId
+                "groupId": `${config.kafka.groupId}-text`
             }
         }
     ],
@@ -40,8 +40,10 @@ module.exports = {
                     { "name": "datecreated" },
                     { "name": "dateretrieved" },
                     { "name": "materialmetadata", "default": {} },
+                    { "name": "providertoken" },
                     { "name": "license" }
-                ]
+                ],
+                "pg": config.pg
             }
         },
         {
@@ -52,7 +54,9 @@ module.exports = {
             "inputs": [{
                 "source": "material-format",
             }],
-            "init": {}
+            "init": {
+                "pg": config.pg
+            }
         },
         {
             "name": "text-content-extraction",
@@ -66,7 +70,8 @@ module.exports = {
                 "text_config": {
                     "preserveLineBreaks": true,
                     "includeAltText": true
-                }
+                },
+                "pg": config.pg
             }
         },
         {
@@ -80,6 +85,7 @@ module.exports = {
             "init": {
                 "userKey": config.preproc.wikifier.userKey,
                 "wikifierUrl": config.preproc.wikifier.wikifierUrl,
+                "pg": config.pg
             }
         },
         {
@@ -90,7 +96,9 @@ module.exports = {
             "inputs": [{
                 "source": "wikification",
             }],
-            "init": {}
+            "init": {
+                "pg": config.pg
+            }
         },
 
         /****************************************

@@ -53,6 +53,7 @@ class KafkaMaterialComplete {
             dateretrieved,
             type,
             materialmetadata,
+            providertoken: provider_token,
             license
         } = material;
 
@@ -160,7 +161,8 @@ class KafkaMaterialComplete {
             urls: {
                 provider_uri,
                 material_url
-            }
+            },
+            provider_token
         };
         // send the message to the database topics
         this._producer.send(this._kafka_topic, message, function (error) {

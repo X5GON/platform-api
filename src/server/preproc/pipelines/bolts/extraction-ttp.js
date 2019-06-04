@@ -55,6 +55,8 @@ class ExtractionTTP {
         this._timeout = config.timeout;
         this._setTimeout = null;
 
+        // create the postgres connection
+        this._pg = require('alias:lib/postgresQL')(config.pg);
         // use other fields from config to control your execution
         callback();
     }
@@ -137,6 +139,13 @@ class ExtractionTTP {
                                 Math.random().toString(36).substring(2, 15) +
                                 Date.now();
 
+            this._pg.upsert({
+                config: {
+                    ttp_external_id: external_id
+                }
+            }, {
+                url: material.materialurl
+            }, 'material_process_pipeline');
 
             // create the speakers list
             let speakers;
@@ -317,19 +326,29 @@ class ExtractionTTP {
                 material.materialmetadata.rawText        = rawText;
                 material.materialmetadata.transcriptions = transcriptions;
 
-                // send material to the next component
-                return self._onEmit(material, stream_id, callback);
+                return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                    // send material to the next component
+                    return self._onEmit(material, stream_id, callback);
+                });
+
 
             }).catch(e => {
                 // log error message and store the not completed material
                 material.message = `${self._prefix} ${e.message}`;
-                return self._onEmit(material, 'stream_partial', callback);
+                return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                    // send material to the next component
+                    return self._onEmit(material, 'stream_partial', callback);
+                });
+
             });
 
         } else {
             // log the unsupported TTP language
             material.message = `${self._prefix} Not TTP supported language=${material.language}.`;
-            return self._onEmit(material, 'stream_partial', callback);
+            return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                // send material to the next component
+                return self._onEmit(material, 'stream_partial', callback);
+            });
         }
     }
 }
