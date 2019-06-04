@@ -23,5 +23,6 @@ services:
         STORING.RECSYS.SELECTIONS:3:1
         STORING.USERACTIVITY.VISIT:3:1
         STORING.USERACTIVITY.VIDEO:3:1
+        STORING.PROVIDERS:2:1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

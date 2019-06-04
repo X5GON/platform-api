@@ -2,6 +2,9 @@
 const router = require('express').Router();
 const request = require('request');
 
+// internal modules
+const KafkaProducer = require('alias:lib/kafka-producer');
+
 /**
  * @description Adds API routes for platform website requests.
  * @param {Object} pg - Postgres connection wrapper.
@@ -13,6 +16,9 @@ module.exports = function (pg, logger, config) {
     // Helper functions
     ////////////////////////////////////////
 
+    // initialize kafka producer
+    const producer = new KafkaProducer(config.kafka.host);
+
     /**
      * @description Generates a token for the seed string.
      * @param {String} seed - The seed string used to generate token.
@@ -20,7 +26,7 @@ module.exports = function (pg, logger, config) {
      */
     function _generateToken(seed) {
         let token = 0;
-        if (seed.length === 0) return hash;
+        if (seed.length === 0) return seed;
         // convert the string into a hash
         for (let i = 0; i < seed.length; i++) {
             let char = seed.charCodeAt(i);
@@ -216,7 +222,8 @@ module.exports = function (pg, logger, config) {
                                 // redirect user to previous page
                                 return res.redirect(`${referrer}?unsuccessful=true`);
                             }
-
+                            // redirect activity to information retrievers
+                            producer.send('STORING.PROVIDERS', { name, domain, contact, token });
                             // render the form submition
                             return res.redirect(`/oer_provider?name=${name}&providerId=${token}`);
                         });
