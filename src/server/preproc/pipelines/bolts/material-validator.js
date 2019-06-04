@@ -121,6 +121,8 @@ class MaterialValidator {
         this._context = context;
         this._onEmit = config.onEmit;
         this._prefix = `[MaterialValidator ${this._name}]`;
+        // create the postgres connection
+        this._pg = require('alias:lib/postgresQL')(config.pg);
 
         // initialize validator with
         this._validator = require('alias:lib/schema-validator')();
@@ -143,8 +145,11 @@ class MaterialValidator {
         const validation = this._validator.validateSchema(material, materialSchema);
         const stream_direction = validation.matching ? stream_id : 'stream_partial';
 
-        // send material to the next component
-        return this._onEmit(material, stream_direction, callback);
+        return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+            // send material to the next component
+            return this._onEmit(material, stream_direction, callback);
+        });
+
 
 
 

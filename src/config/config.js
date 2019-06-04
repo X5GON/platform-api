@@ -24,7 +24,8 @@ const common = {
             {
                 name: "Videolectures.NET",
                 domain: "http://videolectures.net/",
-                script: "api-videolectures.js",
+                script: "api-videolectures",
+                token: process.env.TOKEN_VIDEOLECTURES,
                 config: {
                     apikey: process.env.RETRIEVERS_VL_APIKEY
                 }

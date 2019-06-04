@@ -47,6 +47,10 @@ class Logger {
      * @private
      */
     _transportCreator(fileName, folderPath, level) {
+        if (!fileName) {
+            throw Error(`Parameter 'fileName' not provided`);
+        }
+
         // create daily transport
         let transport = new (transports.DailyRotateFile)({
             filename: fileName,
@@ -152,6 +156,7 @@ class Logger {
         // add console logging transport to the instance
         if (consoleFlag) {
             logger_transports.push(new transports.Console({
+                level,
                 format: format.combine(
                     format.colorize(),
                     format.simple(),

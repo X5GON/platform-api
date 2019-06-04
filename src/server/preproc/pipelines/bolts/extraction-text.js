@@ -36,7 +36,8 @@ class ExtractionText {
 
         // configuration for textract
         this.textConfig = config.text_config;
-
+        // create the postgres connection
+        this._pg = require('alias:lib/postgresQL')(config.pg);
         // use other fields from config to control your execution
         callback();
     }
@@ -61,13 +62,18 @@ class ExtractionText {
                 }
                 // save the raw text within the metadata
                 material.materialmetadata.rawText = text;
-                // send material object to next component
-                return this._onEmit(material, stream_id, callback);
+                return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                    // send material object to next component
+                    return this._onEmit(material, stream_id, callback);
+                });
             });
         } else {
             // send the material to the partial table
             material.message = `${this._prefix} Material does not have type provided.`;
-            return this._onEmit(material, 'stream_partial', callback);
+            return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
+                // send material to the next component
+                return self._onEmit(material, 'stream_partial', callback);
+            });
         }
     }
 }

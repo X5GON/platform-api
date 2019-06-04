@@ -1,7 +1,7 @@
 {
     "apps": [{
         "name": "PROCESSING_MATERIAL_COLLECTOR",
-        "script": "collector.js",
+        "script": "material-collector.js",
         "cwd": ".",
         "env": {
             "NODE_ENV": "dev"

@@ -1,5 +1,6 @@
 // external modules
 const rp = require('request-promise-native');
+const mime = require('mime-types');
 
 class BasicRESTAPI {
 
@@ -7,19 +8,17 @@ class BasicRESTAPI {
      * Initializes the API Basic class.
      * @param {Object} [args] - The constructor parameters.
      * @param {Boolean} [args.enabled=false] - If crawling is enabled for the crawling.
-     * @param {Object|null} [args.interval=null] - The crawling interval object.
-     * @param {Number} [args.frequency=Infinity] - The crawling frequency.
      *
      */
     constructor(args = {}) {
         // set crawling status variables
         this._enabled = args.enabled || false;
-        this._interval = args.interval || null;
-        this._frequency = args.frequency || Infinity;
         // how to process the materials
         this._processCb = args.callback || null;
         // the postgresql object
         this._pg = args.pg || null;
+        // the retriever associated token
+        this._token = args.token || null;
     }
 
     start() {
@@ -53,6 +52,24 @@ class BasicRESTAPI {
     post(url, body) {
         // send a request to the API to get the material
         return rp({ method: 'POST', url, body, json: true });
+    }
+
+    /**
+     * Gets the mimetype using the material URL.
+     * @param {String} url - The url to the material.
+     * @returns {String} The material mimetype.
+     */
+    mimetype(url) {
+        return mime.lookup(url);
+    }
+
+    /**
+     * Gets the extension using the material mimetype.
+     * @param {String} mimetype - The material mimetype.
+     * @returns {String} The material extension.
+     */
+    extension(mimetype) {
+        return mime.extension(mimetype);
     }
 }
 // exports the BasicRESTAPI class

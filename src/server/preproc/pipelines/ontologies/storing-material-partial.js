@@ -15,7 +15,7 @@ module.exports = {
             "init": {
                 "kafka_host": config.kafka.host,
                 "topic": "STORING.MATERIAL.PARTIAL",
-                "groupId": config.kafka.groupId
+                "groupId": `${config.kafka.groupId}-material-partial`
             }
         }
     ],

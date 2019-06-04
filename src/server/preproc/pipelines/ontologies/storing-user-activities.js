@@ -15,7 +15,7 @@ module.exports = {
             "init": {
                 "kafka_host": config.kafka.host,
                 "topic": "STORING.USERACTIVITY.VISIT",
-                "groupId": config.kafka.groupId
+                "groupId": `${config.kafka.groupId}-user-activity-visit`
             }
         },
         {
@@ -26,7 +26,7 @@ module.exports = {
             "init": {
                 "kafka_host": config.kafka.host,
                 "topic": "STORING.USERACTIVITY.VIDEO",
-                "groupId": config.kafka.groupId
+                "groupId": `${config.kafka.groupId}-user-activity-video`
             }
         }
     ],
