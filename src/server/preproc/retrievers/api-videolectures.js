@@ -74,13 +74,12 @@ class VideolecturesAPI extends BasicRESTAPI {
                     for (let file of attachments.attachments) {
                         const display = file.type_display;
                         if (display && (display.includes('Slide Presentation') || display.includes('generic video source'))) {
-                            const oer_material = this._prepareMaterial({ materials, file });
+                            const oer_material = this._prepareMaterial({ materials, file, part: attachments.part });
                             // check if the material is already in the database
                             oer_materials.push(new Promise((resolve, reject) => {
 
                                 self._pg.select({ url: oer_material.materialurl }, 'material_process_pipeline', (xerror, results) => {
                                     if (xerror) { return reject(xerror); }
-
                                     if (results.length === 0) {
                                         // the material is not in the database yet
                                         return resolve(oer_material);
@@ -89,6 +88,7 @@ class VideolecturesAPI extends BasicRESTAPI {
                                         return resolve(null);
                                     }
                                 });
+
                             }));
                         }
 
@@ -159,7 +159,8 @@ class VideolecturesAPI extends BasicRESTAPI {
                 src,
                 ext,
                 mimetype
-            }
+            },
+            part
         } = params;
 
         // fix mimetype and extension if required
@@ -178,6 +179,12 @@ class VideolecturesAPI extends BasicRESTAPI {
             datecreated: time,
             dateretrieved: (new Date()).toISOString(),
             providertoken: this._token,
+            materialmetadata: {
+                providerspecific: {
+                    slug,
+                    part
+                }
+            },
             license: 'Creative Commons BY-NC-ND 3.0'
         };
     }

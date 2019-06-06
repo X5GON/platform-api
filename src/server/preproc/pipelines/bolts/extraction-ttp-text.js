@@ -14,7 +14,7 @@ const rp = require('request-promise-native');
  * provided videos. Supported languages are: english, spanish,
  * german, and slovene.
  */
-class ExtractionTTP {
+class ExtractionTTPText {
 
     constructor() {
         this._name = null;
@@ -26,7 +26,7 @@ class ExtractionTTP {
         this._name = name;
         this._context = context;
         this._onEmit = config.onEmit;
-        this._prefix = `[ExtractionTTP ${this._name}]`;
+        this._prefix = `[ExtractionTTPText ${this._name}]`;
 
         // the user and authentication token used for the requests
         this._options = {
@@ -139,15 +139,6 @@ class ExtractionTTP {
                                 Math.random().toString(36).substring(2, 15) +
                                 Date.now();
 
-            this._pg.upsert({
-                url: material.materialurl,
-                config: {
-                    ttp_external_id: external_id
-                }
-            }, {
-                url: material.materialurl
-            }, 'material_process_pipeline', () => {});
-
             // create the speakers list
             let speakers;
             if (material.author && typeof material.author === 'string') {
@@ -188,8 +179,7 @@ class ExtractionTTP {
                     // if the language is not the material language or english
                     if (language !== 'en' && language !== material.language) {
                         // set the translation path for the given language
-                        delete requested_langs[language].sub;
-                        requested_langs[language].tlpath = [
+                        requested_langs[language].sub.tlpath = [
                             { 'l': 'en' },
                             { 'l': language }
                         ];
@@ -218,6 +208,16 @@ class ExtractionTTP {
             // store the allowed languages and formats
             const languages = Object.keys(self._languages);
             const formats = Object.keys(self._formats);
+
+            // save the configurations
+            this._pg.upsert({
+                url: material.materialurl,
+                config: {
+                    ttp_manifest: options
+                }
+            }, {
+                url: material.materialurl
+            }, 'material_process_pipeline', () => {});
 
             ///////////////////////////////////////////////
             // Start the TTP process
@@ -282,7 +282,6 @@ class ExtractionTTP {
                 // prepare placeholders for material metadata
                 let transcriptions = { };
                 let rawText;
-                let dfxp;
 
                 // iterate through all responses
                 for (let langId = 0; langId < languages.length; langId++) {
@@ -318,7 +317,6 @@ class ExtractionTTP {
                         if (lang === material.language) {
                             // set default transcriptions for the material
                             rawText = transcription.plain;
-                            dfxp = transcription.dfxp;
                         }
                     }
                 }
@@ -355,5 +353,5 @@ class ExtractionTTP {
 }
 
 exports.create = function (context) {
-    return new ExtractionTTP(context);
+    return new ExtractionTTPText(context);
 };

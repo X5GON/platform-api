@@ -259,6 +259,7 @@ class MaterialCollector {
                         });
                         return;
                     }
+                    logger.info(`[upload] video material = ${material.materialurl}`);
                     // send the video material
                     self._producer.send(self._video_topic, material);
                 });
@@ -273,6 +274,7 @@ class MaterialCollector {
                         });
                         return;
                     }
+                    logger.info(`[upload] audio material = ${material.materialurl}`);
                     // send the audio material - processed the same way as video
                     self._producer.send(self._video_topic, material);
                 });

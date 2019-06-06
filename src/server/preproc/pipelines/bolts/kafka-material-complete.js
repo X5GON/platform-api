@@ -41,7 +41,7 @@ class KafkaMaterialComplete {
 
     receive(material, stream_id, callback) {
 
-        // TODO: split the material into pieces and send the data in the correct order
+        // split the material into pieces and send the data in the correct order
         const {
             title,
             description,
@@ -105,11 +105,16 @@ class KafkaMaterialComplete {
                         'transcription' :
                         'translation';
 
+                    const provider_specific = materialmetadata.providerspecific;
+
                     material_contents.push({
                         language,
                         type,
                         extension,
-                        value: { value },
+                        value: {
+                            value,
+                            ...(provider_specific && { provider_specific }),
+                        },
                         material_id: null
                     });
                 }

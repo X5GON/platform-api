@@ -62,7 +62,7 @@ module.exports = {
             "name": "video-content-extraction",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "extraction-ttp.js",
+            "cmd": "extraction-ttp-text.js",
             "inputs": [{
                 "source": "material-type"
             }],
