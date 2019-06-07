@@ -99,7 +99,9 @@ and process it accordingly. The two types that are currently supported are:
 - video/audio
 
 Figure 1 shows the material processing pipeline architecture.
+
 ![preprocessing pipeline](../../../readme/kafka-pipeline.png)
+
 *Figure 1:* The material processing pipeline architecture. It shows how we acquire
 materials via different APIs and send them to the appropriate pipeline based on the
 material's type.
