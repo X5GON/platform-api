@@ -24,6 +24,63 @@ text extraction of most of text files. For some file types additional libraries 
 
 It is required to have a running kafka container before running the processing pipeline. How to do this is described in the project index [README](../../../README.md).
 
+## Running Material Processing Pipeline Components
+
+The material processing pipeline is structured of multiple components.
+
+### Material Collector
+
+```bash
+# start the material collector process
+node ./material-collector.js
+```
+
+```bash
+# start the material collector process with node process manager
+pm2 start ecosystem.collecting.config.json
+```
+
+### Material Processing Components
+
+```bash
+cd pipelines
+# start the text material processing pipeline
+TOPOLOGY=processing-material-text node ./pipeline.js
+
+# start the video and audio processing pipeline
+TOPOLOGY=processing-material-video node ./pipeline.js
+```
+```bash
+# start all processing components with node process manager
+pm2 start ecosystem.processing.config.json
+```
+
+### Material and Other Data Storing Components
+
+```bash
+cd pipelines
+# start the complete material storing process
+TOPOLOGY=storing-material-complete ./pipeline.js
+
+# start the partial material storing process
+TOPOLOGY=storing-material-partial ./pipeline.js
+
+# start the user activities storing process
+TOPOLOGY=storing-user-activities ./pipeline.js
+
+# start the recommender system transitions storing process
+TOPOLOGY=storing-recsys-transitions ./pipeline.js
+
+# start the OER provider storing process
+TOPOLOGY=storing-providers ./pipeline.js
+```
+
+```bash
+# start all storing components with node process manager
+pm2 start ecosystem.storing.config.json
+```
+
+
 ## Folder Structure
 
 The folder structure is as follows:
@@ -42,9 +99,9 @@ and process it accordingly. The two types that are currently supported are:
 - video/audio
 
 Figure 1 shows the material processing pipeline architecture.
-![preprocessing pipeline](readme-imgs/kafka-pipeline.png)
+![preprocessing pipeline](../../../readme/kafka-pipeline.png)
 *Figure 1:* The material processing pipeline architecture. It shows how we acquire
-materials via different APIs and send it to the appropriate pipeline based on the
+materials via different APIs and send them to the appropriate pipeline based on the
 material's type.
 
 ### Pipeline Components
@@ -56,7 +113,7 @@ Each pipeline contains the following components:
     based on the material type:
     - **Text.** We use *textract*, a Nodejs library that is able to extract raw
         text from the text material.
-    - **Video/Audio.** We use the *Transcription and Translation Platform* (TTP)
+    - **Video/Audio.** We use the *Transcription and Translation Platform* ([TTP](https://ttp.mllp.upv.es/index.php?page=faq))
         which automatically generates transcriptions (subtitles) and translates
         the video content.
 

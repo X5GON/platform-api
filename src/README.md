@@ -5,11 +5,11 @@ pipeline and the recommendation engine. The folder structure is as follows:
 
 | folder name | description |
 | ----------- | ----------- |
-| `config`    | This folder contains the configurations that are common to all of the components. Since this data is private the folder needs to be created by the developer and populated with the configuration files. Examples of the configurations are found bellow.|
-| `lib`       | The folder containing modules common to all of the components. |
-| `load`      | Scripts used to load data into databases are located here. |
-| `server`    | The folder containing the source code for the platform, preprocessing pipeline and recommendation engine. |
-| `test`      | Test scripts for ensuring stable code. |
+| config      | This folder contains the configurations that are common to all of the components. Since this data is private the folder needs to be created by the developer and populated with the configuration files. Examples of the configurations are found bellow.|
+| lib         | The folder containing modules common to all of the components. |
+| load        | Scripts used to load data into databases are located here. |
+| server      | The folder containing the source code for the platform, preprocessing pipeline and recommendation engine. |
+| test        | Test scripts for ensuring stable code. |
 
 
 ## Config Folder
