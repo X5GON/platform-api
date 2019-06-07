@@ -250,11 +250,11 @@ class MaterialCollector {
             // get material mimetype and decide where to send the material metadata
             const mimetype = material.type.mime;
             if (mimetype && mimetypes.video.includes(mimetype)) {
-                return self._sendToKafka(material, self._video_topic, 'video');
+                self._sendToKafka(material, self._video_topic, 'video');
             } else if (mimetype && mimetypes.audio.includes(mimetype)) {
-                return self._sendToKafka(material, self._video_topic, 'audio');
+                self._sendToKafka(material, self._video_topic, 'audio');
             } else if (mimetype && mimetypes.text.includes(mimetype)) {
-                return self._sendToKafka(material, self._text_topic, 'text');
+                self._sendToKafka(material, self._text_topic, 'text');
             } else {
                 logger.warn('[Retriever] material mimetype not recognized', {
                     mimetype
