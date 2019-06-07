@@ -1,3 +1,10 @@
+/************************************************
+ * Kafka Producer Module
+ * This module creates a kafka producer which
+ * can create new messages and send them to 
+ * the assigned kafka topic.
+ */
+
 // external modules
 const k = require('kafka-node');
 
@@ -6,6 +13,10 @@ const k = require('kafka-node');
  */
 class KafkaProducer {
 
+    /**
+     * Initializes a kafka producer.
+     * @param {String} host - The kafka host in the form of ip:port (Example: 127.0.0.1:9092).
+     */
     constructor(host) {
         let self = this;
 
@@ -32,7 +43,7 @@ class KafkaProducer {
                     // update the messages array
                     self._messages = self._messages.slice(1);
                     // send the message to the corresponsing topic
-                    self._producer.send([message], (xerror, data) => {
+                    self._producer.send([message], (xerror) => {
                         if (xerror) { console.log(xerror); }
                     });
                 }
@@ -45,6 +56,8 @@ class KafkaProducer {
      * Sends the message to the appropriate topic.
      * @param {String} topic - The topic where the message is sent.
      * @param {Object} msg - The message.
+     * @param {Function} [cb] - The callback triggered after 
+     * the message was sent to the kafka topic.
      */
     send(topic, msg, cb) {
         let self = this;
@@ -60,7 +73,7 @@ class KafkaProducer {
         if (self._ready) {
             // the producer is ready to send the messages
             const payload = [{ topic, messages, attributes: 1 }];
-            self._producer.send(payload, (xerror, data) => {
+            self._producer.send(payload, (xerror) => {
                 if (xerror) { return callback(xerror); }
                 return callback(null);
             });

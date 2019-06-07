@@ -1,19 +1,27 @@
 /************************************************
- * This class contains functions for monitoring
- * processes using the pm2 API plugin
+ * Node Process Monitor Module
+ * This module access the node processes that 
+ * are running using the pm2 API plugin
  * [http://pm2.keymetrics.io/docs/usage/pm2-api/].
  */
 
-function msToTime(s) {
-    let ms = s % 1000;
-    s = (s - ms) / 1000;
-    let secs = s % 60;
-    s = (s - secs) / 60;
-    let mins = s % 60;
-    s = (s - mins) / 60;
-    let hrs = s % 24;
-    s = (s - hrs) / 24;
-    let days = s;
+
+/**
+ * Takes the number of milliseconds and converts them
+ * into human readable format (days hours minutes seconds).
+ * @param {Number} mSeconds - Number of milliseconds.
+ * @returns {String} The human readable format.
+ */
+function msToTime(mSeconds) {
+    let ms = mSeconds % 1000;
+    mSeconds = (mSeconds - ms) / 1000;
+    let secs = mSeconds % 60;
+    mSeconds = (mSeconds - secs) / 60;
+    let mins = mSeconds % 60;
+    mSeconds = (mSeconds - mins) / 60;
+    let hrs = mSeconds % 24;
+    mSeconds = (mSeconds - hrs) / 24;
+    let days = mSeconds;
 
     // construct string with given values
     let time = [];
@@ -21,14 +29,14 @@ function msToTime(s) {
     if (hrs)  { time.push(`${hrs}h`); }
     if (mins) { time.push(`${mins}min`); }
     if (secs) { time.push(`${secs}s`); }
-
+    // return the human readable format
     return time.join(' ');
 }
 
 class Monitor {
 
     /**
-     * Initialize the PM2Monitor instance. It connects to or
+     * Initialize the Monitor instance. It connects to or
      * creates a pm2 deamon and retrieves a list of processes
      * currently running in the deamon.
      */
@@ -39,7 +47,7 @@ class Monitor {
             this._connected = false;
             this._processList = [];
             // create new/connect to the pm2 deamon
-            this.pm2.connect((error, response) => {
+            this.pm2.connect((error) => {
                 if (error) { console.log(error); return; }
                 self._connected = true;
                 // retrieve the list or running processes

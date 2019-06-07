@@ -1,7 +1,10 @@
 /************************************************
- * Winston Logger with Winston daily rotate file
- * This script contains the definition of the
- * logger
+ * Winston Logger with 
+ * Winston Daily Rotate File Module
+ * This module creates a logger which is able
+ * to log activities and rotate them by day. In
+ * addition, the log files are compressed after 
+ * a while.
  */
 
 // module for path creation

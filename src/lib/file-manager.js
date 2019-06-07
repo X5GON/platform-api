@@ -1,3 +1,9 @@
+/************************************************
+ * File Manager Module
+ * This module contains methods for manipulating 
+ * with files and folders.
+ */
+
 // internal modules
 const fs = require('fs');
 const path = require('path');
