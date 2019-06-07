@@ -76,26 +76,26 @@ module.exports = {
                 "pg": config.pg
             }
         },
-        {
-            "name": "text-content-translation",
-            "type": "inproc",
-            "working_dir": "./bolts",
-            "cmd": "extraction-ttp-text.js",
-            "inputs": [{
-                "source": "text-content-extraction",
-            }],
-            "init": {
-                "tmp_folder": path.join(__dirname + '../../../tmp'),
-                "pg": config.pg
-            }
-        },
+        // {
+        //     "name": "text-content-translation",
+        //     "type": "inproc",
+        //     "working_dir": "./bolts",
+        //     "cmd": "extraction-ttp-text.js",
+        //     "inputs": [{
+        //         "source": "text-content-extraction",
+        //     }],
+        //     "init": {
+        //         "tmp_folder": path.join(__dirname + '../../../tmp'),
+        //         "pg": config.pg
+        //     }
+        // },
         {
             "name": "wikification",
             "type": "inproc",
             "working_dir": "./bolts",
             "cmd": "extraction-wikipedia.js",
             "inputs": [{
-                "source": "text-content-translation",
+                "source": "text-content-extraction",
             }],
             "init": {
                 "userKey": config.preproc.wikifier.userKey,
