@@ -1,8 +1,12 @@
-// external modules
-const path = require('path');
+/************************************************
+ * Project Configurations
+ */
 
 // import configured node variables
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+
+// external modules
+const path = require('path');
 
 // get process environment
 const env = process.env.NODE_ENV || 'dev';

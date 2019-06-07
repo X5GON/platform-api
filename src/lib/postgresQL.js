@@ -1,3 +1,9 @@
+/************************************************
+ * PostgresQL Module
+ * This module connect to the PostgresQL database
+ * and allows execution of simple commands.
+ */
+
 // external libraries
 const { Pool } = require('pg');
 const Cursor = require('pg-cursor');
@@ -541,8 +547,6 @@ class PostgreSQL {
             return callback(null, results);
         });
     }
-
-
 
 }
 

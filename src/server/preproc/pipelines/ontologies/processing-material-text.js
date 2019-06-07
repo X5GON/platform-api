@@ -1,3 +1,5 @@
+// module for path creation
+const path = require('path');
 // configurations
 const config = require('alias:config/config');
 
@@ -74,6 +76,19 @@ module.exports = {
                 "pg": config.pg
             }
         },
+        // {
+        //     "name": "text-content-translation",
+        //     "type": "inproc",
+        //     "working_dir": "./bolts",
+        //     "cmd": "extraction-ttp-text.js",
+        //     "inputs": [{
+        //         "source": "text-content-extraction",
+        //     }],
+        //     "init": {
+        //         "tmp_folder": path.join(__dirname + '../../../tmp'),
+        //         "pg": config.pg
+        //     }
+        // },
         {
             "name": "wikification",
             "type": "inproc",

@@ -1,3 +1,9 @@
+/************************************************
+ * Material Preparation Module
+ * This module prepares OER materials that were
+ * sent via different LMS plugins.
+ */
+
 // file type detection/extraction libraries
 const fileTypeManual = require('mime-types');
 

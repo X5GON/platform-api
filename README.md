@@ -6,7 +6,7 @@ The X5GON project stands for easily implemented freely available innovative tech
 will converge currently scattered Open Educational Resources (OER) available in various modalities
 across Europe and the globe.
 
-![preprocessing pipeline](readme-imgs/platform.png)
+![preprocessing pipeline](readme/platform.png)
 
 This repository contains the technology that will realize the vision set within the X5GON project.
 All of the source code is found in the `src` folder. The folder is structured such that files with
@@ -80,7 +80,7 @@ To start the platform run the following command:
 
 ```bash
 npm run start:platform
-# or with node process messenger
+# or with node process manager
 pm2 start ecosystem.platform.config.json
 ```
 
@@ -92,6 +92,6 @@ To start the recommender engine component run the following command:
 
 ```bash
 npm run start:recsys
-# or with node process messenger
+# or with node process manager
 pm2 start ecosystem.recsys.config.json
 ```

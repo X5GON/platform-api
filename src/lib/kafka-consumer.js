@@ -1,8 +1,8 @@
 /************************************************
- * Kafka Consumer Spout
- * This component is listening to a Kafka topic
- * and then sends the message forward to the next
- * component in the topology.
+ * Kafka Consumer Module
+ * This module creates a kafka consumer which
+ * can be used to listen on a particular kafka
+ * topic and receive its messages.
  */
 
 // external modules
