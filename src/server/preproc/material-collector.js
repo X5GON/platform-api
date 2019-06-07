@@ -214,7 +214,8 @@ class MaterialCollector {
                 if (log.provider === api.token) {
                     logger.info('[Retriever] process next log with retriever', {
                         retrieverName: api.name,
-                        retrieverDomain: api.domain
+                        retrieverDomain: api.domain,
+                        materialUrl: log.url
                     });
                     // if retriever is present get the material
                     return api.retriever.getMaterial(log.url, self._sendMaterials.bind(self));
@@ -249,50 +250,11 @@ class MaterialCollector {
             // get material mimetype and decide where to send the material metadata
             const mimetype = material.type.mime;
             if (mimetype && mimetypes.video.includes(mimetype)) {
-                this._pg.insert({ url: material.materialurl }, 'material_process_pipeline', (xerror) => {
-                    if (xerror) {
-                        logger.error('[error] postgresql', {
-                            error: {
-                                message: xerror.message,
-                                stack: xerror.stack
-                            }
-                        });
-                        return;
-                    }
-                    logger.info(`[upload] video material = ${material.materialurl}`);
-                    // send the video material
-                    self._producer.send(self._video_topic, material);
-                });
+                return this._sentToKafka(material, self._video_topic, 'video');
             } else if (mimetype && mimetypes.audio.includes(mimetype)) {
-                this._pg.insert({ url: material.materialurl }, 'material_process_pipeline', (xerror) => {
-                    if (xerror) {
-                        logger.error('[error] postgresql', {
-                            error: {
-                                message: xerror.message,
-                                stack: xerror.stack
-                            }
-                        });
-                        return;
-                    }
-                    logger.info(`[upload] audio material = ${material.materialurl}`);
-                    // send the audio material - processed the same way as video
-                    self._producer.send(self._video_topic, material);
-                });
+                return this._sentToKafka(material, self._video_topic, 'audio');
             } else if (mimetype && mimetypes.text.includes(mimetype)) {
-                this._pg.insert({ url: material.materialurl }, 'material_process_pipeline', (xerror) => {
-                    if (xerror) {
-                        logger.error('[error] postgresql', {
-                            error: {
-                                message: xerror.message,
-                                stack: xerror.stack
-                            }
-                        });
-                        return;
-                    }
-                    logger.info(`[upload] text material = ${material.materialurl}`);
-                    // send the text material
-                    self._producer.send(self._text_topic, material);
-                });
+                return this._sentToKafka(material, self._text_topic, 'text');
             } else {
                 logger.warn('[Retriever] material mimetype not recognized', {
                     mimetype
@@ -300,6 +262,35 @@ class MaterialCollector {
             }
         }
     }
+
+
+    /**
+     * Sends the material to the appropriate kafka topic.
+     * @param {Object} material - The material object.
+     * @param {String} topic - The kafka topic to send the material.
+     * @param {String} type - The material type.
+     */
+    _sentToKafka(material, topic, type) {
+        // insert to postgres process pipeline
+        this._pg.insert({ url: material.materialurl }, 'material_process_pipeline', (xerror) => {
+            if (xerror) {
+                logger.error('[error] postgresql', {
+                    error: {
+                        message: xerror.message,
+                        stack: xerror.stack
+                    }
+                });
+                return;
+            }
+            logger.info(`[upload] ${type} material = ${material.materialurl}`);
+            // send the video material
+            self._producer.send(topic, material);
+        });
+
+
+    }
+
+
 }
 
 ///////////////////////////////////////////////////////
