@@ -303,7 +303,7 @@ const collector = new MaterialCollector(config);
 
 // set interval to check for new log after every
 // secord - until the script is manually stopped
-setInterval(() => { collector.processNext(); }, 1000);
+setInterval(() => { collector.processNext(); }, 100);
 
 /**
  * Gracefully shuts down the collector object.
