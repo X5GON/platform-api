@@ -76,6 +76,7 @@ module.exports = {
                 "pg": config.pg
             }
         },
+        // TODO: add text translation once finished
         // {
         //     "name": "text-content-translation",
         //     "type": "inproc",

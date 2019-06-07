@@ -167,7 +167,7 @@ class ExtractionTTPVideo {
             }
 
             // create the requested langs object
-            let requested_langs = self._languages;
+            let requested_langs = Object.assign({}, self._languages);
             const constructedLanguages = Object.keys(requested_langs)
                                 .filter(lang => lang !== 'en');
 
