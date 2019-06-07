@@ -46,7 +46,7 @@ class MaterialFormat {
         for (let field of this._fields) {
             formatMaterial[field.name] = material[field.name] || field.default;
         }
-        return this._changeStatus(material, stream_id, callback);
+        return this._changeStatus(formatMaterial, stream_id, callback);
     }
 
     /**
