@@ -145,14 +145,25 @@ class MaterialValidator {
         const validation = this._validator.validateSchema(material, materialSchema);
         const stream_direction = validation.matching ? stream_id : 'stream_partial';
 
-        return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
-            // send material to the next component
-            return this._onEmit(material, stream_direction, callback);
-        });
+        return this._changeStatus(material, stream_direction, callback);
+    }
 
-
-
-
+    /**
+     * Changes the status of the material process and continues to the next bolt.
+     * @param {Object} material - The material object.
+     * @param {String} stream_id - The stream ID.
+     * @param {Function} callback - THe final callback function.
+     */
+    _changeStatus(material, stream_id, callback) {
+        const error = stream_id === 'stream_partial' ? ' error' : '';
+        return this._pg.update(
+            { status: `material validated${error}` },
+            { url: material.materialurl },
+            'material_process_pipeline', () => {
+                // send material object to next component
+                return this._onEmit(material, stream_id, callback);
+            }
+        );
     }
 }
 

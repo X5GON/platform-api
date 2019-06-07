@@ -58,24 +58,33 @@ class ExtractionText {
             textract.fromUrl(material.materialurl, self.textConfig, (error, text) => {
                 if (error) {
                     material.message = `${this._prefix} Not able to extract text.`;
-                    return this._onEmit(material, 'stream_partial', callback);
+                    return this._changeStatus(material, 'stream_partial', callback);
                 }
                 // save the raw text within the metadata
                 material.materialmetadata.rawText = text;
-                return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
-                    // send material object to next component
-                    return this._onEmit(material, stream_id, callback);
-                });
+                return this._changeStatus(material, stream_id, callback);
             });
         } else {
             // send the material to the partial table
             material.message = `${this._prefix} Material does not have type provided.`;
-            return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
-                // send material to the next component
-                return self._onEmit(material, 'stream_partial', callback);
-            });
+            return this._changeStatus(material, 'stream_partial', callback);
         }
     }
+
+    /**
+     * Changes the status of the material process and continues to the next bolt.
+     * @param {Object} material - The material object.
+     * @param {String} stream_id - The stream ID.
+     * @param {Function} callback - THe final callback function.
+     */
+    _changeStatus(material, stream_id, callback) {
+        const error = stream_id === 'stream_partial' ? ' error' : '';
+        return this._pg.update({ status: `extracted text${error}` }, { url: material.materialurl }, 'material_process_pipeline', () => {
+            // send material object to next component
+            return this._onEmit(material, stream_id, callback);
+        });
+    }
+
 }
 
 exports.create = function (context) {
