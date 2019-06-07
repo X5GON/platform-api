@@ -11,6 +11,15 @@ The material processing pipeline is dependent on Apache Kafka. One can install
 an instance of Apache Kafka on their machine - what we prefer is to use a docker
 container which includes Apache Kafka.
 
+### Textract
+
+The pipeline uses a nodejs module called [textract](../../../lib/textract) which allows
+text extraction of most of text files. For some file types additional libraries need to be installed:
+
+- **PDF** extraction requires `pdftotext` be installed, [link](http://www.xpdfreader.com/download.html).
+- **DOC** extraction requires `antiword` be installed, [link](http://www.winfield.demon.nl/), unless on OSX
+    in which case textutil (installed by default) is used.
+
 #### Installing and Running Docker
 
 It is required to have a running kafka container before running the processing pipeline. How to do this is described in the project index [README](../../../README.md).
@@ -33,7 +42,6 @@ and process it accordingly. The two types that are currently supported are:
 - video/audio
 
 Figure 1 shows the material processing pipeline architecture.
-
 ![preprocessing pipeline](readme-imgs/kafka-pipeline.png)
 *Figure 1:* The material processing pipeline architecture. It shows how we acquire
 materials via different APIs and send it to the appropriate pipeline based on the
@@ -76,5 +84,3 @@ own retriever, custom for their API.
 The currenlty available retrievers are for the following OER providers:
 
 - [Videolectures.NET](http://videolectures.net/)
-
-

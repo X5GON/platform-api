@@ -305,10 +305,7 @@ class ExtractionWikipedia {
         if (!text) {
             //send it to the next component in the pipeline
             material.message = `${this._prefix} No text provided.`;
-            return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
-                // send material to the next component
-                return this._onEmit(material, 'stream_partial', callback);
-            });
+            return this._changeStatus(material, 'stream_partial', callback);
         }
 
         // process material text and extract wikipedia concepts
@@ -320,10 +317,7 @@ class ExtractionWikipedia {
             if (!wikipediaConcepts.length) {
                 // no wikipedia concepts extracted - send it to partial material table
                 material.message = `${this._prefix} No wikipedia concepts found`;
-                return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
-                    // send material to the next component
-                    return this._onEmit(material, 'stream_partial', callback);
-                });
+                return this._changeStatus(material, 'stream_partial', callback);
             }
 
             // store merged concepts within the material object
@@ -332,20 +326,32 @@ class ExtractionWikipedia {
             if (!material.language || [null, undefined, '', 'und'].includes(material.language)) {
                 material.language = language;
             }
-
-            return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
-                //send it to the next component in the pipeline
-                return this._onEmit(material, stream_id, callback);
-            });
+            return this._changeStatus(material, stream_id, callback);
 
         }).catch(error => {
             // there was an error - send the material to partial table
             material.message = `${this._prefix} ${error.message}`;
-            return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
-                // send material to the next component
-                return this._onEmit(material, 'stream_partial', callback);
-            });
+            return this._changeStatus(material, 'stream_partial', callback);
         });
+    }
+
+
+    /**
+     * Changes the status of the material process and continues to the next bolt.
+     * @param {Object} material - The material object.
+     * @param {String} stream_id - The stream ID.
+     * @param {Function} callback - THe final callback function.
+     */
+    _changeStatus(material, stream_id, callback) {
+        const error = stream_id === 'stream_partial' ? ' error' : '';
+        return this._pg.update(
+            { status: `extracted wikipedia concepts${error}` },
+            { url: material.materialurl },
+            'material_process_pipeline', () => {
+                // send material object to next component
+                return this._onEmit(material, stream_id, callback);
+            }
+        );
     }
 }
 

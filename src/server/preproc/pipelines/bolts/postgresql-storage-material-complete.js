@@ -140,13 +140,27 @@ class PostgresqlMaterialComplete {
 
                 async.series(tasks, function (e) {
                     if (e) { return callback(e); }
-                    self._pg.update({ material_id, status: 'finished' }, { url: material_url.url }, 'material_process_pipeline', () => {
-                        return callback();
-                    });
+                    return self._changeStatus(material_url.url, callback);
                 });
 
             }); // self._pg.insert(oer_materials)
         });
+    }
+
+    /**
+     * Changes the status of the material process.
+     * @param {Object} url - The material url.
+     * @param {Function} callback - THe final callback function.
+     */
+    _changeStatus(url, callback) {
+        return this._pg.update(
+            { status: 'finished' },
+            { url },
+            'material_process_pipeline', () => {
+                // trigger the callback function
+                return callback();
+            }
+        );
     }
 }
 
