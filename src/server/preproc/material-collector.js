@@ -250,11 +250,11 @@ class MaterialCollector {
             // get material mimetype and decide where to send the material metadata
             const mimetype = material.type.mime;
             if (mimetype && mimetypes.video.includes(mimetype)) {
-                return this._sentToKafka(material, self._video_topic, 'video');
+                return self._sendToKafka(material, self._video_topic, 'video');
             } else if (mimetype && mimetypes.audio.includes(mimetype)) {
-                return this._sentToKafka(material, self._video_topic, 'audio');
+                return self._sendToKafka(material, self._video_topic, 'audio');
             } else if (mimetype && mimetypes.text.includes(mimetype)) {
-                return this._sentToKafka(material, self._text_topic, 'text');
+                return self._sendToKafka(material, self._text_topic, 'text');
             } else {
                 logger.warn('[Retriever] material mimetype not recognized', {
                     mimetype
@@ -270,7 +270,8 @@ class MaterialCollector {
      * @param {String} topic - The kafka topic to send the material.
      * @param {String} type - The material type.
      */
-    _sentToKafka(material, topic, type) {
+    _sendToKafka(material, topic, type) {
+        let self = this;
         // insert to postgres process pipeline
         this._pg.insert({ url: material.materialurl }, 'material_process_pipeline', (xerror) => {
             if (xerror) {
@@ -303,7 +304,7 @@ const collector = new MaterialCollector(config);
 
 // set interval to check for new log after every
 // secord - until the script is manually stopped
-setInterval(() => { collector.processNext(); }, 500);
+const interval = setInterval(() => { collector.processNext(); }, 500);
 
 /**
  * Gracefully shuts down the collector object.
@@ -313,7 +314,7 @@ setInterval(() => { collector.processNext(); }, 500);
  */
 function shutdown(error) {
     if (error) { console.log(error); }
-
+    clearInterval(interval);
     // first stop all retrievers
     collector.stopRetriever(null, true);
     // stop the Kafka consumer before
