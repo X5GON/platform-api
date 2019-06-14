@@ -86,6 +86,8 @@ module.exports = {
         //         "source": "text-content-extraction",
         //     }],
         //     "init": {
+        //         "user": config.preproc.ttp.user,
+        //         "token": config.preproc.ttp.token,
         //         "tmp_folder": path.join(__dirname + '../../../tmp'),
         //         "pg": config.pg
         //     }

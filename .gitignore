@@ -67,11 +67,11 @@ typings/
 # visual studio configs
 .vscode
 
-
-
 #======================================
 # PROJECT IGNORE LIST
 #======================================
+
+package-lock.json
 
 # dotenv environment variables file
 .env
@@ -80,6 +80,7 @@ typings/
 data
 backup
 examples
+tmp
 
 *.pyc
 

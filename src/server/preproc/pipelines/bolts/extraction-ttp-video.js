@@ -39,10 +39,14 @@ class ExtractionTTPVideo {
 
         // the default languages for transcriptions and translations
         this._languages = config.languages || {
-            es: { sub: {} },
-            en: { sub: {} },
-            sl: { sub: {} },
-            de: { sub: {} }
+            es: { sub: {} }, // spanish
+            en: { sub: {} }, // english
+            sl: { sub: {} }, // slovene
+            de: { sub: {} }, // german
+            fr: { sub: {} }, // french
+            it: { sub: {} }, // italian
+            pt: { sub: {} }, // portuguese
+            ca: { sub: {} }, // catalan
         };
 
         // the transcription formats
