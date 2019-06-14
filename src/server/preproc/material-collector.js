@@ -18,7 +18,7 @@ const postgresQL = require('alias:lib/postgresQL');
 const Logger = require('alias:lib/logger');
 
 // create a logger for platform requests
-const logger = Logger.createGroupInstance('material-collector', 'processing', config.environment !== 'prod');
+const logger = Logger.createGroupInstance('material-collector', 'preproc', config.environment !== 'prod');
 
 /**
  * @class MaterialCollector
