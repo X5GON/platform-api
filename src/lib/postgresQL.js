@@ -507,6 +507,7 @@ class PostgreSQL {
                     SUM(visit_count) AS visit_count_sum
                 FROM urls
                 LEFT JOIN urls_count ON urls.id=urls_count.url_id
+                WHERE provider_id IS NOT NULL
                 GROUP BY provider_id
             ),
             materials_per_provider_count AS (
@@ -519,11 +520,11 @@ class PostgreSQL {
             ),
             urls_materials_count AS (
                 SELECT
-                    materials_per_provider_count.provider_id AS provider_id,
+                    provider_urls_count.provider_id AS provider_id,
                     visit_count_sum,
                     material_count
                 FROM materials_per_provider_count
-                LEFT JOIN provider_urls_count
+                FULL OUTER JOIN provider_urls_count
                 ON materials_per_provider_count.provider_id=provider_urls_count.provider_id
             )
             SELECT
