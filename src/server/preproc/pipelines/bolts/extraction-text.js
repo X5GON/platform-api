@@ -53,21 +53,21 @@ class ExtractionText {
 
     receive(material, stream_id, callback) {
         const self = this;
-        if (material.type && !this._invalidTypes.includes(material.type.ext)) {
+        if (material.type && !self._invalidTypes.includes(material.type.ext)) {
             // extract raw text from materialURL
-            textract.fromUrl(material.materialurl, self.textConfig, (error, text) => {
+            textract.fromUrl(material.materialurl, (error, text) => {
                 if (error) {
-                    material.message = `${this._prefix} Not able to extract text.`;
-                    return this._changeStatus(material, 'stream_partial', callback);
+                    material.message = `${self._prefix} Not able to extract text.`;
+                    return self._changeStatus(material, 'stream_partial', callback);
                 }
                 // save the raw text within the metadata
                 material.materialmetadata.rawText = text;
-                return this._changeStatus(material, stream_id, callback);
+                return self._changeStatus(material, stream_id, callback);
             });
         } else {
             // send the material to the partial table
-            material.message = `${this._prefix} Material does not have type provided.`;
-            return this._changeStatus(material, 'stream_partial', callback);
+            material.message = `${self._prefix} Material does not have type provided.`;
+            return self._changeStatus(material, 'stream_partial', callback);
         }
     }
 
@@ -78,10 +78,11 @@ class ExtractionText {
      * @param {Function} callback - THe final callback function.
      */
     _changeStatus(material, stream_id, callback) {
+        const self = this;
         const error = stream_id === 'stream_partial' ? ' error' : '';
-        return this._pg.update({ status: `extracted text${error}` }, { url: material.materialurl }, 'material_process_pipeline', () => {
+        return self._pg.update({ status: `extracted text${error}` }, { url: material.materialurl }, 'material_process_pipeline', () => {
             // send material object to next component
-            return this._onEmit(material, stream_id, callback);
+            return self._onEmit(material, stream_id, callback);
         });
     }
 
