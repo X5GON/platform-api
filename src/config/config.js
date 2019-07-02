@@ -86,7 +86,7 @@ const dev = {
         port: parseInt(process.env.DEV_RECSYS_PORT) || 3001
     },
     quality: {
-        port: parseInt(process.env.PROD_QUALITY_PORT) || 6001
+        port: parseInt(process.env.DEV_QUALITY_PORT) || 6001
     },
     kafka: {
         host: process.env.DEV_KAFKA_HOST || '127.0.0.1:9092',
@@ -115,7 +115,7 @@ const test = {
         port: parseInt(process.env.TEST_RECSYS_PORT) || 3002
     },
     quality: {
-        port: parseInt(process.env.PROD_QUALITY_PORT) || 6001
+        port: parseInt(process.env.TEST_QUALITY_PORT) || 6001
     },
     kafka: {
         host: process.env.TEST_KAFKA_HOST || '127.0.0.1:9092',
