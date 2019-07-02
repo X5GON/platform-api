@@ -29,7 +29,7 @@ module.exports = function (app, config) {
         target: `http://127.0.0.1:${config.quality.port}`,
         pathRewrite: {
             '^/api/v1/qa': '/api/latest/qa'
-          }
+        },
         logProvider: function (provider) {
             // create logger for sending requests
             return Logger.createInstance(`proxy`, 'info', 'platform', config.environment !== 'prod');
