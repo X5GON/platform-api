@@ -100,9 +100,27 @@ class x5recommend {
      */
     pushRecordContent(record) {
         let self = this;
-        // TODO: validate record schema
-        if (!true /* check record validation */) {
+
+        // TODO: validate record schema programmatically 
+        function validateRecordSchema(record){
+            if (!record.url) {
+                return false;
+            }
+            if (!record.title) {
+                return false;
+            }
+            if (!record.provider) {
+                return false;
+            }
+            if (!record.language) {
+                return false;
+            }
+            return true;
+        }
+
+        if (!validateRecordSchema(record) /* check record validation */) {
             // record is not in correct format - throw an error
+            console.log('Record not in correct format');
             return new Error('Record not in correct format');
         }
 
@@ -117,9 +135,27 @@ class x5recommend {
      */
     pushRecordMaterialModel(record) {
         let self = this;
+
         // TODO: validate record schema
-        if (!true /* check record validation */) {
+        function validateRecordSchema(record){
+            if (!record.url) {
+                return false;
+            }
+            if (!record.title) {
+                return false;
+            }
+            if (!record.provider) {
+                return false;
+            }
+            if (!record.language) {
+                return false;
+            }
+            return true;
+        }
+
+        if (!validateRecordSchema(record) /* check record validation */) {
             // record is not in correct format - throw an error
+            console.log('Record not in correct format');
             return new Error('Record not in correct format');
         }
 
@@ -509,5 +545,101 @@ class x5recommend {
             });
         });
     }
+
+    /******************************************************
+      * Collaborative Filtering Recommendation Functions
+      *****************************************************/
+
+    /**
+      * @description Get content based recommendations.
+      * @param {Object} query - The object containing the required query parameters.
+      * @param {String} [query.uuid] - The uuid parameter. Finds material most similar to the
+      * material the user already accessed.
+      * @param {String} [query.text] - The text parameter. Finds material containing similar text.
+      * @param {String} [query.url] - The url parameter. Finds the material found using the url and
+      * returns material similar to it.
+      * @param {String} [query.type] - The metrics type.
+      * @returns {Array.<Object>} An array of recommended learning material.
+      */
+     recommendCollaborativeFiltering(query) {
+        let self = this;
+        let recommendations;
+
+        return new Promise(function (resolve, reject){
+            if (!query) {
+                let errorMessage = 'recommendPersonalized: Missing query';
+                self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
+                    error: errorMessage, query
+                });
+                // not supported query option - return error
+                resolve({ error: errorMessage });
+                return;
+            }
+
+            let queryPG = `
+                SELECT provider_uri as url, title as title, description as description, provider as provider, language as language, type as mimetype FROM rec_sys_material_model WHERE url_id IN (
+                    SELECT url_id FROM user_activities WHERE cookie_id IN (
+                        SELECT cookie_id FROM user_activities
+                            WHERE cookie_id<>1 AND cookie_id NOT IN(
+                                SELECT id FROM cookies WHERE uuid = ${query.uuid})
+                            AND url_id IN (
+                                SELECT url_id FROM user_activities WHERE cookie_id IN (
+                                    SELECT id FROM cookies WHERE uuid = ${query.uuid})
+                            )
+                        )
+                    GROUP BY url_id ORDER BY COUNT(url_id) DESC)
+                LIMIT 10;`;
+
+            pg.execute(queryPG, [] , function(err, res){
+                if (err){
+                    self.logger.error('Error fetching user model: ' + err);
+                    resolve({error: 'Error fetching user model'});
+                    return;
+                }
+
+                if (!res || res.length == 0){
+                    resolve({error: 'Cookie is not in the database - unable to fetch the user'});
+                    return;
+                }
+
+                recommendations = [];
+
+                /**
+                * Detects the type of the material.
+                * @param {String} mimetype - The mimetype of the material.
+                * @returns {String} The type of the material.
+                */
+               
+                function detectType(mimetype) {
+                    let mime = mimetype.split('/');
+                    if (mime[0] === 'video') {
+                        return 'video';
+                    } else {
+                        return 'text';
+                    }
+                }
+
+                for (let material of res){
+                    let item = {
+                        url: material.url,
+                        title: material.title,
+                        description: material.description,
+                        provider: material.provider,
+                        language: material.language,
+                        type: detectType(material.mimetype),
+                        videoType: detectType(material.mimetype) === 'video',
+                        audioType: detectType(material.mimetype) === 'audio',
+                        textType: detectType(material.mimetype) === 'text',
+                    };
+                    recommendations.push(item);
+                }
+
+                resolve(recommendations);
+                return;
+            });
+        });
+    }
+
+
 }
 module.exports = x5recommend;
