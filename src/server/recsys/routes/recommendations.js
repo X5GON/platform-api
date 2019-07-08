@@ -162,12 +162,6 @@ module.exports = function (pg, logger) {
                 return res.send({ error: "Bad request: " + result.error });
             });
     });
-
-
-
-
-
-
                
     // GET recommendation based on history
     router.get('/recommend/collaborativeFiltering', (req, res) => {
@@ -231,7 +225,6 @@ module.exports = function (pg, logger) {
                 return res.send({ error: "Bad request: " + result.error });
             });
     });
-
 
     return router;
 };

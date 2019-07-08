@@ -577,7 +577,9 @@ class x5recommend {
             }
 
             let queryPG = `
-                SELECT provider_uri as url, title as title, description as description, provider as provider, language as language, type as mimetype FROM rec_sys_material_model WHERE url_id IN (
+                SELECT provider_uri as url, title as title, description as description, provider as
+                provider, language as language, type as mimetype FROM rec_sys_material_model
+                WHERE url_id IN (
                     SELECT url_id FROM user_activities WHERE cookie_id IN (
                         SELECT cookie_id FROM user_activities
                             WHERE cookie_id<>1 AND cookie_id NOT IN(
@@ -646,7 +648,6 @@ class x5recommend {
             });
         });
     }
-
 
 }
 module.exports = x5recommend;
