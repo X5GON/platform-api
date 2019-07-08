@@ -28,11 +28,6 @@ one of the developers contributing to this project.
 # platform session secret
 PROD_PLATFORM_SESSION_SECRET=platform-session-key
 
-# monitor session secret
-PROD_MONITOR_SESSION_SECRET=monitor-session-key
-# monitor admin token - used to access the monitor
-PROD_MONITOR_ADMIN_TOKEN=admin-token
-
 # postgres database password
 PROD_PG_PASSWORD=postgres-password
 
@@ -40,6 +35,9 @@ PROD_PG_PASSWORD=postgres-password
 PROD_PG_SCHEMA=postgres-database-schema(optional)
 PROD_PG_VERSION=postgres-database-version(optional)
 
+# kafka messaging system options
+PROD_KAFKA_HOST=kafka-host-ip(optional)
+PROD_KAFKA_GROUP=kafka-group(optional)
 
 #######################################
 ### Development variables
@@ -48,17 +46,16 @@ PROD_PG_VERSION=postgres-database-version(optional)
 # platform session secret
 DEV_PLATFORM_SESSION_SECRET=platform-session-key
 
-# monitor session secret
-DEV_MONITOR_SESSION_SECRET=monitor-session-key
-# monitor admin token - used to access the monitor
-DEV_MONITOR_ADMIN_TOKEN=admin-token
-
 # postgres database password
 DEV_PG_PASSWORD=postgres-password
 
 # postgres database options
 DEV_PG_SCHEMA=postgres-database-schema(optional)
 DEV_PG_VERSION=postgres-database-version(optional)
+
+# kafka messaging system options
+DEV_KAFKA_HOST=kafka-host-ip(optional)
+DEV_KAFKA_GROUP=kafka-group(optional)
 
 #######################################
 ### Test variables
@@ -67,11 +64,6 @@ DEV_PG_VERSION=postgres-database-version(optional)
 # platform session secret
 TEST_PLATFORM_SESSION_SECRET=platform-session-key
 
-# monitor session secret
-TEST_MONITOR_SESSION_SECRET=monitor-session-key
-# monitor admin token - used to access the monitor
-TEST_MONITOR_ADMIN_TOKEN=admin-token
-
 # postgres database password
 TEST_PG_PASSWORD=postgres-password
 
@@ -79,6 +71,9 @@ TEST_PG_PASSWORD=postgres-password
 TEST_PG_SCHEMA=postgres-database-schema(optional)
 TEST_PG_VERSION=postgres-database-version(optional)
 
+# kafka messaging system options
+TEST_KAFKA_HOST=kafka-host-ip(optional)
+TEST_KAFKA_GROUP=kafka-group(optional)
 
 ######################################
 # Common variables

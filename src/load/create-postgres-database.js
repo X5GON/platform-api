@@ -12,10 +12,10 @@
 const async = require('async');
 
 // configuration data
-const config = require('@config/config');
+const config = require('alias:config/config');
 
 // postgresql connection to the database
-const pg = require('@lib/postgresQL')(config.pg);
+const pg = require('alias:lib/postgresQL')(config.pg);
 
 
 /////////////////////////////////////////////////
@@ -827,6 +827,63 @@ const dbCreates = {
             IS 'The id of the associated record in the cookies table';`,
 
 
+    rec_sys_user_transitions:
+        `CREATE TABLE ${schema}.rec_sys_user_transitions (
+            id                  serial PRIMARY KEY,
+            uuid                varchar,
+            from_url            varchar NOT NULL,
+            to_url              varchar NOT NULL,
+
+            cookie_id               integer,
+            from_material_model_id  integer,
+            to_material_model_id    integer,
+            FOREIGN KEY (cookie_id)              REFERENCES ${schema}.cookies(id)                ON UPDATE CASCADE ON DELETE CASCADE,
+            FOREIGN KEY (from_material_model_id) REFERENCES ${schema}.rec_sys_material_model(id) ON UPDATE CASCADE ON DELETE CASCADE,
+            FOREIGN KEY (to_material_model_id)   REFERENCES ${schema}.rec_sys_material_model(id) ON UPDATE CASCADE ON DELETE CASCADE
+        );
+
+        ALTER TABLE ${schema}.rec_sys_user_transitions
+            OWNER TO ${config.pg.user};
+
+        CREATE INDEX rec_sys_user_transitions_id
+            ON ${schema}.rec_sys_user_transitions(id);
+
+        CREATE INDEX rec_sys_user_transitions_from_material_model_id
+            ON ${schema}.rec_sys_user_transitions(from_material_model_id);
+
+        CREATE INDEX rec_sys_user_transitions_to_material_model_id
+            ON ${schema}.rec_sys_user_transitions(to_material_model_id);
+
+        CREATE INDEX rec_sys_user_transitions_uuid
+            ON ${schema}.rec_sys_user_transitions(uuid);
+
+
+
+        CREATE TRIGGER update_rec_sys_user_transitions_keys
+            BEFORE INSERT OR UPDATE ON ${schema}.rec_sys_user_transitions
+            FOR EACH ROW
+            EXECUTE PROCEDURE set_cookie_id();
+
+
+
+        COMMENT ON TABLE ${schema}.rec_sys_user_transitions
+            IS 'The table containing the user transitions triggered by selection on the recommender engine';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_transitions.id
+            IS 'The id of the user transition';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_transitions.from_material_model_id
+            IS 'The url from which the user transitioned';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_transitions.to_material_model_id
+            IS 'The url to which the user transitioned';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_transitions.uuid
+            IS 'The transitioned user identifier extracted from the token';
+
+        COMMENT ON COLUMN ${schema}.rec_sys_user_transitions.cookie_id
+            IS 'The id of the user cookie that triggered the transition';`,
+
 
     tools:
         `CREATE TABLE ${schema}.tools (
@@ -995,7 +1052,103 @@ const dbCreates = {
             IS 'The version number of the database';
 
         COMMENT ON COLUMN ${schema}.database_version.date
-            IS 'The time when the database was update to the provided version';`
+            IS 'The time when the database was update to the provided version';`,
+
+
+    api_keys:
+        `CREATE TABLE ${schema}.api_keys (
+            id           serial PRIMARY KEY,
+            owner        varchar NOT NULL,
+            key          varchar (40) UNIQUE NOT NULL,
+            date_created timestamp with time zone DEFAULT NOW(),
+            actions      jsonb NOT NULL
+        );
+
+        ALTER TABLE ${schema}.api_keys
+            OWNER TO ${config.pg.user};
+
+        CREATE INDEX api_keys_id
+            ON ${schema}.api_keys(id);
+
+        COMMENT ON TABLE ${schema}.api_keys
+            IS 'The database containing api keys';
+
+        COMMENT ON COLUMN ${schema}.api_keys.id
+            IS 'The id of the api key';
+
+        COMMENT ON COLUMN ${schema}.api_keys.owner
+            IS 'The owner of the api key';
+
+        COMMENT ON COLUMN ${schema}.api_keys.key
+            IS 'The api key';
+
+        COMMENT ON COLUMN ${schema}.api_keys.date_created
+            IS 'The creation date of the api key';
+
+        COMMENT ON COLUMN ${schema}.api_keys.actions
+            IS 'The JSON object containing the available actions';`,
+
+
+    admins:
+        `CREATE TABLE ${schema}.admins (
+            id           serial PRIMARY KEY,
+            username     varchar UNIQUE NOT NULL,
+            password     varchar NOT NULL
+        );
+
+        ALTER TABLE ${schema}.admins
+            OWNER TO ${config.pg.user};
+
+        CREATE INDEX admins_id
+            ON ${schema}.admins(id);
+
+        COMMENT ON TABLE ${schema}.admins
+            IS 'The database containing admin credentials';
+
+        COMMENT ON COLUMN ${schema}.admins.id
+            IS 'The id of the admin';
+
+        COMMENT ON COLUMN ${schema}.admins.username
+            IS 'The username of the admin';
+
+        COMMENT ON COLUMN ${schema}.admins.password
+            IS 'The password of the admin';`,
+
+    material_process_pipeline:
+        `CREATE TABLE ${schema}.material_process_pipeline (
+            id           serial,
+            url          varchar UNIQUE PRIMARY KEY,
+            config       jsonb,
+            status       varchar NOT NULL DEFAULT 'waiting',
+
+            material_id integer,
+
+            FOREIGN KEY (material_id) REFERENCES ${schema}.oer_materials(id) ON UPDATE CASCADE ON DELETE CASCADE
+        );
+
+        ALTER TABLE ${schema}.material_process_pipeline
+            OWNER TO ${config.pg.user};
+
+        CREATE INDEX material_process_pipeline_url
+            ON ${schema}.material_process_pipeline(url);
+
+        COMMENT ON TABLE ${schema}.material_process_pipeline
+            IS 'The database containing the material process information';
+
+        COMMENT ON COLUMN ${schema}.material_process_pipeline.id
+            IS 'The id of the material process';
+
+        COMMENT ON COLUMN ${schema}.material_process_pipeline.url
+            IS 'The url of the material';
+
+        COMMENT ON COLUMN ${schema}.material_process_pipeline.config
+            IS 'The object containing the process configuration';
+
+        COMMENT ON COLUMN ${schema}.material_process_pipeline.status
+            IS 'The status of the process';
+
+        COMMENT ON COLUMN ${schema}.material_process_pipeline.material_id
+            IS 'The id of the material it processed';`
 
 };
 
@@ -1013,7 +1166,33 @@ const dbCreates = {
  * @description The array containing database updates.
  * @type {db_update[]}
  */
-const dbUpdates = [];
+const dbUpdates = [{
+    version: 1,
+    update: `
+        ALTER TABLE ${schema}.rec_sys_user_transitions
+        ADD COLUMN recommended_urls varchar ARRAY,
+        ADD COLUMN selected_position integer,
+        ADD COLUMN num_of_recommendations integer;
+    `
+}, {
+    version: 2,
+    update: `
+        ALTER TABLE ${schema}.api_keys
+        RENAME COLUMN actions TO permissions;
+    `
+}, {
+    version: 3,
+    update: `
+        ALTER TABLE ${schema}.oer_materials_partial
+        ADD COLUMN providertoken varchar;
+    `
+}, {
+    version: 4,
+    update: `
+        ALTER TABLE ${schema}.rec_sys_user_transitions
+        ADD COLUMN updated_at timestamp with time zone DEFAULT (NOW() AT TIME ZONE 'utc') NOT NULL;
+    `
+}];
 
 // get the requested database version
 const pgVersion = config.pg.version === '*' ?

@@ -5,7 +5,7 @@
  */
 
 // internal modules
-const KafkaProducer = require('@lib/kafka-producer');
+const KafkaProducer = require('alias:lib/kafka-producer');
 
 /**
  * @class KafkaSender
@@ -57,8 +57,10 @@ class KafkaMaterialPartial {
         };
 
         // send the message to the database topics
-        this._producer.send(this._kafka_topic, message);
-        return callback();
+        this._producer.send(this._kafka_topic, message, function (error) {
+            if (error) { return callback(error); }
+            return callback();
+        });
 
     }
 }

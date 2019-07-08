@@ -1,0 +1,102 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+
+      <h1 class="doc doc__section">OER Providers</h1>
+
+
+      {{#if stats}}
+        <div class="row">
+          <div class="offset-md-0 col-md-6 offset-lg-2 col-lg-4 mb-5">
+            <div class="stats">
+              <span class="stats__number">
+                {{stats.oer_materials}}
+              </span>
+              <p class="stats__label">
+                <span>OER Materials</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-4 mb-5">
+            <div class="stats">
+              <span class="stats__number">
+                {{stats.user_activities}}
+              </span>
+              <p class="stats__label">
+                <span>User Activities</span>
+              </p>
+            </div>
+          </div>
+        </div>{{! .row }}
+      {{/if}}
+
+
+      <p class="information">
+        This panel shows the OER providers information along with their tokens,
+        number of processed materials and number of users visits.
+      </p>
+
+      <div id="providers" class="table-responsive mt-4">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th scope="col" class="align-middle doc doc__query name">
+                <b class="doc">OER Provider Name</b>
+              </th>
+              <th scope="col" class="align-middle doc doc__query domain">
+                <b class="doc">Domain</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query token">
+                <b class="doc">Token</b>
+              </th>
+              <th scope="col" class="align-middle doc doc__query contact">
+                <b class="doc">Contact</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query material_count">
+                <b class="doc">Material Count</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query visit_count">
+                <b class="doc">Visit Count</b>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each providers as |provider|}}
+              <tr id="{{provider.id}}" data-provider-head="{{provider.id}}">
+                <td class="align-middle">
+                  <a href="/oer_provider?providerId={{provider.token}}">
+                    <b class="doc">
+                      {{provider.name}}
+                    </b>
+                  </a>
+                </td>
+                <td class="align-middle">
+                  <a href="{{provider.domain}}" target="_blank">
+                    {{provider.domain}}
+                  </a>
+                </td>
+                <td class="text-center align-middle">
+                  {{provider.token}}
+                </td>
+                <td class="align-middle">
+                  {{provider.contact}}
+                </td>
+                <td class="text-center align-middle doc__number" data-value="{{provider.material_count}}">
+                  {{provider.material_count_clean}}
+                </td>
+                <td class="text-center align-middle doc__number" data-value="{{provider.visit_count}}">
+                  {{provider.visit_count_clean}}
+                </td>
+              </tr>{{! tr#id=provider.id }}
+            {{/each}}
+          </tbody>
+        </table>{{! .table-dashed-borders }}
+      </div>{{! #providers .table-responsive }}
+
+
+    </div>{{! .col }}
+  </div>{{! .row }}
+</div>{{! .container }}
+
+<script src="/js/admin-api-keys-actions.js"></script>

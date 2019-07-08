@@ -21,11 +21,11 @@
         "cwd": "./pipelines/",
         "env": {
             "NODE_ENV": "dev",
-            "TOPOLOGY": "processing-material-video-automatic"
+            "TOPOLOGY": "processing-material-video"
         },
         "env_production": {
             "NODE_ENV": "prod",
-            "TOPOLOGY": "processing-material-video-automatic"
+            "TOPOLOGY": "processing-material-video"
         },
         "instances": "3",
         "exec_mode": "cluster",

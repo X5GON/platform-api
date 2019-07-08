@@ -2,22 +2,26 @@
   <div class="recommendations width-restriction"
     style="width:{{style.width}};max-height:{{style.height}};">
     {{#each recommendations as | material index |}}
-    <a class="material" href="{{material.url}}" target="_blank">
+    {{#if ../query.url}}
+      <a class="material" href="/api/v1/transitions?from={{../query.url}}&to={{material.url}}&position={{index}}&rec_urls={{../recommended_urls}}" target="_blank">
+    {{else}}
+      <a class="material" href="{{material.url}}" target="_blank">
+    {{/if}}
       <table class="material-content" style="font-size:{{../style.fontSize}};">
         <body>
           <tr>
             <td class="align-top p-1 pt-2 text-center">
-              {{#if videoType}}
+              {{#if (isEqual material.type 'video')}}
                 <span class="fa-stack fa-lg">
                   <i class="fas fa-circle fa-stack-2x"></i>
                   <i class="fas fa-video fa-stack-1x fa-inverse"></i>
                 </span>
-              {{else if audioType}}
+              {{else if (isEqual material.type 'audio')}}
                 <span class="fa-stack fa-lg">
                   <i class="fas fa-circle fa-stack-2x"></i>
-                  <i class="fas fa-audio fa-stack-1x fa-inverse"></i>
+                  <i class="fas fa-headphones-alt fa-stack-1x fa-inverse"></i>
                 </span>
-              {{else}}
+              {{else if (isEqual material.type 'text')}}
                 <span class="fa-stack fa-lg">
                   <i class="fas fa-circle fa-stack-2x"></i>
                   <i class="fas fa-file-alt fa-stack-1x fa-inverse"></i>

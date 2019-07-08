@@ -6,17 +6,18 @@
  * (http://wikifier.org).
  */
 
+// configurations
+const config = require('alias:config/config');
 
 // internal modules
-const Logger = require('@lib/logging-handler')();
-// create a logger instance for logging recommendation requests
-const logger = Logger.createGroupInstance('recommendation-model-build', 'x5recommend');
+const Logger = require('alias:lib/logger');
 
-// configurations
-const config = require('@config/config');
+// create a logger instance for logging recommendation requests
+const { environment } = config;
+const logger = Logger.createGroupInstance('recommendation-model-build', 'x5recommend', environment === 'dev');
 
 // initialize connection with postgresql
-const pg = require('@lib/postgresQL')(config.pg);
+const pg = require('alias:lib/postgresQL')(config.pg);
 // check if config.schema is defined
 const schema = config.pg.schema;
 
@@ -143,8 +144,7 @@ function build(callback) {
 
             // store wikipedia concepts data
             let wikipediaConceptNames    = [];
-            let wikipediaConceptPageRank = [];
-            let wikipediaConceptCosine   = [];
+            let wikipediaConceptSupport  = [];
 
             // prepare wikipedia concepts if they exist
             if (wikipediaConcepts) {
@@ -152,8 +152,7 @@ function build(callback) {
                     // set the wikipedia concepts for the record
                     let uri = concept.secUri ? concept.secUri : concept.uri;
                     wikipediaConceptNames.push(uri);
-                    wikipediaConceptPageRank.push(concept.pageRank);
-                    wikipediaConceptCosine.push(concept.cosine);
+                    wikipediaConceptSupport.push(concept.supportLen);
                 });
             }
 
@@ -169,8 +168,7 @@ function build(callback) {
                 mimetype,
                 language,
                 wikipediaConceptNames,
-                wikipediaConceptPageRank,
-                wikipediaConceptCosine
+                wikipediaConceptSupport
             };
 
             // push to the recommendation model
@@ -203,7 +201,7 @@ function build(callback) {
 
                     // prepare wikipedia concepts if they exist
                     if (material.concepts) {
-                        for (let concept in material.concepts){
+                        for (let concept in material.concepts) {
                             wikipediaConceptNames.push(concept);
                             wikipediaConceptSupport.push(material.concepts[concept]);
                         }

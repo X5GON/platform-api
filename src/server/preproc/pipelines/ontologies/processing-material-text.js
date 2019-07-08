@@ -1,5 +1,7 @@
+// module for path creation
+const path = require('path');
 // configurations
-const config = require('@config/config');
+const config = require('alias:config/config');
 
 module.exports = {
     "general": {
@@ -15,7 +17,7 @@ module.exports = {
             "init": {
                 "kafka_host": config.kafka.host,
                 "topic": "PROCESSING.MATERIAL.TEXT",
-                "groupId": config.kafka.groupId
+                "groupId": `${config.kafka.groupId}-text`
             }
         }
     ],
@@ -40,8 +42,10 @@ module.exports = {
                     { "name": "datecreated" },
                     { "name": "dateretrieved" },
                     { "name": "materialmetadata", "default": {} },
+                    { "name": "providertoken" },
                     { "name": "license" }
-                ]
+                ],
+                "pg": config.pg
             }
         },
         {
@@ -52,7 +56,9 @@ module.exports = {
             "inputs": [{
                 "source": "material-format",
             }],
-            "init": {}
+            "init": {
+                "pg": config.pg
+            }
         },
         {
             "name": "text-content-extraction",
@@ -62,8 +68,30 @@ module.exports = {
             "inputs": [{
                 "source": "material-type",
             }],
-            "init": {}
+            "init": {
+                "text_config": {
+                    "preserveLineBreaks": true,
+                    "includeAltText": true
+                },
+                "pg": config.pg
+            }
         },
+        // TODO: add text translation once finished
+        // {
+        //     "name": "text-content-translation",
+        //     "type": "inproc",
+        //     "working_dir": "./bolts",
+        //     "cmd": "extraction-ttp-text.js",
+        //     "inputs": [{
+        //         "source": "text-content-extraction",
+        //     }],
+        //     "init": {
+        //         "user": config.preproc.ttp.user,
+        //         "token": config.preproc.ttp.token,
+        //         "tmp_folder": path.join(__dirname + '../../../tmp'),
+        //         "pg": config.pg
+        //     }
+        // },
         {
             "name": "wikification",
             "type": "inproc",
@@ -75,6 +103,7 @@ module.exports = {
             "init": {
                 "userKey": config.preproc.wikifier.userKey,
                 "wikifierUrl": config.preproc.wikifier.wikifierUrl,
+                "pg": config.pg
             }
         },
         {
@@ -85,7 +114,9 @@ module.exports = {
             "inputs": [{
                 "source": "wikification",
             }],
-            "init": {}
+            "init": {
+                "pg": config.pg
+            }
         },
 
         /****************************************

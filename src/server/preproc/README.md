@@ -11,27 +11,75 @@ The material processing pipeline is dependent on Apache Kafka. One can install
 an instance of Apache Kafka on their machine - what we prefer is to use a docker
 container which includes Apache Kafka.
 
-#### Running Docker on Linux
+### Textract
 
-In the command line run the following commands. This will install and link Docker
-to your account.
+The pipeline uses a nodejs module called [textract](../../../lib/textract) which allows
+text extraction of most of text files. For some file types additional libraries need to be installed:
+
+- **PDF** extraction requires `pdftotext` be installed, [link](http://www.xpdfreader.com/download.html).
+- **DOC** extraction requires `antiword` be installed, [link](http://www.winfield.demon.nl/), unless on OSX
+    in which case textutil (installed by default) is used.
+
+#### Installing and Running Docker
+
+It is required to have a running kafka container before running the processing pipeline. How to do this is described in the project index [README](../../../README.md).
+
+## Running Material Processing Pipeline Components
+
+The material processing pipeline is structured of multiple components.
+
+### Material Collector
 
 ```bash
-sudo apt-get update
-sudo apt-get -y install docker.io
-sudo ln -sf /usr/bin/docker.io /usr/local/bin/docker
+# start the material collector process
+node ./material-collector.js
 ```
-
-Docker Hub contains a container called
-[eriknovak/kafka-x5gon](https://hub.docker.com/r/eriknovak/kafka-x5gon)
-which includes Apache Kafka adapted for the X5GON platform. Running the following
-command should start a docker container (in dettach mode `[-d]`).
-
-**NOTE:** It is required to run the Kafka container before starting the pipeline.
 
 ```bash
-sudo docker run -p 2181:2181 -p 9092:9092 -d --env ADVERTISED_HOST=localhost --env ADVERTISED_PORT=9092 --restart unless-stopped --name kafka-x5gon -h kafka-x5gon eriknovak/kafka-x5gon
+# start the material collector process with node process manager
+pm2 start ecosystem.collecting.config.json
 ```
+
+### Material Processing Components
+
+```bash
+cd pipelines
+# start the text material processing pipeline
+TOPOLOGY=processing-material-text node ./pipeline.js
+
+# start the video and audio processing pipeline
+TOPOLOGY=processing-material-video node ./pipeline.js
+```
+```bash
+# start all processing components with node process manager
+pm2 start ecosystem.processing.config.json
+```
+
+### Material and Other Data Storing Components
+
+```bash
+cd pipelines
+# start the complete material storing process
+TOPOLOGY=storing-material-complete ./pipeline.js
+
+# start the partial material storing process
+TOPOLOGY=storing-material-partial ./pipeline.js
+
+# start the user activities storing process
+TOPOLOGY=storing-user-activities ./pipeline.js
+
+# start the recommender system transitions storing process
+TOPOLOGY=storing-recsys-transitions ./pipeline.js
+
+# start the OER provider storing process
+TOPOLOGY=storing-providers ./pipeline.js
+```
+
+```bash
+# start all storing components with node process manager
+pm2 start ecosystem.storing.config.json
+```
+
 
 ## Folder Structure
 
@@ -52,11 +100,13 @@ and process it accordingly. The two types that are currently supported are:
 
 Figure 1 shows the material processing pipeline architecture.
 
-![preprocessing pipeline](imgs/X5GON-processing-pipeline.png)
+![preprocessing pipeline](../../../readme/kafka-pipeline.png)
+
 *Figure 1:* The material processing pipeline architecture. It shows how we acquire
-materials via different APIs and send it to the appropriate pipeline based on the
+materials via different APIs and send them to the appropriate pipeline based on the
 material's type.
 
+### Pipeline Components
 
 Each pipeline contains the following components:
 
@@ -65,7 +115,7 @@ Each pipeline contains the following components:
     based on the material type:
     - **Text.** We use *textract*, a Nodejs library that is able to extract raw
         text from the text material.
-    - **Video/Audio.** We use the *Transcription and Translation Platform* (TTP)
+    - **Video/Audio.** We use the *Transcription and Translation Platform* ([TTP](https://ttp.mllp.upv.es/index.php?page=faq))
         which automatically generates transcriptions (subtitles) and translates
         the video content.
 
@@ -93,5 +143,3 @@ own retriever, custom for their API.
 The currenlty available retrievers are for the following OER providers:
 
 - [Videolectures.NET](http://videolectures.net/)
-
-

@@ -20,7 +20,7 @@ class PostgresqlMaterialPartial {
         this._prefix = `[PostgresqlMaterialPartial ${this._name}]`;
 
         // create the postgres connection
-        this._pg = require('@lib/postgresQL')(config.pg);
+        this._pg = require('alias:lib/postgresQL')(config.pg);
 
         callback();
     }
@@ -44,12 +44,26 @@ class PostgresqlMaterialPartial {
             oer_materials_partial
         } = message;
 
-
         self._pg.upsert(oer_materials_partial, { materialurl: null }, 'oer_materials_partial', (error, result) => {
             if (error) { return callback(error); }
-            return callback();
+            return self._changeStatus(oer_materials_partial.materialurl, callback);
         }); // self._pg.insert(oer_materials_partial)
+    }
 
+    /**
+     * Changes the status of the material process.
+     * @param {Object} url - The material url.
+     * @param {Function} callback - THe final callback function.
+     */
+    _changeStatus(url, callback) {
+        return this._pg.update(
+            { status: 'material error when processing. See oer_materials_partial table or log files' },
+            { url },
+            'material_process_pipeline', () => {
+                // trigger the callback function
+                return callback();
+            }
+        );
     }
 }
 

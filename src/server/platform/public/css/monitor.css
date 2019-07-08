@@ -1,3 +1,12 @@
+header .navbar .btn-nav.btn-monitor {
+    color: white;
+    background-color: #5b95a5;
+}
+
+header .navbar .btn-nav.btn-monitor:hover {
+    background-color: #456f7a;
+}
+
 .table thead {
     background-color: #5b95a5;
     color: white;

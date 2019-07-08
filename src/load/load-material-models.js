@@ -9,14 +9,15 @@ const async = require('async');
 
 
 // configurations
-const config = require('@config/config');
+const config = require('alias:config/config');
+const mimetypes = require('alias:config/mimetypes');
 
 // get the schema of the database
 const schema = config.pg.schema;
 
 // internal modules
-const updateHelper = require('@lib/update-user-models');
-const pg = require('@lib/postgresQL')(config.pg);
+const updateHelper = require('alias:lib/update-user-models');
+const pg = require('alias:lib/postgresQL')(config.pg);
 
 
 /**
@@ -223,22 +224,23 @@ function prepareMaterialModels() {
 
                     // normalize wikipedia concept weight
                     for (let concept in wiki) {
-                            wiki[concept] /= supportLen;
+                        wiki[concept] /= supportLen;
                     }
 
-                    //get most common type of the material
-                    let maxKey = null;
-                    for (let key in type) {
-                        if (!maxKey) {
-                            maxKey = key;
-                        } else if (type[key] > type[maxKey]) {
-                            maxKey = key;
+                    // go through the type list and assign the top one
+                    let topType = null;
+                    for (let mimetype in mimetypes) {
+                        for (let key in type) {
+                            if (mimetypes[mimetype].includes(key)) {
+                                topType = key; break;
+                            }
                         }
+                        if (topType) { break; }
                     }
-                    type = maxKey;
+                    type = topType;
 
-                    //get most common language of the material
-                    maxKey = null;
+                    // get most common language of the material
+                    let maxKey = null;
                     for (let key in language) {
                         if (!maxKey) {
                             maxKey = key;
@@ -331,9 +333,10 @@ function prepareUserModels() {
                 cookie_url AS (
                     SELECT
                         cookie_activities.uuid AS uuid,
-                        ${schema}.urls.url AS url
+                        array_agg(${schema}.urls.url) AS urls
                     FROM cookie_activities LEFT JOIN ${schema}.urls
                     ON cookie_activities.url_id=${schema}.urls.id
+                    GROUP BY cookie_activities.uuid
                 )
 
                 SELECT * FROM cookie_url;

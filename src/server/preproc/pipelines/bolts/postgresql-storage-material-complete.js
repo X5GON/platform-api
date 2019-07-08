@@ -21,7 +21,7 @@ class PostgresqlMaterialComplete {
         this._prefix = `[PostgresqlMaterialComplete ${this._name}]`;
 
         // create the postgres connection
-        this._pg = require('@lib/postgresQL')(config.pg);
+        this._pg = require('alias:lib/postgresQL')(config.pg);
 
         callback();
     }
@@ -45,14 +45,15 @@ class PostgresqlMaterialComplete {
             oer_materials,
             material_contents,
             features_public,
-            urls
+            urls,
+            provider_token
         } = message;
 
-        self._pg.select({ url: urls.material_url.url }, 'urls', function (error, result) {
+        self._pg.select({ url: urls.material_url.url }, 'material_process_pipeline', function (error, result) {
             if (error) { return callback(error); }
 
             // the database already has the material
-            if (result.length) { return callback(); }
+            if (result.length && result[0].status === 'finished') { return callback(); }
 
             // otherwise insert the missing values
             self._pg.insert(oer_materials, 'oer_materials', (error, result) => {
@@ -104,38 +105,62 @@ class PostgresqlMaterialComplete {
                 material_url.material_id = material_id;
 
                 tasks.push(function (xcallback) {
-                    // set url list
-                    const urlData = [provider_uri, material_url];
-                    // create requests
-                    const promises = urlData.map(url => {
-                        return new Promise((resolve, reject) => {
-                            self._pg.upsert(url, { url: null }, 'urls', function (e, res) {
-                                if (e) { return reject(e); }
-                                return resolve(res[0].id);
+                    // check for provider in database
+                    self._pg.select({ token: provider_token }, 'providers', (xe, results) => {
+                        if (xe) { return xcallback(xe); }
+                        const provider_id = results.length ? results[0].id : null;
+                        // set the provider id if inside the database
+                        provider_uri.provider_id = provider_id;
+                        material_url.provider_id = provider_id;
+                        // set url list
+                        const urlData = [provider_uri, material_url];
+                        // create requests
+                        const promises = urlData.map(url => {
+                            return new Promise((resolve, reject) => {
+                                self._pg.upsert(url, { url: null }, 'urls', function (e, res) {
+                                    if (e) { return reject(e); }
+                                    return resolve(res[0].id);
+                                });
                             });
                         });
-                    });
 
-                    Promise.all(promises).then(ids => {
-                        // insert the contains record
-                        self._pg.execute(`INSERT INTO contains (container_id, contains_id) VALUES (${ids[0]}, ${ids[1]}) ON CONFLICT ON CONSTRAINT contains_pkey DO NOTHING;`, [], function (e, res) {
-                            if (e) { return xcallback(e); }
-                            return xcallback(null, 1);
-                        });
-                    }).catch(e => xcallback(e));
+                        Promise.all(promises).then(ids => {
+                            // insert the contains record
+                            self._pg.execute(`INSERT INTO contains (container_id, contains_id) VALUES (${ids[0]}, ${ids[1]}) ON CONFLICT ON CONSTRAINT contains_pkey DO NOTHING;`, [], function (e, res) {
+                                if (e) { return xcallback(e); }
+                                return xcallback(null, 1);
+                            });
+                        }).catch(e => xcallback(e));
+                    });
                 });
 
                 ///////////////////////////////////////////
                 // RUN THE TASKS
                 ///////////////////////////////////////////
 
-                async.series(tasks, function (e, res) {
+                async.series(tasks, function (e) {
                     if (e) { return callback(e); }
-                    return callback();
+                    return self._changeStatus(material_url.url, callback);
                 });
 
             }); // self._pg.insert(oer_materials)
         });
+    }
+
+    /**
+     * Changes the status of the material process.
+     * @param {Object} url - The material url.
+     * @param {Function} callback - THe final callback function.
+     */
+    _changeStatus(url, callback) {
+        return this._pg.update(
+            { status: 'finished' },
+            { url },
+            'material_process_pipeline', () => {
+                // trigger the callback function
+                return callback();
+            }
+        );
     }
 }
 

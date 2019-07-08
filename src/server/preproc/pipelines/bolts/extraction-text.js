@@ -7,7 +7,9 @@
  */
 
 // external libraries
-const textract = require('textract');
+const textract = require('alias:lib/textract');
+
+
 
 /**
  * Formats Material into a common schema.
@@ -32,6 +34,10 @@ class ExtractionText {
             'gz'    // zip files
         ];
 
+        // configuration for textract
+        this.textConfig = config.text_config;
+        // create the postgres connection
+        this._pg = require('alias:lib/postgresQL')(config.pg);
         // use other fields from config to control your execution
         callback();
     }
@@ -46,25 +52,40 @@ class ExtractionText {
     }
 
     receive(material, stream_id, callback) {
-
-        if (material.type && !this._invalidTypes.includes(material.type.ext)) {
+        const self = this;
+        if (material.type && !self._invalidTypes.includes(material.type.ext)) {
             // extract raw text from materialURL
             textract.fromUrl(material.materialurl, (error, text) => {
                 if (error) {
-                    material.message = `${this._prefix} Not able to extract text.`;
-                    return this._onEmit(material, 'stream_partial', callback);
+                    material.message = `${self._prefix} Not able to extract text.`;
+                    return self._changeStatus(material, 'stream_partial', callback);
                 }
                 // save the raw text within the metadata
                 material.materialmetadata.rawText = text;
-                // send material object to next component
-                return this._onEmit(material, stream_id, callback);
+                return self._changeStatus(material, stream_id, callback);
             });
         } else {
             // send the material to the partial table
-            material.message = `${this._prefix} Material does not have type provided.`;
-            return this._onEmit(material, 'stream_partial', callback);
+            material.message = `${self._prefix} Material does not have type provided.`;
+            return self._changeStatus(material, 'stream_partial', callback);
         }
     }
+
+    /**
+     * Changes the status of the material process and continues to the next bolt.
+     * @param {Object} material - The material object.
+     * @param {String} stream_id - The stream ID.
+     * @param {Function} callback - THe final callback function.
+     */
+    _changeStatus(material, stream_id, callback) {
+        const self = this;
+        const error = stream_id === 'stream_partial' ? ' error' : '';
+        return self._pg.update({ status: `extracted text${error}` }, { url: material.materialurl }, 'material_process_pipeline', () => {
+            // send material object to next component
+            return self._onEmit(material, stream_id, callback);
+        });
+    }
+
 }
 
 exports.create = function (context) {

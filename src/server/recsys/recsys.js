@@ -3,7 +3,7 @@
  */
 
 // configurations
-const config = require('@config/config');
+const config = require('alias:config/config');
 
 // external modules
 const express = require('express');
@@ -11,13 +11,12 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 // internal modules
-const pg = require('@lib/postgresQL')(config.pg);
-const Logger = require('@lib/logging-handler')();
+const pg = require('alias:lib/postgresQL')(config.pg);
+const Logger = require('alias:lib/logger');
 
-// get process environment
-const env = process.env.NODE_ENV;
 // create a logger instance for logging API requests
-const logger = Logger.createGroupInstance(`recsys-requests-${env}`, 'api', env !== 'test');
+const { environment } = config;
+const logger = Logger.createGroupInstance('requests', 'recsys', environment === 'dev');
 
 // create express app
 let app = express();

@@ -1,0 +1,109 @@
+<div class="container">
+  <div class="row">
+    <div class="col">
+
+      <h1 class="doc doc__section">Process Monitor</h1>
+
+      <p class="information">
+        This panel shows the status of each process that is running in the
+        X5GON platform. One can manually disable and enable processes if required.
+        <b class="doc">NOTE:</b> The only process which does not have available
+        actions is the <b class="doc">X5GON_PLATFORM</b> process - through
+        which the actions are transfered.
+      </p>
+
+
+      <div id="process-monitor" class="table-responsive mt-4">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th scope="col" class="align-middle doc doc__query process-name">
+                <b class="doc">Process Name</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query process-id">
+                <b class="doc">ID</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query status">
+                <b class="doc">Status</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query time-since-creation">
+                <b class="doc">Time Since Creation</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query uptime">
+                <b class="doc">Uptime</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query created-at">
+                <b class="doc">Created At</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query times-restarted">
+                <b class="doc">Times Restarted</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query unstable-restarts">
+                <b class="doc">Unstable Restarts</b>
+              </th>
+              <th scope="col" class="text-center align-middle doc doc__query actions">
+                <b class="doc">Actions</b>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+
+            {{#each processList as |process|}}
+              <tr id="{{process.name}}" data-process-head="{{process.name}}">
+                <td class="align-middle">
+                  <b class="doc">{{process.name}}</b>
+                </td>
+                <td class="text-center align-middle">
+                  {{process.pm_id}}
+                </td>
+                <td class="text-center align-middle font-weight-bold {{statusColor process.pm2_env.status}}"
+                  type="status">
+                  {{process.pm2_env.status}}
+                </td>
+                <td class="text-center align-middle" type="running-time">
+                  {{process.pm2_env.running_time}}
+                </td>
+                <td class="text-center align-middle" type="uptime">
+                  {{process.pm2_env.pm_uptime}}
+                </td>
+                <td class="text-center align-middle" type="created-at">
+                  {{process.pm2_env.created_at_clean}}
+                <td class="text-center align-middle" type="restart-time">
+                  {{process.pm2_env.restart_time}}
+                </td>
+                <td class="text-center align-middle doc__number" type="unstable-restarts" data-value="{{process.pm2_env.unstable_restarts}}">
+                  {{process.pm2_env.unstable_restarts}}
+                </td>
+                <td class="text-center align-middle">
+                  {{#if (isNotEqual process.name 'X5GON_PLATFORM')}}
+                    {{#if (isEqual process.pm2_env.status 'online')}}
+                      <button type="button" class="btn btn-danger btn-sm"
+                        data-action="disable"
+                        data-process-id={{process.pm_id}}>
+                        disable
+                      </button>
+                    {{else}}
+                      <button type="button" class="btn btn-success btn-sm"
+                        data-action="enable"
+                        data-process-id={{process.pm_id}}>
+                        enable
+                      </button>
+                    {{/if}}
+                  {{/if}}
+                </td>
+              </tr>{{! tr#id=process.name }}
+            {{/each}}
+
+          </tbody>
+        </table>{{! .table-dashed-borders }}
+      </div>{{! #process-monitor .table-responsive }}
+
+    </div>{{! .col }}
+  </div>{{! .row }}
+</div>{{! .container }}
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script src="/js/admin-process-monitor-socket.js"></script>
+<script src="/js/admin-process-monitor-actions.js"></script>
+

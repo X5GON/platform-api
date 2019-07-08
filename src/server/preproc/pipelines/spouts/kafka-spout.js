@@ -34,7 +34,7 @@ class KafkaConsumer {
             groupId,
             sessionTimeout: 15000,
             protocol: ['roundrobin'],
-            fromOffset: 'earliest',
+            fromOffset: 'latest',
             commitOffsetsOnFirstJoin: true,
             outOfRangeOffset: 'earliest',
             migrateHLC: false,
@@ -49,6 +49,7 @@ class KafkaConsumer {
 
         // setup the listener
         this.consumerGroup.on('message', (message) => {
+            if (message.value === '') { return; }
             // push the new message to the container
             this._data.push(JSON.parse(message.value));
 

@@ -1,0 +1,190 @@
+/**********************************************
+ * Dataset Statistics
+ *********************************************/
+
+.stats {
+    text-align: center;
+    color: #5b95a5;
+}
+
+.stats__number {
+    font-size: 52px;
+}
+
+.stats__label {
+    line-height: 0.5;
+    text-align: center;
+}
+.stats__label span {
+    display: inline-block;
+    position: relative;
+    font-size: 24px;
+    font-weight: 500;
+}
+.stats__label span:before,
+.stats__label span:after {
+    content: "";
+    position: absolute;
+    height: 8px;
+    border-bottom: 3px solid #5b95a5;
+    top: 0;
+    width: 40%;
+}
+.stats__label span:before {
+    right: 100%;
+    margin-right: 15px;
+}
+.stats__label span:after {
+    left: 100%;
+    margin-left: 15px;
+}
+
+
+/**********************************************
+ * Process Monitor Table
+ *********************************************/
+
+#process-monitor .table-dashed-borders thead th {
+    border-bottom: 2px solid #5b95a5;
+    padding: 0 12px 5px 12px;
+}
+
+#process-monitor .doc.doc__query.process-name {
+    min-width: 120px;
+    width: 120px;
+}
+
+#process-monitor .doc.doc__query.process-id {
+    min-width: 20px;
+    width: 20px;
+}
+
+#process-monitor .doc.doc__query.status {
+    min-width: 100px;
+    width: 100px;
+}
+
+#process-monitor .doc.doc__query.time-since-creation,
+#process-monitor .doc.doc__query.uptime {
+    min-width: 120px;
+    width: 120px;
+}
+
+#process-monitor .doc.doc__query.created-at {
+    min-width: 220px;
+    width: 220px;
+}
+
+#process-monitor .doc.doc__query.times-restarted,
+#process-monitor .doc.doc__query.unstable-restarts {
+    min-width: 30px;
+    width: 30px;
+}
+
+#process-monitor td.doc__number[data-value] {
+    color: #990000;
+    font-weight: 600;
+}
+
+#process-monitor td.doc__number[data-value="0"] {
+    color: #226679;
+    font-weight: 600;
+}
+
+/**********************************************
+ * API Keys Table
+ *********************************************/
+
+#api-keys .table-dashed-borders thead th {
+    border-bottom: 2px solid #5b95a5;
+    padding: 0 12px 5px 12px;
+}
+
+#api-keys .doc.doc__query.owner {
+    min-width: 200px;
+    width: 200px;
+}
+
+#api-keys .doc.doc__query.id {
+    min-width: 30px;
+    width: 30px;
+}
+
+#api-keys .doc.doc__query.key {
+    min-width: 340px;
+    width: 340px;
+}
+
+#api-keys .doc.doc__query.permissions {
+    min-width: 120px;
+    width: 120px;
+}
+
+#api-keys .doc.doc__query.created-at {
+    min-width: 240px;
+    width: 240px;
+}
+
+/**********************************************
+ * OER Providers Table
+ *********************************************/
+
+#providers .table-dashed-borders thead th {
+    border-bottom: 2px solid #5b95a5;
+    padding: 0 12px 5px 12px;
+}
+
+#providers .doc.doc__query.name {
+    min-width: 300px;
+    width: 300px;
+}
+
+#providers .doc.doc__query.domain {
+    min-width: 300px;
+    width: 300px;
+}
+
+#providers .doc.doc__query.token {
+    min-width: 50px;
+    width: 50px;
+}
+
+#providers .doc.doc__query.contact {
+    min-width: 280px;
+    width: 280px;
+}
+
+#providers td.doc__number[data-value] {
+    color: #226679;
+    font-weight: 600;
+}
+
+#providers td.doc__number[data-value="0"] {
+    color: #990000;
+    font-weight: 600;
+}
+
+
+/**********************************************
+ * OER Providers Table
+ *********************************************/
+
+#admins .table-dashed-borders thead th {
+    border-bottom: 2px solid #5b95a5;
+    padding: 0 12px 5px 12px;
+}
+
+#admins .doc.doc__query.username {
+    min-width: 300px;
+    width: 300px;
+}
+
+#admins .doc.doc__query {
+    min-width: 300px;
+    width: 300px;
+}
+
+#admins .doc.doc__query.action {
+    min-width: 50px;
+    width: 50px;
+}

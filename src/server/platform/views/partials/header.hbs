@@ -1,51 +1,30 @@
 <header>
-  <nav class="navbar navbar-expand-md fixed-top">
+  <nav class="navbar navbar-expand-md">
     <div class="container">
-      <span class="navbar-brand mb-0 h1">
-        <a href="https://www.x5gon.org/">
-          <img src="https://www.x5gon.org/wp-content/themes/x5gon/dist/assets/img/logo.svg" alt="X5GON">
-        </a>
-      </span>
-      {{!-- <button class="navbar-toggler" type="button" data-toggle="collapse"
-        data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-        aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button> --}}
 
-      <ul class="navbar-nav mr-auto">
+      <ul class="navbar-nav mr-auto"></ul>
 
-        {{! home link }} {{! TODO add a proper home page }}
-        <li class="nav-item">
-          <a class="btn btn-nav btn-sm" href="/search">Search</a>
-        </li>
-      </ul>
+      <a href="/oer_provider/login" data-toggle="tooltip"
+        data-placement="bottom" title="Provider login">
+        <span class="fa-stack">
+          <i class="link-background fas fa-circle fa-stack-2x"></i>
+          <i class="link-symbol fas fa-sign-in-alt fa-stack-1x fa-inverse"></i>
+        </span>
+      </a>
 
-      {{!-- <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
+      <a class="ml-2" href="/join" data-toggle="tooltip"
+        data-placement="bottom" title="Join the X5GON network">
+        <span class="fa-stack">
+          <i class="link-background fas fa-circle fa-stack-2x"></i>
+          <i class="link-symbol fas fa-handshake fa-stack-1x fa-inverse"></i>
+        </span>
+      </a>
 
-        </ul> --}}
+      <a class="ml-2 btn btn-outline-secondary btn-sm rounded-0"
+        href="https://www.x5gon.org/#subscribe">
+          Subscribe
+      </a>
 
-        <a href="/oer-provider/login" data-toggle="tooltip"
-          data-placement="bottom" title="Provider login">
-          <span class="fa-stack">
-            <i class="link-background fas fa-circle fa-stack-2x"></i>
-            <i class="link-symbol fas fa-sign-in-alt fa-stack-1x fa-inverse"></i>
-          </span>
-        </a>
-
-        <a class="ml-2" href="/application-form" data-toggle="tooltip"
-          data-placement="bottom" title="Join the X5GON network">
-          <span class="fa-stack">
-            <i class="link-background fas fa-circle fa-stack-2x"></i>
-            <i class="link-symbol fas fa-handshake fa-stack-1x fa-inverse"></i>
-          </span>
-        </a>
-
-        <a class="ml-2 btn btn-outline-secondary btn-sm rounded-0"
-          href="https://www.x5gon.org/#subscribe">
-            Subscribe
-        </a>
-      {{!-- </div> --}}
     </div>
   </nav>
 </header>

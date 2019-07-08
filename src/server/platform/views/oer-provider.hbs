@@ -26,6 +26,20 @@
             </p>
           </div>{{! .repo-information }}
 
+          <div class="repo-information">
+            <h6>Processed OER Materials</h6>
+            <p>
+              <b class="doc">{{material_count_clean}}</b>
+            </p>
+          </div>{{! .repo-information }}
+
+          <div class="repo-information">
+            <h6>Logged Number of Visits</h6>
+            <p>
+              <b class="doc">{{visit_count_clean}}</b>
+            </p>
+          </div>{{! .repo-information }}
+
         </div>{{! .col-lg-3 }}
 
         <div class="col-lg-9">
@@ -51,7 +65,7 @@
             <p class="form-text">
               The X5GON Connect library contains functions for providing information about the
               user activity. What kind of user information the functions provide is listed in the
-              <a href="/privacy-policy" target="_blank">privacy policy</a>, section
+              <a href="/privacy_policy" target="_blank">privacy policy</a>, section
               "About the Data We Collect".
             </p>
             <p class="form-text">
@@ -62,7 +76,9 @@
             <h6>Latest Library</h6>
             <pre class="mb-4">
               <code class="language-handlebars">
-                &lt;script type="text/javascript" src="https://platform.x5gon.org/api/v1/snippet/latest/x5gon-log.min.js"&gt;&lt;/script&gt;
+                &lt;script type="text/javascript" src="https://platform.x5gon.org/api/v1/snippet/latest/x5gon-log.min.js"
+                    integrity="sha384-ZfzlS43MMnlhhaZGNiNLYUcwbS+ndioybwxGNvzEFR7XcaLun22bDz+tCvCUWfq0"
+                    crossorigin="anonymous"&gt;&lt;/script&gt;
               </code>
             </pre>
 
@@ -155,7 +171,7 @@
                         "link": "Learn more",
                         // link to the X5GON platform privacy policy - describing what are we collecting
                         // through the platform
-                        "href": "https://platform.x5gon.org/privacy-policy"
+                        "href": "https://platform.x5gon.org/privacy_policy"
                       },
                       onInitialise: function (status) {
                         var type = this.options.type;

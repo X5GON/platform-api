@@ -1,3 +1,9 @@
+/************************************************
+ * File Manager Module
+ * This module contains methods for manipulating 
+ * with files and folders.
+ */
+
 // internal modules
 const fs = require('fs');
 const path = require('path');
@@ -12,6 +18,21 @@ exports.removeFile = function(fileName) {
         fs.unlinkSync(fileName);
     } else {
         throw Error(`File does not exist: ${fileName}`);
+    }
+};
+
+/**
+ * @description Removes the file.
+ * @param {String} oldPath - Name of the file to be moved.
+ * @param {String} newPath - New destination of the file.
+ */
+exports.moveFile = function(oldPath, newPath) {
+    // check if file exists
+    if (fs.existsSync(oldPath)) {
+        // move the file to other folder
+        fs.renameSync(oldPath, newPath);
+    }else {
+        throw Error(`File does not exist: ${oldPath}`);
     }
 };
 

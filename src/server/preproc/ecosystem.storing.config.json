@@ -47,5 +47,37 @@
         "exec_mode": "cluster",
         "autorestart": true,
         "max_restarts": 20
+    }, {
+        "name": "STORING_RECSYS_TRANSITIONS",
+        "script": "pipeline.js",
+        "cwd": "./pipelines/",
+        "env": {
+            "NODE_ENV": "dev",
+            "TOPOLOGY": "storing-recsys-transitions"
+        },
+        "env_production": {
+            "NODE_ENV": "prod",
+            "TOPOLOGY": "storing-recsys-transitions"
+        },
+        "instances": "1",
+        "exec_mode": "cluster",
+        "autorestart": true,
+        "max_restarts": 20
+    }, {
+        "name": "STORING_PROVIDERS",
+        "script": "pipeline.js",
+        "cwd": "./pipelines/",
+        "env": {
+            "NODE_ENV": "dev",
+            "TOPOLOGY": "storing-providers"
+        },
+        "env_production": {
+            "NODE_ENV": "prod",
+            "TOPOLOGY": "storing-providers"
+        },
+        "instances": "1",
+        "exec_mode": "cluster",
+        "autorestart": true,
+        "max_restarts": 20
     }]
 }

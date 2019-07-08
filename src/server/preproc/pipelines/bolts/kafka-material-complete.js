@@ -5,7 +5,7 @@
  */
 
 // internal modules
-const KafkaProducer = require('@lib/kafka-producer');
+const KafkaProducer = require('alias:lib/kafka-producer');
 
 /**
  * @class KafkaSender
@@ -41,7 +41,7 @@ class KafkaMaterialComplete {
 
     receive(material, stream_id, callback) {
 
-        // TODO: split the material into pieces and send the data in the correct order
+        // split the material into pieces and send the data in the correct order
         const {
             title,
             description,
@@ -53,6 +53,7 @@ class KafkaMaterialComplete {
             dateretrieved,
             type,
             materialmetadata,
+            providertoken: provider_token,
             license
         } = material;
 
@@ -104,11 +105,16 @@ class KafkaMaterialComplete {
                         'transcription' :
                         'translation';
 
+                    const provider_specific = materialmetadata.providerspecific;
+
                     material_contents.push({
                         language,
                         type,
                         extension,
-                        value: { value },
+                        value: {
+                            value,
+                            ...(provider_specific && { provider_specific }),
+                        },
                         material_id: null
                     });
                 }
@@ -160,11 +166,15 @@ class KafkaMaterialComplete {
             urls: {
                 provider_uri,
                 material_url
-            }
+            },
+            provider_token
         };
         // send the message to the database topics
-        this._producer.send(this._kafka_topic, message);
-        return callback();
+        this._producer.send(this._kafka_topic, message, function (error) {
+            if (error) { return callback(error); }
+            return callback();
+        });
+
     }
 }
 

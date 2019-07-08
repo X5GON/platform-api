@@ -121,9 +121,11 @@ class MaterialValidator {
         this._context = context;
         this._onEmit = config.onEmit;
         this._prefix = `[MaterialValidator ${this._name}]`;
+        // create the postgres connection
+        this._pg = require('alias:lib/postgresQL')(config.pg);
 
         // initialize validator with
-        this._validator = require('@lib/schema-validator')();
+        this._validator = require('alias:lib/schema-validator')();
 
         // use other fields from config to control your execution
         callback();
@@ -141,13 +143,27 @@ class MaterialValidator {
     receive(material, stream_id, callback) {
         // validate the provided material
         const validation = this._validator.validateSchema(material, materialSchema);
-        const stream_direction = validation ? stream_id : 'stream_partial';
+        const stream_direction = validation.matching ? stream_id : 'stream_partial';
 
-        // send material to the next component
-        return this._onEmit(material, stream_direction, callback);
+        return this._changeStatus(material, stream_direction, callback);
+    }
 
-
-
+    /**
+     * Changes the status of the material process and continues to the next bolt.
+     * @param {Object} material - The material object.
+     * @param {String} stream_id - The stream ID.
+     * @param {Function} callback - THe final callback function.
+     */
+    _changeStatus(material, stream_id, callback) {
+        const error = stream_id === 'stream_partial' ? ' error' : '';
+        return this._pg.update(
+            { status: `material validated${error}` },
+            { url: material.materialurl },
+            'material_process_pipeline', () => {
+                // send material object to next component
+                return this._onEmit(material, stream_id, callback);
+            }
+        );
     }
 }
 

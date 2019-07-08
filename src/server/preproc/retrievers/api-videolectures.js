@@ -7,21 +7,24 @@
 // import basic api class
 const BasicRESTAPI = require('./api-rest-basic');
 
-// create an videolectures data retrieval class
+/**
+ * @class VideolecturesAPI
+ * @description The class for retrieving videolectures materials.
+ */
 class VideolecturesAPI extends BasicRESTAPI {
 
     /**
      * Initialize the Videolectures API class.
      * @param {Object} args - The constructor parameters.
-     * @param {String} args.apikey - The key used to make the request.
-     * @param {Function} args.callback - The callback how to process the material.
-     * @param {Object} args.pg - The postgres connection object.
+     * @param {String} args.apikey - The API key used to make the request.
      */
     constructor(args) {
-        // set domain for crawling
         super(args);
+        // set retriever parameters
         this._domain = 'http://videolectures.net';
         this._apikey = args.apikey || null;
+        // enable retriever
+        this._enabled = true;
     }
 
     /**
@@ -29,12 +32,12 @@ class VideolecturesAPI extends BasicRESTAPI {
      * @param {String} url - The slug of the videolectures.
      * @param {Function} cb - Function specifying what to do with the data.
      */
-    get(url, cb) {
+    getMaterial(url, cb) {
 
         let self = this;
 
         if (!url) {
-            const error = new Error('[API-Videolectures get] url not provided');
+            const error = new Error('[VideolecturesAPI.getMaterial] url not provided');
             return cb(error);
         }
 
@@ -64,29 +67,28 @@ class VideolecturesAPI extends BasicRESTAPI {
                 }
 
                 // create a container for oer materials
-                let OERMaterials = [];
+                let oer_materials = [];
                 // go through all attachments
                 for (let attachments of content) {
                     // go through all attachments
                     for (let file of attachments.attachments) {
                         const display = file.type_display;
                         if (display && (display.includes('Slide Presentation') || display.includes('generic video source'))) {
-                            const oerMaterial = this._prepareMaterial(materials, file);
+                            const oer_material = this._prepareMaterial({ materials, file, part: attachments.part });
+                            // check if the material is already in the database
+                            oer_materials.push(new Promise((resolve, reject) => {
 
-                            // TODO: check if the material is already in the database
-                            OERMaterials.push(new Promise((resolve, reject) => {
-
-                                self._pg.select({ url: oerMaterial.materialurl }, 'urls', (xerror, results) => {
+                                self._pg.select({ url: oer_material.materialurl }, 'material_process_pipeline', (xerror, results) => {
                                     if (xerror) { return reject(xerror); }
-
                                     if (results.length === 0) {
                                         // the material is not in the database yet
-                                        return resolve(oerMaterial);
+                                        return resolve(oer_material);
                                     } else {
                                         // the material can be skipped, already in database
                                         return resolve(null);
                                     }
                                 });
+
                             }));
                         }
 
@@ -94,7 +96,7 @@ class VideolecturesAPI extends BasicRESTAPI {
                 }
 
                 // wait for the materials
-                Promise.all(OERMaterials).then(materials => {
+                Promise.all(oer_materials).then(materials => {
                     const newMaterials = materials.filter(material => material);
                     // return the material through the callback
                     return cb(null, newMaterials);
@@ -107,45 +109,25 @@ class VideolecturesAPI extends BasicRESTAPI {
     }
 
     /**
-     * Starts the crawling process.
+     * Enable the retriever.
      */
     start() {
-        let self = this;
-        // make crawling enabled
-        self._enabled = true;
-
-        // setup the crawling interval
-        self._interval = setInterval(() => {
-            self._fetchLecture(`${self._domain}/site/api/lectures?apikey=${self._apikey}`,
-                self._checkMaterialDb()
-            );
-        }, self._frequency);
-
-        // start crawling the materials
-        self._fetchLecture(`${self._domain}/site/api/lectures?apikey=${self._apikey}`,
-            self._checkMaterialDb()
-        );
-    }
+        this._enabled = true;
+     }
 
     /**
-     * Stops the crawling process.
+     * Stops the retriever.
      */
     stop() {
         this._enabled = false;
-        if (this._interval) {
-            clearInterval(this._interval);
-            this._interval = null;
-        }
     }
 
     /**
-     * Changes the crawling frequency and restarts the crawling process.
-     * @param {Number} params.frequency - The crawling frequency.
+     * Changes the material processing callback and restarts the retriever.
+     * @param {Object} params - The update parameters.
      * @param {Function} params.callback - The material processing callback.
      */
-    update(params) {
-        const { frequency, callback } = params;
-        this._frequency = frequency || this._frequency;
+    update({ callback }) {
         this._processCb = callback || this._processCb;
         // stop and restart the crawling
         this.stop(); this.start();
@@ -162,11 +144,28 @@ class VideolecturesAPI extends BasicRESTAPI {
      * the file metadata.
      * @returns {Object} The formatted material object from Videolectures.
      */
-    _prepareMaterial(material, file) {
+    _prepareMaterial(params) {
+        // get material metadata
+        let {
+            materials: {
+                title,
+                description,
+                slug,
+                authors,
+                language,
+                time
+            },
+            file: {
+                src,
+                ext,
+                mimetype
+            },
+            part
+        } = params;
 
-        // get values from the material and file object that are used
-        const { title, description, slug, authors, language, time } = material;
-        const { src, ext, mimetype } = file;
+        // fix mimetype and extension if required
+        mimetype = mimetype ? mimetype : super.mimetype(src);
+        ext = ext ? ext : super.extension(mimetype);
 
         // return the material object
         return {
@@ -179,11 +178,14 @@ class VideolecturesAPI extends BasicRESTAPI {
             type: { ext, mime: mimetype },
             datecreated: time,
             dateretrieved: (new Date()).toISOString(),
-            providermetadata: {
-                title: 'Videolectures.NET',
-                url: this._domain
+            providertoken: this._token,
+            materialmetadata: {
+                providerspecific: {
+                    slug,
+                    part
+                }
             },
-            license: 'CC BY-NC-ND 3.0'
+            license: 'Creative Commons BY-NC-ND 3.0'
         };
     }
 

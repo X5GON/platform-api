@@ -1,3 +1,7 @@
+/************************************************
+ * Project Configurations
+ */
+
 // external modules
 const path = require('path');
 
@@ -24,7 +28,8 @@ const common = {
             {
                 name: "Videolectures.NET",
                 domain: "http://videolectures.net/",
-                script: "api-videolectures.js",
+                script: "api-videolectures",
+                token: process.env.TOKEN_VIDEOLECTURES,
                 config: {
                     apikey: process.env.RETRIEVERS_VL_APIKEY
                 }
@@ -51,10 +56,8 @@ const prod = {
     recsys: {
         port: parseInt(process.env.PROD_RECSYS_PORT) || 3000
     },
-    monitor: {
-        port: parseInt(process.env.PROD_MONITOR_PORT) || 7500,
-        sessionSecret: process.env.PROD_MONITOR_SESSION_SECRET,
-        adminToken: process.env.PROD_MONITOR_ADMIN_TOKEN
+    quality: {
+        port: parseInt(process.env.PROD_QUALITY_PORT) || 6001
     },
     kafka: {
         host: process.env.PROD_KAFKA_HOST || '127.0.0.1:9092',
@@ -82,10 +85,8 @@ const dev = {
     recsys: {
         port: parseInt(process.env.DEV_RECSYS_PORT) || 3001
     },
-    monitor: {
-        port: parseInt(process.env.DEV_MONITOR_PORT) || 7501,
-        sessionSecret: process.env.DEV_MONITOR_SESSION_SECRET,
-        adminToken: process.env.DEV_MONITOR_ADMIN_TOKEN
+    quality: {
+        port: parseInt(process.env.DEV_QUALITY_PORT) || 6001
     },
     kafka: {
         host: process.env.DEV_KAFKA_HOST || '127.0.0.1:9092',
@@ -113,10 +114,8 @@ const test = {
     recsys: {
         port: parseInt(process.env.TEST_RECSYS_PORT) || 3002
     },
-    monitor: {
-        port: parseInt(process.env.TEST_MONITOR_PORT) || 7502,
-        sessionSecret: process.env.TEST_MONITOR_SESSION_SECRET,
-        adminToken: process.env.TEST_MONITOR_ADMIN_TOKEN
+    quality: {
+        port: parseInt(process.env.TEST_QUALITY_PORT) || 6001
     },
     kafka: {
         host: process.env.TEST_KAFKA_HOST || '127.0.0.1:9092',

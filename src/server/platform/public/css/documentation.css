@@ -1,0 +1,178 @@
+/**********************************************
+ * Documentation specific styles
+ *********************************************/
+
+.doc-navigation {
+    position: fixed;
+    top: 9rem;
+    left: 3%;
+}
+
+.doc-navigation ul {
+    list-style-type: none;
+    margin-bottom: 0;
+    padding-inline-start: 20px;
+}
+
+@media screen and (max-width: 1720px) {
+    .doc-navigation {
+        position: relative;
+        top: 0px;
+        left: 0px;
+        margin-bottom: 20px;
+    }
+    .doc-navigation ul:first-child {
+        padding-inline-start: 0px;
+    }
+}
+
+
+.doc-navigation a.route {
+    font-weight: 300;
+}
+
+
+.doc.url_baseline {
+    background-color: #eaeaea;
+    color: #226679;
+}
+
+.doc.url_baseline p {
+    margin: 0;
+    word-wrap: break-word;
+}
+
+
+.doc.doc__section {
+    font-weight: 600;
+    color: #226679;
+}
+
+.doc.doc__subsection {
+    color: #226679;
+}
+
+
+.doc.doc__method {
+    padding: 0px;
+    height: 0px;
+}
+
+.doc.doc__method.request {
+    width: 1%;
+}
+
+.doc.doc__method.route {
+    min-width: 330px;
+    width: 39%;
+}
+
+.doc.doc__method.description {
+    min-width: 400px;
+    width: 60%;
+}
+
+
+.doc.doc__query {
+    padding: 0px;
+    height: 0px;
+}
+
+.doc.doc__query.name {
+    min-width: 120px;
+    width: 120px;
+}
+
+.doc.doc__query.type {
+    min-width: 70px;
+    width: 70px;
+}
+
+.doc.doc__query.title {
+    min-width: 150px;
+    width: 150px;
+}
+
+.doc.doc__query.optional {
+    min-width: 110px;
+    width: 110px;
+}
+
+.doc.doc__query.description {
+    min-width: 240px;
+}
+
+
+.doc.doc--small {
+    color: #9e9e9e;
+    font-size: 12px;
+}
+
+.doc.doc--small::after {
+    content: "\A";
+    white-space: pre;
+}
+
+
+
+b.doc {
+    color: #226679;
+    font-weight: 600;
+}
+
+b.doc.error {
+    color: #990000;
+    font-weight: 600;
+}
+
+a.anchor {
+    display: block;
+    position: relative;
+    top: -60px;
+    visibility: hidden;
+}
+
+a.doc {
+    color: #226679;
+    font-weight: 600;
+}
+
+a.doc:hover {
+    color: #323232;
+}
+
+
+/**********************************************
+ * Table style
+ *********************************************/
+
+
+.table.table--second-level {
+    background-color: #f1f1f1;
+}
+
+.table.table--third-level {
+    background-color: #e6e6e6;
+}
+
+.table-dashed-borders thead th {
+    border: 0px;
+}
+.table-dashed-borders tbody tr.no-bottom-border > td {
+    border-bottom: 0px solid;
+}
+
+.table-dashed-borders tbody tr.no-top-border > td {
+    border-top: 0px solid;
+}
+
+.table-dashed-borders td {
+    border-top: 1px dashed #e1e1e1;
+    border-bottom: 1px dashed #e1e1e1;
+}
+
+tr.clickable-row {
+    cursor: pointer;
+}
+
+

@@ -1,8 +1,8 @@
 /************************************************
- * Kafka Consumer Spout
- * This component is listening to a Kafka topic
- * and then sends the message forward to the next
- * component in the topology.
+ * Kafka Consumer Module
+ * This module creates a kafka consumer which
+ * can be used to listen on a particular kafka
+ * topic and receive its messages.
  */
 
 // external modules
@@ -34,7 +34,7 @@ class KafkaConsumer {
             groupId,
             sessionTimeout: 15000,
             protocol: ['roundrobin'],
-            fromOffset: 'earliest',
+            fromOffset: 'latest',
             commitOffsetsOnFirstJoin: true,
             outOfRangeOffset: 'earliest',
             migrateHLC: false,
@@ -49,6 +49,7 @@ class KafkaConsumer {
 
         // setup the listener
         this.consumerGroup.on('message', (message) => {
+            if (message.value === '') { return; }
             // push the new message to the container
             this._data.push(JSON.parse(message.value));
 

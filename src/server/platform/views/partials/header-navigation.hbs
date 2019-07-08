@@ -1,0 +1,68 @@
+<header>
+  <nav class="navbar navbar-expand-md">
+    <div class="container">
+      <span class="navbar-brand mb-0 h1">
+        <a href="https://www.x5gon.org/">
+          <img src="https://www.x5gon.org/wp-content/themes/x5gon/dist/assets/img/logo.svg" alt="X5GON">
+        </a>
+      </span>
+
+      <ul class="navbar-nav mr-auto"></ul>
+
+        <a href="/oer_provider/login" data-toggle="tooltip"
+          data-placement="bottom" title="Provider login">
+          <span class="fa-stack">
+            <i class="link-background fas fa-circle fa-stack-2x"></i>
+            <i class="link-symbol fas fa-sign-in-alt fa-stack-1x fa-inverse"></i>
+          </span>
+        </a>
+
+        <a class="ml-2" href="/join" data-toggle="tooltip"
+          data-placement="bottom" title="Join the X5GON network">
+          <span class="fa-stack">
+            <i class="link-background fas fa-circle fa-stack-2x"></i>
+            <i class="link-symbol fas fa-handshake fa-stack-1x fa-inverse"></i>
+          </span>
+        </a>
+
+        <a class="ml-2 btn btn-outline-secondary btn-sm rounded-0"
+          href="https://www.x5gon.org/#subscribe">
+            Subscribe
+        </a>
+    </div>
+  </nav>
+
+  <nav class="navbar navbar-expand-md site-nav mb-4">
+    <div class="container">
+
+      <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse"
+        data-target="#site-navigation" aria-controls="site-navigation"
+        aria-expanded="false" aria-label="Toggle site navigation">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30" width="30" height="30" focusable="false">
+          <title>Menu</title>
+          <path stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-miterlimit="10" d="M4 7h22M4 15h22M4 23h22"></path>
+        </svg>
+      </button>
+
+      <div class="collapse navbar-collapse" id="site-navigation">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item {{home}}">
+            <a class="btn btn-nav" href="/">Home</a>
+          </li>
+          <li class="nav-item {{search}}">
+            <a class="btn btn-nav" href="/search">Search</a>
+          </li>
+          <li class="nav-item {{docs}}">
+            <a class="btn btn-nav" href="/documentation">API</a>
+          </li>
+          <li class="nav-item {{join}}">
+            <a class="btn btn-nav" href="/join">Join</a>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </nav>
+
+</header>
