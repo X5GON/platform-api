@@ -592,13 +592,13 @@ class x5recommend {
 
             pg.execute(queryPG, [] , function(err, res){
                 if (err){
-                    self.logger.error('Error fetching user model: ' + err);
-                    resolve({error: 'Error fetching user model'});
+                    self.logger.error('Error fetching collaborative filtering recommendations from'     + ' database: ' + err);
+                    resolve({error: 'Error fetching collaborative filtering recommendations from'       + 'database'});
                     return;
                 }
 
                 if (!res || res.length == 0){
-                    resolve({error: 'Cookie is not in the database - unable to fetch the user'});
+                    resolve({error: 'Cookie is not in the database - unable to fetch the ' +            'collaborative filtering recommendations.'});
                     return;
                 }
 
@@ -632,6 +632,13 @@ class x5recommend {
                         textType: detectType(material.mimetype) === 'text',
                     };
                     recommendations.push(item);
+                }
+
+                if (!recommendations){
+                    console.log('Empty rec.');
+                    recommendations = {error : 'Error fetching collaborative filtering ' +              'recommendations'};
+                    resolve(recommendations);
+                    return;
                 }
 
                 resolve(recommendations);
