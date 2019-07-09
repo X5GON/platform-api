@@ -52,6 +52,7 @@ class ExtractionTTPVideo {
         // the transcription formats
         this._formats = config.formats || {
             0: 'dfxp',
+            3: 'webvtt',
             4: 'plain'
         };
 
