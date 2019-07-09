@@ -767,8 +767,6 @@ class x5recommend {
                 self._materialFormat(material, results[1][id])
             );
         }).catch((error) => {
-            console.log("Bananas. Forgot to handle a rejection!");
-            console.log('ERROR:', error);
             return error;
         });
 
