@@ -193,9 +193,6 @@ module.exports = function (pg, logger) {
 
     });
 
-
-
-
     // GET recommendation based on query
     router.get('/recommend/personalized', (req, res) => {
         // get the query parameters
@@ -264,10 +261,6 @@ module.exports = function (pg, logger) {
                
     // GET recommendation based on history
     router.get('/recommend/collaborativeFiltering', (req, res) => {
-        logger.info('client requested for collaborative filtering',
-            logger.formatRequest(req)
-        );
-
         // get the query parameters
         let query = req.query;
         query.uuid = req.cookies[x5gonCookieName] ? req.cookies[x5gonCookieName] : null;
@@ -284,7 +277,7 @@ module.exports = function (pg, logger) {
         }
 
         // get the recommended material - returns a promise
-        let recommendations = x5recommend.recommendCollaborativeFiltering(query);
+        let recommendations = x5recommend.recommend(query, 'collaborative');
         
         recommendations.then(function(result){
             if (result.error){
@@ -303,15 +296,11 @@ module.exports = function (pg, logger) {
                     res.status(400);
                     return res.send({ error: "Bad request: " + contentRecommendations.error });
                 }
-                // log the recommendation success
-                logger.info('client requested for recommendation successful');
                 // send the recommendations to the user
                 res.status(200);
                 return res.send(contentRecommendations);
             }
             
-            // log the recommendation success
-            logger.info('client requested for CF recommendation successful');
             // send the recommendations to the user
             res.status(200);
             return res.send(result);

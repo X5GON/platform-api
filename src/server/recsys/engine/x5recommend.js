@@ -583,7 +583,9 @@ class x5recommend {
                     wikipediaConceptSupport: wikipediaConceptSupport
                 };
 
-                let recommendations = self.userMaterialSimNN.search(query);
+                const maxCount = query.count ? query.count : 20;
+
+                let recommendations = self.userMaterialSimNN.search(query, maxCount);
 
                 if (!recommendations) {
                     self.logger.warn('[warn] x5recommend.recommendPersonalized', {
@@ -596,18 +598,12 @@ class x5recommend {
                     return reject(recommendations);
                 }
 
-                // format recommendations
-                recommendations = recommendations[0].map((material, id) =>
-                    self._materialFormat(material, recommendations[1][id])
-                );
-
                 return resolve(recommendations);
             });
         });
 
     }
 
-<<<<<<< HEAD
     /******************************************************
       * Collaborative Filtering Recommendation Functions
       *****************************************************/
@@ -623,50 +619,53 @@ class x5recommend {
       * @param {String} [query.type] - The metrics type.
       * @returns {Array.<Object>} An array of recommended learning material.
       */
-     recommendCollaborativeFiltering(query) {
+     recommendCollaborativeFiltering(userQuery) {
         let self = this;
         let recommendations;
 
+        let count = userQuery.count ? userQuery.count : 20;
+
         return new Promise(function (resolve, reject){
-            if (!query) {
+            if (!userQuery) {
                 let errorMessage = 'recommendPersonalized: Missing query';
                 self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
-                    error: errorMessage, query
+                    error: errorMessage, userQuery
                 });
                 // not supported query option - return error
-                resolve({ error: errorMessage });
+                reject({ error: errorMessage });
                 return;
             }
 
             let queryPG = `
-                SELECT provider_uri as url, title as title, description as description, provider as
-                provider, language as language, type as mimetype FROM rec_sys_material_model
-                WHERE url_id IN (
-                    SELECT url_id FROM user_activities WHERE cookie_id IN (
-                        SELECT cookie_id FROM user_activities
-                            WHERE cookie_id<>1 AND cookie_id NOT IN(
-                                SELECT id FROM cookies WHERE uuid = ${query.uuid})
-                            AND url_id IN (
-                                SELECT url_id FROM user_activities WHERE cookie_id IN (
-                                    SELECT id FROM cookies WHERE uuid = ${query.uuid})
-                            )
+            WITH url_count AS (
+                SELECT url_id, COUNT(url_id) AS count FROM user_activities WHERE cookie_id IN (
+                    SELECT cookie_id FROM user_activities
+                    WHERE cookie_id<>1 AND cookie_id NOT IN
+                        (SELECT id FROM cookies WHERE uuid = '${userQuery.uuid}')
+                        AND url_id IN (
+                            SELECT url_id FROM user_activities 
+                            WHERE cookie_id IN 
+                            (SELECT id FROM cookies WHERE uuid = '${userQuery.uuid}')
                         )
-                    GROUP BY url_id ORDER BY COUNT(url_id) DESC)
-                LIMIT 10;`;
+                ) 
+                GROUP BY url_id ORDER BY count DESC
+            )            
+            SELECT url_count.*, rsmm.* FROM url_count, rec_sys_material_model AS rsmm WHERE url_count.url_id = rsmm.url_id ORDER BY count DESC LIMIT ${count};`;
 
             pg.execute(queryPG, [] , function(err, res){
                 if (err){
                     self.logger.error('Error fetching collaborative filtering recommendations from'     + ' database: ' + err);
-                    resolve({error: 'Error fetching collaborative filtering recommendations from'       + 'database'});
+                    reject({error: 'Error fetching collaborative filtering recommendations from'       + 'database'});
                     return;
                 }
 
                 if (!res || res.length == 0){
-                    resolve({error: 'Cookie is not in the database - unable to fetch the ' +            'collaborative filtering recommendations.'});
+                    reject({error: 'Cookie is not in the database - unable to fetch the ' +            'collaborative filtering recommendations.'});
                     return;
                 }
 
-                recommendations = [];
+                let materials = [];
+                let weights =  [];
 
                 /**
                 * Detects the type of the material.
@@ -684,34 +683,54 @@ class x5recommend {
                 }
 
                 for (let material of res){
+                    let wikipediaConceptNames = [];
+                    let wikipediaConceptSupport = [];
+                    for (let concept in material.concepts){
+                        wikipediaConceptNames.push(concept);
+                        wikipediaConceptSupport.push(material.concepts[concept]);
+                    }
+
                     let item = {
-                        url: material.url,
+                        url: material.provider_uri,
                         title: material.title,
                         description: material.description,
                         provider: material.provider,
                         language: material.language,
-                        type: detectType(material.mimetype),
-                        videoType: detectType(material.mimetype) === 'video',
-                        audioType: detectType(material.mimetype) === 'audio',
-                        textType: detectType(material.mimetype) === 'text',
+                        mimetype: material.type,
+                        wikipediaConceptNames: new qm.la.StrVector(wikipediaConceptNames),
+                        wikipediaConceptSupport: new qm.la.Vector(wikipediaConceptSupport)
                     };
-                    recommendations.push(item);
+                    materials.push(item);
+                    weights.push(material.count);
                 }
 
-                if (!recommendations){
-                    console.log('Empty rec.');
-                    recommendations = {error : 'Error fetching collaborative filtering ' +              'recommendations'};
-                    resolve(recommendations);
-                    return;
-                }
+                recommendations = [materials, weights];
 
-                resolve(recommendations);
-                return;
+                if (!recommendations) {
+                    let errorMessage = 'Error fetching collaborative filtering ' +                      'recommendations';
+                    self.logger.warn('[warn] x5recommend.recommendMaterials', {
+                        error: { message: errorMessage },
+                        query: userQuery
+                    });
+                    // not supported query option - return error
+                    return reject({ error: errorMessage });
+        
+                } else if (recommendations.error) {
+                    // log the error given by the recommendation search
+                    self.logger.warn('[warn] x5recommend.recommendCollaborativeFiltering', {
+                        error: { message: recommendations.error },
+                        query: userQuery
+                    });
+                    // not supported query option - return error
+                    return reject({ error: recommendations.error });
+                }
+        
+                return resolve(recommendations);
+
             });
         });
     }
 
-=======
     /********************************************
      * General Interface for Recommendations
      *******************************************/
@@ -733,20 +752,24 @@ class x5recommend {
             recommendations = self.recommendBundles(query);
         } else if (type === 'personal') {
             recommendations = self.recommendPersonalized(query);
+        } else if (type === 'collaborative') {
+            recommendations = self.recommendCollaborativeFiltering(query);
         } else {
             recommendations = Promise.resolve([[],[]]);
         }
-
         // return an object
         return recommendations.then(results => {
             if (results.error) {
                 return results;
             }
-
             // return the list of recommended materials with their weights
-            return results[0].map((material, id) =>
+            return results[0].map((material, id) => 
                 self._materialFormat(material, results[1][id])
             );
+        }).catch((error) => {
+            console.log("Bananas. Forgot to handle a rejection!");
+            console.log('ERROR:', error);
+            return error;
         });
 
     }
@@ -819,6 +842,5 @@ class x5recommend {
     }
 
 
->>>>>>> upstream/master
 }
 module.exports = x5recommend;
