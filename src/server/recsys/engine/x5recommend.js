@@ -803,6 +803,7 @@ class x5recommend {
         let self = this;
 
         const {
+            materialId,
             url,
             title,
             description,
@@ -828,6 +829,7 @@ class x5recommend {
 
         // format the material
         return {
+            ...materialId && { material_id: materialId },
             weight,
             url,
             title,

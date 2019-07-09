@@ -123,7 +123,6 @@ function build(callback) {
         }
         for (let material of results) {
             logger.info(`next record being processed id=${material.id}`);
-
             // extract values from postgres record
             let {
                 title,
@@ -136,8 +135,11 @@ function build(callback) {
                 provider_name: provider,
                 text_extraction,
                 transcription,
-                wikipedia_concepts: wikipediaConcepts
+                wikipedia_concepts: wikipediaConcepts,
+                id: materialId
             } = material;
+
+            materialId = materialId.toString();
 
             // get raw text from the material
             let rawContent = text_extraction ? text_extraction : transcription;
@@ -168,7 +170,8 @@ function build(callback) {
                 mimetype,
                 language,
                 wikipediaConceptNames,
-                wikipediaConceptSupport
+                wikipediaConceptSupport,
+                materialId
             };
 
             // push to the recommendation model
@@ -188,7 +191,6 @@ function build(callback) {
             logger.info('closed');
         } else {
             logger.info('Processing material models.');
-
             pg.selectLarge({ }, 'rec_sys_material_model', 10, (error, results, cb) => {
                 if (error) {
                     logger.error('error when retrieving from postgres', { error: error.message });
