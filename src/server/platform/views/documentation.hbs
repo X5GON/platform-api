@@ -23,7 +23,22 @@
                 <ul>
                   <li>
                     <a class="doc route" href="#get-list-of-rec-materials">
-                      GET recommendations
+                      GET search for relevant materials
+                    </a>
+                  </li>
+                  <li>
+                    <a class="doc route" href="#get-list-of-rec-materials-2">
+                      GET recommended materials
+                    </a>
+                  </li>
+                  <li>
+                    <a class="doc route" href="#get-list-of-rec-bundles">
+                      GET recommended bundles (web pages)
+                    </a>
+                  </li>
+                  <li>
+                    <a class="doc route" href="#get-list-of-rec-collaborative">
+                      GET personalized recommended bundles (web pages)
                     </a>
                   </li>
                 </ul>
@@ -341,6 +356,24 @@
               <td>Get a list of relevant open educational resources</td>
               </a>
             </tr>
+            <tr class="clickable-row" data-href="#get-list-of-rec-materials-2">
+              <td><b class="doc">GET</b></td>
+              <td>/recommend/oer_materials</td>
+              <td>Get a list of relevant open educational resources</td>
+              </a>
+            </tr>
+            <tr class="clickable-row" data-href="#get-list-of-rec-bundles">
+              <td><b class="doc">GET</b></td>
+              <td>/recommend/oer_bundles</td>
+              <td>Get a list of most relevant open educational bundles</td>
+              </a>
+            </tr>
+            <tr class="clickable-row" data-href="#get-list-of-rec-collaborative">
+              <td><b class="doc">GET</b></td>
+              <td>/recommend/collaborative_filtering</td>
+              <td>Get a list of personalized open educational bundles</td>
+              </a>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -350,7 +383,7 @@
       {{!-- Get a list of open educational resources --}}
       <a class="anchor" id="get-list-of-rec-materials"></a>
       <h5 class="doc doc__subsection mt-5 mb-3">
-        Get a list of relevant open educational resources
+        Search for relevant materials
       </h5>
 
       <div class="table-responsive">
@@ -585,6 +618,21 @@
                     </tr>
                   </thead>
                   <tbody>
+                    <tr>
+                      <td><b class="doc">material_id</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> Integer
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material ID
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The unique ID of the OER material.
+                      </td>
+                    </tr>
 
                     <tr>
                       <td><b class="doc">weight</b></td>
@@ -853,6 +901,1019 @@
                   </tbody>
                 </table>
 
+
+              </td>{{!  colspan="5" }}
+            </tr>{{! .no-top-border }}
+
+
+
+          </tbody>
+        </table>
+      </div>{{! .table-responsive }}
+
+
+      {{!-- Get a list of open educational resources --}}
+      <a class="anchor" id="get-list-of-rec-materials-2"></a>
+      <h5 class="doc doc__subsection mt-5 mb-3">
+        Get a list of most relevant open educational resources (similar to <code>/search</code>)
+      </h5>
+
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th class="doc doc__method request"></td>
+              <th class="doc doc__method route"></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b class="doc">GET</b></td>
+              <td><b>/recommend/oer_materials</b></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="information">
+        Get a list of most relevant open educational resources.
+      </p>
+
+      <h6 class="mt-2">Query string parameters</h6>
+
+      <div class="table-responsive">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th class="doc doc__query name"></th>
+              <th class="doc doc__query type"></th>
+              <th class="doc doc__query title"></th>
+              <th class="doc doc__query optional"></th>
+              <th class="doc doc__query description"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td><b class="doc">text</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> String
+              </td>
+              <td>
+                <span class="doc doc--small">Title:</span> Query Text
+              </td>
+              <td>
+                <span class="doc doc--small">Optional:</span> false
+              </td>
+              <td>
+                The seed text from which the system finds the relevant
+                open educational resources.
+              </td>
+            </tr>
+
+            <tr>
+              <td><b class="doc">type</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> String
+              </td>
+              <td>
+                <span class="doc doc--small">Title:</span> Material Type
+              </td>
+              <td>
+                <span class="doc doc--small">Optional:</span> true
+              </td>
+              <td>
+                The type of open educational resources. Possible options:
+                all, video, audio and text.
+                <b class="doc">Default value</b> is <b>all</b>.
+              </td>
+            </tr>
+
+            <tr>
+              <td><b class="doc">page</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> Integer
+              </td>
+              <td>
+                <span class="doc doc--small">Title:</span> Page
+              </td>
+              <td>
+                <span class="doc doc--small">Optional:</span> true
+              </td>
+              <td>
+                The page number of the recommended list.
+                <b class="doc">Default value</b> is <b>1</b>.
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+
+      <h6 class="mt-2">Response body attributes</h6>
+
+      <div class="table-responsive">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th class="doc doc__query name"></th>
+              <th class="doc doc__query type"></th>
+              <th class="doc doc__query title"></th>
+              <th class="doc doc__query optional"></th>
+              <th class="doc doc__query description"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr class="no-bottom-border">
+              <td><b class="doc">rec_materials</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> Array
+              </td>
+              <td>
+                <span class="doc doc--small">Title:</span> Recommended Materials
+              </td>
+              <td>
+                <span class="doc doc--small">Read only:</span> true
+              </td>
+              <td>
+                An array of objects, each representing an recommended open
+                educational resource.
+              </td>
+            </tr>{{! .no-bottom-border }}
+
+            <tr class="no-top-border">
+              <td colspan="5">
+
+                <b class="doc">rec_materials object properties</b>
+
+                <table class="table table-dashed-borders table--second-level">
+                  <thead>
+                    <tr>
+                      <th class="doc doc__query name"></th>
+                      <th class="doc doc__query type"></th>
+                      <th class="doc doc__query title"></th>
+                      <th class="doc doc__query optional"></th>
+                      <th class="doc doc__query description"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <tr>
+                      <td><b class="doc">material_id</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> Integer
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material ID
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The unique ID of the OER material.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">weight</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> Float
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Recommendation Weight
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The number between 0 and 1 representing the relevance
+                        of the OER material. Greater weight means bigger relevance.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">url</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material URL
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The URL of the OER material.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">title</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material Title
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The title of the OER material.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">description</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material Description
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The description of the OER material.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">provider</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material Provider
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The name of the OER materials provider.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">language</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material Language
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The language of the OER material in ISO 639-1 code.
+                      </td>
+                    </tr>
+
+
+                    <tr class="no-bottom-border">
+                      <td><b class="doc">wikipedia</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> Array
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material Wikipedia Concepts
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        An array of objects, each representing the most relevant
+                        wikipedia concept of the material.
+                      </td>
+                    </tr>
+
+                    <tr class="no-top-border">
+                      <td colspan="5">
+
+                        <b class="doc">wikipedia object properties</b>
+
+                        <table class="table table-dashed-borders table--third-level">
+                          <thead>
+                            <tr>
+                              <th class="doc doc__query name"></th>
+                              <th class="doc doc__query type"></th>
+                              <th class="doc doc__query title"></th>
+                              <th class="doc doc__query optional"></th>
+                              <th class="doc doc__query description"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+
+                            <tr>
+                              <td><b class="doc">concept</b></td>
+                              <td>
+                                <span class="doc doc--small">Type:</span> String
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Title:</span> Wikipedia Concept
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Read only:</span> true
+                              </td>
+                              <td>
+                                The Wikipedia concept represented as an URL.
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td><b class="doc">support</b></td>
+                              <td>
+                                <span class="doc doc--small">Type:</span> Integer
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Title:</span> Wikipedia Concept Support
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Read only:</span> true
+                              </td>
+                              <td>
+                                The amount of elements in the material that support
+                                the given Wikipedia concept.
+                              </td>
+                            </tr>
+
+                          </tbody>
+                        </table>
+
+
+                      </td>{{!  colspan="5" }}
+                    </tr>{{! .no-top-border }}
+
+                    <tr>
+                      <td><b class="doc">type</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Material Type
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The type of the OER material.
+                      </td>
+                    </tr>
+
+                  </tbody>
+                </table>
+
+              </td>{{!  colspan="5" }}
+            </tr>{{! .no-top-border }}
+
+
+          </tbody>
+        </table>
+      </div>{{! .table-responsive }}
+
+
+      {{!-- Get a list of open educational resources --}}
+      <a class="anchor" id="get-list-of-rec-bundles"></a>
+      <h5 class="doc doc__subsection mt-5 mb-3">
+        Get a list of relevant open educational bundles (web pages)
+      </h5>
+
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th class="doc doc__method request"></td>
+              <th class="doc doc__method route"></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b class="doc">GET</b></td>
+              <td><b>/recommend/oer_bundles</b></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="information">
+        Get a list of relevant open educational bundles (web pages).
+      </p>
+
+      <h6 class="mt-2">Query string parameters</h6>
+
+      <div class="table-responsive">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th class="doc doc__query name"></th>
+              <th class="doc doc__query type"></th>
+              <th class="doc doc__query title"></th>
+              <th class="doc doc__query optional"></th>
+              <th class="doc doc__query description"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td><b class="doc">url</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> String
+              </td>
+              <td>
+                <span class="doc doc--small">Title:</span> website URL
+              </td>
+              <td>
+                <span class="doc doc--small">Optional:</span> false
+              </td>
+              <td>
+                The URL of the website containing the OER materials. The URL must
+                be present in the X5GON database
+              </td>
+            </tr>
+
+            <tr>
+              <td><b class="doc">page</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> Integer
+              </td>
+              <td>
+                <span class="doc doc--small">Title:</span> Page
+              </td>
+              <td>
+                <span class="doc doc--small">Optional:</span> true
+              </td>
+              <td>
+                The page number of the recommended list.
+                <b class="doc">Default value</b> is <b>1</b>.
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+
+      <h6 class="mt-2">Response body attributes</h6>
+
+      <div class="table-responsive">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th class="doc doc__query name"></th>
+              <th class="doc doc__query type"></th>
+              <th class="doc doc__query title"></th>
+              <th class="doc doc__query optional"></th>
+              <th class="doc doc__query description"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+
+            <tr class="no-bottom-border">
+              <td><b class="doc">rec_bundles</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> Array
+              </td>
+              <td>
+                <span class="doc doc--small">Title:</span> Recommended Bundles
+              </td>
+              <td>
+                <span class="doc doc--small">Read only:</span> true
+              </td>
+              <td>
+                An array of objects, each representing an recommended open
+                educational resource bundle.
+              </td>
+            </tr>{{! .no-bottom-border }}
+
+            <tr class="no-top-border">
+              <td colspan="5">
+
+                <b class="doc">rec_bundles object properties</b>
+
+                <table class="table table-dashed-borders table--second-level">
+                  <thead>
+                    <tr>
+                      <th class="doc doc__query name"></th>
+                      <th class="doc doc__query type"></th>
+                      <th class="doc doc__query title"></th>
+                      <th class="doc doc__query optional"></th>
+                      <th class="doc doc__query description"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <tr>
+                      <td><b class="doc">weight</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> Float
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Recommendation Weight
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The number of common concepts between the given url bundle
+                        and this OER bundle. Greater weight means bigger relevance.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">url</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle URL
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The URL of the OER bundle.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">title</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle Title
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The title of the OER bundle.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">description</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle Description
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The description of the OER bundle.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">provider</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle Provider
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The name of the OER bundle provider.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">language</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle Language
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The dominant language of the OER bundle in ISO 639-1 code.
+                      </td>
+                    </tr>
+
+
+                    <tr class="no-bottom-border">
+                      <td><b class="doc">wikipedia</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> Array
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle Wikipedia Concepts
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        An array of objects, each representing the most relevant
+                        wikipedia concept of the bundle.
+                      </td>
+                    </tr>
+
+                    <tr class="no-top-border">
+                      <td colspan="5">
+
+                        <b class="doc">wikipedia object properties</b>
+
+                        <table class="table table-dashed-borders table--third-level">
+                          <thead>
+                            <tr>
+                              <th class="doc doc__query name"></th>
+                              <th class="doc doc__query type"></th>
+                              <th class="doc doc__query title"></th>
+                              <th class="doc doc__query optional"></th>
+                              <th class="doc doc__query description"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+
+                            <tr>
+                              <td><b class="doc">concept</b></td>
+                              <td>
+                                <span class="doc doc--small">Type:</span> String
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Title:</span> Wikipedia Concept
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Read only:</span> true
+                              </td>
+                              <td>
+                                The Wikipedia concept represented as an URL.
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td><b class="doc">support</b></td>
+                              <td>
+                                <span class="doc doc--small">Type:</span> Integer
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Title:</span> Wikipedia Concept Support
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Read only:</span> true
+                              </td>
+                              <td>
+                                The amount of elements in the material that support
+                                the given Wikipedia concept.
+                              </td>
+                            </tr>
+
+                          </tbody>
+                        </table>
+
+
+                      </td>{{!  colspan="5" }}
+                    </tr>{{! .no-top-border }}
+
+                    <tr>
+                      <td><b class="doc">type</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle Type
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The dominant type of the OER bundle.
+                      </td>
+                    </tr>
+
+                  </tbody>
+                </table>
+
+              </td>{{!  colspan="5" }}
+            </tr>{{! .no-top-border }}
+
+
+
+          </tbody>
+        </table>
+      </div>{{! .table-responsive }}
+
+
+
+
+      {{!-- Get a list of open educational resources --}}
+      <a class="anchor" id="get-list-of-rec-collaborative"></a>
+      <h5 class="doc doc__subsection mt-5 mb-3">
+        Get a list of personalized open educational bundles recommendations
+      </h5>
+
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th class="doc doc__method request"></td>
+              <th class="doc doc__method route"></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b class="doc">GET</b></td>
+              <td><b>/recommend/collaborative_filtering</b></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="information">
+        Get a list of personalized open educational bundles recommendations.
+      </p>
+
+      <h6 class="mt-2">Query string parameters</h6>
+
+      <div class="table-responsive">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th class="doc doc__query name"></th>
+              <th class="doc doc__query type"></th>
+              <th class="doc doc__query title"></th>
+              <th class="doc doc__query optional"></th>
+              <th class="doc doc__query description"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td><b class="doc">page</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> Integer
+              </td>
+              <td>
+                <span class="doc doc--small">Title:</span> Page
+              </td>
+              <td>
+                <span class="doc doc--small">Optional:</span> true
+              </td>
+              <td>
+                The page number of the recommended list.
+                <b class="doc">Default value</b> is <b>1</b>.
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+
+      <h6 class="mt-2">Response body attributes</h6>
+
+      <div class="table-responsive">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th class="doc doc__query name"></th>
+              <th class="doc doc__query type"></th>
+              <th class="doc doc__query title"></th>
+              <th class="doc doc__query optional"></th>
+              <th class="doc doc__query description"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+
+            <tr class="no-bottom-border">
+              <td><b class="doc">rec_bundles</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> Array
+              </td>
+              <td>
+                <span class="doc doc--small">Title:</span> Personalized Bundles
+              </td>
+              <td>
+                <span class="doc doc--small">Read only:</span> true
+              </td>
+              <td>
+                An array of objects, each representing an recommended open
+                educational resource bundle.
+              </td>
+            </tr>{{! .no-bottom-border }}
+
+            <tr class="no-top-border">
+              <td colspan="5">
+
+                <b class="doc">rec_bundles object properties</b>
+
+                <table class="table table-dashed-borders table--second-level">
+                  <thead>
+                    <tr>
+                      <th class="doc doc__query name"></th>
+                      <th class="doc doc__query type"></th>
+                      <th class="doc doc__query title"></th>
+                      <th class="doc doc__query optional"></th>
+                      <th class="doc doc__query description"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    <tr>
+                      <td><b class="doc">weight</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> Float
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Recommendation Weight
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The number of times the bundle was viewed by similar users.
+                        Greater weight means bigger relevance.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">url</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle URL
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The URL of the OER bundle.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">title</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle Title
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The title of the OER bundle.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">description</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle Description
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The description of the OER bundle.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">provider</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle Provider
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The name of the OER bundle provider.
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><b class="doc">language</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle Language
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The dominant language of the OER bundle in ISO 639-1 code.
+                      </td>
+                    </tr>
+
+
+                    <tr class="no-bottom-border">
+                      <td><b class="doc">wikipedia</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> Array
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle Wikipedia Concepts
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        An array of objects, each representing the most relevant
+                        wikipedia concept of the bundle.
+                      </td>
+                    </tr>
+
+                    <tr class="no-top-border">
+                      <td colspan="5">
+
+                        <b class="doc">wikipedia object properties</b>
+
+                        <table class="table table-dashed-borders table--third-level">
+                          <thead>
+                            <tr>
+                              <th class="doc doc__query name"></th>
+                              <th class="doc doc__query type"></th>
+                              <th class="doc doc__query title"></th>
+                              <th class="doc doc__query optional"></th>
+                              <th class="doc doc__query description"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+
+                            <tr>
+                              <td><b class="doc">concept</b></td>
+                              <td>
+                                <span class="doc doc--small">Type:</span> String
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Title:</span> Wikipedia Concept
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Read only:</span> true
+                              </td>
+                              <td>
+                                The Wikipedia concept represented as an URL.
+                              </td>
+                            </tr>
+
+                            <tr>
+                              <td><b class="doc">support</b></td>
+                              <td>
+                                <span class="doc doc--small">Type:</span> Integer
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Title:</span> Wikipedia Concept Support
+                              </td>
+                              <td>
+                                <span class="doc doc--small">Read only:</span> true
+                              </td>
+                              <td>
+                                The amount of elements in the material that support
+                                the given Wikipedia concept.
+                              </td>
+                            </tr>
+
+                          </tbody>
+                        </table>
+
+
+                      </td>{{!  colspan="5" }}
+                    </tr>{{! .no-top-border }}
+
+                    <tr>
+                      <td><b class="doc">type</b></td>
+                      <td>
+                        <span class="doc doc--small">Type:</span> String
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Title:</span> Bundle Type
+                      </td>
+                      <td>
+                        <span class="doc doc--small">Read only:</span> true
+                      </td>
+                      <td>
+                        The dominant type of the OER bundle.
+                      </td>
+                    </tr>
+
+                  </tbody>
+                </table>
 
               </td>{{!  colspan="5" }}
             </tr>{{! .no-top-border }}
