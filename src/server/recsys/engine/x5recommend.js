@@ -113,8 +113,24 @@ class x5recommend {
      */
     pushRecordContent(record) {
         let self = this;
-        // TODO: validate record schema
-        if (!true /* check record validation */) {
+
+        // TODO: validate record schema programmatically 
+        function validateRecordSchema(record){
+            if (!record.url) {
+                return false;
+            }
+            if (!record.title) {
+                return false;
+            }
+            if (!record.provider) {
+                return false;
+            }
+            if (!record.language) {
+                return false;
+            }
+            return true;
+        }
+        if (!validateRecordSchema(record) /* check record validation */) {
             // log the difference in schemas
             self.logger.warn('[warn] x5recommend.pushRecordContent', {
                 error: { message: 'record is not in correct format' },
@@ -135,8 +151,24 @@ class x5recommend {
      */
     pushRecordMaterialModel(record) {
         let self = this;
+
         // TODO: validate record schema
-        if (!true /* check record validation */) {
+        function validateRecordSchema(record){
+            if (!record.url) {
+                return false;
+            }
+            if (!record.title) {
+                return false;
+            }
+            if (!record.provider) {
+                return false;
+            }
+            if (!record.language) {
+                return false;
+            }
+            return true;
+        }
+        if (!validateRecordSchema(record) /* check record validation */) {
             // log the difference in schemas
             self.logger.warn('[warn] x5recommend.pushRecordMaterialModel', {
                 error: { message: 'record is not in correct format' },
@@ -551,7 +583,9 @@ class x5recommend {
                     wikipediaConceptSupport: wikipediaConceptSupport
                 };
 
-                let recommendations = self.userMaterialSimNN.search(query);
+                const maxCount = query.count ? query.count : 20;
+
+                let recommendations = self.userMaterialSimNN.search(query, maxCount);
 
                 if (!recommendations) {
                     self.logger.warn('[warn] x5recommend.recommendPersonalized', {
@@ -564,15 +598,137 @@ class x5recommend {
                     return reject(recommendations);
                 }
 
-                // format recommendations
-                recommendations = recommendations[0].map((material, id) =>
-                    self._materialFormat(material, recommendations[1][id])
-                );
-
                 return resolve(recommendations);
             });
         });
 
+    }
+
+    /******************************************************
+      * Collaborative Filtering Recommendation Functions
+      *****************************************************/
+
+    /**
+      * @description Get content based recommendations.
+      * @param {Object} query - The object containing the required query parameters.
+      * @param {String} [query.uuid] - The uuid parameter. Finds material most similar to the
+      * material the user already accessed.
+      * @param {String} [query.text] - The text parameter. Finds material containing similar text.
+      * @param {String} [query.url] - The url parameter. Finds the material found using the url and
+      * returns material similar to it.
+      * @param {String} [query.type] - The metrics type.
+      * @returns {Array.<Object>} An array of recommended learning material.
+      */
+     recommendCollaborativeFiltering(userQuery) {
+        let self = this;
+        let recommendations;
+
+        let count = userQuery.count ? userQuery.count : 20;
+
+        return new Promise(function (resolve, reject){
+            if (!userQuery) {
+                let errorMessage = 'recommendPersonalized: Missing query';
+                self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
+                    error: errorMessage, userQuery
+                });
+                // not supported query option - return error
+                reject({ error: errorMessage });
+                return;
+            }
+
+            let queryPG = `
+            WITH url_count AS (
+                SELECT url_id, COUNT(url_id) AS count FROM user_activities WHERE cookie_id IN (
+                    SELECT cookie_id FROM user_activities
+                    WHERE cookie_id<>1 AND cookie_id NOT IN
+                        (SELECT id FROM cookies WHERE uuid = '${userQuery.uuid}')
+                        AND url_id IN (
+                            SELECT url_id FROM user_activities 
+                            WHERE cookie_id IN 
+                            (SELECT id FROM cookies WHERE uuid = '${userQuery.uuid}')
+                        )
+                ) 
+                GROUP BY url_id ORDER BY count DESC
+            )            
+            SELECT url_count.*, rsmm.* FROM url_count, rec_sys_material_model AS rsmm WHERE url_count.url_id = rsmm.url_id ORDER BY count DESC LIMIT ${count};`;
+
+            pg.execute(queryPG, [] , function(err, res){
+                if (err){
+                    self.logger.error('Error fetching collaborative filtering recommendations from'     + ' database: ' + err);
+                    reject({error: 'Error fetching collaborative filtering recommendations from'       + 'database'});
+                    return;
+                }
+
+                if (!res || res.length == 0){
+                    reject({error: 'Cookie is not in the database - unable to fetch the ' +            'collaborative filtering recommendations.'});
+                    return;
+                }
+
+                let materials = [];
+                let weights =  [];
+
+                /**
+                * Detects the type of the material.
+                * @param {String} mimetype - The mimetype of the material.
+                * @returns {String} The type of the material.
+                */
+               
+                function detectType(mimetype) {
+                    let mime = mimetype.split('/');
+                    if (mime[0] === 'video') {
+                        return 'video';
+                    } else {
+                        return 'text';
+                    }
+                }
+
+                for (let material of res){
+                    let wikipediaConceptNames = [];
+                    let wikipediaConceptSupport = [];
+                    for (let concept in material.concepts){
+                        wikipediaConceptNames.push(concept);
+                        wikipediaConceptSupport.push(material.concepts[concept]);
+                    }
+
+                    let item = {
+                        url: material.provider_uri,
+                        title: material.title,
+                        description: material.description,
+                        provider: material.provider,
+                        language: material.language,
+                        mimetype: material.type,
+                        wikipediaConceptNames: new qm.la.StrVector(wikipediaConceptNames),
+                        wikipediaConceptSupport: new qm.la.Vector(wikipediaConceptSupport)
+                    };
+                    materials.push(item);
+                    weights.push(material.count);
+                }
+
+                recommendations = [materials, weights];
+
+                if (!recommendations) {
+                    let errorMessage = 'Error fetching collaborative filtering ' +                      'recommendations';
+                    self.logger.warn('[warn] x5recommend.recommendMaterials', {
+                        error: { message: errorMessage },
+                        query: userQuery
+                    });
+                    // not supported query option - return error
+                    return reject({ error: errorMessage });
+        
+                } else if (recommendations.error) {
+                    // log the error given by the recommendation search
+                    self.logger.warn('[warn] x5recommend.recommendCollaborativeFiltering', {
+                        error: { message: recommendations.error },
+                        query: userQuery
+                    });
+                    // not supported query option - return error
+                    return reject({ error: recommendations.error });
+                }
+        
+                return resolve(recommendations);
+
+            });
+        });
     }
 
     /********************************************
@@ -596,20 +752,22 @@ class x5recommend {
             recommendations = self.recommendBundles(query);
         } else if (type === 'personal') {
             recommendations = self.recommendPersonalized(query);
+        } else if (type === 'collaborative') {
+            recommendations = self.recommendCollaborativeFiltering(query);
         } else {
             recommendations = Promise.resolve([[],[]]);
         }
-
         // return an object
         return recommendations.then(results => {
             if (results.error) {
                 return results;
             }
-
             // return the list of recommended materials with their weights
-            return results[0].map((material, id) =>
+            return results[0].map((material, id) => 
                 self._materialFormat(material, results[1][id])
             );
+        }).catch((error) => {
+            return error;
         });
 
     }
@@ -645,6 +803,7 @@ class x5recommend {
         let self = this;
 
         const {
+            materialId,
             url,
             title,
             description,
@@ -670,6 +829,7 @@ class x5recommend {
 
         // format the material
         return {
+            ...materialId && { material_id: materialId },
             weight,
             url,
             title,
