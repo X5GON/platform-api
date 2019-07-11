@@ -704,7 +704,14 @@ module.exports = function (pg, logger, config) {
 
             if (records.length === 0) {
                 // respond to the user there are no materials
-                return res.status(204).send();
+                return res.status(204).send({
+                    oer_materials: {
+                        id: materialId
+                    },
+                    error: {
+                        message: `No contents associated with material`
+                    }
+                });
             }
 
             /**********************************
@@ -760,7 +767,14 @@ module.exports = function (pg, logger, config) {
 
             if (records.length === 0) {
                 // respond to the user there are no materials
-                return res.status(204).send();
+                return res.status(204).send({
+                    oer_materials: {
+                        id: materialId
+                    },
+                    error: {
+                        message: `No content with id= ${contentId} associated with material`
+                    }
+                });
             }
 
             /**********************************
@@ -768,15 +782,74 @@ module.exports = function (pg, logger, config) {
              *********************************/
 
             // convert the materials
-            const contents = records.map(content => oerMaterialContentFormat(content));
+            const oer_contents = records.map(content => oerMaterialContentFormat(content))[0];
 
             // send the materials to the user
             return res.status(200).send({
                 oer_materials: {
                     id: materialId
                 },
-                contents
+                oer_contents
             });
+        });
+    });
+
+    router.get('/oer_materials/:material_id/contents/:content_id/value', (req, res) => {
+        // get material and content ids
+        const {
+            material_id,
+            content_id
+        } = req.params;
+
+        // parse the material id like an integer
+        const materialId = parseInt(material_id);
+        const contentId = parseInt(content_id);
+
+        // constuct the query
+        const query = contentsOERMaterialQuery({ materialId, contentId });
+
+        // execute the user query
+        pg.execute(query, [], function (error, records) {
+            if (error) {
+                logger.error('[error] postgresql error',
+                    logger.formatRequest(req, {
+                        error: {
+                            message: error.message,
+                            stack: error.stack
+                        }
+                    })
+                );
+                // something went wrong on server side
+                return res.status(500).send({
+                    errors: {
+                        msg: 'Error on server side'
+                    }
+                });
+            }
+
+            if (records.length === 0) {
+                // respond to the user there are no materials
+                return res.status(204).send({
+                    oer_materials: {
+                        id: materialId
+                    },
+                    error: {
+                        message: `No content with id= ${contentId} associated with material`
+                    }
+                });
+            }
+
+            /**********************************
+             * prepare query results
+             *********************************/
+
+            // convert the materials
+            const oer_contents = records.map(content => oerMaterialContentFormat(content));
+
+            // send the materials to the user
+            const value = oer_contents[0] && oer_contents[0].value
+                ? oer_contents[0].value.value : null;
+            return res.status(200).send(value);
         });
     });
 

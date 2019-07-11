@@ -16,7 +16,7 @@ const Logger = require('alias:lib/logger');
 
 // create a logger instance for logging API requests
 const { environment } = config;
-const logger = Logger.createGroupInstance('requests', 'recsys', environment === 'dev');
+const logger = Logger.createGroupInstance('requests', 'recsys', environment !== 'prod');
 
 // create express app
 let app = express();
