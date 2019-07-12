@@ -794,7 +794,7 @@ module.exports = function (pg, logger, config) {
         });
     });
 
-    router.get('/oer_materials/:material_id/contents/:content_id/body', (req, res) => {
+    router.get('/oer_materials/:material_id/contents/:content_id/value', (req, res) => {
         // get material and content ids
         const {
             material_id,
