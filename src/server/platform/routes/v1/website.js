@@ -424,7 +424,7 @@ module.exports = function (pg, logger, config) {
 
         let options = { layout: 'empty', style, empty: true };
         let queryString = Object.keys(query).map(key => `${key}=${encodeURIComponent(query[key])}`).join('&');
-        request(`http://localhost:${config.platform.port}/api/v1/recommend/bundles?${queryString}`, (error, httpRequest, body) => {
+        request(`http://localhost:${config.recsys.port}/api/v1/recommend/bundles?${queryString}`, (error, httpRequest, body) => {
 
             if (error) {
                 // error when making material request
