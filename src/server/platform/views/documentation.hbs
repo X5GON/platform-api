@@ -73,6 +73,11 @@
                       GET specific material content
                     </a>
                   </li>
+                  <li>
+                    <a class="doc route" href="#get-info-about-oer-content-value">
+                      GET the body value of a specific material content
+                    </a>
+                  </li>
                 </ul>
               </li>
             </ul>
@@ -1634,7 +1639,12 @@
       </div>
 
       <p class="information">
-        Get a list of personalized open educational bundles recommendations.
+        Get a list of personalized open educational bundles recommendations. The personalization
+        is performed via the
+        <a href="https://en.wikipedia.org/wiki/Collaborative_filtering" target="_blank">
+          <b class="doc">collaborative filtering</b>
+        </a>
+        method.
       </p>
 
       <h6 class="mt-2">Query string parameters</h6>
@@ -1985,6 +1995,11 @@
               <td><b class="doc">GET</b></td>
               <td>/oer_materials/{material_id}/contents/{content_id}</td>
               <td>Get information of a specific content of a specific open educational resource</td>
+            </tr>
+            <tr class="clickable-row" data-href="#get-info-about-oer-content-value">
+              <td><b class="doc">GET</b></td>
+              <td>/oer_materials/{material_id}/contents/{content_id}/value</td>
+              <td>Get the body value of a specific content of a specific open educational resource</td>
             </tr>
           </tbody>
         </table>
@@ -3430,7 +3445,89 @@
           </tbody>
         </table>
       </div>{{! .table-responsive }}
+
+
+
       {{!-- Get information of a specific open educational resource --}}
+      <a class="anchor" id="get-info-about-oer-content-value"></a>
+      <h5 class="doc doc__subsection mt-5 mb-3">
+        Get the body value of a specific content of a specific open educational resource
+      </h5>
+
+      <div class="table-responsive">
+        <table class="table table-borderless">
+          <thead>
+            <tr>
+              <th class="doc doc__method request"></td>
+              <th class="doc doc__method route"></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b class="doc">GET</b></td>
+              <td><b>/oer_materials/{material_id}/contents/{content_id}/value</b></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="information">
+        Get the body value of a specific content of a specific open educational resource.
+      </p>
+
+
+
+      <h6 class="mt-2">Path parameters</h6>
+
+      <div class="table-responsive">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th class="doc doc__method request"></td>
+              <th class="doc doc__method route"></td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b class="doc">material_id</b></td>
+              <td>The unique ID of the open educational resource.</td>
+            </tr>
+            <tr>
+              <td><b class="doc">content_id</b></td>
+              <td>The unique ID of the OER content.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+
+
+      <h6 class="mt-2">Response value</h6>
+
+      <div class="table-responsive">
+        <table class="table table-dashed-borders">
+          <thead>
+            <tr>
+              <th class="doc doc__query name"></th>
+              <th class="doc doc__query type"></th>
+              <th class="doc doc__query description"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr>
+              <td><b class="doc">content body</b></td>
+              <td>
+                <span class="doc doc--small">Type:</span> String
+              </td>
+              <td>
+                The body value of the content of a specific open educational resource.
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>{{! .table-responsive }}
 
 
 
