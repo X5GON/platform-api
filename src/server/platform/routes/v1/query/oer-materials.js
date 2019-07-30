@@ -1,5 +1,6 @@
 // external modules
 const router = require('express').Router();
+const cors = require('cors');
 
 // internal modules
 const mimetypes = require('alias:config/mimetypes');
@@ -36,7 +37,6 @@ module.exports = function (pg, logger, config) {
             PROVIDER_IDS
         } = params;
 
-
         // create oer materials query statement
         const query = `
             WITH urls_extended AS (
@@ -61,7 +61,7 @@ module.exports = function (pg, logger, config) {
                     urls_extended.provider_domain AS provider_domain,
 
                     COUNT(*) OVER() AS full_count
-                FROM ${schema}.oer_materials LEFT JOIN urls_extended
+                FROM ${schema}.oer_materials INNER JOIN urls_extended
                 ON ${schema}.oer_materials.id=urls_extended.material_id
 
                 ${LANGUAGES.length ? `WHERE ${schema}.oer_materials.language IN (${LANGUAGES.join(',')})` : ''}
@@ -315,12 +315,15 @@ module.exports = function (pg, logger, config) {
             url,
             language,
             type,
+            extension,
             mimetype,
             content_ids,
             provider: {
+                provider_id,
                 provider_name,
                 provider_domain
-            }
+            },
+            license
         };
 
     }
@@ -514,7 +517,7 @@ module.exports = function (pg, logger, config) {
      * Routes
      *********************************/
 
-    router.get('/oer_materials', (req, res) => {
+    router.get('/oer_materials', cors(), (req, res) => {
 
         /**********************************
          * setup user parameters
@@ -615,7 +618,7 @@ module.exports = function (pg, logger, config) {
 
     });
 
-    router.get('/oer_materials/:material_id', (req, res) => {
+    router.get('/oer_materials/:material_id', cors(), (req, res) => {
         // get material id
         const { material_id } = req.params;
 
@@ -670,7 +673,7 @@ module.exports = function (pg, logger, config) {
 
     });
 
-    router.get('/oer_materials/:material_id/contents', (req, res) => {
+    router.get('/oer_materials/:material_id/contents', cors(), (req, res) => {
 
         // get material id
         const {
@@ -732,7 +735,7 @@ module.exports = function (pg, logger, config) {
 
     });
 
-    router.get('/oer_materials/:material_id/contents/:content_id', (req, res) => {
+    router.get('/oer_materials/:material_id/contents/:content_id', cors(), (req, res) => {
         // get material and content ids
         const {
             material_id,
@@ -794,7 +797,7 @@ module.exports = function (pg, logger, config) {
         });
     });
 
-    router.get('/oer_materials/:material_id/contents/:content_id/value', (req, res) => {
+    router.get('/oer_materials/:material_id/contents/:content_id/value', cors(), (req, res) => {
         // get material and content ids
         const {
             material_id,

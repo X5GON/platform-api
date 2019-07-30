@@ -114,7 +114,7 @@ class x5recommend {
     pushRecordContent(record) {
         let self = this;
 
-        // TODO: validate record schema programmatically 
+        // TODO: validate record schema programmatically
         function validateRecordSchema(record){
             if (!record.url) {
                 return false;
@@ -643,13 +643,13 @@ class x5recommend {
                     WHERE cookie_id<>1 AND cookie_id NOT IN
                         (SELECT id FROM cookies WHERE uuid = '${userQuery.uuid}')
                         AND url_id IN (
-                            SELECT url_id FROM user_activities 
-                            WHERE cookie_id IN 
+                            SELECT url_id FROM user_activities
+                            WHERE cookie_id IN
                             (SELECT id FROM cookies WHERE uuid = '${userQuery.uuid}')
                         )
-                ) 
+                )
                 GROUP BY url_id ORDER BY count DESC
-            )            
+            )
             SELECT url_count.*, rsmm.* FROM url_count, rec_sys_material_model AS rsmm WHERE url_count.url_id = rsmm.url_id ORDER BY count DESC LIMIT ${count};`;
 
             pg.execute(queryPG, [] , function(err, res){
@@ -672,7 +672,7 @@ class x5recommend {
                 * @param {String} mimetype - The mimetype of the material.
                 * @returns {String} The type of the material.
                 */
-               
+
                 function detectType(mimetype) {
                     let mime = mimetype.split('/');
                     if (mime[0] === 'video') {
@@ -696,6 +696,7 @@ class x5recommend {
                         description: material.description,
                         provider: material.provider,
                         language: material.language,
+                        type: detectType(material.type),
                         mimetype: material.type,
                         wikipediaConceptNames: new qm.la.StrVector(wikipediaConceptNames),
                         wikipediaConceptSupport: new qm.la.Vector(wikipediaConceptSupport)
@@ -707,14 +708,14 @@ class x5recommend {
                 recommendations = [materials, weights];
 
                 if (!recommendations) {
-                    let errorMessage = 'Error fetching collaborative filtering ' +                      'recommendations';
+                    let errorMessage = 'Error fetching collaborative filtering recommendations';
                     self.logger.warn('[warn] x5recommend.recommendMaterials', {
                         error: { message: errorMessage },
                         query: userQuery
                     });
                     // not supported query option - return error
                     return reject({ error: errorMessage });
-        
+
                 } else if (recommendations.error) {
                     // log the error given by the recommendation search
                     self.logger.warn('[warn] x5recommend.recommendCollaborativeFiltering', {
@@ -724,7 +725,7 @@ class x5recommend {
                     // not supported query option - return error
                     return reject({ error: recommendations.error });
                 }
-        
+
                 return resolve(recommendations);
 
             });
@@ -763,7 +764,7 @@ class x5recommend {
                 return results;
             }
             // return the list of recommended materials with their weights
-            return results[0].map((material, id) => 
+            return results[0].map((material, id) =>
                 self._materialFormat(material, results[1][id])
             );
         }).catch((error) => {
@@ -816,7 +817,7 @@ class x5recommend {
 
         // get the top 3 wikipedia concepts
         let sort = wikipediaConceptSupport.sortPerm(false);
-        const maxCount = 3 > sort.perm.length ? sort.perm.length : 3;
+        const maxCount = 10 > sort.perm.length ? sort.perm.length : 10;
         // store wikipedia names
         let wikipedia = [];
         for (let i = 0; i < maxCount; i++) {
