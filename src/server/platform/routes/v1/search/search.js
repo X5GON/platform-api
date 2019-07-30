@@ -1,7 +1,7 @@
 // external modules
 const router = require('express').Router();
 const request = require('request').defaults({ jar: true });
-
+const cors = require('cors');
 /********************************************
  * Helper functions
  *******************************************/
@@ -56,7 +56,7 @@ module.exports = function (pg, logger, config) {
      * @apiExample  Example usage:
      *      https://platform.x5gon.org/api/v1/search?url=https://platform.x5gon.org/materialUrl&text=deep+learning
      */
-    router.get('/search', (req, res) => {
+    router.get('/search', cors(), (req, res) => {
 
         if (!Object.keys(req.query).length) {
             return res.send({
@@ -162,7 +162,7 @@ module.exports = function (pg, logger, config) {
      * @apiExample  Example usage:
      *      https://platform.x5gon.org/api/v1/search?url=https://platform.x5gon.org/materialUrl&text=deep+learning
      */
-    router.get('/recommend/oer_materials', (req, res) => {
+    router.get('/recommend/oer_materials', cors(), (req, res) => {
 
         if (!Object.keys(req.query).length) {
             return res.send({
@@ -266,7 +266,7 @@ module.exports = function (pg, logger, config) {
      * @apiExample  Example usage:
      *      https://platform.x5gon.org/api/v1/search?url=https://platform.x5gon.org/materialUrl&text=deep+learning
      */
-    router.get('/recommend/oer_bundles', (req, res) => {
+    router.get('/recommend/oer_bundles', cors(), (req, res) => {
 
         if (!Object.keys(req.query).length) {
             return res.send({
@@ -367,7 +367,7 @@ module.exports = function (pg, logger, config) {
      * @apiExample  Example usage:
      *      https://platform.x5gon.org/api/v1/search?url=https://platform.x5gon.org/materialUrl&text=deep+learning
      */
-    router.get('/recommend/collaborative_filtering', (req, res) => {
+    router.get('/recommend/collaborative_filtering', cors(), (req, res) => {
 
         const j = request.jar();
         const cookie = request.cookie(`x5gonTrack=${req.cookies[x5gonCookieName]}`);

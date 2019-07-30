@@ -1,5 +1,6 @@
 // external modules
 const router = require('express').Router();
+const cors = require('cors');
 
 // internal modules
 const mimetypes = require('alias:config/mimetypes');
@@ -514,7 +515,7 @@ module.exports = function (pg, logger, config) {
      * Routes
      *********************************/
 
-    router.get('/oer_materials', (req, res) => {
+    router.get('/oer_materials', cors(), (req, res) => {
 
         /**********************************
          * setup user parameters
@@ -615,7 +616,7 @@ module.exports = function (pg, logger, config) {
 
     });
 
-    router.get('/oer_materials/:material_id', (req, res) => {
+    router.get('/oer_materials/:material_id', cors(), (req, res) => {
         // get material id
         const { material_id } = req.params;
 
@@ -670,7 +671,7 @@ module.exports = function (pg, logger, config) {
 
     });
 
-    router.get('/oer_materials/:material_id/contents', (req, res) => {
+    router.get('/oer_materials/:material_id/contents', cors(), (req, res) => {
 
         // get material id
         const {
@@ -732,7 +733,7 @@ module.exports = function (pg, logger, config) {
 
     });
 
-    router.get('/oer_materials/:material_id/contents/:content_id', (req, res) => {
+    router.get('/oer_materials/:material_id/contents/:content_id', cors(), (req, res) => {
         // get material and content ids
         const {
             material_id,
@@ -794,7 +795,7 @@ module.exports = function (pg, logger, config) {
         });
     });
 
-    router.get('/oer_materials/:material_id/contents/:content_id/value', (req, res) => {
+    router.get('/oer_materials/:material_id/contents/:content_id/value', cors(), (req, res) => {
         // get material and content ids
         const {
             material_id,
