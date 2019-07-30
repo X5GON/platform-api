@@ -37,7 +37,6 @@ module.exports = function (pg, logger, config) {
             PROVIDER_IDS
         } = params;
 
-
         // create oer materials query statement
         const query = `
             WITH urls_extended AS (
@@ -62,7 +61,7 @@ module.exports = function (pg, logger, config) {
                     urls_extended.provider_domain AS provider_domain,
 
                     COUNT(*) OVER() AS full_count
-                FROM ${schema}.oer_materials LEFT JOIN urls_extended
+                FROM ${schema}.oer_materials INNER JOIN urls_extended
                 ON ${schema}.oer_materials.id=urls_extended.material_id
 
                 ${LANGUAGES.length ? `WHERE ${schema}.oer_materials.language IN (${LANGUAGES.join(',')})` : ''}
@@ -316,12 +315,15 @@ module.exports = function (pg, logger, config) {
             url,
             language,
             type,
+            extension,
             mimetype,
             content_ids,
             provider: {
+                provider_id,
                 provider_name,
                 provider_domain
-            }
+            },
+            license
         };
 
     }

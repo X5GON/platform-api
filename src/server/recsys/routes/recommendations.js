@@ -77,10 +77,6 @@ module.exports = function (pg, logger) {
         let recommendations = x5recommend.recommend(query, 'materials');
 
         recommendations.then(results => {
-            // // error when making material request
-            // logger.info('[info] recommendation material results',
-            //     logger.formatRequest(req, { results })
-            // );
             // send the recommendations to the user
             return res.status(200).send(results);
         }).catch(error => {
@@ -109,10 +105,6 @@ module.exports = function (pg, logger) {
         let recommendations = x5recommend.recommend(query, 'materials');
 
         recommendations.then(results => {
-            // // log the recommendation success
-            // logger.info('[info] recommendation material results',
-            //     logger.formatRequest(req, { results })
-            // );
             // send the recommendations to the user
             return res.status(200).send(results);
         }).catch(error => {
@@ -140,10 +132,6 @@ module.exports = function (pg, logger) {
         let recommendations = x5recommend.recommend(query, 'bundle');
 
         recommendations.then(results => {
-            // // log the recommendation success
-            // logger.info('[info] recommendation bundle results',
-            //     logger.formatRequest(req, { results })
-            // );
             // send the recommendations to the user
             return res.status(200).send(results);
         }).catch(error => {
@@ -172,10 +160,6 @@ module.exports = function (pg, logger) {
         let recommendations = x5recommend.recommend(query, 'bundle');
 
         recommendations.then(results => {
-            // // log the recommendation success
-            // logger.info('[info] recommendation bundle results',
-            //     logger.formatRequest(req, { results })
-            // );
             // send the recommendations to the user
             return res.status(200).send(results);
         }).catch(error => {
@@ -228,20 +212,12 @@ module.exports = function (pg, logger) {
                         // send the error message to the user
                         return res.status(400).send({ error: "Bad request: " + content.error });
                     }
-                    // // log the recommendation success
-                    // logger.info('[info] recommendation material results',
-                    //     logger.formatRequest(req, { results: content })
-                    // );
                     // send the recommendations to the user
                     return res.status(200).send(content);
                 });
 
             }
 
-            // // log the recommendation success
-            // logger.info('[info] recommendation material results',
-            //     logger.formatRequest(req, { results })
-            // );
             // send the recommendations to the user
             return res.status(200).send(results);
 
@@ -258,7 +234,7 @@ module.exports = function (pg, logger) {
                 return res.status(400).send({ error: "Bad request: " + error.error });
             });
     });
-               
+
     // GET recommendation based on history
     router.get('/recommend/collaborativeFiltering', (req, res) => {
         // get the query parameters
@@ -272,13 +248,12 @@ module.exports = function (pg, logger) {
                 logger.formatRequest(req, { error: errorMessage })
             );
             // send error response
-            res.status(400);
-            return res.send({ error: "Bad request: " + errorMessage });
+            return res.status(400).send({ error: "Bad request: " + errorMessage });
         }
 
         // get the recommended material - returns a promise
         let recommendations = x5recommend.recommend(query, 'collaborative');
-        
+
         recommendations.then(function(result){
             if (result.error){
                 let errorMessage = 'error when making CF recommendations: ' + result.error;
@@ -293,24 +268,20 @@ module.exports = function (pg, logger) {
                     logger.warn('warning [query_parameters]: client requested for recommendation failed',
                         logger.formatRequest(req, { error: errorMessage })
                     );
-                    res.status(400);
-                    return res.send({ error: "Bad request: " + contentRecommendations.error });
+                    return res.status(400).send({ error: "Bad request: " + contentRecommendations.error });
                 }
                 // send the recommendations to the user
-                res.status(200);
-                return res.send(contentRecommendations);
+                return res.status(200).send(contentRecommendations);
             }
-            
+
             // send the recommendations to the user
-            res.status(200);
-            return res.send(result);
+            return res.status(200).send(result);
         }).catch(function(err){
                 let errorMessage = 'error when making CF recommendations: ' + err;
                 logger.warn('warning [query_parameters]: client requested for recommendation failed',
                     logger.formatRequest(req, { error: errorMessage })
                 );
-                res.status(400);
-                return res.send({ error: "Bad request: " + result.error });
+                return res.status(400).send({ error: "Bad request: " + err.message });
             });
     });
 
