@@ -288,7 +288,7 @@ module.exports = function (pg, logger, config) {
             queryParams.count = parseInt(queryParams.count) || 10000;
 
             let queryString = Object.keys(queryParams).map(key => `${key}=${encodeURIComponent(queryParams[key])}`).join('&');
-            request(`http://localhost:${config.platform.port}/api/v1/recommend/materials?${queryString}`, (error, httpRequest, body) => {
+            request(`http://localhost:${config.recsys.port}/api/v1/recommend/materials?${queryString}`, (error, httpRequest, body) => {
 
                 // set query parameters
                 let query = {
