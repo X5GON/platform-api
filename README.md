@@ -1,4 +1,4 @@
-# X5GON
+# X5GON Platform
 
 ### Cross Modal, Cross Cultural, Cross Lingual, Cross Domain, and Cross Site Global OER Network
 
