@@ -25,9 +25,9 @@ class PrepareMaterials {
         const {
             title,
             description,
-            resurl: materialurl,
-            rq: provideruri,
-            cid: providertoken,
+            resurl: material_url,
+            rq: provider_uri,
+            cid: provider_token,
             author,
             language,
             creation_date,
@@ -37,19 +37,20 @@ class PrepareMaterials {
 
         return {
             title,
-            provideruri,
-            materialurl,
-            providertoken,
+            provider_uri,
+            material_url,
+            provider_token,
             language,
-            datecreated: (new Date(parseInt(creation_date))).toISOString(),
-            dateretrieved: (new Date()).toISOString(),
+            date_created: (new Date(parseInt(creation_date))).toISOString(),
+            retrieved_date: (new Date()).toISOString(),
             type: {
                 ext: fileTypeManual.extension(mime),
                 mime
             },
             ...(description && { description }),
             ...(author && { author }),
-            ...(license && { license })
+            ...(license && { license }),
+            // TODO: additional material metadata
         };
     }
 
