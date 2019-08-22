@@ -8,35 +8,33 @@ module.exports = {
     },
     "spouts": [
         {
-            "name": "material-complete-input",
+            "name": "kafka.providers",
             "type": "inproc",
             "working_dir": "./spouts",
             "cmd": "kafka-spout.js",
             "init": {
                 "kafka_host": config.kafka.host,
-                "topic": "STORING.MATERIAL.COMPLETE",
-                "groupId": `${config.kafka.groupId}-material-complete`
+                "topic": "STORING.PROVIDERS",
+                "groupId": `${config.kafka.groupId}.PROVIDERS`
             }
         }
     ],
     "bolts": [
         /****************************************
-         * Storing OER materials into database
+         * Storing user activity into database
          */
-
         {
-            "name": "postgresql-storage-material-complete",
+            "name": "store.pg.providers",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "postgresql-storage-material-complete.js",
+            "cmd": "store.pg.providers.js",
             "inputs": [{
-                "source": "material-complete-input",
+                "source": "kafka.providers",
             }],
             "init": {
                 "pg": config.pg
             }
         }
-
     ],
     "variables": {}
 };

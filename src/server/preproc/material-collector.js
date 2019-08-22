@@ -273,7 +273,7 @@ class MaterialCollector {
     _sendToKafka(material, topic, type) {
         let self = this;
         // insert to postgres process pipeline
-        this._pg.insert({ url: material.materialurl }, 'material_process_pipeline', (xerror) => {
+        this._pg.insert({ url: material.material_url }, 'material_process_pipeline', (xerror) => {
             if (xerror) {
                 logger.error('[error] postgresql', {
                     error: {
@@ -283,7 +283,7 @@ class MaterialCollector {
                 });
                 return;
             }
-            logger.info(`[upload] ${type} material = ${material.materialurl}`);
+            logger.info(`[upload] ${type} material = ${material.material_url}`);
             // send the video material
             self._producer.send(topic, material);
         });

@@ -1,6 +1,6 @@
 /************************************************
  * Node Process Monitor Module
- * This module access the node processes that 
+ * This module access the node processes that
  * are running using the pm2 API plugin
  * [http://pm2.keymetrics.io/docs/usage/pm2-api/].
  */

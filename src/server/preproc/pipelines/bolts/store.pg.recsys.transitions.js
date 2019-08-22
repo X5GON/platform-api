@@ -4,7 +4,7 @@
  * stores it into postgresQL database.
  */
 
-class PostgresqlRecsysTransitions {
+class StorePGRecsysTransitions {
 
     constructor() {
         this._name = null;
@@ -16,7 +16,7 @@ class PostgresqlRecsysTransitions {
         this._name = name;
         this._context = context;
         this._onEmit = config.onEmit;
-        this._prefix = `[PostgresqlRecsysTransitions ${this._name}]`;
+        this._prefix = `[StorePGRecsysTransitions ${this._name}]`;
 
         // create the postgres connection
         this._pg = require('alias:lib/postgresQL')(config.pg);
@@ -70,7 +70,6 @@ class PostgresqlRecsysTransitions {
             // create user transitions values
             const rec_sys_user_transitions = {
                 uuid: !uuid.includes('unknown') ? uuid : null,
-
                 from_url:               from,
                 to_url:                 to,
                 from_material_model_id: materialModalIds[0],
@@ -85,6 +84,7 @@ class PostgresqlRecsysTransitions {
                 // return the id of the material model
                 return callback(null);
             });
+
         }).catch(error => {
             return callback(error);
         });
@@ -92,5 +92,5 @@ class PostgresqlRecsysTransitions {
 }
 
 exports.create = function (context) {
-    return new PostgresqlRecsysTransitions(context);
+    return new StorePGRecsysTransitions(context);
 };

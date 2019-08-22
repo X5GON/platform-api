@@ -14,7 +14,7 @@ const rp = require('request-promise-native');
  * provided videos. Supported languages are: english, spanish,
  * german, and slovene.
  */
-class ExtractionTTPVideo {
+class ExtractVideoTTP {
 
     constructor() {
         this._name = null;
@@ -26,7 +26,7 @@ class ExtractionTTPVideo {
         this._name = name;
         this._context = context;
         this._onEmit = config.onEmit;
-        this._prefix = `[ExtractionTTPVideo ${this._name}]`;
+        this._prefix = `[ExtractVideoTTP ${this._name}]`;
 
         // the user and authentication token used for the requests
         this._options = {
@@ -144,20 +144,20 @@ class ExtractionTTPVideo {
 
             // create the speakers list
             let speakers;
-            if (material.author && typeof material.author === 'string') {
+            if (material.authors && typeof material.authors === 'string') {
                 // Expectation: material.author = 'author 1, author 2, author 3'
                 // split the string of authors and create an array
-                speakers = material.author
+                speakers = material.authors
                             .split(',')
                             .map(author => ({
                                 speaker_id:   this._normalizeString(author.trim()),
                                 speaker_name: this._normalizeString(author.trim())
                             }));
 
-            } else if (material.author && typeof material.author === 'object') {
+            } else if (material.authors && typeof material.authors === 'object') {
                 // Expectation: material.author = ['author 1', 'author 2']
                 // map the authors into the manifest file
-                speakers = material.author
+                speakers = material.authors
                             .map(author => ({
                                 speaker_id:   this._normalizeString(author.trim()),
                                 speaker_name: this._normalizeString(author.trim())
@@ -194,7 +194,7 @@ class ExtractionTTPVideo {
             const options = Object.assign({ }, self._options, {
                 manifest: {
                     media: {
-                        url: material.materialurl
+                        url: material.material_url
                     },
                     metadata: {
                         // external_id equals to material url
@@ -214,13 +214,13 @@ class ExtractionTTPVideo {
 
             // save the configurations
             this._pg.upsert({
-                url: material.materialurl,
+                url: material.material_url,
                 status: 'extracting transcriptions and translations waiting',
                 config: {
                     ttp_manifest: options
                 }
             }, {
-                url: material.materialurl
+                url: material.material_url
             }, 'material_process_pipeline', () => {});
 
             ///////////////////////////////////////////////
@@ -285,7 +285,7 @@ class ExtractionTTPVideo {
 
                 // prepare placeholders for material metadata
                 let transcriptions = { };
-                let rawText;
+                let raw_text;
 
                 // iterate through all responses
                 for (let langId = 0; langId < languages.length; langId++) {
@@ -321,26 +321,26 @@ class ExtractionTTPVideo {
 
                         if (lang === material.language) {
                             // set default transcriptions for the material
-                            rawText = transcription.plain;
+                            raw_text = transcription.plain;
                         }
                     }
                 }
 
                 // save transcriptions into the material's metadata field
-                material.materialmetadata.rawText        = rawText;
-                material.materialmetadata.transcriptions = transcriptions;
+                material.material_metadata.raw_text       = raw_text;
+                material.material_metadata.transcriptions = transcriptions;
                 return this._changeStatus(material, stream_id, callback);
 
             }).catch(e => {
                 // log error message and store the not completed material
                 material.message = `${self._prefix} ${e.message}`;
-                return this._changeStatus(material, 'stream_partial', callback);
+                return this._changeStatus(material, 'incomplete', callback);
             });
 
         } else {
             // log the unsupported TTP language
-            material.message = `${self._prefix} Not TTP supported language=${material.language}.`;
-            return this._changeStatus(material, 'stream_partial', callback);
+            material.message = `${self._prefix} Not a TTP supported language=${material.language}.`;
+            return this._changeStatus(material, 'incomplete', callback);
         }
     }
 
@@ -352,10 +352,10 @@ class ExtractionTTPVideo {
      * @param {Function} callback - THe final callback function.
      */
     _changeStatus(material, stream_id, callback) {
-        const error = stream_id === 'stream_partial' ? ' error' : '';
+        const error = stream_id === 'incomplete' ? ' error' : '';
         return this._pg.update(
             { status: `extracted transcriptions and translations${error}` },
-            { url: material.materialurl },
+            { url: material.material_url },
             'material_process_pipeline', () => {
                 // send material object to next component
                 return this._onEmit(material, stream_id, callback);
@@ -379,5 +379,5 @@ class ExtractionTTPVideo {
 }
 
 exports.create = function (context) {
-    return new ExtractionTTPVideo(context);
+    return new ExtractVideoTTP(context);
 };

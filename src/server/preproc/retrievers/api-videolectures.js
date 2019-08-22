@@ -171,16 +171,19 @@ class VideolecturesAPI extends BasicRESTAPI {
         return {
             title,
             description,
-            provideruri: `${this._domain}/${slug}/`,
-            materialurl: src,
+            provider_uri: `${this._domain}/${slug}/`,
+            material_url: src,
             author: authors.join(','),
             language: language,
-            type: { ext, mime: mimetype },
-            datecreated: time,
-            dateretrieved: (new Date()).toISOString(),
-            providertoken: this._token,
-            materialmetadata: {
-                providerspecific: {
+            type: {
+                ext,
+                mime: mimetype
+            },
+            date_created: time,
+            retrieved_date: (new Date()).toISOString(),
+            provider_token: this._token,
+            material_metadata: {
+                other: {
                     slug,
                     part
                 }

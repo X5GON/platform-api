@@ -69,11 +69,11 @@ class Wikification {
                     }
                 }
                 // store merged concepts within the material object
-                const wikipediaConcepts = Object.values(conceptMap);
+                const wikipedia_concepts = Object.values(conceptMap);
 
                 // get the dominant language of the material
                 let languages = { };
-                for (let concept of wikipediaConcepts) {
+                for (let concept of wikipedia_concepts) {
                     if (languages[concept.lang]) {
                         languages[concept.lang] += 1;
                     } else {
@@ -85,7 +85,7 @@ class Wikification {
                 const language = Object.keys(languages)
                     .reduce((a, b) => languages[a] > languages[b] ? a : b);
 
-                return resolve({ wikipediaConcepts, language });
+                return resolve({ wikipedia_concepts, language });
             });
         });
 
@@ -192,7 +192,6 @@ class Wikification {
             return callback(null, concepts);
 
         }, error => {
-            console.log(error.message);
             return callback(error);
         });
     }
@@ -265,7 +264,7 @@ class Wikification {
 /**
  * Extracts wikipedia concepts out of the OER material.
  */
-class ExtractionWikipedia {
+class ExtractWikipedia {
 
     constructor() {
         this._name = null;
@@ -277,7 +276,7 @@ class ExtractionWikipedia {
         this._name = name;
         this._context = context;
         this._onEmit = config.onEmit;
-        this._prefix = `[Wikification ${this._name}]`;
+        this._prefix = `[ExtractWikipedia ${this._name}]`;
         // create the postgres connection
         this._pg = require('alias:lib/postgresQL')(config.pg);
         // wikifier request object
@@ -300,28 +299,28 @@ class ExtractionWikipedia {
         let self = this;
 
        // get the raw text from the material
-        const text = material.materialmetadata.rawText;
+        const text = material.material_metadata.raw_text;
 
         if (!text) {
             //send it to the next component in the pipeline
             material.message = `${this._prefix} No text provided.`;
-            return this._changeStatus(material, 'stream_partial', callback);
+            return this._changeStatus(material, 'incomplete', callback);
         }
 
         // process material text and extract wikipedia concepts
         self._wikifier.processText(text).then(response => {
 
             // retrieve wikifier results
-            const { wikipediaConcepts, language } = response;
+            const { wikipedia_concepts, language } = response;
 
-            if (!wikipediaConcepts.length) {
+            if (!wikipedia_concepts.length) {
                 // no wikipedia concepts extracted - send it to partial material table
                 material.message = `${this._prefix} No wikipedia concepts found`;
-                return this._changeStatus(material, 'stream_partial', callback);
+                return this._changeStatus(material, 'incomplete', callback);
             }
 
             // store merged concepts within the material object
-            material.materialmetadata.wikipediaConcepts = wikipediaConcepts;
+            material.material_metadata.wikipedia_concepts = wikipedia_concepts;
             // assign the missing language using the wikifier language autodetect
             if (!material.language || [null, undefined, '', 'und'].includes(material.language)) {
                 material.language = language;
@@ -331,7 +330,7 @@ class ExtractionWikipedia {
         }).catch(error => {
             // there was an error - send the material to partial table
             material.message = `${this._prefix} ${error.message}`;
-            return this._changeStatus(material, 'stream_partial', callback);
+            return this._changeStatus(material, 'incomplete', callback);
         });
     }
 
@@ -343,10 +342,10 @@ class ExtractionWikipedia {
      * @param {Function} callback - THe final callback function.
      */
     _changeStatus(material, stream_id, callback) {
-        const error = stream_id === 'stream_partial' ? ' error' : '';
+        const error = stream_id === 'incomplete' ? ' error' : '';
         return this._pg.update(
             { status: `extracted wikipedia concepts${error}` },
-            { url: material.materialurl },
+            { url: material.material_url },
             'material_process_pipeline', () => {
                 // send material object to next component
                 return this._onEmit(material, stream_id, callback);
@@ -356,5 +355,5 @@ class ExtractionWikipedia {
 }
 
 exports.create = function (context) {
-    return new ExtractionWikipedia(context);
+    return new ExtractWikipedia(context);
 };

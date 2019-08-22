@@ -25,7 +25,7 @@ const crypto = require('crypto');
  * provided videos. Supported languages are: english, spanish,
  * german, and slovene.
  */
-class ExtractionTTPText {
+class ExtractTextTTP {
 
     constructor() {
         this._name = null;
@@ -37,7 +37,7 @@ class ExtractionTTPText {
         this._name = name;
         this._context = context;
         this._onEmit = config.onEmit;
-        this._prefix = `[ExtractionTTPText ${this._name}]`;
+        this._prefix = `[ExtractTextTTP ${this._name}]`;
 
         // the user and authentication token used for the requests
         this._options = {
@@ -155,29 +155,27 @@ class ExtractionTTPText {
                                 Date.now();
 
             // create the requested langs object
-            let requested_langs = Object.assign({}, self._languages);
-            const constructedLanguages = Object.keys(requested_langs)
-                                .filter(lang => lang !== 'en');
+            let requested_langs = JSON.parse(JSON.stringify(self._languages));
 
-            if (constructedLanguages.includes(material.language)) {
-                // for non-english lnaguages, we need to set up translation paths
-                for (let language of constructedLanguages) {
-                    // if the language is not the material language or english
-                    if (language !== 'en' && language !== material.language) {
-                        // set the translation path for the given language
-                        requested_langs[language].tlpath = [
-                            { 'l': 'en' },
-                            { 'l': language }
-                        ];
-                    }
+            // for non-english lnaguages, we need to set up translation paths
+            for (let language of Object.keys(self._languages)) {
+                if (language === material.language) {
+                    // delete the language
+                    delete requested_langs[language];
+                } else if (material.language !== 'en' && language !== 'en') {
+                    // set the translation path for the given language
+                    requested_langs[language].tlpath = [
+                        { 'l': 'en' },
+                        { 'l': language }
+                    ];
                 }
             }
 
             // store the allowed languages and formats
-            const languages = Object.keys(self._languages);
+            const languages = Object.keys(requested_langs);
 
             // generate the md5 hash for file checking
-            const md5 = crypto.createHash('md5').update(material.materialmetadata.rawText).digest("hex");
+            const md5 = crypto.createHash('md5').update(material.material_metadata.raw_text).digest("hex");
 
             // setup options for sending the video to TPP
             const options = Object.assign({ }, self._options, {
@@ -202,14 +200,13 @@ class ExtractionTTPText {
             fileManager.createDirectoryPath(rootPath);
             // create a file with the material raw text
             const txtPath = path.join(rootPath, 'material.txt');
-            fs.writeFileSync(txtPath, material.materialmetadata.rawText);
+            fs.writeFileSync(txtPath, material.material_metadata.raw_text);
 
             // write the manifest json in the file
             const jsonPath = path.join(rootPath, 'manifest.json');
             fs.writeFileSync(jsonPath, JSON.stringify(options));
-            // create a zip file containing the material and manifest
 
-            // create a file to stream archive data to
+            // create a zip file containing the material and manifest
             var documentPackage = fs.createWriteStream(path.join(rootPath, 'document-package.zip'));
             const archive = archiver('zip', { zlip: { level: 0 } });
 
@@ -241,163 +238,26 @@ class ExtractionTTPText {
             archive.pipe(documentPackage);
 
             archive.file(txtPath, { name: 'material.txt' });
-            archive.file(jsonPath, { name: 'manifest.json' });
 
             archive.finalize().then(() => {
                 // save the configurations
                 this._pg.upsert({
-                    url: material.materialurl,
+                    url: material.material_url,
                     config: {
                         ttp_manifest: options
                     }
                 }, {
-                    url: material.materialurl
+                    url: material.material_url
                 }, 'material_process_pipeline', () => {});
 
                 // after the request remove the zip files
-                // fileManager.removeFolder(rootPath);
+                fileManager.removeFolder(rootPath);
 
-
-
+                // TODO: finish rest of the code
 
                 return self._onEmit(material, stream_id, callback);
             });
         }
-
-
-        //     ///////////////////////////////////////////////
-        //     // Start the TTP process
-
-        //     rp({
-        //         method: 'POST',
-        //         uri: `${self._url}/ingest/new`,
-        //         body: options,
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //         },
-        //         json: true
-        //     }).then(({ rcode, id }) => {
-        //         // TODO: delete zip files
-
-
-        //         if (rcode === 0) {
-        //             // check for status of the process
-        //             return _checkTTPStatus(id);
-        //         } else {
-        //             // something went wrong with the upload - terminate process
-        //             throw new Error(`[status_code: ${rcode}] Error when uploading process_id=${id}`);
-        //         }
-        //     }).then(response => {
-        //         /////////////////////////////////////////////////////////
-        //         // SECOND STEP
-        //         // If the material has been processed, make a request
-        //         // for all transcriptions and translations
-
-        //         if (response.process_completed) {
-        //             // get processed values - transcriptions and translations
-        //             let requests = [];
-        //             // iterate through all languages
-        //             for (let lang of languages) {
-        //                 // iterate through all formats
-        //                 for (let format of formats) {
-        //                     // prepare the requests to get the transcriptions and translations
-        //                     let request = rp({
-        //                         uri: `${self._url}/get`,
-        //                         qs: Object.assign({ }, self._options, {
-        //                             id: external_id,
-        //                             format,
-        //                             lang
-        //                         }),
-        //                     });
-        //                     // store it for later
-        //                     requests.push(request);
-        //                 }
-        //             }
-
-        //             // wait for all requests to go through
-        //             return Promise.all(requests);
-
-        //         } else {
-        //             const { status_code_msg, status_code, process_id } = response;
-        //             // the process has not been successfully completed
-        //             throw new Error(`[status_code: ${status_code}] ${status_code_msg} for process_id=${process_id}`);
-        //         }
-        //     }).then(transcriptionList => {
-        //         /////////////////////////////////////////////////////////
-        //         // THIRD STEP
-        //         // Go through the transcription list, prepare material
-        //         // metadata and save it in the material object
-
-        //         // prepare placeholders for material metadata
-        //         let transcriptions = { };
-        //         let rawText;
-
-        //         // iterate through all responses
-        //         for (let langId = 0; langId < languages.length; langId++) {
-        //             // get current language
-        //             const lang = languages[langId];
-        //             // placeholder for transcriptions
-        //             let transcription = { };
-
-        //             for (let formatId = 0; formatId < formats.length; formatId++) {
-        //                 // get current format
-        //                 const format = self._formats[formats[formatId]];
-        //                 // get index of the current transcription value
-        //                 let index = langId * formats.length + formatId;
-
-        //                 try {
-        //                     // try if the response is a JSON. If goes through,
-        //                     // the response contains the error
-        //                     JSON.parse(transcriptionList[index]);
-
-        //                 }catch (err) {
-        //                     // if here, the response is a text file, dfxp or plain
-        //                     if (typeof transcriptionList[index] === 'string') {
-        //                         transcription[format] = transcriptionList[index];
-        //                     }
-        //                 }
-
-        //             }
-
-        //             if (Object.keys(transcription)) {
-        //                 // save transcriptions under the current language
-        //                 transcriptions[lang] = transcription;
-
-        //                 if (lang === material.language) {
-        //                     // set default transcriptions for the material
-        //                     rawText = transcription.plain;
-        //                 }
-        //             }
-        //         }
-
-        //         // save transcriptions into the material's metadata field
-        //         material.materialmetadata.rawText        = rawText;
-        //         material.materialmetadata.transcriptions = transcriptions;
-
-        //         return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
-        //             // send material to the next component
-        //             return self._onEmit(material, stream_id, callback);
-        //         });
-
-
-        //     }).catch(e => {
-        //         // log error message and store the not completed material
-        //         material.message = `${self._prefix} ${e.message}`;
-        //         return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
-        //             // send material to the next component
-        //             return self._onEmit(material, 'stream_partial', callback);
-        //         });
-
-        //     });
-
-        // } else {
-        //     // log the unsupported TTP language
-        //     material.message = `${self._prefix} Not TTP supported language=${material.language}.`;
-        //     return this._pg.update({ status: this._prefix }, { url: material.materialurl }, 'material_process_pipeline', () => {
-        //         // send material to the next component
-        //         return self._onEmit(material, 'stream_partial', callback);
-        //     });
-        // }
     }
 
     /**
@@ -416,5 +276,5 @@ class ExtractionTTPText {
 }
 
 exports.create = function (context) {
-    return new ExtractionTTPText(context);
+    return new ExtractTextTTP(context);
 };

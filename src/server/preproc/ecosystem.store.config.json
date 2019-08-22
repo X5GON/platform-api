@@ -1,79 +1,74 @@
 {
     "apps": [{
-        "name": "STORING_MATERIAL_COMPLETE",
+        "name": "STORE.MATERIAL.COMPLETE",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
+        "args": "-tn uuid.store.material.complete -tp ./ontologies/store.material.complete",
         "env": {
-            "NODE_ENV": "dev",
-            "TOPOLOGY": "storing-material-complete"
+            "NODE_ENV": "dev"
         },
         "env_production": {
-            "NODE_ENV": "prod",
-            "TOPOLOGY": "storing-material-complete"
+            "NODE_ENV": "prod"
         },
         "instances": "2",
         "exec_mode": "cluster",
         "autorestart": true,
         "max_restarts": 20
     }, {
-        "name": "STORING_MATERIAL_PARTIAL",
+        "name": "STORE.MATERIAL.PARTIAL",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
+        "args": "-tn uuid.store.material.partial -tp ./ontologies/store.material.partial",
         "env": {
-            "NODE_ENV": "dev",
-            "TOPOLOGY": "storing-material-partial"
+            "NODE_ENV": "dev"
         },
         "env_production": {
-            "NODE_ENV": "prod",
-            "TOPOLOGY": "storing-material-partial"
+            "NODE_ENV": "prod"
         },
         "instances": "1",
         "exec_mode": "cluster",
         "autorestart": true,
         "max_restarts": 20
     }, {
-        "name": "STORING_USERACTIVITY_CONNECT",
+        "name": "STORE.USERACTIVITY.CONNECT",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
+        "args": "-tn uuid.store.user-activities -tp ./ontologies/store.user-activities",
         "env": {
-            "NODE_ENV": "dev",
-            "TOPOLOGY": "storing-user-activities"
+            "NODE_ENV": "dev"
         },
         "env_production": {
-            "NODE_ENV": "prod",
-            "TOPOLOGY": "storing-user-activities"
+            "NODE_ENV": "prod"
         },
         "instances": "1",
         "exec_mode": "cluster",
         "autorestart": true,
         "max_restarts": 20
     }, {
-        "name": "STORING_RECSYS_TRANSITIONS",
+        "name": "STORE.RECSYS.TRANSITIONS",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
+        "args": "-tn uuid.store.recsys.transitions -tp ./ontologies/store.recsys.transitions",
         "env": {
-            "NODE_ENV": "dev",
-            "TOPOLOGY": "storing-recsys-transitions"
+            "NODE_ENV": "dev"
         },
         "env_production": {
-            "NODE_ENV": "prod",
-            "TOPOLOGY": "storing-recsys-transitions"
+            "NODE_ENV": "prod"
         },
         "instances": "1",
         "exec_mode": "cluster",
         "autorestart": true,
         "max_restarts": 20
     }, {
-        "name": "STORING_PROVIDERS",
+        "name": "STORE.PROVIDERS",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
+        "args": "-tn uuid.store.providers -tp ./ontologies/store.providers",
         "env": {
-            "NODE_ENV": "dev",
-            "TOPOLOGY": "storing-providers"
+            "NODE_ENV": "dev"
         },
         "env_production": {
-            "NODE_ENV": "prod",
-            "TOPOLOGY": "storing-providers"
+            "NODE_ENV": "prod"
         },
         "instances": "1",
         "exec_mode": "cluster",

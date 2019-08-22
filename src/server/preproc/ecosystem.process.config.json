@@ -1,31 +1,29 @@
 {
     "apps": [{
-        "name": "PROCESSING_MATERIAL_TEXT",
+        "name": "PROCESS.MATERIAL.TEXT",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
+        "args": "-tn uuid.process.material.text -tp ./ontologies/process.material.text",
         "env": {
-            "NODE_ENV": "dev",
-            "TOPOLOGY": "processing-material-text"
+            "NODE_ENV": "dev"
         },
         "env_production": {
-            "NODE_ENV": "prod",
-            "TOPOLOGY": "processing-material-text"
+            "NODE_ENV": "prod"
         },
         "instances": "5",
         "exec_mode": "cluster",
         "autorestart": true,
         "max_restarts": 20
     }, {
-        "name": "PROCESSING_MATERIAL_VIDEO",
+        "name": "PROCESS.MATERIAL.VIDEO",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
+        "args": "-tn uuid.process.material.video -tp ./ontologies/process.material.video",
         "env": {
-            "NODE_ENV": "dev",
-            "TOPOLOGY": "processing-material-video"
+            "NODE_ENV": "dev"
         },
         "env_production": {
-            "NODE_ENV": "prod",
-            "TOPOLOGY": "processing-material-video"
+            "NODE_ENV": "prod"
         },
         "instances": "3",
         "exec_mode": "cluster",

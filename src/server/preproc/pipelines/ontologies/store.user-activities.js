@@ -8,25 +8,25 @@ module.exports = {
     },
     "spouts": [
         {
-            "name": "user-activity-visit-input",
+            "name": "kafka.user-activities.visits",
             "type": "inproc",
             "working_dir": "./spouts",
             "cmd": "kafka-spout.js",
             "init": {
                 "kafka_host": config.kafka.host,
                 "topic": "STORING.USERACTIVITY.VISIT",
-                "groupId": `${config.kafka.groupId}-user-activity-visit`
+                "groupId": `${config.kafka.groupId}.USER-ACTIVITIES.VISITS`
             }
         },
         {
-            "name": "user-activity-video-input",
+            "name": "kafka.user-activities.video",
             "type": "inproc",
             "working_dir": "./spouts",
             "cmd": "kafka-spout.js",
             "init": {
                 "kafka_host": config.kafka.host,
                 "topic": "STORING.USERACTIVITY.VIDEO",
-                "groupId": `${config.kafka.groupId}-user-activity-video`
+                "groupId": `${config.kafka.groupId}.USER-ACTIVITIES.VIDEO`
             }
         }
     ],
@@ -35,12 +35,12 @@ module.exports = {
          * Storing user activity into database
          */
         {
-            "name": "postgresql-storage-user-activity-connect",
+            "name": "store.pg.user-activity.visits",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "postgresql-storage-user-activity-connect.js",
+            "cmd": "store.pg.user-activity.visits.js",
             "inputs": [{
-                "source": "user-activity-visit-input",
+                "source": "kafka.user-activities.visits",
             }],
             "init": {
                 "pg": config.pg
@@ -51,14 +51,14 @@ module.exports = {
          * Logging user activity
          */
         {
-            "name": "logger-user-activity-connect",
+            "name": "log.user-activity.connect",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "logger-user-activity-connect.js",
+            "cmd": "log.user-activity.connect.js",
             "inputs": [{
-                "source": "user-activity-visit-input",
+                "source": "kafka.user-activities.visits",
             },{
-                "source": "user-activity-video-input",
+                "source": "kafka.user-activities.video",
             }],
             "init": {
                 file_name: 'user-activities',

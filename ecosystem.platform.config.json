@@ -1,6 +1,6 @@
 {
     "apps": [{
-        "name": "X5GON_PLATFORM",
+        "name": "X5GON.PLATFORM",
         "script": "platform.js",
         "cwd": "./src/server/platform/",
         "env": {

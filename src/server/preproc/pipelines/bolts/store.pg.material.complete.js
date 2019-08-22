@@ -49,7 +49,7 @@ class PostgresqlMaterialComplete {
             provider_token
         } = message;
 
-        self._pg.select({ url: urls.material_url.url }, 'material_process_pipeline', function (error, result) {
+        self._pg.select({ url: urls.material_url }, 'material_process_pipeline', function (error, result) {
             if (error) { return callback(error); }
 
             // the database already has the material
@@ -97,12 +97,14 @@ class PostgresqlMaterialComplete {
                 // SAVE URLS
                 ///////////////////////////////////////////
 
-                let {
-                    provider_uri,
-                    material_url
-                } = urls;
+                let material_url = {
+                    url: urls.material_url,
+                    material_id
+                };
 
-                material_url.material_id = material_id;
+                let provider_uri = {
+                    url: urls.provider_uri
+                };
 
                 tasks.push(function (xcallback) {
                     // check for provider in database

@@ -8,9 +8,6 @@
 // external modules
 const k = require('kafka-node');
 
-const HIGH_WATER = 100;
-const LOW_WATER = 10;
-
 /**
  * @class KafkaConsumer
  * @description Listens to a particular Kafka topic/channel
@@ -23,9 +20,12 @@ class KafkaConsumer {
      * @param {String} host - The host address of the kafka service.
      * @param {String} topic - The topic kafka consumer is listening to.
      */
-    constructor(host, topic, groupId) {
+    constructor(host, topic, groupId, HIGH_WATER=100, LOW_WATER=10) {
         // the message container
         this._data = [];
+        // set the data limits
+        this.HIGH_WATER = HIGH_WATER;
+        this.LOW_WATER = LOW_WATER;
 
         // setup the consumer options
         const options = {
@@ -54,7 +54,7 @@ class KafkaConsumer {
             this._data.push(JSON.parse(message.value));
 
             // handle large amount of data
-            if (this._data.length >= HIGH_WATER) {
+            if (this._data.length >= this.HIGH_WATER) {
                 this._highWaterClearing = true;
                 this.consumerGroup.pause();
             }
@@ -97,7 +97,7 @@ class KafkaConsumer {
         if (this._data.length > 0) {
             let msg = this._data[0];
             this._data = this._data.slice(1);
-            if (this._data.length <= LOW_WATER) {
+            if (this._data.length <= this.LOW_WATER) {
                 this._highWaterClearing = false;
                 this.consumerGroup.resume();
             }
@@ -136,7 +136,13 @@ class KafkaSpout {
         this._name = name;
         this._context = context;
         this._prefix = `[KafkaSpout ${this._name}]`;
-        this._generator = new KafkaConsumer(config.kafka_host, config.topic, config.groupId);
+        this._generator = new KafkaConsumer(
+            config.kafka_host,
+            config.topic,
+            config.groupId,
+            config.HIGH_WATER,
+            config.LOW_WATER
+        );
         callback();
     }
 

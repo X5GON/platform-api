@@ -8,25 +8,25 @@ module.exports = {
     },
     "spouts": [
         {
-            "name": "recsys-user-transitions",
+            "name": "kafka.recsys.transitions",
             "type": "inproc",
             "working_dir": "./spouts",
             "cmd": "kafka-spout.js",
             "init": {
                 "kafka_host": config.kafka.host,
                 "topic": "STORING.RECSYS.TRANSITIONS",
-                "groupId": `${config.kafka.groupId}-recsys-user-transitions`
+                "groupId": `${config.kafka.groupId}.RECSYS.TRANSITIONS`
             }
         }
     ],
     "bolts": [
         {
-            "name": "postgresql-storage-recsys-transitions",
+            "name": "store.pg.recsys.transitions",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "postgresql-storage-recsys-transitions.js",
+            "cmd": "store.pg.recsys.transitions.js",
             "inputs": [{
-                "source": "recsys-user-transitions",
+                "source": "kafka.recsys.transitions",
             }],
             "init": {
                 "pg": config.pg
