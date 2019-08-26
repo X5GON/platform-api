@@ -44,9 +44,9 @@ module.exports = {
                     "provider": { "token": "provider_token" },
                     "license": "license",
                     "material_metadata": {
+                        "metadata": "material_metadata.metadata",
                         "raw_text": "material_metadata.raw_text",
-                        "wikipedia_concepts": {},
-                        "other": "material_metadata.other"
+                        "wikipedia_concepts": {}
                     }
                 }
             }
@@ -147,15 +147,10 @@ module.exports = {
                     "dateretrieved": "retrieved_date",
                     "providertoken": "provider.token",
                     "license": "license",
-                    "materialmetadata": {
-                        "rawText": "material_metadata.raw_text",
-                        "wikipediaConcepts": "material_metadata.wikipedia_concepts",
-                        "other": "other"
-                    }
+                    "materialmetadata": "material_metadata"
                 }
             }
         },
-
         {
             "name": "kafka.material.partial",
             "type": "inproc",

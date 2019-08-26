@@ -69,47 +69,62 @@ module.exports = function (pg, logger, config) {
                 ORDER BY ${schema}.oer_materials.id
                 ${LIMIT  ? `LIMIT ${LIMIT}` : ''}
                 ${OFFSET ? `OFFSET ${OFFSET}` : ''}
+            ),
+
+            oer_materials_wiki AS (
+                SELECT
+                    oer_materials_query.*,
+                    ${schema}.features_public.value->>'value' AS wikipedia
+
+                FROM oer_materials_query INNER JOIN features_public
+                ON oer_materials_query.id=features_public.record_id
+                WHERE features_public.table_name='oer_materials' AND
+                    features_public.name='wikipedia_concepts'
             )
 
             SELECT
-                oer_materials_query.id,
-                oer_materials_query.title,
-                oer_materials_query.description,
-                oer_materials_query.url,
-                oer_materials_query.authors,
-                oer_materials_query.language,
-                oer_materials_query.creation_date,
-                oer_materials_query.retrieved_date,
-                oer_materials_query.type,
-                oer_materials_query.mimetype,
-                oer_materials_query.license,
-                oer_materials_query.full_count,
+                oer_materials_wiki.id,
+                oer_materials_wiki.title,
+                oer_materials_wiki.description,
+                oer_materials_wiki.url,
+                oer_materials_wiki.authors,
+                oer_materials_wiki.language,
+                oer_materials_wiki.creation_date,
+                oer_materials_wiki.retrieved_date,
+                oer_materials_wiki.type,
+                oer_materials_wiki.mimetype,
+                oer_materials_wiki.license,
+                oer_materials_wiki.metadata,
+                oer_materials_wiki.wikipedia,
+                oer_materials_wiki.full_count,
 
-                oer_materials_query.provider_id,
-                oer_materials_query.provider_name,
-                oer_materials_query.provider_domain,
+                oer_materials_wiki.provider_id,
+                oer_materials_wiki.provider_name,
+                oer_materials_wiki.provider_domain,
 
                 array_agg(${schema}.material_contents.id) AS material_content_ids
 
-            FROM oer_materials_query LEFT JOIN ${schema}.material_contents
-            ON oer_materials_query.id=${schema}.material_contents.material_id
+            FROM oer_materials_wiki LEFT JOIN ${schema}.material_contents
+            ON oer_materials_wiki.id=${schema}.material_contents.material_id
             GROUP BY
-                oer_materials_query.id,
-                oer_materials_query.title,
-                oer_materials_query.description,
-                oer_materials_query.url,
-                oer_materials_query.authors,
-                oer_materials_query.language,
-                oer_materials_query.creation_date,
-                oer_materials_query.retrieved_date,
-                oer_materials_query.type,
-                oer_materials_query.mimetype,
-                oer_materials_query.license,
-                oer_materials_query.full_count,
+                oer_materials_wiki.id,
+                oer_materials_wiki.title,
+                oer_materials_wiki.description,
+                oer_materials_wiki.url,
+                oer_materials_wiki.authors,
+                oer_materials_wiki.language,
+                oer_materials_wiki.creation_date,
+                oer_materials_wiki.retrieved_date,
+                oer_materials_wiki.type,
+                oer_materials_wiki.mimetype,
+                oer_materials_wiki.license,
+                oer_materials_wiki.metadata,
+                oer_materials_wiki.wikipedia,
+                oer_materials_wiki.full_count,
 
-                oer_materials_query.provider_id,
-                oer_materials_query.provider_name,
-                oer_materials_query.provider_domain;
+                oer_materials_wiki.provider_id,
+                oer_materials_wiki.provider_name,
+                oer_materials_wiki.provider_domain;
         ;`;
 
         return query;
@@ -141,45 +156,58 @@ module.exports = function (pg, logger, config) {
 
                 FROM ${schema}.oer_materials RIGHT JOIN urls_extended
                 ON ${schema}.oer_materials.id=urls_extended.material_id
+            ),
+
+            oer_materials_wiki AS (
+                SELECT
+                    oer_materials_query.*,
+                    ${schema}.features_public.value->>'value' AS wikipedia
+
+                FROM oer_materials_query INNER JOIN features_public
+                ON oer_materials_query.id=features_public.record_id
+                WHERE features_public.table_name='oer_materials' AND
+                    features_public.name='wikipedia_concepts'
             )
 
             SELECT
-                oer_materials_query.id,
-                oer_materials_query.title,
-                oer_materials_query.description,
-                oer_materials_query.url,
-                oer_materials_query.authors,
-                oer_materials_query.language,
-                oer_materials_query.creation_date,
-                oer_materials_query.retrieved_date,
-                oer_materials_query.type,
-                oer_materials_query.mimetype,
-                oer_materials_query.license,
+                oer_materials_wiki.id,
+                oer_materials_wiki.title,
+                oer_materials_wiki.description,
+                oer_materials_wiki.url,
+                oer_materials_wiki.authors,
+                oer_materials_wiki.language,
+                oer_materials_wiki.creation_date,
+                oer_materials_wiki.retrieved_date,
+                oer_materials_wiki.type,
+                oer_materials_wiki.mimetype,
+                oer_materials_wiki.license,
+                oer_materials_wiki.metadata,
 
-                oer_materials_query.provider_id,
-                oer_materials_query.provider_name,
-                oer_materials_query.provider_domain,
+                oer_materials_wiki.provider_id,
+                oer_materials_wiki.provider_name,
+                oer_materials_wiki.provider_domain,
 
                 array_agg(${schema}.material_contents.id) AS material_content_ids
 
-            FROM oer_materials_query LEFT JOIN ${schema}.material_contents
-            ON oer_materials_query.id=${schema}.material_contents.material_id
+            FROM oer_materials_wiki LEFT JOIN ${schema}.material_contents
+            ON oer_materials_wiki.id=${schema}.material_contents.material_id
             GROUP BY
-                oer_materials_query.id,
-                oer_materials_query.title,
-                oer_materials_query.description,
-                oer_materials_query.url,
-                oer_materials_query.authors,
-                oer_materials_query.language,
-                oer_materials_query.creation_date,
-                oer_materials_query.retrieved_date,
-                oer_materials_query.type,
-                oer_materials_query.mimetype,
-                oer_materials_query.license,
+                oer_materials_wiki.id,
+                oer_materials_wiki.title,
+                oer_materials_wiki.description,
+                oer_materials_wiki.url,
+                oer_materials_wiki.authors,
+                oer_materials_wiki.language,
+                oer_materials_wiki.creation_date,
+                oer_materials_wiki.retrieved_date,
+                oer_materials_wiki.type,
+                oer_materials_wiki.mimetype,
+                oer_materials_wiki.license,
+                oer_materials_wiki.metadata,
 
-                oer_materials_query.provider_id,
-                oer_materials_query.provider_name,
-                oer_materials_query.provider_domain;
+                oer_materials_wiki.provider_id,
+                oer_materials_wiki.provider_name,
+                oer_materials_wiki.provider_domain;
         `;
 
         return query;
@@ -289,13 +317,14 @@ module.exports = function (pg, logger, config) {
             title,
             description,
             url,
-            authors,
             language,
             creation_date,
             retrieved_date,
             type: extension,
             mimetype,
             license,
+            metadata,
+            wikipedia,
 
             provider_id,
             provider_name,
@@ -314,6 +343,8 @@ module.exports = function (pg, logger, config) {
             description,
             url,
             language,
+            creation_date,
+            retrieved_date,
             type,
             extension,
             mimetype,
@@ -323,7 +354,18 @@ module.exports = function (pg, logger, config) {
                 provider_name,
                 provider_domain
             },
-            license
+            license,
+            wikipedia: JSON.parse(wikipedia).map(concept => ({
+                uri: concept.uri,
+                name: concept.name,
+                secUri: concept.secUri,
+                secName: concept.secName,
+                lang: concept.lang,
+                cosine: concept.consine,
+                pageRank: concept.pageRank,
+                supportLen: concept.supportLen
+            })),
+            metadata
         };
 
     }

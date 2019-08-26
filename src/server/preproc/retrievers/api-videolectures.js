@@ -183,7 +183,7 @@ class VideolecturesAPI extends BasicRESTAPI {
             retrieved_date: (new Date()).toISOString(),
             provider_token: this._token,
             material_metadata: {
-                other: {
+                metadata: {
                     slug,
                     part
                 }

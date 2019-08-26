@@ -57,8 +57,7 @@ class KafkaMaterialComplete {
             provider: {
                 token: provider_token
             },
-            license,
-            other
+            license
         } = material;
 
         ///////////////////////////////////////////
@@ -143,7 +142,7 @@ class KafkaMaterialComplete {
                 type: type.toLowerCase(),
                 mimetype: mimetype.toLowerCase(),
                 license,
-                other
+                ...material_metadata.metadata && { metadata: material_metadata.metadata }
             },
             material_contents,
             features_public,

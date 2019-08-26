@@ -37,22 +37,22 @@ module.exports = {
                     "material_url": "material_url",
                     "authors": "author",
                     "language": "language",
-                    "type": "type.ext",
-                    "mimetype": "type.mime",
                     "creation_date": "date_created",
                     "retrieved_date": "retrieved_date",
+                    "type": "type.ext",
+                    "mimetype": "type.mime",
                     "provider": { "token": "provider_token" },
                     "license": "license",
                     "material_metadata": {
+                        "metadata": "material_metadata.metadata",
                         "raw_text": "material_metadata.raw_text",
-                        "wikipedia_concepts": {},
-                        "other": "material_metadata.other"
+                        "wikipedia_concepts": {}
                     }
                 }
             }
         },
         {
-            "name": "extract.text.text",
+            "name": "extract.text.raw",
             "type": "inproc",
             "working_dir": "./bolts",
             "cmd": "extract.text.raw.js",
@@ -149,11 +149,7 @@ module.exports = {
                     "dateretrieved": "retrieved_date",
                     "providertoken": "provider.token",
                     "license": "license",
-                    "materialmetadata": {
-                        "rawText": "material_metadata.raw_text",
-                        "wikipediaConcepts": "material_metadata.wikipedia_concepts",
-                        "other": "other"
-                    }
+                    "materialmetadata": "material_metadata"
                 }
             }
         },
