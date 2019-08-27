@@ -5,7 +5,7 @@
  */
 
 
-class PostgresqlMaterialPartial {
+class StorePGMaterialPartial {
 
     constructor() {
         this._name = null;
@@ -17,7 +17,7 @@ class PostgresqlMaterialPartial {
         this._name = name;
         this._context = context;
         this._onEmit = config.onEmit;
-        this._prefix = `[PostgresqlMaterialPartial ${this._name}]`;
+        this._prefix = `[StorePGMaterialPartial ${this._name}]`;
 
         // create the postgres connection
         this._pg = require('alias:lib/postgresQL')(config.pg);
@@ -68,5 +68,5 @@ class PostgresqlMaterialPartial {
 }
 
 exports.create = function (context) {
-    return new PostgresqlMaterialPartial(context);
+    return new StorePGMaterialPartial(context);
 };

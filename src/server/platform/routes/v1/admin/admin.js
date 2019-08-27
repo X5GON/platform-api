@@ -374,7 +374,9 @@ module.exports = function (pg, logger, config, passport, monitor) {
      */
     router.get('/admin/monitor/api/process/:id/start', _checkAuthentication, (req, res) => {
         const id = parseInt(req.params.id);
-        monitor.startProcess(id, (error, status) => {
+        console.log(id);
+        monitor.restartProcess(id, (error, status) => {
+            console.log(error);
             if (error) { return res.status(400).send({ error: error.message }); }
             return res.status(200).send(status);
         });

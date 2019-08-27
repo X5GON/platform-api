@@ -103,12 +103,7 @@ module.exports = function (pg, logger, config) {
             list.push({ material, errors: messages });
             return;
         }
-        // change the
-        for (let key of Object.keys(material)) {
-            material[key.replace(/_/g, '')] = material[key];
-        }
-
-        pg.select({ url: material.materialurl }, 'material_process_pipeline', (error, results) => {
+        pg.select({ url: material.material_url }, 'material_process_pipeline', (error, results) => {
             if (error) {
                 logger.error('[error] postgresql', {
                     error: {
@@ -121,16 +116,16 @@ module.exports = function (pg, logger, config) {
             }
             if (results.length) {
                 logger.error('[upload] material already in the processing pipeline',
-                    { url: material.materialurl }
+                    { url: material.material_url }
                 );
                 // list the material
-                list.push({ material, errors: [`material at location = ${material.materialurl} already in processing`] });
+                list.push({ material, errors: [`material at location = ${material.material_url} already in processing`] });
                 return;
             }
             // get material mimetype and decide where to send the material metadata
             const mimetype = material.type.mime;
             if (mimetype && mimetypes.video.includes(mimetype)) {
-                pg.insert({ url: material.materialurl }, 'material_process_pipeline', (xerror) => {
+                pg.insert({ url: material.material_url }, 'material_process_pipeline', (xerror) => {
                     if (xerror) {
                         logger.error('[error] postgresql', {
                             error: {
@@ -141,12 +136,13 @@ module.exports = function (pg, logger, config) {
                         list.push({ material, errors: ['Error on server side'] });
                         return;
                     }
-                    logger.info(`[upload] video material = ${material.materialurl}`);
+                    logger.info(`[upload] video material = ${material.material_url}`);
+                    material.retrieved_date = (new Date()).toISOString();
                     // send the video material
                     producer.send(video_topic, material);
                 });
             } else if (mimetype && mimetypes.audio.includes(mimetype)) {
-                pg.insert({ url: material.materialurl }, 'material_process_pipeline', (xerror) => {
+                pg.insert({ url: material.material_url }, 'material_process_pipeline', (xerror) => {
                     if (xerror) {
                         logger.error('[error] postgresql', {
                             error: {
@@ -157,14 +153,15 @@ module.exports = function (pg, logger, config) {
                         list.push({ material, errors: ['Error on server side'] });
                         return;
                     }
-                    logger.info(`[upload] audio material = ${material.materialurl}`);
+                    logger.info(`[upload] audio material = ${material.material_url}`);
+                    material.retrieved_date = (new Date()).toISOString();
                     // send the video material
                     producer.send(video_topic, material);
                 });
                 // send the audio material
                 producer.send(video_topic, material);
             } else if (mimetype && mimetypes.text.includes(mimetype)) {
-                pg.insert({ url: material.materialurl }, 'material_process_pipeline', (xerror) => {
+                pg.insert({ url: material.material_url }, 'material_process_pipeline', (xerror) => {
                     if (xerror) {
                         logger.error('[error] postgresql', {
                             error: {
@@ -175,7 +172,8 @@ module.exports = function (pg, logger, config) {
                         list.push({ material, errors: ['Error on server side'] });
                         return;
                     }
-                    logger.info(`[upload] text material = ${material.materialurl}`);
+                    logger.info(`[upload] text material = ${material.material_url}`);
+                    material.retrieved_date = (new Date()).toISOString();
                     // send the text material
                     producer.send(text_topic, material);
                 });

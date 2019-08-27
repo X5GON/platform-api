@@ -14,7 +14,7 @@ const textract = require('alias:lib/textract');
 /**
  * Formats Material into a common schema.
  */
-class ExtractionText {
+class ExtractTextRaw {
 
     constructor() {
         this._name = null;
@@ -26,7 +26,7 @@ class ExtractionText {
         this._name = name;
         this._context = context;
         this._onEmit = config.onEmit;
-        this._prefix = `[ExtractionText ${this._name}]`;
+        this._prefix = `[ExtractTextRaw ${this._name}]`;
 
         // set invalid types
         this._invalidTypes = config.invalid_types || [
@@ -53,21 +53,27 @@ class ExtractionText {
 
     receive(material, stream_id, callback) {
         const self = this;
-        if (material.type && !self._invalidTypes.includes(material.type.ext)) {
+
+        if (material.material_metadata.raw_text) {
+            // material already has the raw text
+            return self._changeStatus(material, stream_id, callback);
+
+        } else if (material.type && !self._invalidTypes.includes(material.type)) {
             // extract raw text from materialURL
-            textract.fromUrl(material.materialurl, (error, text) => {
+            textract.fromUrl(material.material_url, (error, text) => {
                 if (error) {
                     material.message = `${self._prefix} Not able to extract text.`;
-                    return self._changeStatus(material, 'stream_partial', callback);
+                    return self._changeStatus(material, 'incomplete', callback);
                 }
                 // save the raw text within the metadata
-                material.materialmetadata.rawText = text;
+                material.material_metadata.raw_text = text;
                 return self._changeStatus(material, stream_id, callback);
             });
+
         } else {
             // send the material to the partial table
             material.message = `${self._prefix} Material does not have type provided.`;
-            return self._changeStatus(material, 'stream_partial', callback);
+            return self._changeStatus(material, 'incomplete', callback);
         }
     }
 
@@ -79,8 +85,8 @@ class ExtractionText {
      */
     _changeStatus(material, stream_id, callback) {
         const self = this;
-        const error = stream_id === 'stream_partial' ? ' error' : '';
-        return self._pg.update({ status: `extracted text${error}` }, { url: material.materialurl }, 'material_process_pipeline', () => {
+        const error = stream_id === 'incomplete' ? ' error' : '';
+        return self._pg.update({ status: `extracted text${error}` }, { url: material.material_url }, 'material_process_pipeline', () => {
             // send material object to next component
             return self._onEmit(material, stream_id, callback);
         });
@@ -89,5 +95,5 @@ class ExtractionText {
 }
 
 exports.create = function (context) {
-    return new ExtractionText(context);
+    return new ExtractTextRaw(context);
 };

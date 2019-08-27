@@ -45,15 +45,18 @@ class KafkaMaterialComplete {
         const {
             title,
             description,
-            provideruri,
-            materialurl,
-            author,
+            provider_uri,
+            material_url,
+            authors,
             language: origin_language,
-            datecreated,
-            dateretrieved,
+            creation_date,
+            retrieved_date,
             type,
-            materialmetadata,
-            providertoken: provider_token,
+            mimetype,
+            material_metadata,
+            provider: {
+                token: provider_token
+            },
             license
         } = material;
 
@@ -61,30 +64,15 @@ class KafkaMaterialComplete {
         // PREPARE MATERIAL AUTHORS
         ///////////////////////////////////////////
 
-        let authors = author;
-        if (authors) {
-            authors = authors.replace(/[{\"}]/g, '');
-            authors = authors.split(',').map(str => str.trim());
-            if (authors.length === 1 && authors[0] === '') {
-                authors = null;
+        let authors_copy = authors;
+
+        if (authors_copy) {
+            authors_copy = authors_copy.replace(/[{\"}]/g, '');
+            authors_copy = authors_copy.split(',').map(str => str.trim());
+            if (authors_copy.length === 1 && authors_copy[0] === '') {
+                authors_copy = null;
             }
         }
-
-
-        ///////////////////////////////////////////
-        // PREPARE MATERIAL CONTENTS
-        ///////////////////////////////////////////
-
-        // material url information
-        let material_url = {
-            url: materialurl,
-            material_id: null
-        };
-
-        // provider uri information
-        let provider_uri = {
-            url: provideruri
-        };
 
         ///////////////////////////////////////////
         // PREPARE MATERIAL CONTENTS
@@ -92,36 +80,31 @@ class KafkaMaterialComplete {
 
         let material_contents = [];
         // prepare list of material contents
-        if (materialmetadata.transcriptions) {
-            let languages = Object.keys(materialmetadata.transcriptions);
+        if (material_metadata.transcriptions) {
+            let languages = Object.keys(material_metadata.transcriptions);
             for (let language of languages) {
-                let extensions = Object.keys(materialmetadata.transcriptions[language]);
+                let extensions = Object.keys(material_metadata.transcriptions[language]);
                 for (let extension of extensions) {
                     // get value of the language and extension
-                    const value = materialmetadata.transcriptions[language][extension];
+                    const value = material_metadata.transcriptions[language][extension];
 
                     // define the type of the transcriptions
                     const type = language === origin_language ?
                         'transcription' :
                         'translation';
 
-                    const provider_specific = materialmetadata.providerspecific;
-
                     material_contents.push({
                         language,
                         type,
                         extension,
-                        value: {
-                            value,
-                            ...(provider_specific && { provider_specific }),
-                        },
+                        value: { value },
                         material_id: null
                     });
                 }
             }
-        } else if (materialmetadata.rawText) {
+        } else if (material_metadata.raw_text) {
             // get the raw text of the material
-            const value = materialmetadata.rawText;
+            const value = material_metadata.raw_text;
             // prepare the material content object
             material_contents.push({
                 language: origin_language,
@@ -139,11 +122,10 @@ class KafkaMaterialComplete {
         // prepare of public feature - wikipedia concept
         let features_public = {
             name: 'wikipedia_concepts',
-            value: { value: materialmetadata.wikipediaConcepts },
+            value: { value: material_metadata.wikipedia_concepts },
             re_required: true,
             record_id: null
         };
-
 
         ///////////////////////////////////////////
         // SEND TO THE DATABASES
@@ -154,12 +136,13 @@ class KafkaMaterialComplete {
                 title,
                 description,
                 language: origin_language,
-                authors,
-                creation_date: datecreated,
-                retrieved_date: dateretrieved,
-                type: type.ext.toLowerCase(),
-                mimetype: type.mime.toLowerCase(),
-                license
+                authors: authors_copy,
+                creation_date,
+                retrieved_date,
+                type: type.toLowerCase(),
+                mimetype: mimetype.toLowerCase(),
+                license,
+                ...material_metadata.metadata && { metadata: material_metadata.metadata }
             },
             material_contents,
             features_public,
@@ -169,6 +152,7 @@ class KafkaMaterialComplete {
             },
             provider_token
         };
+
         // send the message to the database topics
         this._producer.send(this._kafka_topic, message, function (error) {
             if (error) { return callback(error); }

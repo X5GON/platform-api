@@ -7,7 +7,7 @@
 // helper for updating user models with the provided activity
 const updateUserModels = require('alias:lib/update-user-models');
 
-class PostgresqlStorageUserActivites {
+class StorePGUserActivities {
 
     constructor() {
         this._name = null;
@@ -19,7 +19,7 @@ class PostgresqlStorageUserActivites {
         this._name = name;
         this._context = context;
         this._onEmit = config.onEmit;
-        this._prefix = `[PostgresqlStorageUserActivites ${this._name}]`;
+        this._prefix = `[StorePGUserActivities ${this._name}]`;
 
         // create the postgres connection
         this._pg = require('alias:lib/postgresQL')(config.pg);
@@ -126,5 +126,5 @@ class PostgresqlStorageUserActivites {
 }
 
 exports.create = function (context) {
-    return new PostgresqlStorageUserActivites(context);
+    return new StorePGUserActivities(context);
 };

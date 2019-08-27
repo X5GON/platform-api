@@ -40,7 +40,7 @@ class MaterialCollector {
         this._pg = postgresQL(config.pg);
 
         // set kafka consumer & producers
-        this._consumer = new KafkaConsumer(config.kafka.host, 'STORING.USERACTIVITY.VISIT', `${config.kafka.groupId}-material-collector`);
+        this._consumer = new KafkaConsumer(config.kafka.host, 'STORING.USERACTIVITY.VISIT', `${config.kafka.groupId}.MATERIAL.COLLECTOR`);
         this._producer = new KafkaProducer(config.kafka.host);
         // define kafka topic names
         this._text_topic  = 'PROCESSING.MATERIAL.TEXT';
@@ -273,7 +273,7 @@ class MaterialCollector {
     _sendToKafka(material, topic, type) {
         let self = this;
         // insert to postgres process pipeline
-        this._pg.insert({ url: material.materialurl }, 'material_process_pipeline', (xerror) => {
+        this._pg.insert({ url: material.material_url }, 'material_process_pipeline', (xerror) => {
             if (xerror) {
                 logger.error('[error] postgresql', {
                     error: {
@@ -283,7 +283,7 @@ class MaterialCollector {
                 });
                 return;
             }
-            logger.info(`[upload] ${type} material = ${material.materialurl}`);
+            logger.info(`[upload] ${type} material = ${material.material_url}`);
             // send the video material
             self._producer.send(topic, material);
         });

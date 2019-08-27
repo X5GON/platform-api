@@ -1,6 +1,6 @@
 {
     "apps": [{
-        "name": "X5GON_RECSYS",
+        "name": "X5GON.RECSYS",
         "script": "recsys.js",
         "cwd": "./src/server/recsys/",
         "env": {

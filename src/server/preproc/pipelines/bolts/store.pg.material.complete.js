@@ -6,7 +6,7 @@
 
 const async = require('async');
 
-class PostgresqlMaterialComplete {
+class StorePGMaterialComplete {
 
     constructor() {
         this._name = null;
@@ -18,7 +18,7 @@ class PostgresqlMaterialComplete {
         this._name = name;
         this._context = context;
         this._onEmit = config.onEmit;
-        this._prefix = `[PostgresqlMaterialComplete ${this._name}]`;
+        this._prefix = `[StorePGMaterialComplete ${this._name}]`;
 
         // create the postgres connection
         this._pg = require('alias:lib/postgresQL')(config.pg);
@@ -49,7 +49,7 @@ class PostgresqlMaterialComplete {
             provider_token
         } = message;
 
-        self._pg.select({ url: urls.material_url.url }, 'material_process_pipeline', function (error, result) {
+        self._pg.select({ url: urls.material_url }, 'material_process_pipeline', function (error, result) {
             if (error) { return callback(error); }
 
             // the database already has the material
@@ -97,21 +97,23 @@ class PostgresqlMaterialComplete {
                 // SAVE URLS
                 ///////////////////////////////////////////
 
-                let {
-                    provider_uri,
-                    material_url
-                } = urls;
-
-                material_url.material_id = material_id;
-
                 tasks.push(function (xcallback) {
                     // check for provider in database
                     self._pg.select({ token: provider_token }, 'providers', (xe, results) => {
                         if (xe) { return xcallback(xe); }
                         const provider_id = results.length ? results[0].id : null;
                         // set the provider id if inside the database
-                        provider_uri.provider_id = provider_id;
-                        material_url.provider_id = provider_id;
+                        let material_url = {
+                            url: urls.material_url,
+                            material_id,
+                            ...provider_id && { provider_id }
+                        };
+
+                        let provider_uri = {
+                            url: urls.provider_uri,
+                            ...provider_id && { provider_id }
+                        };
+
                         // set url list
                         const urlData = [provider_uri, material_url];
                         // create requests
@@ -140,7 +142,7 @@ class PostgresqlMaterialComplete {
 
                 async.series(tasks, function (e) {
                     if (e) { return callback(e); }
-                    return self._changeStatus(material_url.url, callback);
+                    return self._changeStatus(urls.material_url, callback);
                 });
 
             }); // self._pg.insert(oer_materials)
@@ -165,5 +167,5 @@ class PostgresqlMaterialComplete {
 }
 
 exports.create = function (context) {
-    return new PostgresqlMaterialComplete(context);
+    return new StorePGMaterialComplete(context);
 };

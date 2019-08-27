@@ -6,12 +6,11 @@
 // internal libraries
 const dfxp2srt = require('alias:lib/dfxp2srt-wrapper');
 
-class ExtractionDFXP {
+class ExtractVideoRaw {
 
     constructor() {
         this._name = null;
         this._onEmit = null;
-        this._context = null;
     }
 
     init(name, config, context, callback) {
@@ -19,7 +18,7 @@ class ExtractionDFXP {
         this._onEmit = config.onEmit;
         this._context = context;
 
-        this._prefix = `[ExtractionDFXP ${this._name}]`;
+        this._prefix = `[ExtractVideoRaw ${this._name}]`;
         this._dfxpFolder = config.dfxp_folder;
         // use other fields from config to control your execution
         callback();
@@ -38,13 +37,13 @@ class ExtractionDFXP {
 
         // get the raw text associated with the videos
         let slug;
-        if (material.provideruri.includes('videolectures')) {
-            slug = material.provideruri.split('/')[3];
-        } else if (material.provideruri.includes('media.upv.es')) {
-            let sections = material.provideruri.split('/');
+        if (material.provider_uri.includes('videolectures')) {
+            slug = material.provider_uri.split('/')[3];
+        } else if (material.provider_uri.includes('media.upv.es')) {
+            let sections = material.provider_uri.split('/');
             slug = sections[sections.length - 1];
-        } else if (material.provideruri.includes('virtuos')) {
-            let sections = material.provideruri.split('=');
+        } else if (material.provider_uri.includes('virtuos')) {
+            let sections = material.provider_uri.split('=');
             slug = sections[sections.length - 1];
         }
 
@@ -67,20 +66,20 @@ class ExtractionDFXP {
                 }
 
                 // assign the extracted attributes to the material
-                material.materialmetadata.rawText = originText;
-                material.materialmetadata.transcriptions = transcriptions;
+                material.material_metadata.raw_text = originText;
+                material.material_metadata.transcriptions = transcriptions;
                 // send the material to the next component
                 return this._onEmit(material, stream_id, callback);
             });
         } catch (error) {
              // unable to process the material
              material.message = `${this._prefix} ${error.message}`;
-             return this._onEmit(material, 'stream_partial', callback);
+             return this._onEmit(material, 'incomplete', callback);
         }
 
     }
 }
 
 exports.create = function (context) {
-    return new ExtractionDFXP(context);
+    return new ExtractVideoRaw(context);
 };

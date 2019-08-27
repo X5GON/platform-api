@@ -8,14 +8,14 @@ module.exports = {
     },
     "spouts": [
         {
-            "name": "material-partial-input",
+            "name": "kafka.material.partial",
             "type": "inproc",
             "working_dir": "./spouts",
             "cmd": "kafka-spout.js",
             "init": {
                 "kafka_host": config.kafka.host,
                 "topic": "STORING.MATERIAL.PARTIAL",
-                "groupId": `${config.kafka.groupId}-material-partial`
+                "groupId": `${config.kafka.groupId}.MATERIAL.PARTIAL`
             }
         }
     ],
@@ -25,12 +25,12 @@ module.exports = {
          */
 
         {
-            "name": "postgresql-storage-material-partial",
+            "name": "store.pg.material.partial",
             "type": "inproc",
             "working_dir": "./bolts",
-            "cmd": "postgresql-storage-material-partial.js",
+            "cmd": "store.pg.material.partial.js",
             "inputs": [{
-                "source": "material-partial-input",
+                "source": "kafka.material.partial",
             }],
             "init": {
                 "pg": config.pg

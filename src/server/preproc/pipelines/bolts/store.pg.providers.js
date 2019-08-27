@@ -4,7 +4,7 @@
  * stores it into postgresQL database.
  */
 
-class PostgresqlStorageProviders {
+class StorePGProviders {
 
     constructor() {
         this._name = null;
@@ -16,7 +16,7 @@ class PostgresqlStorageProviders {
         this._name = name;
         this._context = context;
         this._onEmit = config.onEmit;
-        this._prefix = `[PostgresqlStorageProviders ${this._name}]`;
+        this._prefix = `[StorePGProviders ${this._name}]`;
 
         // create the postgres connection
         this._pg = require('alias:lib/postgresQL')(config.pg);
@@ -59,5 +59,5 @@ class PostgresqlStorageProviders {
 }
 
 exports.create = function (context) {
-    return new PostgresqlStorageProviders(context);
+    return new StorePGProviders(context);
 };

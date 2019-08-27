@@ -1192,6 +1192,12 @@ const dbUpdates = [{
         ALTER TABLE ${schema}.rec_sys_user_transitions
         ADD COLUMN updated_at timestamp with time zone DEFAULT (NOW() AT TIME ZONE 'utc') NOT NULL;
     `
+}, {
+    version: 5,
+    update: `
+        ALTER TABLE ${schema}.oer_materials
+        ADD COLUMN metadata jsonb;
+    `
 }];
 
 // get the requested database version
