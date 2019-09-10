@@ -406,7 +406,8 @@ module.exports = function (pg, logger, config) {
      * @apiParam {String} [text] - The raw text. If both `text` and `url` are present, `url` has the priority.
      * @apiParam {String} [url] - The url of the material. If both `text` and `url` are present, `url` has the priority.
      * @apiParam {String="cosine","null"} [type] - The metrics used in combination with the url parameter.
-     *
+     * @apiParam {String="bundles","personalized","collaborativeFiltering"} [algorithm] - The algorithm used to compute the recommendations.
+     * 
      * @apiSuccess (200) {String} list - The html of the embed-ready list.
      * @apiExample {html} Example usage:
      *      <iframe src="https://platform.x5gon.org/embed/recommendations?url=https://platform.x5gon.org/materialUrl&text=education"
@@ -422,9 +423,12 @@ module.exports = function (pg, logger, config) {
             fontSize: query.fontSize
         };
 
+        // select recommendation algorithm
+        let recAlg = query.algorithm ? query.algorithm : 'bundles';        
+
         let options = { layout: 'empty', style, empty: true };
         let queryString = Object.keys(query).map(key => `${key}=${encodeURIComponent(query[key])}`).join('&');
-        request(`http://localhost:${config.recsys.port}/api/v1/recommend/bundles?${queryString}`, (error, httpRequest, body) => {
+        request(`http://localhost:${config.recsys.port}/api/v1/recommend/${recAlg}?${queryString}`, (error, httpRequest, body) => {
 
             if (error) {
                 // error when making material request
