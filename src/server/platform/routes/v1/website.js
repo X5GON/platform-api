@@ -12,6 +12,8 @@ const KafkaProducer = require('alias:lib/kafka-producer');
  */
 module.exports = function (pg, logger, config) {
 
+    const x5gonCookieName = 'x5gonTrack';
+
     ////////////////////////////////////////
     // Helper functions
     ////////////////////////////////////////
@@ -426,9 +428,18 @@ module.exports = function (pg, logger, config) {
         // select recommendation algorithm
         let recAlg = query.algorithm ? query.algorithm : 'bundles';        
 
+        // generate url
         let options = { layout: 'empty', style, empty: true };
         let queryString = Object.keys(query).map(key => `${key}=${encodeURIComponent(query[key])}`).join('&');
-        request(`http://localhost:${config.recsys.port}/api/v1/recommend/${recAlg}?${queryString}`, (error, httpRequest, body) => {
+        let url = `http://localhost:${config.recsys.port}/api/v1/recommend/${recAlg}?${queryString}`;
+
+        // forward the cookie
+        const j = request.jar();
+        const cookie = request.cookie(`x5gonTrack=${req.cookies[x5gonCookieName]}`);
+        // assign cookie to the url
+        j.setCookie(cookie, url);
+
+        request({ url, jar: j }, (error, httpRequest, body) => {
 
             if (error) {
                 // error when making material request
