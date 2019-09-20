@@ -12,10 +12,10 @@
 const async = require('async');
 
 // configuration data
-const config = require('alias:config/config');
+const config = require('@config/config');
 
 // postgresql connection to the database
-const pg = require('alias:lib/postgresQL')(config.pg);
+const pg = require('@library/postgresQL')(config.pg);
 
 
 /////////////////////////////////////////////////

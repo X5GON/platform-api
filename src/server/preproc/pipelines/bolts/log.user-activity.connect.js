@@ -4,7 +4,7 @@
  * formats into a common schema.
  */
 
-const Logger = require('alias:lib/logger');
+const Logger = require('@library/logger');
 
 /**
  * Formats Material into a common schema.

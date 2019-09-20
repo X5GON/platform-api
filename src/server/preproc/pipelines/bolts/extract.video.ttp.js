@@ -7,7 +7,7 @@
 
 // external modules
 const rp = require('request-promise-native');
-const normalization = require('alias:lib/normalization');
+const normalization = require('@library/normalization');
 
 /**
  * @class ExtractionTTP
@@ -62,7 +62,7 @@ class ExtractVideoTTP {
         this._setTimeout = null;
 
         // create the postgres connection
-        this._pg = require('alias:lib/postgresQL')(config.pg);
+        this._pg = require('@library/postgresQL')(config.pg);
         // use other fields from config to control your execution
         callback();
     }

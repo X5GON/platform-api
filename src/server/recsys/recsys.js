@@ -3,7 +3,7 @@
  */
 
 // configurations
-const config = require('alias:config/config');
+const config = require('@config/config');
 
 // external modules
 const express = require('express');
@@ -11,8 +11,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 // internal modules
-const pg = require('alias:lib/postgresQL')(config.pg);
-const Logger = require('alias:lib/logger');
+const pg = require('@library/postgresQL')(config.pg);
+const Logger = require('@library/logger');
 
 // create a logger instance for logging API requests
 const { environment } = config;

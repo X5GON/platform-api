@@ -1,5 +1,5 @@
 const assert      = require('assert');
-const fileManager = require('alias:lib/file-manager');
+const fileManager = require('@library/file-manager');
 const winston     = require('winston');
 const path        = require('path');
 const fs          = require('fs');
@@ -13,18 +13,18 @@ describe('logger.js: logging handler methods unit tests.', function () {
     describe('Require module.', function () {
 
         it('Should not throw an error when requiring the module', function (done) {
-            assert.doesNotThrow(function () { require('alias:lib/logger'); });
+            assert.doesNotThrow(function () { require('@library/logger'); });
             done();
         });
 
         it('Should be an object for creating new logger objects', function (done) {
-            const Logger = require('alias:lib/logger');
+            const Logger = require('@library/logger');
             assert.ok(typeof Logger === 'object');
             done();
         });
 
         it('Should create new log folder', function (done) {
-            const Logger = require('alias:lib/logger');
+            const Logger = require('@library/logger');
             assert.equal(path.join(__dirname, '../../../logs/'), Logger.folder);
             done();
         });
@@ -33,7 +33,7 @@ describe('logger.js: logging handler methods unit tests.', function () {
 
     describe('Logger methods.', function () {
         // create Logger factory object
-        const Logger = require('alias:lib/logger');
+        const Logger = require('@library/logger');
 
         describe('createInstance.', function () {
 

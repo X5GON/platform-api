@@ -3,9 +3,9 @@ var https = require('https');
 const async = require('async');
 
 // configurations
-const config = require('alias:config/config');
+const config = require('@config/config');
 // kafka connection
-const KafkaProducer = require('alias:lib/kafka-producer');
+const KafkaProducer = require('@library/kafka-producer');
 const producer = new KafkaProducer(config.kafka.host);
 
 let diff = { };

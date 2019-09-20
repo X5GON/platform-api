@@ -278,7 +278,7 @@ class ExtractWikipedia {
         this._onEmit = config.onEmit;
         this._prefix = `[ExtractWikipedia ${this._name}]`;
         // create the postgres connection
-        this._pg = require('alias:lib/postgresQL')(config.pg);
+        this._pg = require('@library/postgresQL')(config.pg);
         // wikifier request object
         this._wikifier = new Wikification(config.userKey, config.wikifierUrl);
 

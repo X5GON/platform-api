@@ -7,7 +7,7 @@
  */
 
 // external libraries
-const textract = require('alias:lib/textract');
+const textract = require('@library/textract');
 
 
 
@@ -37,7 +37,7 @@ class ExtractTextRaw {
         // configuration for textract
         this.textConfig = config.text_config;
         // create the postgres connection
-        this._pg = require('alias:lib/postgresQL')(config.pg);
+        this._pg = require('@library/postgresQL')(config.pg);
         // use other fields from config to control your execution
         callback();
     }

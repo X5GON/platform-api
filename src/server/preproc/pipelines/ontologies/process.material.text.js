@@ -1,5 +1,5 @@
 // global configuration
-const config = require('alias:config/config');
+const config = require('@config/config');
 
 // topology definition
 module.exports = {

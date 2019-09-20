@@ -3,7 +3,7 @@ const router = require('express').Router();
 const cors = require('cors');
 
 // internal modules
-const mimetypes = require('alias:config/mimetypes');
+const mimetypes = require('@config/mimetypes');
 
 /**
  * @description Adds API routes for logging user activity.
@@ -355,16 +355,17 @@ module.exports = function (pg, logger, config) {
                 provider_domain
             },
             license,
-            wikipedia: JSON.parse(wikipedia).map(concept => ({
-                uri: concept.uri,
-                name: concept.name,
-                secUri: concept.secUri,
-                secName: concept.secName,
-                lang: concept.lang,
-                cosine: concept.consine,
-                pageRank: concept.pageRank,
-                supportLen: concept.supportLen
-            })),
+            ...wikipedia && { wikipedia: JSON.parse(wikipedia).map(concept => ({
+                    uri: concept.uri,
+                    name: concept.name,
+                    secUri: concept.secUri,
+                    secName: concept.secName,
+                    lang: concept.lang,
+                    cosine: concept.consine,
+                    pageRank: concept.pageRank,
+                    supportLen: concept.supportLen
+                })),
+            },
             metadata
         };
 

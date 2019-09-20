@@ -1,5 +1,5 @@
 // configurations
-const config = require('alias:config/config');
+const config = require('@config/config');
 
 module.exports = {
     "general": {

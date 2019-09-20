@@ -9,11 +9,11 @@
 const rp = require('request-promise-native');
 
 // normalization module
-const normalization = require('alias:lib/normalization');
+const normalization = require('@library/normalization');
 
 
 // file management module
-const fileManager = require('alias:lib/file-manager');
+const fileManager = require('@library/file-manager');
 // module for path creation
 const path = require('path');
 // archive required modules
@@ -70,7 +70,7 @@ class ExtractTextTTP {
         this._setTimeout = null;
 
         // create the postgres connection
-        this._pg = require('alias:lib/postgresQL')(config.pg);
+        this._pg = require('@library/postgresQL')(config.pg);
 
         this._tmp_folder = config.tmp_folder;
         // create the temporary folder

@@ -7,13 +7,13 @@ const url = require('url');
 const cors = require('cors');
 
 // internal modules
-const KafkaProducer = require('alias:lib/kafka-producer');
-const validator = require('alias:lib/schema-validator')({
+const KafkaProducer = require('@library/kafka-producer');
+const validator = require('@library/schema-validator')({
     userActivitySchema: require('alias:platform_schemas/user-activity-schema')
 });
 
 // module for preparing materials
-const PrepareMaterials = require('alias:lib/prepare-materials');
+const PrepareMaterials = require('@library/prepare-materials');
 const prepareMaterials = new PrepareMaterials();
 
 /**

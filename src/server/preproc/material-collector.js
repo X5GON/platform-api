@@ -6,16 +6,16 @@
  */
 
 // configurations
-const config = require('alias:config/config');
+const config = require('@config/config');
 // internal modules
-const KafkaConsumer = require('alias:lib/kafka-consumer');
-const KafkaProducer = require('alias:lib/kafka-producer');
+const KafkaConsumer = require('@library/kafka-consumer');
+const KafkaProducer = require('@library/kafka-producer');
 // material mimetypes used for type selection
-const mimetypes = require('alias:config/mimetypes');
+const mimetypes = require('@config/mimetypes');
 // setup connection with the database
-const postgresQL = require('alias:lib/postgresQL');
+const postgresQL = require('@library/postgresQL');
 // logger for storing activity
-const Logger = require('alias:lib/logger');
+const Logger = require('@library/logger');
 
 // create a logger for platform requests
 const logger = Logger.createGroupInstance('material-collector', 'preproc', config.environment !== 'prod');

@@ -2,15 +2,15 @@
 const router = require('express').Router();
 
 // internal modules
-const KafkaProducer = require('alias:lib/kafka-producer');
+const KafkaProducer = require('@library/kafka-producer');
 
 // initialize validator with
-const validator = require('alias:lib/schema-validator')({
+const validator = require('@library/schema-validator')({
     oer_material_schema: require('alias:platform_schemas/oer-material-schema')
 });
 
 // import mimetypes for comparison
-const mimetypes = require('alias:config/mimetypes');
+const mimetypes = require('@config/mimetypes');
 
 /**
  * @description Adds API routes for logging user activity.

@@ -19,7 +19,7 @@ class StorePGRecsysTransitions {
         this._prefix = `[StorePGRecsysTransitions ${this._name}]`;
 
         // create the postgres connection
-        this._pg = require('alias:lib/postgresQL')(config.pg);
+        this._pg = require('@library/postgresQL')(config.pg);
 
         callback();
     }

@@ -2,7 +2,7 @@
 const proxy = require('http-proxy-middleware');
 
 // logger for proxying requests
-const Logger = require('alias:lib/logger');
+const Logger = require('@library/logger');
 
 
 /**

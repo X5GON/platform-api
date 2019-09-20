@@ -1,9 +1,9 @@
 /************************************************
- * Winston Logger with 
+ * Winston Logger with
  * Winston Daily Rotate File Module
  * This module creates a logger which is able
  * to log activities and rotate them by day. In
- * addition, the log files are compressed after 
+ * addition, the log files are compressed after
  * a while.
  */
 
@@ -11,7 +11,7 @@
 const path = require('path');
 
 // file management module
-const fileManager = require('alias:lib/file-manager');
+const fileManager = require('@library/file-manager');
 
 // main logging modules
 const { createLogger, format, transports, addColors } = require('winston');

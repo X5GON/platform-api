@@ -1,0 +1,47 @@
+{
+  "redirects": [],
+  "pages": [
+    {
+      "path": "/404/"
+    },
+    {
+      "path": "/"
+    },
+    {
+      "path": "/join/"
+    },
+    {
+      "path": "/policy/"
+    },
+    {
+      "path": "/privacy/"
+    },
+    {
+      "path": "/products/analytics/"
+    },
+    {
+      "path": "/products/connect/"
+    },
+    {
+      "path": "/products/discovery/"
+    },
+    {
+      "path": "/products/feed/"
+    },
+    {
+      "path": "/products/recommend/"
+    },
+    {
+      "path": "/products/translate/"
+    },
+    {
+      "path": "/team/"
+    },
+    {
+      "path": "/transparency/"
+    },
+    {
+      "path": "/404.html"
+    }
+  ]
+}
