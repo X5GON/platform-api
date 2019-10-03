@@ -1,3 +1,4 @@
+require(`module-alias/register`);
 // external modules
 const qtopology = require('qtopology');
 

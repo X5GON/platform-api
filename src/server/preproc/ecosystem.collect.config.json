@@ -1,6 +1,6 @@
 {
     "apps": [{
-        "name": "PROCESSING_MATERIAL_COLLECTOR",
+        "name": "PROCESSING.MATERIAL.COLLECTOR",
         "script": "material-collector.js",
         "cwd": ".",
         "env": {

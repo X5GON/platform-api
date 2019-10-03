@@ -15,6 +15,7 @@ const env = process.env.NODE_ENV || 'dev';
 const common = {
     environment: env,
     platform: {
+        cookieID: 'x5gonTrack',
         google: {
             reCaptcha: {
                 verifyUrl: 'https://www.google.com/recaptcha/api/siteverify',

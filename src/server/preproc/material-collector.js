@@ -4,6 +4,7 @@
  * and then crawls pages that were previously not seen.
  *
  */
+require(`module-alias/register`);
 
 // configurations
 const config = require('@config/config');

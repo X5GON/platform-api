@@ -4,12 +4,14 @@
   "description": "Connecting OER repositories",
   "main": "index.js",
   "scripts": {
-    "postinstall": "link-module-alias && npm run minify:snippet && git checkout -- src/lib/textract && npm run install:textract",
+    "postinstall": "npm run minify:snippet && git checkout -- src/lib/textract && npm run install:textract",
     "start:platform": "cd src/server/platform && node platform.js",
     "start:recsys": "cd src/server/recsys && node recsys.js",
     "postgres:create": "cd src/load && node -e 'require(`./create-postgres-database`).startDBCreate();'",
     "minify:snippet": "cd src/server/platform/scripts && node minify-snippet.js",
     "install:textract": "cd src/lib/textract && npm install",
+    "react:start": "cd src/server/platform/x5gon-gatsby && npm start",
+    "react:build": "cd src/server/platform/x5gon-gatsby && npm run-script build",
     "test": "cd src/test && NODE_ENV=test mocha all.js",
     "test:lib": "cd src/test/lib && NODE_ENV=test mocha *.js",
     "test:recsys": "cd src/server/recsys/test && NODE_ENV=test mocha *.js"
@@ -62,7 +64,6 @@
   "devDependencies": {
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.3.0",
-    "link-module-alias": "^1.1.6",
     "mocha": "^5.2.0",
     "node-minify": "^2.4.1",
     "supertest": "^3.3.0",

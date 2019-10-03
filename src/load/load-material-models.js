@@ -3,6 +3,7 @@
  * This script creates and stores the material models in the database.
  * The material models are then used for creating user models.
  */
+require('module-alias/register');
 
 // external modules
 const async = require('async');

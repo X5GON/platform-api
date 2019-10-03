@@ -18,7 +18,7 @@ const x5recommend = new (require(path.join(__dirname, '../engine/x5recommend')))
 module.exports = function (pg, logger) {
 
     // x5gon cookie name
-    const x5gonCookieName = 'x5gonTrack';
+    const x5gonCookieName = config.platform.cookieID;
 
     /**
      * @description Checks if there are query parameters for GET requests

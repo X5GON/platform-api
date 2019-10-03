@@ -5,6 +5,7 @@
  * wikipedia concepts, extracted from the raw content using wikifier
  * (http://wikifier.org).
  */
+require('module-alias/register');
 
 // configurations
 const config = require('@config/config');

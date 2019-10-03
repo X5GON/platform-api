@@ -1,7 +1,7 @@
 /************************************************
  * Kafka Producer Module
  * This module creates a kafka producer which
- * can create new messages and send them to 
+ * can create new messages and send them to
  * the assigned kafka topic.
  */
 
@@ -56,7 +56,7 @@ class KafkaProducer {
      * Sends the message to the appropriate topic.
      * @param {String} topic - The topic where the message is sent.
      * @param {Object} msg - The message.
-     * @param {Function} [cb] - The callback triggered after 
+     * @param {Function} [cb] - The callback triggered after.
      * the message was sent to the kafka topic.
      */
     send(topic, msg, cb) {
