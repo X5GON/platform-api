@@ -1,3 +1,0 @@
-[submodule "src/server/platform/x5gon-gatsby"]
-	path = src/server/platform/x5gon-gatsby
-	url = https://github.com/gregpr07/x5gon-gatsby.git
