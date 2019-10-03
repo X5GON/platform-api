@@ -155,11 +155,9 @@ module.exports = function (pg, logger, config) {
                     }
                     logger.info(`[upload] audio material = ${material.material_url}`);
                     material.retrieved_date = (new Date()).toISOString();
-                    // send the video material
+                    // send the audio material
                     producer.send(video_topic, material);
                 });
-                // send the audio material
-                producer.send(video_topic, material);
             } else if (mimetype && mimetypes.text.includes(mimetype)) {
                 pg.insert({ url: material.material_url }, 'material_process_pipeline', (xerror) => {
                     if (xerror) {

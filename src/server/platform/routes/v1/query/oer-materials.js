@@ -182,6 +182,7 @@ module.exports = function (pg, logger, config) {
                 oer_materials_wiki.mimetype,
                 oer_materials_wiki.license,
                 oer_materials_wiki.metadata,
+                oer_materials_wiki.wikipedia,
 
                 oer_materials_wiki.provider_id,
                 oer_materials_wiki.provider_name,
