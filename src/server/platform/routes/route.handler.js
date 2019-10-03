@@ -33,14 +33,4 @@ module.exports = function (app, pg, logger, config, passport, monitor) {
     app.use('/', require('./v1/admin/admin')(pg, logger, config, passport, monitor));
     app.use('/', require('./v1/website')(pg, logger, config));
 
-
-    ////////////////////////////////////////
-    // Catching all false requests
-    ////////////////////////////////////////
-
-    app.get('/*', (req, res) => {
-        // error in website request
-        logger.warn('error in website request', logger.formatRequest(req));
-        return res.render('error', { title: '404' });
-    });
 };

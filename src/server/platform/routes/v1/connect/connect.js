@@ -9,7 +9,7 @@ const cors = require('cors');
 // internal modules
 const KafkaProducer = require('@library/kafka-producer');
 const validator = require('@library/schema-validator')({
-    userActivitySchema: require('alias:platform_schemas/user-activity-schema')
+    userActivitySchema: require('@platform_schemas/user-activity-schema')
 });
 
 // module for preparing materials
@@ -28,7 +28,7 @@ module.exports = function (logger, config) {
     ////////////////////////////////////////
 
     // parameters used within the routes
-    const x5gonCookieName = 'x5gonTrack';
+    const x5gonCookieName = config.platform.cookieID;
 
     // initialize kafka producer
     const producer = new KafkaProducer(config.kafka.host);

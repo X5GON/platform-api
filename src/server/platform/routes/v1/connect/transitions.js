@@ -12,7 +12,7 @@ const KafkaProducer = require('@library/kafka-producer');
 module.exports = function (logger, config) {
 
     // parameters used within the routes
-    const x5gonCookieName = 'x5gonTrack';
+    const x5gonCookieName = config.platform.cookieID;
 
     // initialize kafka producer
     const producer = new KafkaProducer(config.kafka.host);

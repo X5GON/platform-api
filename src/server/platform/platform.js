@@ -64,19 +64,20 @@ require('./config/passport')(passport, pg);
 require('./config/sockets')(http, monitor);
 // add handlebars configurations
 require('./config/handlebars')(app);
+
 // sets the API routes - adding the postgresql connection, logger, config file,
 // passport object (for authentication), and monitoring object
+require('./routes/route.handler')(app, pg, logger, config, passport, monitor);
 
-app.use(gatsbyExpress('./config/gatsby-express.json', {
-    publicDir: __dirname + '/public/',
-    template: 'public/404/index.html',
 
+const frontEndPath = `${__dirname}/x5gon-gatsby`;
+app.use(express.static(`${frontEndPath}/public`))
+app.use(gatsbyExpress(`${frontEndPath}/gatsby-express.json`, {
+    publicDir: `${frontEndPath}/public`,
     // redirects all /path/ to /path
     // should be used with gatsby-plugin-remove-trailing-slashes
-    redirectSlashes: true,
-  }));
-
-require('./routes/route.handler')(app, pg, logger, config, passport, monitor);
+    redirectSlashes: true
+}));
 
 // parameters used on the express app
 const PORT = config.platform.port;

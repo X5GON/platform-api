@@ -6,7 +6,7 @@ const KafkaProducer = require('@library/kafka-producer');
 
 // initialize validator with
 const validator = require('@library/schema-validator')({
-    oer_material_schema: require('alias:platform_schemas/oer-material-schema')
+    oer_material_schema: require('@platform_schemas/oer-material-schema')
 });
 
 // import mimetypes for comparison

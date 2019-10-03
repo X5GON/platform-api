@@ -69,44 +69,9 @@ module.exports = function (pg, logger, config) {
     // Portal Pages
     ////////////////////////////////////////
 
-    router.get('/', (req, res) => {
-        // currently redirect to form page
-        return res.render('homepage', {
-            layout: 'submain',
-            title: 'Home',
-            home: 'active'
-        });
-    });
-
-    // legacy
-    router.get('/application-form', (req, res) => {
-        res.redirect('/join');
-    });
-
-    // send join form page
-    router.get('/join', (req, res) => {
-        // check if the user was successfully validated by google captcha
-        // this is used only when redirected from POST /repository
-        const { invalid, unsuccessful } = req.query;
-        // const invalid = req.query.invalid ? req.query.invalid == 'true' : false;
-        // const unsuccessful = req.query.invalid ? req.query.invalid == 'true' : false;
-        const recaptchaSiteKey = config.platform.google.reCaptcha.siteKey;
-
-        return res.render('join', {
-            title: 'Join',
-            join: 'active',
-            recaptchaSiteKey,
-            invalid,
-            unsuccessful,
-        });
-    });
-
-    router.get('/oer_provider', (req, res) => {
+    router.get('/api/v1/oer_provider', (req, res) => {
         // get token used for accessing data
         const token = req.query.providerId;
-        const referrer = req.header('Referrer') ?
-            req.header('Referrer').split('?')[0] :
-            '/join';
 
         if (!token) {
              // provider is not registered in the platform
@@ -114,7 +79,7 @@ module.exports = function (pg, logger, config) {
              logger.formatRequest(req)
          );
          // redirect user to previous page
-         return res.redirect(`${referrer}?invalid=true`);
+         return res.json({ error: 'token was not provided by the user' });
         }
 
         // check if the repository already exists - return existing token
@@ -130,7 +95,7 @@ module.exports = function (pg, logger, config) {
                     })
                 );
                 // redirect user to previous page
-                return res.redirect(`${referrer}?invalid=true`);
+                return res.json({ error: 'error on server side' });
              }
 
             if (results.length === 0) {
@@ -139,15 +104,14 @@ module.exports = function (pg, logger, config) {
                     logger.formatRequest(req)
                 );
                 // redirect user to previous page
-                return res.redirect(`${referrer}?invalid=true`);
+                return res.json({ error: 'no OER provider registered with the given token' });
             } else {
                 // provider is not registered in the platform
                 logger.info('[info] provider requested for its information',
                     logger.formatRequest(req)
                 );
                 // render the form submition
-                return res.render('oer-provider', {
-                    title: 'OER Provider Information',
+                return res.send({
                     ...results[0]
                 });
             }
@@ -155,7 +119,7 @@ module.exports = function (pg, logger, config) {
     });
 
     // send repository
-    router.post('/oer_provider', (req, res) => {
+    router.post('/api/v1/oer_provider', (req, res) => {
         // get body request
         const body = req.body;
 
@@ -169,6 +133,7 @@ module.exports = function (pg, logger, config) {
 
         // verify user through google validation
         const gRecaptchaResponse = body["g-recaptcha-response"];
+
         _googleVerifyUser(gRecaptchaResponse)
             .then(validation => {
 
@@ -179,7 +144,7 @@ module.exports = function (pg, logger, config) {
                         logger.formatRequest(req)
                     );
                     // redirect user to join page
-                    return res.redirect('/join?invalid=true');
+                    return res.redirect(`${referrer}?invalid=true`);
                 }
 
                 // check if the repository already exists - return existing token
@@ -225,14 +190,14 @@ module.exports = function (pg, logger, config) {
                             // redirect activity to information retrievers
                             producer.send('STORING.PROVIDERS', { name, domain, contact, token });
                             // render the form submition
-                            return res.redirect(`/oer_provider?name=${name}&providerId=${token}`);
+                            return res.redirect(`/oer_provider?repositoryToken=${token}`);
                         });
 
                     } else {
                         // there are registered repositories in the database
                         const { token } = results[0];
                         // render the form submition
-                        return res.redirect(`/oer_provider?name=${name}&providerId=${token}`);
+                        return res.redirect(`/oer_provider?repositoryToken=${token}`);
                     }
                 });
             })
@@ -251,26 +216,6 @@ module.exports = function (pg, logger, config) {
             });
     });
 
-    router.get('/oer_provider/login', (req, res) => {
-        const invalid = req.query.invalid;
-        return res.render('oer-provider-login', {
-            layout: 'admin-submain',
-            title: 'OER Provider Login',
-            invalid,
-        });
-    });
-
-
-    router.get('/privacy_policy', (req, res) => {
-        return res.render('privacy-policy', { title: 'Privacy Policy' });
-    });
-
-    router.get('/documentation', (req, res) => {
-        return res.render('documentation', {
-            title: 'API Documentation',
-            docs: 'active'
-        });
-    });
 
     ////////////////////////////////////////
     // Material Search
