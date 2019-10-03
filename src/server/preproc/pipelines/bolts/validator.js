@@ -23,11 +23,12 @@ class MaterialValidator {
         this._onEmit = config.onEmit;
         this._prefix = `[MaterialValidator ${this._name}]`;
         // create the postgres connection
-        this._pg = require('alias:lib/postgresQL')(config.pg);
+        this._pg = require('@library/postgresQL')(config.pg);
 
         // initialize validator with
-        this._validator = require('alias:lib/schema-validator')();
+        this._validator = require('@library/schema-validator')();
 
+        this._productionModeFlag = config.production_mode;
         // use other fields from config to control your execution
         callback();
     }
@@ -57,6 +58,12 @@ class MaterialValidator {
      */
     _changeStatus(material, stream_id, callback) {
         const error = stream_id === 'incomplete' ? ' error' : '';
+
+        if (!this._productionModeFlag) {
+            // send material object to next component
+            return this._onEmit(material, stream_id, callback);
+        }
+
         return this._pg.update(
             { status: `material validated${error}` },
             { url: material.material_url },

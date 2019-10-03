@@ -2,7 +2,7 @@
 const router = require('express').Router();
 
 // internal modules
-const KafkaProducer = require('alias:lib/kafka-producer');
+const KafkaProducer = require('@library/kafka-producer');
 
 /**
  * @description Adds API routes for logging user activity.
@@ -12,7 +12,7 @@ const KafkaProducer = require('alias:lib/kafka-producer');
 module.exports = function (logger, config) {
 
     // parameters used within the routes
-    const x5gonCookieName = 'x5gonTrack';
+    const x5gonCookieName = config.platform.cookieID;
 
     // initialize kafka producer
     const producer = new KafkaProducer(config.kafka.host);

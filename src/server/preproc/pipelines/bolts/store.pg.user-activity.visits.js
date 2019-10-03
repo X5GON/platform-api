@@ -5,7 +5,7 @@
  */
 
 // helper for updating user models with the provided activity
-const updateUserModels = require('alias:lib/update-user-models');
+const updateUserModels = require('@library/update-user-models');
 
 class StorePGUserActivities {
 
@@ -22,7 +22,7 @@ class StorePGUserActivities {
         this._prefix = `[StorePGUserActivities ${this._name}]`;
 
         // create the postgres connection
-        this._pg = require('alias:lib/postgresQL')(config.pg);
+        this._pg = require('@library/postgresQL')(config.pg);
 
         callback();
     }

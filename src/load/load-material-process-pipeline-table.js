@@ -1,9 +1,11 @@
+require('module-alias/register');
+
 // async values handler
 const async = require('async');
 
 // configurations
-const config = require('../config/config');
-const pg = require('alias:lib/postgresQL')(config.pg);
+const config = require('@config/config');
+const pg = require('@library/postgresQL')(config.pg);
 
 pg.selectLarge({}, 'urls', 10,
     (error, rows, callback) => {

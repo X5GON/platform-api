@@ -3,21 +3,22 @@
  * This script creates and stores the material models in the database.
  * The material models are then used for creating user models.
  */
+require('module-alias/register');
 
 // external modules
 const async = require('async');
 
 
 // configurations
-const config = require('alias:config/config');
-const mimetypes = require('alias:config/mimetypes');
+const config = require('@config/config');
+const mimetypes = require('@config/mimetypes');
 
 // get the schema of the database
 const schema = config.pg.schema;
 
 // internal modules
-const updateHelper = require('alias:lib/update-user-models');
-const pg = require('alias:lib/postgresQL')(config.pg);
+const updateHelper = require('@library/update-user-models');
+const pg = require('@library/postgresQL')(config.pg);
 
 
 /**

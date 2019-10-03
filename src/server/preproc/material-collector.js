@@ -4,18 +4,19 @@
  * and then crawls pages that were previously not seen.
  *
  */
+require(`module-alias/register`);
 
 // configurations
-const config = require('alias:config/config');
+const config = require('@config/config');
 // internal modules
-const KafkaConsumer = require('alias:lib/kafka-consumer');
-const KafkaProducer = require('alias:lib/kafka-producer');
+const KafkaConsumer = require('@library/kafka-consumer');
+const KafkaProducer = require('@library/kafka-producer');
 // material mimetypes used for type selection
-const mimetypes = require('alias:config/mimetypes');
+const mimetypes = require('@config/mimetypes');
 // setup connection with the database
-const postgresQL = require('alias:lib/postgresQL');
+const postgresQL = require('@library/postgresQL');
 // logger for storing activity
-const Logger = require('alias:lib/logger');
+const Logger = require('@library/logger');
 
 // create a logger for platform requests
 const logger = Logger.createGroupInstance('material-collector', 'preproc', config.environment !== 'prod');
@@ -55,6 +56,8 @@ class MaterialCollector {
             retriever.config.pg = this._pg;
             this.addRetriever(retriever);
         }
+        // set the production mode flag
+        this._productionModeFlag = config.environment === 'prod';
         // got initialization process
         logger.info('[MaterialCollector] collector initialized');
     }
@@ -272,8 +275,16 @@ class MaterialCollector {
      */
     _sendToKafka(material, topic, type) {
         let self = this;
+
+        if (!self._productionModeFlag) {
+            // just send it in development mode
+            logger.info(`[upload] ${type} material = ${material.material_url}`);
+            // send the video material
+            return self._producer.send(topic, material);
+        }
+
         // insert to postgres process pipeline
-        this._pg.insert({ url: material.material_url }, 'material_process_pipeline', (xerror) => {
+        this._pg.upsert({ url: material.material_url }, { url: null }, 'material_process_pipeline', (xerror) => {
             if (xerror) {
                 logger.error('[error] postgresql', {
                     error: {
@@ -285,7 +296,7 @@ class MaterialCollector {
             }
             logger.info(`[upload] ${type} material = ${material.material_url}`);
             // send the video material
-            self._producer.send(topic, material);
+            return self._producer.send(topic, material);
         });
 
 

@@ -278,10 +278,11 @@ class ExtractWikipedia {
         this._onEmit = config.onEmit;
         this._prefix = `[ExtractWikipedia ${this._name}]`;
         // create the postgres connection
-        this._pg = require('alias:lib/postgresQL')(config.pg);
+        this._pg = require('@library/postgresQL')(config.pg);
         // wikifier request object
         this._wikifier = new Wikification(config.userKey, config.wikifierUrl);
 
+        this._productionModeFlag = config.production_mode;
         // use other fields from config to control your execution
         callback();
     }
@@ -343,8 +344,14 @@ class ExtractWikipedia {
      */
     _changeStatus(material, stream_id, callback) {
         const error = stream_id === 'incomplete' ? ' error' : '';
+
+        if (!this._productionModeFlag) {
+            // send material object to next component
+            return this._onEmit(material, stream_id, callback);
+        }
+
         return this._pg.update(
-            { status: `extracted wikipedia concepts${error}` },
+            { status: `material wikipedia concepts extracted ${error}` },
             { url: material.material_url },
             'material_process_pipeline', () => {
                 // send material object to next component

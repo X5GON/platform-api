@@ -1,9 +1,10 @@
 /**
  * Runs the X5GON recommendation engine
  */
+require('module-alias/register');
 
 // configurations
-const config = require('alias:config/config');
+const config = require('@config/config');
 
 // external modules
 const express = require('express');
@@ -11,8 +12,8 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 
 // internal modules
-const pg = require('alias:lib/postgresQL')(config.pg);
-const Logger = require('alias:lib/logger');
+const pg = require('@library/postgresQL')(config.pg);
+const Logger = require('@library/logger');
 
 // create a logger instance for logging API requests
 const { environment } = config;
@@ -29,7 +30,7 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 app.use(cookieParser()); // cookie parser
 
 // sets the API routes
-app.use('/api/v1/', require('./routes/recommendations')(pg, logger));
+app.use('/api/v1/', require('./routes/recommendations')(pg, logger, config));
 
 // parameters used on the express app
 const PORT = config.recsys.port;

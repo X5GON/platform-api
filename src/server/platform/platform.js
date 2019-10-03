@@ -2,7 +2,10 @@
  * Runs the X5GON platform server
  */
 
+require('module-alias/register');
+
 // external modules
+const gatsbyExpress = require('gatsby-plugin-express');
 const express      = require('express');
 const bodyParser   = require('body-parser');
 const cookieParser = require('cookie-parser');
@@ -10,12 +13,12 @@ const session      = require('express-session');
 const passport     = require('passport');
 const flash        = require('connect-flash');
 // configurations
-const config = require('alias:config/config');
+const config = require('@config/config');
 
 // internal modules
-const pg     = require('alias:lib/postgresQL')(config.pg);
-const Logger = require('alias:lib/logger');
-const Monitor = require('alias:lib/process-monitor');
+const pg     = require('@library/postgresQL')(config.pg);
+const Logger = require('@library/logger');
+const Monitor = require('@library/process-monitor');
 
 // create a logger for platform requests
 const logger = Logger.createGroupInstance('requests', 'platform', config.environment !== 'prod');
@@ -61,9 +64,19 @@ require('./config/passport')(passport, pg);
 require('./config/sockets')(http, monitor);
 // add handlebars configurations
 require('./config/handlebars')(app);
+
 // sets the API routes - adding the postgresql connection, logger, config file,
 // passport object (for authentication), and monitoring object
 require('./routes/route.handler')(app, pg, logger, config, passport, monitor);
+
+const frontEndPath = `${__dirname}/frontend`;
+app.use(express.static(`${frontEndPath}/public`))
+app.use(gatsbyExpress(`${frontEndPath}/gatsby-express.json`, {
+    publicDir: `${frontEndPath}/public`,
+    // redirects all /path/ to /path
+    // should be used with gatsby-plugin-remove-trailing-slashes
+    redirectSlashes: true
+}));
 
 // parameters used on the express app
 const PORT = config.platform.port;

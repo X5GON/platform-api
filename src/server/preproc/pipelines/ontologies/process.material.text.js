@@ -1,5 +1,5 @@
 // global configuration
-const config = require('alias:config/config');
+const config = require('@config/config');
 
 // topology definition
 module.exports = {
@@ -64,7 +64,8 @@ module.exports = {
                     "preserveLineBreaks": true,
                     "includeAltText": true
                 },
-                "pg": config.pg
+                "pg": config.pg,
+                "production_mode": config.environment === 'prod'
             }
         },
         {
@@ -78,7 +79,8 @@ module.exports = {
             "init": {
                 "userKey": config.preproc.wikifier.userKey,
                 "wikifierUrl": config.preproc.wikifier.wikifierUrl,
-                "pg": config.pg
+                "pg": config.pg,
+                "production_mode": config.environment === 'prod'
             }
         },
         {
@@ -90,7 +92,8 @@ module.exports = {
                 "source": "extract.wikipedia",
             }],
             "init": {
-                "pg": config.pg
+                "pg": config.pg,
+                "production_mode": config.environment === 'prod'
             }
         },
 

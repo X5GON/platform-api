@@ -20,7 +20,7 @@ class StorePGMaterialPartial {
         this._prefix = `[StorePGMaterialPartial ${this._name}]`;
 
         // create the postgres connection
-        this._pg = require('alias:lib/postgresQL')(config.pg);
+        this._pg = require('@library/postgresQL')(config.pg);
 
         callback();
     }
@@ -56,6 +56,12 @@ class StorePGMaterialPartial {
      * @param {Function} callback - THe final callback function.
      */
     _changeStatus(url, callback) {
+
+        if (!this._productionModeFlag) {
+            // trigger the callback function
+            return callback();
+        }
+
         return this._pg.update(
             { status: 'material error when processing. See oer_materials_partial table or log files' },
             { url },

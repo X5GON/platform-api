@@ -1,5 +1,5 @@
 // configurations
-const config = require('alias:config/config');
+const config = require('@config/config');
 
 module.exports = {
     "general": {
@@ -33,7 +33,9 @@ module.exports = {
                 "source": "kafka.material.complete",
             }],
             "init": {
-                "pg": config.pg
+                "pg": config.pg,
+                "production_mode": config.environment === 'prod'
+
             }
         }
 

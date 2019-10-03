@@ -21,7 +21,7 @@ module.exports = function (pg, logger, config) {
     // TODO: write helper functions
 
     // x5gon cookie name
-    const x5gonCookieName = 'x5gonTrack';
+    const x5gonCookieName = config.platform.cookieID;
 
      ////////////////////////////////////////
     // Material Search
