@@ -60,7 +60,7 @@ class StorePGUserActivities {
         let cookies = {
             uuid,
             user_agent,
-            language
+            language: language || ''
         };
 
         // user activities information

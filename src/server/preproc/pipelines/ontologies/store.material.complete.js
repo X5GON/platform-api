@@ -35,7 +35,6 @@ module.exports = {
             "init": {
                 "pg": config.pg,
                 "production_mode": config.environment === 'prod'
-
             }
         }
 
