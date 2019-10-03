@@ -1,6 +1,7 @@
 /**
  * Runs the X5GON recommendation engine
  */
+require('module-alias/register');
 
 // configurations
 const config = require('@config/config');
@@ -29,7 +30,7 @@ app.use(bodyParser.urlencoded({ // to support URL-encoded bodies
 app.use(cookieParser()); // cookie parser
 
 // sets the API routes
-app.use('/api/v1/', require('./routes/recommendations')(pg, logger));
+app.use('/api/v1/', require('./routes/recommendations')(pg, logger, config));
 
 // parameters used on the express app
 const PORT = config.recsys.port;

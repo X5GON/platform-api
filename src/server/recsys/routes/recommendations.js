@@ -15,7 +15,7 @@ const x5recommend = new (require(path.join(__dirname, '../engine/x5recommend')))
  * @param {Object} pg - Postgres connection wrapper.
  * @param {Object} logger - The logger object.
  */
-module.exports = function (pg, logger) {
+module.exports = function (pg, logger, config) {
 
     // x5gon cookie name
     const x5gonCookieName = config.platform.cookieID;
