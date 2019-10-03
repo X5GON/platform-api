@@ -56,6 +56,8 @@ class MaterialCollector {
             retriever.config.pg = this._pg;
             this.addRetriever(retriever);
         }
+        // set the production mode flag
+        this._productionModeFlag = config.environment === 'prod';
         // got initialization process
         logger.info('[MaterialCollector] collector initialized');
     }
@@ -273,8 +275,16 @@ class MaterialCollector {
      */
     _sendToKafka(material, topic, type) {
         let self = this;
+
+        if (!self._productionModeFlag) {
+            // just send it in development mode
+            logger.info(`[upload] ${type} material = ${material.material_url}`);
+            // send the video material
+            return self._producer.send(topic, material);
+        }
+
         // insert to postgres process pipeline
-        this._pg.insert({ url: material.material_url }, 'material_process_pipeline', (xerror) => {
+        this._pg.upsert({ url: material.material_url }, { url: null }, 'material_process_pipeline', (xerror) => {
             if (xerror) {
                 logger.error('[error] postgresql', {
                     error: {
@@ -286,7 +296,7 @@ class MaterialCollector {
             }
             logger.info(`[upload] ${type} material = ${material.material_url}`);
             // send the video material
-            self._producer.send(topic, material);
+            return self._producer.send(topic, material);
         });
 
 

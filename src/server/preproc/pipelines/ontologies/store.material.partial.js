@@ -33,7 +33,8 @@ module.exports = {
                 "source": "kafka.material.partial",
             }],
             "init": {
-                "pg": config.pg
+                "pg": config.pg,
+                "production_mode": config.environment === 'prod'
             }
         }
 

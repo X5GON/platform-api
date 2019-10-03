@@ -56,6 +56,12 @@ class StorePGMaterialPartial {
      * @param {Function} callback - THe final callback function.
      */
     _changeStatus(url, callback) {
+
+        if (!this._productionModeFlag) {
+            // trigger the callback function
+            return callback();
+        }
+
         return this._pg.update(
             { status: 'material error when processing. See oer_materials_partial table or log files' },
             { url },

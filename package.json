@@ -6,6 +6,7 @@
   "scripts": {
     "postinstall": "npm run minify:snippet && git checkout -- src/lib/textract && npm run install:textract && npm audit fix",
     "start": "npm run pm2:platform && npm run pm2:recsys && npm run pm2:preproc",
+    "start-dev": "npm run pm2:platform-dev && npm run pm2:recsys-dev && npm run pm2:preproc-dev",
     "postgres:create": "cd src/load && node -e 'require(`./create-postgres-database`).startDBCreate();'",
     "minify:snippet": "cd src/server/platform/scripts && node minify-snippet.js",
     "install:textract": "cd src/lib/textract && npm install && npm audit fix",
@@ -16,7 +17,10 @@
     "test:recsys": "cd src/server/recsys/test && NODE_ENV=test mocha *.js",
     "pm2:platform": "pm2 reload ecosystem.platform.config.json --env production",
     "pm2:recsys": "pm2 reload ecosystem.recsys.config.json --env production",
-    "pm2:preproc": "cd src/server/preproc && pm2 reload ecosystem.collect.config.json --env production && pm2 reload ecosystem.process.text.config.json --env production && pm2 reload ecosystem.process.video.config.json --env production && pm2 reload ecosystem.store.config.json --env production"
+    "pm2:preproc": "cd src/server/preproc && pm2 reload ecosystem.collect.config.json --env production && pm2 reload ecosystem.process.text.config.json --env production && pm2 reload ecosystem.process.video.config.json --env production && pm2 reload ecosystem.store.config.json --env production",
+    "pm2:platform-dev": "pm2 reload ecosystem.platform.config.json",
+    "pm2:recsys-dev": "pm2 reload ecosystem.recsys.config.json",
+    "pm2:preproc-dev": "cd src/server/preproc && pm2 reload ecosystem.collect.config.json && pm2 reload ecosystem.process.text.config.json && pm2 reload ecosystem.process.video.config.json && pm2 reload ecosystem.store.config.json"
   },
   "repository": {
     "type": "git",

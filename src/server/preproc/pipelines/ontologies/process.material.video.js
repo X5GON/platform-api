@@ -62,7 +62,8 @@ module.exports = {
             "init": {
                 "user": config.preproc.ttp.user,
                 "token": config.preproc.ttp.token,
-                "pg": config.pg
+                "pg": config.pg,
+                "production_mode": config.environment === 'prod'
             }
         },
         {
@@ -76,7 +77,8 @@ module.exports = {
             "init": {
                 "userKey": config.preproc.wikifier.userKey,
                 "wikifierUrl": config.preproc.wikifier.wikifierUrl,
-                "pg": config.pg
+                "pg": config.pg,
+                "production_mode": config.environment === 'prod'
             }
         },
         {
@@ -88,7 +90,8 @@ module.exports = {
                 "source": "extract.wikipedia"
             }],
             "init": {
-                "pg": config.pg
+                "pg": config.pg,
+                "production_mode": config.environment === 'prod'
             }
         },
 

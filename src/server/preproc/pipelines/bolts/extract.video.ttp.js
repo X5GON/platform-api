@@ -214,16 +214,17 @@ class ExtractVideoTTP {
             const formats = Object.keys(self._formats);
 
             // save the configurations
-            this._pg.upsert({
-                url: material.material_url,
-                status: 'extracting transcriptions and translations waiting',
-                config: {
-                    ttp_manifest: options
-                }
-            }, {
-                url: material.material_url
-            }, 'material_process_pipeline', () => {});
-
+            if (this._productionModeFlag) {
+                this._pg.upsert({
+                    url: material.material_url,
+                    status: 'extracting transcriptions and translations waiting',
+                    config: {
+                        ttp_manifest: options
+                    }
+                }, {
+                    url: material.material_url
+                }, 'material_process_pipeline', () => {});
+            }
             ///////////////////////////////////////////////
             // Start the TTP process
 

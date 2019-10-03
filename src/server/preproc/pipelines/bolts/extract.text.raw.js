@@ -38,6 +38,8 @@ class ExtractTextRaw {
         this.textConfig = config.text_config;
         // create the postgres connection
         this._pg = require('@library/postgresQL')(config.pg);
+
+        this._productionModeFlag = config.production_mode;
         // use other fields from config to control your execution
         callback();
     }
@@ -86,6 +88,12 @@ class ExtractTextRaw {
     _changeStatus(material, stream_id, callback) {
         const self = this;
         const error = stream_id === 'incomplete' ? ' error' : '';
+
+        if (!this._productionModeFlag) {
+            // send material object to next component
+            return this._onEmit(material, stream_id, callback);
+        }
+
         return self._pg.update({ status: `extracted text${error}` }, { url: material.material_url }, 'material_process_pipeline', () => {
             // send material object to next component
             return self._onEmit(material, stream_id, callback);
