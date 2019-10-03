@@ -69,7 +69,7 @@ require('./config/handlebars')(app);
 // passport object (for authentication), and monitoring object
 require('./routes/route.handler')(app, pg, logger, config, passport, monitor);
 
-const frontEndPath = `${__dirname}/x5gon-gatsby`;
+const frontEndPath = `${__dirname}/frontend`;
 app.use(express.static(`${frontEndPath}/public`))
 app.use(gatsbyExpress(`${frontEndPath}/gatsby-express.json`, {
     publicDir: `${frontEndPath}/public`,
