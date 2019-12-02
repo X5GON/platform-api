@@ -69,12 +69,28 @@ module.exports = {
             }
         },
         {
+            "name": "extract.text.ttp",
+            "type": "inproc",
+            "working_dir": "./bolts",
+            "cmd": "extract.text.ttp.js",
+            "inputs": [{
+                "source": "extract.text.raw",
+            }],
+            "init": {
+                "user": config.preproc.ttp.user,
+                "token": config.preproc.ttp.token,
+                "tmp_folder": './tmp',
+                "pg": config.pg,
+                "production_mode": config.environment === 'prod'
+            }
+        },
+        {
             "name": "extract.wikipedia",
             "type": "inproc",
             "working_dir": "./bolts",
             "cmd": "extract.wikipedia.js",
             "inputs": [{
-                "source": "extract.text.raw",
+                "source": "extract.text.ttp",
             }],
             "init": {
                 "userKey": config.preproc.wikifier.userKey,

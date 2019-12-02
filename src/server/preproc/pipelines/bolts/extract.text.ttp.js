@@ -54,10 +54,14 @@ class ExtractTextTTP {
 
         // the default languages for transcriptions and translations
         this._languages = config.languages || {
-            es: { },
-            en: { },
-            sl: { },
-            de: { }
+            es: { }, // spanish
+            en: { }, // english
+            sl: { }, // slovene
+            de: { }, // german
+            fr: { }, // french
+            it: { }, // italian
+            pt: { }, // portuguese
+            ca: { }, // catalan
         };
 
         // the transcription formats
@@ -66,7 +70,7 @@ class ExtractTextTTP {
         };
 
         // the default timeout when checking status
-        this._timeout = config.timeout;
+        this._timeout = config.timeout || 2 * 60 * 1000;
         this._setTimeout = null;
 
         // create the postgres connection
@@ -120,11 +124,11 @@ class ExtractTextTTP {
             // check for the process status code
             return request.then(({ status_code }) => {
 
-                if (status_code === 6) {
+                if (status_code === 3) {
                     // handle successful process
                     return { process_completed: true };
 
-                } else if (status_code < 6) {
+                } else if (status_code < 3) {
                     // the process has not been finished
                     return _checkTTPStatus(id);
 
@@ -177,6 +181,7 @@ class ExtractTextTTP {
 
             // store the allowed languages and formats
             const languages = Object.keys(requested_langs);
+            const formats   = Object.keys(self._formats);
 
             // generate the md5 hash for file checking
             const md5 = crypto.createHash('md5').update(material.material_metadata.raw_text).digest("hex");
@@ -193,8 +198,7 @@ class ExtractTextTTP {
                         md5
                     }],
                     // translations
-                    requested_langs,
-                    test_mode: true
+                    requested_langs
                 }
             });
 
@@ -211,15 +215,13 @@ class ExtractTextTTP {
             fs.writeFileSync(jsonPath, JSON.stringify(options));
 
             // create a zip file containing the material and manifest
-            var documentPackage = fs.createWriteStream(path.join(rootPath, 'document-package.zip'));
+            const documentPackagePath = path.join(rootPath, 'document-package.zip')
+            var documentPackage = fs.createWriteStream(documentPackagePath);
             const archive = archiver('zip', { zlip: { level: 0 } });
 
             // listen for all archive data to be written
             // 'close' event is fired only when a file descriptor is involved
-            documentPackage.on('close', function() {
-                console.log(archive.pointer() + ' total bytes');
-                console.log('archiver has been finalized and the output file descriptor has closed.');
-            });
+            documentPackage.on('close', function() { });
 
             // This event is fired when the data source is drained no matter what was the data source.
             // It is not part of this library but rather from the NodeJS Stream API.
@@ -231,10 +233,10 @@ class ExtractTextTTP {
             // good practice to catch warnings (ie stat failures and other non-blocking errors)
             archive.on('warning', function(err) {
                 if (err.code === 'ENOENT') {
-                // log warning
+                    // log warning
                 } else {
-                // throw error
-                throw err;
+                    // throw error
+                    throw err;
                 }
             });
 
@@ -247,6 +249,7 @@ class ExtractTextTTP {
                 // save the configurations
                 this._pg.upsert({
                     url: material.material_url,
+                    status: 'text translations waiting',
                     config: {
                         ttp_manifest: options
                     }
@@ -254,14 +257,132 @@ class ExtractTextTTP {
                     url: material.material_url
                 }, 'material_process_pipeline', () => {});
 
-                // after the request remove the zip files
-                fileManager.removeFolder(rootPath);
 
-                //! TODO: finish rest of the code
+                rp({
+                    method: 'POST',
+                    uri: `${self._url}/ingest/new`,
+                    formData: {
+                        json: fs.createReadStream(jsonPath),
+                        pkg: fs.createReadStream(documentPackagePath)
+                    },
+                    json: true
+                }).then(({ rcode, id }) => {
+                    // after the request remove the zip files
+                    fileManager.removeFolder(rootPath);
+                    if (rcode === 0) {
+                        // check for status of the process
+                        return _checkTTPStatus(id);
+                    } else {
+                        // something went wrong with the upload - terminate process
+                        throw new Error(`[status_code: ${rcode}] Error when uploading process_id=${id}`);
+                    }
+                }).then(response => {
+                    /////////////////////////////////////////////////////////
+                    // SECOND STEP
+                    // If the material has been processed, make a request
+                    // for all transcriptions and translations
 
-                return self._onEmit(material, stream_id, callback);
+                    if (response.process_completed) {
+                        // get processed values - transcriptions and translations
+                        let requests = [];
+                        // iterate through all languages
+                        for (let lang of languages) {
+                            // iterate through all formats
+                            for (let format of formats) {
+                                // prepare the requests to get the transcriptions and translations
+                                let request = rp({
+                                    uri: `${self._url}/get`,
+                                    qs: Object.assign({ }, self._options, {
+                                        id: external_id,
+                                        format,
+                                        lang
+                                    }),
+                                });
+                                // store it for later
+                                requests.push(request);
+                            }
+                        }
+
+                        // wait for all requests to go through
+                        return Promise.all(requests);
+
+                    } else {
+                        const { status_code_msg, status_code, process_id } = response;
+                        // the process has not been successfully completed
+                        throw new Error(`[status_code: ${status_code}] ${status_code_msg} for process_id=${process_id}`);
+                    }
+
+                }).then(translations => {
+                    /////////////////////////////////////////////////////////
+                    // THIRD STEP
+                    // Go through the transcription list, prepare material
+                    // metadata and save it in the material object
+
+                    // prepare placeholders for material metadata
+                    let transcriptions = { };
+
+                    // iterate through all responses
+                    for (let langId = 0; langId < languages.length; langId++) {
+                        // get current language
+                        const lang = languages[langId];
+
+                        // placeholder for transcriptions
+                        let transcription = { };
+
+                        for (let formatId = 0; formatId < formats.length; formatId++) {
+                            // get current format
+                            const format = self._formats[formats[formatId]];
+                            // get index of the current transcription value
+                            let index = langId * formats.length + formatId;
+
+                            try {
+                                // try if the response is a JSON. If goes through,
+                                // the response contains the error
+                                JSON.parse(translations[index]);
+                            } catch (err) {
+                                // if here, the response is a text file, dfxp or plain
+                                if (typeof translations[index] === 'string') {
+                                    transcription[format] = translations[index];
+                                }
+                            }
+                        }
+
+                        if (Object.keys(transcription)) {
+                            // save transcriptions under the current language
+                            transcriptions[lang] = transcription;
+                        }
+                    }
+
+                    // save transcriptions into the material's metadata field
+                    material.material_metadata.transcriptions = transcriptions;
+                    return this._changeStatus(material, stream_id, callback);
+
+                }).catch(e => {
+                    // log error message and store the not completed material
+                    material.message = `${self._prefix} ${e.message}`;
+                    return this._changeStatus(material, 'incomplete', callback);
+                });
+
             });
         }
+    }
+
+    /**
+     * Changes the status of the material process and continues to the next bolt.
+     * @param {Object} material - The material object.
+     * @param {String} stream_id - The stream ID.
+     * @param {Function} callback - THe final callback function.
+     */
+    _changeStatus(material, stream_id, callback) {
+        const error = stream_id === 'incomplete' ? ' error' : '';
+        return this._pg.update(
+            { status: `text translations${error}` },
+            { url: material.material_url },
+            'material_process_pipeline', () => {
+                // send material object to next component
+                return this._onEmit(material, stream_id, callback);
+            }
+        );
     }
 
 }

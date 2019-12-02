@@ -86,6 +86,7 @@ tmp
 
 # temporary ignore visualizations
 src/server/visualizations
+development
 
 # ignore minified files
 src/server/**/*.min.js

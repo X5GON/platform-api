@@ -271,7 +271,7 @@ module.exports = function (pg, logger, config) {
         const MAX_OFFSET = Math.floor(fullCount / LIMIT) * LIMIT;
 
         // construct create the domain
-        const domain  = `https://platform.x5gon.org`;
+        const domain = 'https://platform.x5gon.org';
         // set the base url
         let baseUrl = `${domain}${req.baseUrl}${req.path}`;
 
