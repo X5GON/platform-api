@@ -1,6 +1,6 @@
 /************************************************
  * File Manager Module
- * This module contains methods for manipulating 
+ * This module contains methods for manipulating
  * with files and folders.
  */
 

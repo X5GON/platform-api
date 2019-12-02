@@ -58,7 +58,7 @@ class ExtractVideoTTP {
         };
 
         // the default timeout when checking status
-        this._timeout = config.timeout;
+        this._timeout = config.timeout || 5 * 60 * 1000;
         this._setTimeout = null;
 
         // create the postgres connection
