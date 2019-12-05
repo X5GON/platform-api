@@ -44,7 +44,11 @@ const common = {
             user: process.env.PREPROC_TTP_USER,
             token: process.env.PREPROC_TTP_TOKEN,
         }
-    }
+    },
+    quality: {
+        // used for proxying to the quality assurance service
+        port: parseInt(process.env.SERVICE_QUALITY_PORT) || 6001
+    },
 };
 
 
@@ -56,9 +60,6 @@ const prod = {
     },
     recsys: {
         port: parseInt(process.env.PROD_RECSYS_PORT) || 3000
-    },
-    quality: {
-        port: parseInt(process.env.PROD_QUALITY_PORT) || 6001
     },
     kafka: {
         host: process.env.PROD_KAFKA_HOST || '127.0.0.1:9092',
@@ -86,9 +87,6 @@ const dev = {
     recsys: {
         port: parseInt(process.env.DEV_RECSYS_PORT) || 3001
     },
-    quality: {
-        port: parseInt(process.env.DEV_QUALITY_PORT) || 6001
-    },
     kafka: {
         host: process.env.DEV_KAFKA_HOST || '127.0.0.1:9092',
         groupId: process.env.DEV_KAFKA_GROUP || 'developmentGroup'
@@ -114,9 +112,6 @@ const test = {
     },
     recsys: {
         port: parseInt(process.env.TEST_RECSYS_PORT) || 3002
-    },
-    quality: {
-        port: parseInt(process.env.TEST_QUALITY_PORT) || 6001
     },
     kafka: {
         host: process.env.TEST_KAFKA_HOST || '127.0.0.1:9092',
