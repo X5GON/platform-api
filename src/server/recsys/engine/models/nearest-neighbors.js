@@ -147,12 +147,13 @@ class NearestNeighbors {
      * @param {Object} [query.url] - The url of the material.
      * @param {Object} [query.text] - The text used to find similar content.
      * @param {Object} store - The qminer store used for creating record(s).
-     * @param {Number} [maxCount=100] - The maximal neighbor count.
+     * @param {Number} [maxCount=20] - The maximal neighbor count.
+     * @param {Number} [maxSim=1] - Maximum similarity treshold.
      * @param {Number} [minSim=0.01] - Minimal similarity treshold.
      * @return {Array.<Object>} An array where the first element is a record set
      * of relevant solutions and the second element is an array of similarity measures.
      */
-    search(query, maxCount=20, minSim=0.10) {
+    search(query, maxCount=20, maxSim=1, minSim=0.01) {
         let self = this;
         // get store
         const store = self.store;
@@ -231,19 +232,32 @@ class NearestNeighbors {
                 // the threshold is larger than the similarity vector
                 maxCount = sort.perm.length;
             }
-
-            for (let i = 0; i < maxCount; i++) {
+            console.log("Max count: ", maxCount);
+            for (let i = 0; i < sort.perm.length; i++) {
                 // get content id of (i+1)-th most similar content
                 let maxid = sort.perm[i];
                 // stop if similarity to small
                 if (sim[maxid] < minSim) { break; }
 
+                // skip the most similar documents
+                if (sim[maxid] > maxSim) { continue; }
                 // skip the record used to find recommendations
                 if (query.url && maxid === queryRec.$id) { continue; }
+
+                // check if the similarity is close to an existing one
+                let toSimilar = false;
+                for (let s of simVec) {
+                    if (Math.abs(s - sim[maxid]) < 0.01) { toSimilar = true; break; }
+                }
+                // there is already one similar document
+                if (toSimilar) { continue; }
 
                 // else remember the content and it's similarity
                 idVec.push(typeIds ? typeIds[maxid] : maxid);
                 simVec.push(sim[maxid]);
+
+                // stop retrieving the documents
+                if (simVec.length === maxCount) { break; }
             }
 
             // return the record set and their similarities

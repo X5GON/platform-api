@@ -404,7 +404,11 @@ class x5recommend {
 
         // get the model of the respected type
         let model,
-            query;
+            query,
+            recommendations;
+
+        const maxCount = count ? count : 20;
+
         if (url && (self.content.recordByName(url) || !text)) {
             // decide on the model
             model = type === 'support' ?
@@ -412,14 +416,12 @@ class x5recommend {
                 self.contentWikiNN;
             // setup the query
             query = { url, type };
+            recommendations = model.search(query, maxCount, 0.95);
         } else if (text) {
             model = self.contentTextNN;
             query = { text, type };
+            recommendations = model.search(query, maxCount);
         }
-
-        const maxCount = count ? count : 20;
-        // get material recommendations
-        let recommendations = model.search(query, maxCount);
 
         if (!recommendations) {
             let errorMessage = 'Empty query object';
@@ -476,16 +478,22 @@ class x5recommend {
         } = userQuery;
 
         let model,
-            query;
+            query,
+            recommendations;
+
+        const maxCount = count ? count : 20;
+
         // get the model of the respected type
         if (url && (self.materialModel.recordByName(url) || !text)) {
             // decide on the model
             model = self.userMaterialSimNN;
             // setup the query
             query = { url, type };
+            recommendations = model.search(query, maxCount, 0.95);
         } else if (text) {
             model = self.contentTextNN;
             query = { text, type };
+            recommendations = model.search(query, maxCount);
         } else {
             // log the error for unsupported parameters
             let errorMessage = 'Unsupported recommendation parameters';
@@ -496,10 +504,6 @@ class x5recommend {
             // not supported query option - return error
             return Promise.reject({ error: errorMessage });
         }
-
-        const maxCount = count ? count : 20;
-        // get material recommendations
-        let recommendations = model.search(query, maxCount);
 
         if (!recommendations) {
             let errorMessage = 'Empty query object';
