@@ -162,7 +162,8 @@ class KafkaSpout {
     }
 
     next(callback) {
-        callback(null, this._generator.next(), null, callback);
+        let message = this._generator.next();
+        callback(null, message, null, callback);
     }
 }
 

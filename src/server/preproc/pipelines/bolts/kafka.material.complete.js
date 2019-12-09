@@ -98,7 +98,8 @@ class KafkaMaterialComplete {
                         type,
                         extension,
                         value: { value },
-                        material_id: null
+                        material_id: null,
+                        last_updated: (new Date()).toISOString()
                     });
                 }
             }
@@ -111,7 +112,8 @@ class KafkaMaterialComplete {
                 type: 'transcription',
                 extension: 'plain',
                 value: { value },
-                material_id: null
+                material_id: null,
+                last_updated: (new Date()).toISOString()
             });
         }
 

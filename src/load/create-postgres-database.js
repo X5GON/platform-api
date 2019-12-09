@@ -1199,6 +1199,12 @@ const dbUpdates = [{
         ALTER TABLE ${schema}.oer_materials
         ADD COLUMN metadata jsonb;
     `
+}, {
+    version: 6,
+    update: `
+        ALTER TABLE ${schema}.material_contents
+        ADD COLUMN last_updated timestamp with time zone;
+    `
 }];
 
 // get the requested database version
