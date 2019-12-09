@@ -102,7 +102,7 @@ class KafkaMaterialComplete {
                     });
                 }
             }
-        if (material_metadata.raw_text) {
+        } else if (material_metadata.raw_text) {
             // get the raw text of the material
             const value = material_metadata.raw_text;
             // prepare the material content object
