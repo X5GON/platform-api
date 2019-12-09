@@ -102,13 +102,13 @@ class KafkaMaterialComplete {
                     });
                 }
             }
-        } else if (material_metadata.raw_text) {
+        if (material_metadata.raw_text) {
             // get the raw text of the material
             const value = material_metadata.raw_text;
             // prepare the material content object
             material_contents.push({
                 language: origin_language,
-                type: 'text_extraction',
+                type: 'transcription',
                 extension: 'plain',
                 value: { value },
                 material_id: null
