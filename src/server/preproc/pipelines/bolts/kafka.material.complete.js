@@ -108,7 +108,7 @@ class KafkaMaterialComplete {
             // prepare the material content object
             material_contents.push({
                 language: origin_language,
-                type: 'text_extraction',
+                type: 'transcription',
                 extension: 'plain',
                 value: { value },
                 material_id: null

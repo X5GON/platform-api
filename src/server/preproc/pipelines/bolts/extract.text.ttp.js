@@ -353,6 +353,11 @@ class ExtractTextTTP {
                         }
                     }
 
+                    // add the original language content
+                    transcriptions[material.language] = {
+                        plain: material.material_metadata.raw_text
+                    };
+
                     // save transcriptions into the material's metadata field
                     material.material_metadata.transcriptions = transcriptions;
                     return this._changeStatus(material, stream_id, callback);
