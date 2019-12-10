@@ -1205,6 +1205,18 @@ const dbUpdates = [{
         ALTER TABLE ${schema}.material_contents
         ADD COLUMN last_updated timestamp with time zone;
     `
+},  {
+    version: 7,
+    update: `
+        ALTER TABLE ${schema}.oer_materials
+        ADD COLUMN ttp_id varchar;
+    `
+}, {
+    version: 8,
+    update: `
+        ALTER TABLE ${schema}.features_public
+        ADD COLUMN last_updated timestamp with time zone;
+    `
 }];
 
 // get the requested database version

@@ -53,7 +53,11 @@ class KafkaMaterialComplete {
             retrieved_date,
             type,
             mimetype,
-            material_metadata,
+            material_metadata: {
+                transcriptions,
+                raw_text,
+                ttp_id
+            },
             provider: {
                 token: provider_token
             },
@@ -80,13 +84,13 @@ class KafkaMaterialComplete {
 
         let material_contents = [];
         // prepare list of material contents
-        if (material_metadata.transcriptions) {
-            let languages = Object.keys(material_metadata.transcriptions);
+        if (transcriptions) {
+            let languages = Object.keys(transcriptions);
             for (let language of languages) {
-                let extensions = Object.keys(material_metadata.transcriptions[language]);
+                let extensions = Object.keys(transcriptions[language]);
                 for (let extension of extensions) {
                     // get value of the language and extension
-                    const value = material_metadata.transcriptions[language][extension];
+                    const value = transcriptions[language][extension];
 
                     // define the type of the transcriptions
                     const type = language === origin_language ?
@@ -103,15 +107,13 @@ class KafkaMaterialComplete {
                     });
                 }
             }
-        } else if (material_metadata.raw_text) {
-            // get the raw text of the material
-            const value = material_metadata.raw_text;
+        } else if (raw_text) {
             // prepare the material content object
             material_contents.push({
                 language: origin_language,
                 type: 'transcription',
                 extension: 'plain',
-                value: { value },
+                value: { value: raw_text },
                 material_id: null,
                 last_updated: (new Date()).toISOString()
             });
@@ -144,6 +146,7 @@ class KafkaMaterialComplete {
                 type: type.toLowerCase(),
                 mimetype: mimetype.toLowerCase(),
                 license,
+                ttp_id,
                 ...material_metadata.metadata && { metadata: material_metadata.metadata }
             },
             material_contents,

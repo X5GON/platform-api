@@ -22,12 +22,24 @@ module.exports = {
     ],
     "bolts": [
         {
+            "name": "get.material.content",
+            "type": "inproc",
+            "working_dir": "./bolts",
+            "cmd": "get.material.content.js",
+            "inputs": [{
+                "source": "input.kafka.text",
+            }],
+            "init": {
+                "pg": config.pg
+            }
+        },
+        {
             "name": "extract.text.raw",
             "type": "inproc",
             "working_dir": "./bolts",
             "cmd": "extract.text.raw.js",
             "inputs": [{
-                "source": "input.kafka.text",
+                "source": "get.material.content",
             }],
             "init": {
                 "text_config": {
@@ -38,13 +50,28 @@ module.exports = {
                 "production_mode": config.environment === 'prod'
             }
         },
+        {
+            "name": "extract.wikipedia",
+            "type": "inproc",
+            "working_dir": "./bolts",
+            "cmd": "extract.wikipedia.js",
+            "inputs": [{
+                "source": "extract.text.raw",
+            }],
+            "init": {
+                "userKey": config.preproc.wikifier.userKey,
+                "wikifierUrl": config.preproc.wikifier.wikifierUrl,
+                "pg": config.pg,
+                "production_mode": config.environment === 'prod'
+            }
+        },
         // {
         //     "name": "extract.text.ttp",
         //     "type": "inproc",
         //     "working_dir": "./bolts",
         //     "cmd": "extract.text.ttp.js",
         //     "inputs": [{
-        //         "source": "extract.text.raw",
+        //         "source": "extract.wikipedia",
         //     }],
         //     "init": {
         //         "user": config.preproc.ttp.user,
@@ -66,7 +93,7 @@ module.exports = {
             "working_dir": "./bolts",
             "cmd": "kafka.forward.js",
             "inputs": [{
-                "source": "extract.text.raw",
+                "source": "extract.wikipedia",
             }],
             "init": {
                 "kafka_host": config.kafka.host,

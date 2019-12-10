@@ -54,11 +54,18 @@ module.exports = {
                             material_id,
                             array_agg(last_updated) AS lu
                         FROM material_contents
-                        GROUP BY
-                            material_id
+                        GROUP BY material_id
                     )
 
-                    SELECT * FROM OERS WHERE material_id IN (SELECT material_id FROM CONTENT WHERE TRUE = ANY(SELECT unnest(lu) IS NULL)) ORDER BY u_count DESC LIMIT 1000;
+                    SELECT *
+                    FROM OERS
+                    WHERE material_id IN (
+                        SELECT material_id
+                        FROM CONTENT
+                        WHERE TRUE = ANY(SELECT unnest(lu) IS NULL)
+                    )
+                    ORDER BY u_count DESC
+                    LIMIT 1000;
                 `, // TODO: add the SQL statement for checking if the material is already in the queue
                 // repeat every one day
                 "time_interval": 1 * 24 * 60 * 60 * 1000

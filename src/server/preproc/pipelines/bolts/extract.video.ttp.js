@@ -199,7 +199,7 @@ class ExtractVideoTTP {
                     },
                     metadata: {
                         // external_id equals to material url
-                        external_id: external_id,
+                        external_id,
                         language: material.language,
                         title: normalization.normalizeString(material.title),
                         speakers
@@ -331,6 +331,7 @@ class ExtractVideoTTP {
                 // save transcriptions into the material's metadata field
                 material.material_metadata.raw_text       = raw_text;
                 material.material_metadata.transcriptions = transcriptions;
+                material.material_metadata.ttp_id         = external_id;
                 return this._changeStatus(material, stream_id, callback);
 
             }).catch(e => {

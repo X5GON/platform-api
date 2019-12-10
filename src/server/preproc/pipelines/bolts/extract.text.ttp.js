@@ -360,6 +360,7 @@ class ExtractTextTTP {
 
                     // save transcriptions into the material's metadata field
                     material.material_metadata.transcriptions = transcriptions;
+                    material.material_metadata.ttp_id         = external_id;
                     return this._changeStatus(material, stream_id, callback);
 
                 }).catch(e => {

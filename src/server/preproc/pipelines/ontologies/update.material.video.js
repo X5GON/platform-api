@@ -36,6 +36,21 @@ module.exports = {
                 "production_mode": config.environment === 'prod'
             }
         },
+        {
+            "name": "extract.wikipedia",
+            "type": "inproc",
+            "working_dir": "./bolts",
+            "cmd": "extract.wikipedia.js",
+            "inputs": [{
+                "source": "extract.video.ttp"
+            }],
+            "init": {
+                "userKey": config.preproc.wikifier.userKey,
+                "wikifierUrl": config.preproc.wikifier.wikifierUrl,
+                "pg": config.pg,
+                "production_mode": config.environment === 'prod'
+            }
+        },
 
         /****************************************
          * Send the completely processed materials
@@ -48,7 +63,7 @@ module.exports = {
             "working_dir": "./bolts",
             "cmd": "kafka.forward.js",
             "inputs": [{
-                "source": "extract.video.ttp",
+                "source": "extract.wikipedia",
             }],
             "init": {
                 "kafka_host": config.kafka.host,
