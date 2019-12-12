@@ -94,7 +94,7 @@ class ExtractTextRaw {
             return this._onEmit(material, stream_id, callback);
         }
 
-        return self._pg.update({ status: `extracted text${error}` }, { url: material.material_url }, 'material_process_pipeline', () => {
+        return self._pg.update({ status: `extracted text${error}` }, { url: material.material_url }, 'material_process_queue', () => {
             // send material object to next component
             return self._onEmit(material, stream_id, callback);
         });

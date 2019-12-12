@@ -67,7 +67,7 @@ class MaterialValidator {
         return this._pg.update(
             { status: `material validated${error}` },
             { url: material.material_url },
-            'material_process_pipeline', () => {
+            'material_process_queue', () => {
                 // send material object to next component
                 return this._onEmit(material, stream_id, callback);
             }

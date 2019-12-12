@@ -60,6 +60,7 @@ class StorePGMaterialUpdate {
             }
         } = message;
 
+        console.log('\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/');
         console.log(material_id);
         console.log(transcriptions);
         console.log(wikipedia_concepts);
@@ -142,7 +143,8 @@ class StorePGMaterialUpdate {
             value: { value: wikipedia_concepts },
             re_required: true,
             record_id: material_id,
-            table_name: 'oer_materials'
+            table_name: 'oer_materials',
+            last_updated: (new Date()).toISOString()
         }
 
         tasks.push(function (xcallback) {
@@ -172,7 +174,11 @@ class StorePGMaterialUpdate {
 
         // add the task of pushing material contents
         tasks.push(function (xcallback) {
-            self._pg.update({ retrieved_date: (new Date()).toISOString(), ttp_id }, { id: material_id }, "oer_materials", function (e, res) {
+            const material_update = {
+                retrieved_date: (new Date()).toISOString(),
+                ttp_id
+            };
+            self._pg.update(material_update, { id: material_id }, "oer_materials", function (e, res) {
                 if (e) { return xcallback(e); }
                 return xcallback(null, 1);
             });
@@ -184,6 +190,7 @@ class StorePGMaterialUpdate {
         ///////////////////////////////////////////
 
         console.log(material_id);
+        console.log('\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\n');
         async.series(tasks, function (e) {
             if (e) { return callback(null); }
             return callback();

@@ -50,7 +50,7 @@ class StorePGMaterialComplete {
         }
 
 
-        self._pg.select({ url: urls.material_url }, 'material_process_pipeline', function (error, result) {
+        self._pg.select({ url: urls.material_url }, 'material_process_queue', function (error, result) {
             if (error) { return callback(error); }
 
             // the database already has the material
@@ -81,12 +81,15 @@ class StorePGMaterialComplete {
             // tasks container
             const tasks = [];
 
+            const date = (new Date()).toISOString();
+
             ///////////////////////////////////////////
             // SAVE MATERIAL CONTENTS
             ///////////////////////////////////////////
 
             for (let material_content of material_contents) {
                 material_content.material_id = material_id;
+                material_content.last_updated = date;
                 // add the task of pushing material contents
                 tasks.push(function (xcallback) {
                     self._pg.insert(material_content, 'material_contents', function (e, res) {
@@ -102,7 +105,7 @@ class StorePGMaterialComplete {
 
             features_public.record_id  = material_id;
             features_public.table_name = 'oer_materials';
-
+            features_public.last_updated = date;
             tasks.push(function (xcallback) {
                 self._pg.insert(features_public, 'features_public', function (e, res) {
                     if (e) { return xcallback(e); }
@@ -177,7 +180,7 @@ class StorePGMaterialComplete {
             return callback();
         }
 
-        return this._pg.update({ status: 'finished' }, { url }, 'material_process_pipeline', () => {
+        return this._pg.update({ status: 'finished' }, { url }, 'material_process_queue', () => {
             // trigger the callback function
             return callback();
         });

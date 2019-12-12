@@ -65,7 +65,7 @@ class StorePGMaterialPartial {
         return this._pg.update(
             { status: 'material error when processing. See oer_materials_partial table or log files' },
             { url },
-            'material_process_pipeline', () => {
+            'material_process_queue', () => {
                 // trigger the callback function
                 return callback();
             }

@@ -103,7 +103,7 @@ class KafkaMaterialComplete {
                         extension,
                         value: { value },
                         material_id: null,
-                        last_updated: (new Date()).toISOString()
+                        last_updated: null
                     });
                 }
             }
@@ -115,7 +115,7 @@ class KafkaMaterialComplete {
                 extension: 'plain',
                 value: { value: raw_text },
                 material_id: null,
-                last_updated: (new Date()).toISOString()
+                last_updated: null
             });
         }
 
@@ -128,7 +128,8 @@ class KafkaMaterialComplete {
             name: 'wikipedia_concepts',
             value: { value: material_metadata.wikipedia_concepts },
             re_required: true,
-            record_id: null
+            record_id: null,
+            last_updated: null
         };
 
         ///////////////////////////////////////////

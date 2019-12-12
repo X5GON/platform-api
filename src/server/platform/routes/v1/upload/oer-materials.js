@@ -103,7 +103,7 @@ module.exports = function (pg, logger, config) {
             list.push({ material, errors: messages });
             return;
         }
-        pg.select({ url: material.material_url }, 'material_process_pipeline', (error, results) => {
+        pg.select({ url: material.material_url }, 'material_process_queue', (error, results) => {
             if (error) {
                 logger.error('[error] postgresql', {
                     error: {
@@ -125,7 +125,7 @@ module.exports = function (pg, logger, config) {
             // get material mimetype and decide where to send the material metadata
             const mimetype = material.type.mime;
             if (mimetype && mimetypes.video.includes(mimetype)) {
-                pg.insert({ url: material.material_url }, 'material_process_pipeline', (xerror) => {
+                pg.insert({ url: material.material_url }, 'material_process_queue', (xerror) => {
                     if (xerror) {
                         logger.error('[error] postgresql', {
                             error: {
@@ -142,7 +142,7 @@ module.exports = function (pg, logger, config) {
                     producer.send(video_topic, material);
                 });
             } else if (mimetype && mimetypes.audio.includes(mimetype)) {
-                pg.insert({ url: material.material_url }, 'material_process_pipeline', (xerror) => {
+                pg.insert({ url: material.material_url }, 'material_process_queue', (xerror) => {
                     if (xerror) {
                         logger.error('[error] postgresql', {
                             error: {
@@ -159,7 +159,7 @@ module.exports = function (pg, logger, config) {
                     producer.send(video_topic, material);
                 });
             } else if (mimetype && mimetypes.text.includes(mimetype)) {
-                pg.insert({ url: material.material_url }, 'material_process_pipeline', (xerror) => {
+                pg.insert({ url: material.material_url }, 'material_process_queue', (xerror) => {
                     if (xerror) {
                         logger.error('[error] postgresql', {
                             error: {

@@ -189,7 +189,7 @@ class MaterialCollector {
             const url = log.material.materialurl;
             // check if the material is already in the database
             // (should have an URL in the urls table)
-            return self._pg.select({ url }, 'material_process_pipeline', (error, results) => {
+            return self._pg.select({ url }, 'material_process_queue', (error, results) => {
                 if (error) {
                     // log postgres error
                     logger.error('error [postgres.select]: unable to select a material',
@@ -284,7 +284,7 @@ class MaterialCollector {
         }
 
         // insert to postgres process pipeline
-        this._pg.upsert({ url: material.material_url }, { url: null }, 'material_process_pipeline', (xerror) => {
+        this._pg.upsert({ url: material.material_url }, { url: null }, 'material_process_queue', (xerror) => {
             if (xerror) {
                 logger.error('[error] postgresql', {
                     error: {

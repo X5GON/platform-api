@@ -20,7 +20,7 @@ pg.selectLarge({}, 'urls', 10,
             } = row;
 
             tasks.push(xcallback => {
-                pg.upsert({ url, material_id, status: 'finished' }, { url: null }, 'material_process_pipeline', function (xerror) {
+                pg.upsert({ url, material_id, status: 'finished' }, { url: null }, 'material_process_queue', function (xerror) {
                     xcallback(xerror);
                 });
             });
