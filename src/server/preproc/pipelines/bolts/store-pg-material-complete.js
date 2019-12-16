@@ -23,7 +23,8 @@ class StorePGMaterialComplete {
         // create the postgres connection
         this._pg = require('@library/postgresQL')(config.pg);
 
-        this._productionModeFlag = config.production_mode;
+        this._finalBolt = config.final_bolt || false;
+
         callback();
     }
 
@@ -33,31 +34,12 @@ class StorePGMaterialComplete {
 
     shutdown(callback) {
         // close connection to postgres database
-        this._pg.close();
-        // shutdown component
-        callback();
+        this._pg.close(callback);
     }
 
     receive(message, stream_id, callback) {
         let self = this;
-
-        // get sent values
-        const { urls } = message;
-
-        if (!self._productionModeFlag) {
-            // otherwise insert the missing values
-            return self._storeRecords(message, callback);
-        }
-
-
-        self._pg.select({ url: urls.material_url }, 'material_process_queue', function (error, result) {
-            if (error) { return callback(error); }
-
-            // the database already has the material
-            if (result.length && result[0].status === 'finished') { return callback(); }
-            // otherwise insert the missing values
-            return self._storeRecords(message, callback);
-        });
+        return self._storeRecords(message, callback);
     }
 
 
@@ -162,28 +144,11 @@ class StorePGMaterialComplete {
 
             async.series(tasks, function (e) {
                 if (e) { return callback(null); }
-                return self._changeStatus(urls.material_url, callback);
+                if (self._finalBolt) { return callback(); }
+                return this._onEmit(message, stream_id, callback);
             });
 
         }); // self._pg.insert(oer_materials)
-    }
-
-    /**
-     * Changes the status of the material process.
-     * @param {Object} url - The material url.
-     * @param {Function} callback - THe final callback function.
-     */
-    _changeStatus(url, callback) {
-
-        if (!this._productionModeFlag) {
-            // trigger the callback function
-            return callback();
-        }
-
-        return this._pg.update({ status: 'finished' }, { url }, 'material_process_queue', () => {
-            // trigger the callback function
-            return callback();
-        });
     }
 }
 

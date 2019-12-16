@@ -1,18 +1,17 @@
-/********************************************************************
- * PostgresQL storage process
- * This component receives the verified OER material object and
- * stores it into postgresQL database.
+/** ******************************************************************
+ * Forward Message to Kafka Topic
+ * This component forwards the provided message to the
+ * appropriate kafka topic and service.
  */
 
 // internal modules
-const KafkaProducer = require('@library/kafka-producer');
+const KafkaProducer = require("@library/kafka-producer");
 
 /**
  * @class KafkaSender
  * @description Sends the messages to the corresponding kafka topic.
  */
 class KafkaForward {
-
     constructor() {
         this._name = null;
         this._onEmit = null;
@@ -41,11 +40,10 @@ class KafkaForward {
 
     receive(message, stream_id, callback) {
         // send the message to the database topics
-        this._producer.send(this._kafka_topic, message, function (error) {
+        this._producer.send(this._kafka_topic, message, (error) => {
             if (error) { return callback(error); }
             return callback();
         });
-
     }
 }
 

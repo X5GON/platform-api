@@ -83,13 +83,13 @@ module.exports = {
         //     "cmd": "transform",
         //     "inputs": [{
         //         "source": "extract.video.ttp",
-        //         "stream_id": "incomplete"
+        //         "stream_id": "stream_error"
         //     },{
         //         "source": "extract.wikipedia",
-        //         "stream_id": "incomplete"
+        //         "stream_id": "stream_error"
         //     },{
         //         "source": "validator",
-        //         "stream_id": "incomplete"
+        //         "stream_id": "stream_error"
         //     }],
         //     "init": {
         //         "output_template": {

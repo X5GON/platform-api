@@ -48,7 +48,7 @@ class UpdateRedirect {
             stream_id = "text";
         } else {
             // the materials are recent, end process
-            callback();
+            stream_id = "updated";
         }
         // redirect the material
         return this._onEmit(material, stream_id, callback);

@@ -113,10 +113,10 @@ module.exports = {
         //     "cmd": "transform",
         //     "inputs": [{
         //         "source": "extract.text.raw",
-        //         "stream_id": "incomplete"
+        //         "stream_id": "stream_error"
         //     },{
         //         "source": "extract.text.ttp",
-        //         "stream_id": "incomplete"
+        //         "stream_id": "stream_error"
         //     }],
         //     "init": {
         //         "output_template": {

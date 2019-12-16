@@ -1154,7 +1154,7 @@ const dbCreates = {
     material_update_queue:
         `CREATE TABLE ${schema}.material_update_queue (
             id                  serial,
-            start_process_time  timestamp with time zone DEFAULT (NOW() AT TIME ZONE 'utc') NOT NULL,
+            start_process_time  timestamp with time zone DEFAULT (NOW() AT TIME ZONE 'utc'),
             end_process_time    timestamp with time zone,
             status              varchar NOT NULL DEFAULT 'in_queue',
 
