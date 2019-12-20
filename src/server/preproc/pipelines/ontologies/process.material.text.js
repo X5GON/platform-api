@@ -43,7 +43,7 @@ module.exports = {
               message_primary_id: 'material_url',
               postgres_method: 'update',
               postgres_time_attrs: {
-                start_process_date: true
+                start_process_time: true
               },
               postgres_literal_attrs: {
                 status: 'material processing started: 0/5 steps completed'
@@ -357,18 +357,58 @@ module.exports = {
       type: 'sys',
       cmd: 'transform',
       inputs: [
+        ...(productionMode
+          ? [
+              {
+                source: 'log.material.process.started',
+                stream_id: 'stream_error'
+              }
+            ]
+          : []),
+        ...(productionMode
+          ? [
+              {
+                source: 'log.material.process.formatting',
+                stream_id: 'stream_error'
+              }
+            ]
+          : []),
         {
           source: 'extract.text.raw',
           stream_id: 'stream_error'
         },
+        ...(productionMode
+          ? [
+              {
+                source: 'log.material.process.extract.text.raw',
+                stream_id: 'stream_error'
+              }
+            ]
+          : []),
         {
           source: 'extract.text.ttp',
           stream_id: 'stream_error'
         },
+        ...(productionMode
+          ? [
+              {
+                source: 'log.material.process.extract.text.ttp',
+                stream_id: 'stream_error'
+              }
+            ]
+          : []),
         {
           source: 'extract.wikipedia',
           stream_id: 'stream_error'
         },
+        ...(productionMode
+          ? [
+              {
+                source: 'log.material.process.extract.wikipedia',
+                stream_id: 'stream_error'
+              }
+            ]
+          : []),
         {
           source: 'message.validate',
           stream_id: 'stream_error'
@@ -390,7 +430,8 @@ module.exports = {
           dateretrieved: 'retrieved_date',
           providertoken: 'provider.token',
           license: 'license',
-          materialmetadata: 'material_metadata'
+          materialmetadata: 'material_metadata',
+          message: 'message'
         }
       }
     },
@@ -405,14 +446,15 @@ module.exports = {
             cmd: 'log-message-postgresql.js',
             inputs: [
               {
-                source: 'transform.material.partial'
+                source: 'transform.material.partial',
+                stream_id: 'stream_error'
               }
             ],
             init: {
               pg: config.pg,
               postgres_table: 'material_process_queue',
               postgres_primary_id: 'material_url',
-              message_primary_id: 'material_url',
+              message_primary_id: 'materialurl',
               postgres_method: 'update',
               postgres_message_attrs: {
                 status: 'message'
@@ -432,7 +474,8 @@ module.exports = {
         {
           source: productionMode
             ? 'log.material.process.error'
-            : 'transform.material.partial'
+            : 'transform.material.partial',
+          stream_id: 'stream_error'
         }
       ],
       init: {

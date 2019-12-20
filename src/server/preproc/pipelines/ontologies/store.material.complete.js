@@ -55,10 +55,13 @@ module.exports = {
               pg: config.pg,
               postgres_table: 'material_process_queue',
               postgres_primary_id: 'material_url',
-              message_primary_id: 'material_url',
+              message_primary_id: 'urls.material_url',
               postgres_method: 'update',
+              postgres_message_attrs: {
+                material_id: 'oer_materials.material_id'
+              },
               postgres_time_attrs: {
-                end_process_date: true
+                end_process_time: true
               },
               postgres_literal_attrs: {
                 status: 'material stored'

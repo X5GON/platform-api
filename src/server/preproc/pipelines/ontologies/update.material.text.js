@@ -1,156 +1,287 @@
 // global configuration
 const config = require('@config/config');
 
+const productionMode = config.environment === 'prod';
+
 // topology definition
 module.exports = {
-    "general": {
-        "heartbeat": 2000,
-        "pass_binary_messages": true
-    },
-    "spouts": [
-        {
-            "name": "input.kafka.text",
-            "type": "inproc",
-            "working_dir": "./spouts",
-            "cmd": "kafka-spout.js",
-            "init": {
-                "kafka_host": config.kafka.host,
-                "topic": "UPDATE.MATERIAL.TEXT",
-                "groupId": config.kafka.groupId
+  general: {
+    heartbeat: 2000,
+    pass_binary_messages: true
+  },
+  spouts: [
+    {
+      name: 'input.kafka.text',
+      type: 'inproc',
+      working_dir: './spouts',
+      cmd: 'kafka-spout.js',
+      init: {
+        kafka_host: config.kafka.host,
+        topic: 'UPDATE.MATERIAL.TEXT',
+        groupId: config.kafka.groupId
+      }
+    }
+  ],
+  bolts: [
+    // LOGGING STATE OF MATERIAL PROCESS
+    ...(productionMode
+      ? [
+          {
+            name: 'log.material.update.started',
+            type: 'inproc',
+            working_dir: './bolts',
+            cmd: 'log-message-postgresql.js',
+            inputs: [
+              {
+                source: 'input.kafka.text'
+              }
+            ],
+            init: {
+              pg: config.pg,
+              postgres_table: 'material_update_queue',
+              postgres_primary_id: 'material_id',
+              message_primary_id: 'material_id',
+              postgres_method: 'update',
+              postgres_time_attrs: {
+                start_process_time: true
+              },
+              postgres_literal_attrs: {
+                status: 'material update started: 0/4 steps completed'
+              },
+              document_error_path: 'message'
             }
+          }
+        ]
+      : []),
+
+    {
+      name: 'get.material.content',
+      type: 'inproc',
+      working_dir: './bolts',
+      cmd: 'get-material-content.js',
+      inputs: [
+        {
+          source: productionMode
+            ? 'log.material.update.started'
+            : 'input.kafka.text'
         }
-    ],
-    "bolts": [
-        {
-            "name": "get.material.content",
-            "type": "inproc",
-            "working_dir": "./bolts",
-            "cmd": "get.material.content.js",
-            "inputs": [{
-                "source": "input.kafka.text",
-            }],
-            "init": {
-                "pg": config.pg
-            }
-        },
-        {
-            "name": "extract.text.raw",
-            "type": "inproc",
-            "working_dir": "./bolts",
-            "cmd": "extract.text.raw.js",
-            "inputs": [{
-                "source": "get.material.content",
-            }],
-            "init": {
-                "text_config": {
-                    "preserveLineBreaks": true,
-                    "includeAltText": true
-                },
-                "pg": config.pg,
-                "production_mode": config.environment === 'prod'
-            }
-        },
-        {
-            "name": "extract.wikipedia",
-            "type": "inproc",
-            "working_dir": "./bolts",
-            "cmd": "extract.wikipedia.js",
-            "inputs": [{
-                "source": "extract.text.raw",
-            }],
-            "init": {
-                "userKey": config.preproc.wikifier.userKey,
-                "wikifierUrl": config.preproc.wikifier.wikifierUrl,
-                "pg": config.pg,
-                "production_mode": config.environment === 'prod'
-            }
-        },
-        // {
-        //     "name": "extract.text.ttp",
-        //     "type": "inproc",
-        //     "working_dir": "./bolts",
-        //     "cmd": "extract.text.ttp.js",
-        //     "inputs": [{
-        //         "source": "extract.wikipedia",
-        //     }],
-        //     "init": {
-        //         "user": config.preproc.ttp.user,
-        //         "token": config.preproc.ttp.token,
-        //         "tmp_folder": './tmp',
-        //         "pg": config.pg,
-        //         "production_mode": config.environment === 'prod'
-        //     }
-        // },
+      ],
+      init: {
+        pg: config.pg
+      }
+    },
 
-        /****************************************
-         * Send the completely processed materials
-         * to kafka distribution
-         */
-
-        {
-            "name": "kafka.material.content",
-            "type": "inproc",
-            "working_dir": "./bolts",
-            "cmd": "kafka.forward.js",
-            "inputs": [{
-                "source": "extract.wikipedia",
-            }],
-            "init": {
-                "kafka_host": config.kafka.host,
-                "kafka_topic": "UPDATE.MATERIAL.CONTENT"
+    // LOGGING STATE OF MATERIAL PROCESS
+    ...(productionMode
+      ? [
+          {
+            name: 'log.material.update.get.material.content',
+            type: 'inproc',
+            working_dir: './bolts',
+            cmd: 'log-message-postgresql.js',
+            inputs: [
+              {
+                source: 'get.material.content'
+              }
+            ],
+            init: {
+              pg: config.pg,
+              postgres_table: 'material_update_queue',
+              postgres_primary_id: 'material_id',
+              message_primary_id: 'material_id',
+              postgres_method: 'update',
+              postgres_literal_attrs: {
+                status:
+                  'material existing content extracted: 1/4 steps completed'
+              },
+              document_error_path: 'message'
             }
+          }
+        ]
+      : []),
+
+    {
+      name: 'extract.text.raw',
+      type: 'inproc',
+      working_dir: './bolts',
+      cmd: 'extract-text-raw.js',
+      inputs: [
+        {
+          source: productionMode
+            ? 'log.material.update.get.material.content'
+            : 'get.material.content'
+        }
+      ],
+      init: {
+        textract_config: {
+          preserve_line_breaks: true,
+          preserve_only_multiple_line_breaks: false,
+          include_alt_text: true
         },
+        document_location_path: 'material_url',
+        document_location_type: 'remote',
+        document_text_path: 'material_metadata.raw_text',
+        document_error_path: 'message'
+      }
+    },
 
-        /****************************************
-         * Send the partially processed materials
-         * to kafka distribution
-         */
+    // LOGGING STATE OF MATERIAL PROCESS
+    ...(productionMode
+      ? [
+          {
+            name: 'log.material.update.extract.text.raw',
+            type: 'inproc',
+            working_dir: './bolts',
+            cmd: 'log-message-postgresql.js',
+            inputs: [
+              {
+                source: 'extract.text.raw'
+              }
+            ],
+            init: {
+              pg: config.pg,
+              postgres_table: 'material_update_queue',
+              postgres_primary_id: 'material_id',
+              message_primary_id: 'material_id',
+              postgres_method: 'update',
+              postgres_literal_attrs: {
+                status: 'material content extracted: 2/4 steps completed'
+              },
+              document_error_path: 'message'
+            }
+          }
+        ]
+      : []),
 
-        // {
-        //     "name": "transform.material.partial",
-        //     "working_dir": ".",
-        //     "type": "sys",
-        //     "cmd": "transform",
-        //     "inputs": [{
-        //         "source": "extract.text.raw",
-        //         "stream_id": "stream_error"
-        //     },{
-        //         "source": "extract.text.ttp",
-        //         "stream_id": "stream_error"
-        //     }],
-        //     "init": {
-        //         "output_template": {
-        //             "title": "title",
-        //             "description": "description",
-        //             "provideruri": "provider_uri",
-        //             "materialurl": "material_url",
-        //             "author": "authors",
-        //             "language": "language",
-        //             "type": {
-        //                 "ext": "type",
-        //                 "mime": "mimetype"
-        //             },
-        //             "datecreated": "creation_date",
-        //             "dateretrieved": "retrieved_date",
-        //             "providertoken": "provider.token",
-        //             "license": "license",
-        //             "materialmetadata": "material_metadata"
-        //         }
-        //     }
-        // },
-        // {
-        //     "name": "kafka.material.partial",
-        //     "type": "inproc",
-        //     "working_dir": "./bolts",
-        //     "cmd": "kafka.material.partial.js",
-        //     "inputs": [
-        //         { "source": "transform.material.partial" }
-        //     ],
-        //     "init": {
-        //         "kafka_host": config.kafka.host,
-        //         "kafka_topic": "STORING.MATERIAL.PARTIAL"
-        //     }
-        // }
-    ],
-    "variables": {}
+    {
+      name: 'extract.text.ttp',
+      type: 'inproc',
+      working_dir: './bolts',
+      cmd: 'extract-text-ttp.js',
+      inputs: [
+        {
+          source: productionMode
+            ? 'log.material.update.extract.text.raw'
+            : 'extract.text.raw'
+        }
+      ],
+      init: {
+        ttp: {
+          user: config.preproc.ttp.user,
+          token: config.preproc.ttp.token
+        },
+        tmp_folder: './tmp',
+        document_title_path: 'title',
+        document_language_path: 'language',
+        document_text_path: 'material_metadata.raw_text',
+        document_transcriptions_path: 'material_metadata.transcriptions',
+        document_error_path: 'message',
+        ttp_id_path: 'material_metadata.ttp_id'
+      }
+    },
+
+    // LOGGING STATE OF MATERIAL PROCESS
+    ...(productionMode
+      ? [
+          {
+            name: 'log.material.update.extract.text.ttp',
+            type: 'inproc',
+            working_dir: './bolts',
+            cmd: 'log-message-postgresql.js',
+            inputs: [
+              {
+                source: 'extract.text.ttp'
+              }
+            ],
+            init: {
+              pg: config.pg,
+              postgres_table: 'material_update_queue',
+              postgres_primary_id: 'material_id',
+              message_primary_id: 'material_id',
+              postgres_method: 'update',
+              postgres_literal_attrs: {
+                status: 'material translations extracted: 3/4 steps completed'
+              },
+              document_error_path: 'message'
+            }
+          }
+        ]
+      : []),
+
+    {
+      name: 'extract.wikipedia',
+      type: 'inproc',
+      working_dir: './bolts',
+      cmd: 'extract-wikipedia.js',
+      inputs: [
+        {
+          source: productionMode
+            ? 'log.material.update.extract.text.ttp'
+            : 'extract.text.ttp'
+        }
+      ],
+      init: {
+        wikifier: {
+          user_key: config.preproc.wikifier.userKey,
+          wikifier_url: config.preproc.wikifier.wikifierUrl,
+          max_length: 10000
+        },
+        document_text_path: 'material_metadata.raw_text',
+        wikipedia_concept_path: 'material_metadata.wikipedia_concepts',
+        document_error_path: 'message'
+      }
+    },
+
+    // LOGGING STATE OF MATERIAL PROCESS
+    ...(productionMode
+      ? [
+          {
+            name: 'log.material.update.extract.wikipedia',
+            type: 'inproc',
+            working_dir: './bolts',
+            cmd: 'log-message-postgresql.js',
+            inputs: [
+              {
+                source: 'extract.wikipedia'
+              }
+            ],
+            init: {
+              pg: config.pg,
+              postgres_table: 'material_update_queue',
+              postgres_primary_id: 'material_id',
+              message_primary_id: 'material_id',
+              postgres_method: 'update',
+              postgres_literal_attrs: {
+                status: 'material wikipedia extracted: 4/4 steps completed'
+              },
+              document_error_path: 'message'
+            }
+          }
+        ]
+      : []),
+
+    /****************************************
+     * Send the completely processed materials
+     * to kafka distribution
+     */
+
+    {
+      name: 'kafka.material.content',
+      type: 'inproc',
+      working_dir: './bolts',
+      cmd: 'kafka-message-forward.js',
+      inputs: [
+        {
+          source: productionMode
+            ? 'log.material.update.extract.wikipedia'
+            : 'extract.wikipedia'
+        }
+      ],
+      init: {
+        kafka_host: config.kafka.host,
+        kafka_topic: 'UPDATE.MATERIAL.CONTENT'
+      }
+    }
+  ],
+  variables: {}
 };

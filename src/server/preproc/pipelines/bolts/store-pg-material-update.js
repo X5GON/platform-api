@@ -23,7 +23,8 @@ class StorePGMaterialUpdate {
         // create the postgres connection
         this._pg = require('@library/postgresQL')(config.pg);
 
-        this._productionModeFlag = config.production_mode;
+        this._finalBolt = config.final_bolt || false;
+
         callback();
     }
 
@@ -62,11 +63,20 @@ class StorePGMaterialUpdate {
 
         console.log('\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/');
         console.log(material_id);
-        console.log(transcriptions);
-        console.log(wikipedia_concepts);
-        console.log(raw_text);
 
         let tasks = [];
+
+        ///////////////////////////////////////////
+        // DELETE PREVIOUS CONTENTS
+        ///////////////////////////////////////////
+
+        // add the task of pushing material contents
+        tasks.push(function (xcallback) {
+            self._pg.delete({ material_id }, "material_contents", function (e, res) {
+                if (e) { return xcallback(e); }
+                return xcallback(null, 1);
+            });
+        });
 
         ///////////////////////////////////////////
         // SAVE MATERIAL CONTENTS
@@ -76,10 +86,8 @@ class StorePGMaterialUpdate {
         let material_contents = [];
         // prepare list of material contents
         if (transcriptions) {
-            let languages = Object.keys(transcriptions);
-            for (let language of languages) {
-                let extensions = Object.keys(transcriptions[language]);
-                for (let extension of extensions) {
+            for (let language in transcriptions) {
+                for (let extension in transcriptions[language]) {
                     // get value of the language and extension
                     const value = transcriptions[language][extension];
 
@@ -113,24 +121,12 @@ class StorePGMaterialUpdate {
         for (let material_content of material_contents) {
             // add the task of pushing material contents
             tasks.push(function (xcallback) {
-                self._pg.insert(material_content, 'material_contents', function (e, res) {
+                self._pg.insert(material_content, 'material_contents', function (e) {
                     if (e) { return xcallback(e); }
                     return xcallback(null, 1);
                 });
             });
         }
-
-        ///////////////////////////////////////////
-        // DELETE PREVIOUS CONTENTS
-        ///////////////////////////////////////////
-
-        // // add the task of pushing material contents
-        // tasks.push(function (xcallback) {
-        //     self._pg.execute(`DELETE FROM material_contents WHERE material_id=${material_id} AND last_updated IS NULL;`, [], function (e, res) {
-        //         if (e) { return xcallback(e); }
-        //         return xcallback(null, 1);
-        //     });
-        // });
 
 
          ///////////////////////////////////////////
@@ -148,7 +144,7 @@ class StorePGMaterialUpdate {
         }
 
         tasks.push(function (xcallback) {
-            self._pg.insert(features_public, 'features_public', function (e, res) {
+            self._pg.insert(features_public, 'features_public', function (e) {
                 if (e) { return xcallback(e); }
                 return xcallback(null, 1);
             });
@@ -159,12 +155,12 @@ class StorePGMaterialUpdate {
         ///////////////////////////////////////////
 
         // add the task of pushing material contents
-        // tasks.push(function (xcallback) {
-        //     self._pg.execute(`DELETE FROM features_public WHERE record_id=${material_id} AND table_name='oer_materials' AND name='wikipedia_concepts' AND re_required IS TRUE AND last_updated IS NULL;`, [], function (e, res) {
-        //         if (e) { return xcallback(e); }
-        //         return xcallback(null, 1);
-        //     });
-        // });
+        tasks.push(function (xcallback) {
+            self._pg.execute(`DELETE FROM features_public WHERE record_id=${material_id} AND table_name='oer_materials' AND name='wikipedia_concepts' AND re_required IS TRUE AND last_updated IS NULL;`, [], function (e, res) {
+                if (e) { return xcallback(e); }
+                return xcallback(null, 1);
+            });
+        });
 
 
 
@@ -178,7 +174,7 @@ class StorePGMaterialUpdate {
                 retrieved_date: (new Date()).toISOString(),
                 ttp_id
             };
-            self._pg.update(material_update, { id: material_id }, "oer_materials", function (e, res) {
+            self._pg.update(material_update, { id: material_id }, "oer_materials", function (e) {
                 if (e) { return xcallback(e); }
                 return xcallback(null, 1);
             });
@@ -189,11 +185,12 @@ class StorePGMaterialUpdate {
         // RUN THE TASKS
         ///////////////////////////////////////////
 
-        console.log(material_id);
         console.log('\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\n');
         async.series(tasks, function (e) {
+            console.log(e);
             if (e) { return callback(null); }
-            return callback();
+            if (self._finalBolt) { return callback(); }
+            return self._onEmit(message, stream_id, callback);
         });
 
     }

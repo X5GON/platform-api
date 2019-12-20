@@ -30,6 +30,21 @@ module.exports = function (pg, logger, config) {
      * Helper functions
      *********************************/
 
+
+    /**
+     * Generates a 40 character long API key.
+     * @returns {String} The 40 character long API key.
+     */
+    function generateUUID() {
+        let time = new Date().getTime();
+        const uuid = 'xxxxxxxx-0xxx-yxxxxxxxxxxxxxxx'.replace(/[xy]/g, char => {
+            let hash = (time + Math.random() * 16) % 16 | 0;
+            time = Math.floor(time / 16);
+            return (char === 'x' ? hash : (hash & 0x3 | 0x8)).toString(16);
+        });
+        return uuid;
+    }
+
     /**
      * Checks if the provided API key is valid.
      * @param {Object} req - Express request.
@@ -92,18 +107,18 @@ module.exports = function (pg, logger, config) {
      */
     function _sendMaterial(material, list) {
         // validate the material
-        const { matching, errors } = validator.validateSchema(
+        const { isValid, errors } = validator.validateSchema(
             material,
             validator.schemas.oer_material_schema
         );
 
-        if (!matching) {
+        if (!isValid) {
             const messages = errors.map(err => err.stack);
             // store the invalid material for the user
             list.push({ material, errors: messages });
             return;
         }
-        pg.select({ url: material.material_url }, 'material_process_queue', (error, results) => {
+        pg.select({ material_url: material.material_url }, 'material_process_queue', (error, results) => {
             if (error) {
                 logger.error('[error] postgresql', {
                     error: {
@@ -116,16 +131,19 @@ module.exports = function (pg, logger, config) {
             }
             if (results.length) {
                 logger.error('[upload] material already in the processing pipeline',
-                    { url: material.material_url }
+                    { material_url: material.material_url }
                 );
                 // list the material
                 list.push({ material, errors: [`material at location = ${material.material_url} already in processing`] });
                 return;
             }
+
+            const process_id = generateUUID();
+
             // get material mimetype and decide where to send the material metadata
             const mimetype = material.type.mime;
             if (mimetype && mimetypes.video.includes(mimetype)) {
-                pg.insert({ url: material.material_url }, 'material_process_queue', (xerror) => {
+                pg.insert({ process_id, material_url: material.material_url }, 'material_process_queue', (xerror) => {
                     if (xerror) {
                         logger.error('[error] postgresql', {
                             error: {
@@ -142,7 +160,7 @@ module.exports = function (pg, logger, config) {
                     producer.send(video_topic, material);
                 });
             } else if (mimetype && mimetypes.audio.includes(mimetype)) {
-                pg.insert({ url: material.material_url }, 'material_process_queue', (xerror) => {
+                pg.insert({ process_id, material_url: material.material_url }, 'material_process_queue', (xerror) => {
                     if (xerror) {
                         logger.error('[error] postgresql', {
                             error: {
@@ -159,7 +177,7 @@ module.exports = function (pg, logger, config) {
                     producer.send(video_topic, material);
                 });
             } else if (mimetype && mimetypes.text.includes(mimetype)) {
-                pg.insert({ url: material.material_url }, 'material_process_queue', (xerror) => {
+                pg.insert({ process_id, material_url: material.material_url }, 'material_process_queue', (xerror) => {
                     if (xerror) {
                         logger.error('[error] postgresql', {
                             error: {

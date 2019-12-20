@@ -22,7 +22,7 @@ class ExtractWikipedia extends BasicBolt {
         this._name = name;
         this._context = context;
         this._onEmit = config.onEmit;
-        this._prefix = `[Wikification ${this._name}]`;
+        this._prefix = `[ExtractWikipedia ${this._name}]`;
 
         // wikifier request instance
         this._wikifier = require("@library/wikifier")(config.wikifier);
@@ -46,32 +46,32 @@ class ExtractWikipedia extends BasicBolt {
         callback();
     }
 
-    async receive(material, stream_id, callback) {
+    async receive(message, stream_id, callback) {
         let self = this;
 
         try {
             // get the raw text from the material
-            let text = self.get(material, this._documentTextPath);
+            let text = self.get(message, this._documentTextPath);
 
             if (!text) {
                 // send it to the next component in the pipeline
                 // there was an error - send the material to partial table
-                throw new Error(`${this._prefix} No text provided.`);
+                throw new Error("No text provided.");
             }
             // process material text and extract wikipedia concepts
             const { wikipedia } = await self._wikifier.processText(text);
             // retrieve wikifier results
             if (!wikipedia.length) {
-                throw new Error(`${this._prefix} No wikipedia concepts found`);
+                throw new Error("No wikipedia concepts found");
             }
 
             // store merged concepts within the material object
-            self.set(material, this._wikipediaConceptPath, wikipedia);
-            return this._onEmit(material, stream_id, callback);
+            self.set(message, this._wikipediaConceptPath, wikipedia);
+            return this._onEmit(message, stream_id, callback);
         } catch (error) {
             // there was an error - send the material to partial table
-            this.set(material, this._documentErrorPath, `${this._prefix} ${error.message}`);
-            return this._onEmit(material, "stream_error", callback);
+            this.set(message, this._documentErrorPath, `${this._prefix} ${error.message}`);
+            return this._onEmit(message, "stream_error", callback);
         }
     }
 }

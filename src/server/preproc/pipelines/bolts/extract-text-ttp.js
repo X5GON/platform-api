@@ -139,7 +139,7 @@ class ExtractTextTTP extends BasicBolt {
                 }
             } catch (error) {
                 // log error message and store the not completed material
-                message.message = `${self._prefix} ${error.message}`;
+                this.set(message, self._documentErrorPath, `${self._prefix} ${error.message}`);
                 return this._onEmit(message, "stream_error", callback);
             }
         }

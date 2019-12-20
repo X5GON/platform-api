@@ -47,17 +47,17 @@ module.exports = {
             cmd: 'log-message-postgresql.js',
             inputs: [
               {
-                source: 'store.pg.material.complete'
+                source: 'store.pg.material.partial'
               }
             ],
             init: {
               pg: config.pg,
               postgres_table: 'material_process_queue',
               postgres_primary_id: 'material_url',
-              message_primary_id: 'materialurl',
+              message_primary_id: 'oer_materials_partial.materialurl',
               postgres_method: 'update',
               postgres_time_attrs: {
-                end_process_date: true
+                end_process_time: true
               },
               document_error_path: 'message',
               final_bolt: true

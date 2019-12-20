@@ -4,9 +4,12 @@
  * stores it into postgresQL database.
  */
 
-class RetrieveMaterialMetadata {
+// basic bolt template
+const BasicBolt = require("./basic-bolt");
+class RetrieveMaterialMetadata extends BasicBolt {
 
     constructor() {
+        super();
         this._name = null;
         this._onEmit = null;
         this._context = null;
@@ -42,8 +45,13 @@ class RetrieveMaterialMetadata {
 
         this._pg.select({ material_id, type: "text_extraction" }, "material_contents", function (error, response) {
             if (error) { return callback(); }
+
+            if (!response[0]) {
+                // redirect the material
+                return self._onEmit(material, stream_id, callback);
+            }
             const { value } = response[0];
-            material.material_metadata.raw_text = value.value;
+            self.set(material, 'material_metadata.raw_text', value.value);
             // redirect the material
             return self._onEmit(material, stream_id, callback);
         });

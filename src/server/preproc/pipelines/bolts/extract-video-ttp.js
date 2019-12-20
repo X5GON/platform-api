@@ -94,7 +94,7 @@ class ExtractVideoTTP extends BasicBolt {
     }
 
 
-    async receive(material, stream_id, callback) {
+    async receive(message, stream_id, callback) {
         let self = this;
 
         /**
@@ -135,8 +135,8 @@ class ExtractVideoTTP extends BasicBolt {
                 }
             } catch (error) {
                 // log error message and store the not completed material
-                material.message = `${self._prefix} ${error.message}`;
-                return this._onEmit(material, "stream_error", callback);
+                self.set(message, self._documentErrorPath, `${self._prefix} ${error.message}`);
+                return this._onEmit(message, "stream_error", callback);
             }
         }
 
@@ -145,7 +145,7 @@ class ExtractVideoTTP extends BasicBolt {
         // Start Processing materials
         // ///////////////////////////////////////////////////////////
 
-        const documentLanguage = this.get(this._documentLanguagePath);
+        const documentLanguage = this.get(message, this._documentLanguagePath);
         if (Object.keys(self._TTPLanguages).includes(documentLanguage)) {
             // external_id generation - for using in TTP
             const external_id = Math.random().toString(36).substring(2, 15)
@@ -153,7 +153,7 @@ class ExtractVideoTTP extends BasicBolt {
                                 + Date.now();
 
             // get the documents authors
-            const documentAuthors = this.get(this._documentAuthorsPath);
+            const documentAuthors = this.get(message, this._documentAuthorsPath);
             // create the speakers list
             let speakers;
             if (documentAuthors && typeof documentAuthors === "string") {
@@ -201,8 +201,8 @@ class ExtractVideoTTP extends BasicBolt {
             }
 
             // get document location
-            const documentLocation = this.get(this._documentLocationPath);
-            const documentTitle = this.get(this._documentTitlePath);
+            const documentLocation = this.get(message, this._documentLocationPath);
+            const documentTitle = this.get(message, this._documentTitlePath);
             // setup options for sending the video to TPP
             const options = {
                 ...self._TTPOptions,
@@ -314,7 +314,7 @@ class ExtractVideoTTP extends BasicBolt {
                         // save transcriptions under the current language
                         transcriptions[lang] = transcription;
 
-                        if (lang === documentLocation) {
+                        if (lang === documentLanguage) {
                             // set default transcriptions for the material
                             raw_text = transcription.plain;
                         }
@@ -322,20 +322,20 @@ class ExtractVideoTTP extends BasicBolt {
                 }
 
                 // save transcriptions into the material's metadata field
-                this.set(this._documentTextPath, raw_text);
-                this.set(this._documentTranscriptionsPath, transcriptions);
-                this.set(this._TTPIdPath, external_id);
+                this.set(message, this._documentTextPath, raw_text);
+                this.set(message, this._documentTranscriptionsPath, transcriptions);
+                this.set(message, this._TTPIdPath, external_id);
 
-                return this._onEmit(material, stream_id, callback);
+                return this._onEmit(message, stream_id, callback);
             } catch (error) {
                 // log error message and store the not completed material
-                this.set(this._documentErrorPath, `${self._prefix} ${error.message}`);
-                return this._onEmit(material, "stream_error", callback);
+                this.set(message, this._documentErrorPath, `${self._prefix} ${error.message}`);
+                return this._onEmit(message, "stream_error", callback);
             }
         } else {
             // log the unsupported TTP language
-            this.set(this._documentErrorPath, `${self._prefix} Not a TTP supported language=${documentLanguage}`);
-            return this._onEmit(material, "stream_error", callback);
+            this.set(message, this._documentErrorPath, `${self._prefix} Not a TTP supported language=${documentLanguage}`);
+            return this._onEmit(message, "stream_error", callback);
         }
     }
 }

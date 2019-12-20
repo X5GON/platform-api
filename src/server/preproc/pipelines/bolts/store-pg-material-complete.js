@@ -39,12 +39,6 @@ class StorePGMaterialComplete {
 
     receive(message, stream_id, callback) {
         let self = this;
-        return self._storeRecords(message, callback);
-    }
-
-
-    _storeRecords(message, callback) {
-        let self = this;
 
         const {
             oer_materials,
@@ -142,10 +136,12 @@ class StorePGMaterialComplete {
             // RUN THE TASKS
             ///////////////////////////////////////////
 
+            // update the message with the material id
+            message.oer_materials.material_id = material_id;
             async.series(tasks, function (e) {
                 if (e) { return callback(null); }
                 if (self._finalBolt) { return callback(); }
-                return this._onEmit(message, stream_id, callback);
+                return self._onEmit(message, stream_id, callback);
             });
 
         }); // self._pg.insert(oer_materials)

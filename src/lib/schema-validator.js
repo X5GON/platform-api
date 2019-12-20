@@ -1,7 +1,7 @@
 /************************************************
  * JSON Validator Module
  * This module stores different JSON schemas
- * provided by the user and validates the 
+ * provided by the user and validates the
  * JSON objects.
  */
 
@@ -17,8 +17,8 @@ class Validator {
      * @description Initializes the JSON validator.
      * @param {Object} params - The constructor parameter.
      * @param {Object} [params.schema] - The object containing
-     * a single key-value, where the value is the JSON schema 
-     * and the key is its assigned name. 
+     * a single key-value, where the value is the JSON schema
+     * and the key is its assigned name.
      */
     constructor(params) {
         let self = this;
@@ -38,7 +38,7 @@ class Validator {
         let self = this;
         let validation = self._validator.validate(object, schema);
         return {
-            matching: validation.errors.length === 0,
+            isValid: validation.errors.length === 0,
             errors: validation.errors
         };
     }

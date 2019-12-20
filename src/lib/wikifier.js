@@ -162,7 +162,6 @@ class Wikifier {
             // return the concept list
             return concepts;
         } catch (error) {
-            console.log(error.message);
             return error;
         }
     }

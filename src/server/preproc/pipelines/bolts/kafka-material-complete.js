@@ -54,8 +54,10 @@ class KafkaMaterialComplete {
             type,
             mimetype,
             material_metadata: {
+                wikipedia_concepts,
                 transcriptions,
                 raw_text,
+                metadata,
                 ttp_id
             },
             provider: {
@@ -126,7 +128,7 @@ class KafkaMaterialComplete {
         // prepare of public feature - wikipedia concept
         let features_public = {
             name: 'wikipedia_concepts',
-            value: { value: material_metadata.wikipedia_concepts },
+            value: { value: wikipedia_concepts },
             re_required: true,
             record_id: null,
             last_updated: null
@@ -148,7 +150,7 @@ class KafkaMaterialComplete {
                 mimetype: mimetype.toLowerCase(),
                 license,
                 ttp_id,
-                ...material_metadata.metadata && { metadata: material_metadata.metadata }
+                ...metadata && { metadata }
             },
             material_contents,
             features_public,

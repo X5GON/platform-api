@@ -49,9 +49,9 @@ app.use(session({
     secret: config.platform.sessionSecret,
     saveUninitialized: false,
     resave: false,
-    cookie: {
-        ...(config.environment === 'prod' && { domain: '.x5gon.org' })
-    }
+    // cookie: {
+    //     ...(config.environment === 'prod' && { domain: '.x5gon.org' })
+    // }
 }));
 // use flash messages
 app.use(flash());

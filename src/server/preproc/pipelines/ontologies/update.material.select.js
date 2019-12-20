@@ -61,11 +61,6 @@ module.exports = {
 
             SELECT *
             FROM OERS
-            WHERE material_id IN (
-                SELECT material_id
-                FROM CONTENT
-                WHERE TRUE = ANY(SELECT unnest(lu) IS NULL)
-            ) AND material_id NOT IN (SELECT material_id FROM material_update_queue)
             ORDER BY u_count DESC
             LIMIT 1000;
         `, // TODO: add the SQL statement for checking if the material is already in the queue
@@ -95,10 +90,10 @@ module.exports = {
               message_primary_id: 'material_id',
               postgres_method: 'upsert',
               postgres_time_attrs: {
-                start_process_date: true
+                start_process_time: true
               },
               postgres_literal_attrs: {
-                status: 'material in queue'
+                status: 'in queue'
               },
               document_error_path: 'message'
             }
@@ -168,7 +163,7 @@ module.exports = {
               message_primary_id: 'material_id',
               postgres_method: 'update',
               postgres_time_attrs: {
-                end_process_date: true
+                end_process_time: true
               },
               postgres_literal_attrs: {
                 status: 'material updated'

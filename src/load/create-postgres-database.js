@@ -1115,7 +1115,7 @@ const dbCreates = {
         COMMENT ON COLUMN ${schema}.admins.password
             IS 'The password of the admin';`,
 
-    material_process_pipeline:
+    material_process_queue:
         `CREATE TABLE ${schema}.material_process_pipeline (
             id           serial,
             url          varchar UNIQUE PRIMARY KEY,
@@ -1263,6 +1263,18 @@ const dbUpdates = [{
         ADD COLUMN end_process_time timestamp with time zone;
         ALTER TABLE ${schema}.material_process_queue
         RENAME COLUMN url TO material_url;
+    `
+}, {
+    version: 10,
+    update: `
+        ALTER TABLE ${schema}.material_process_queue
+        ALTER COLUMN status SET DEFAULT 'in_queue';
+    `
+}, {
+    version: 11,
+    update: `
+        ALTER TABLE ${schema}.material_process_queue
+        ADD COLUMN process_id varchar;
     `
 }];
 
