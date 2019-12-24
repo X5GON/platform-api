@@ -46,7 +46,7 @@ module.exports = {
                 start_process_time: true
               },
               postgres_literal_attrs: {
-                status: 'material update started: 0/4 steps completed'
+                status: '[TEXT] material update started: 0/4 steps completed. Retrieving the stored material content'
               },
               document_error_path: 'message'
             }
@@ -92,7 +92,7 @@ module.exports = {
               postgres_method: 'update',
               postgres_literal_attrs: {
                 status:
-                  'material existing content extracted: 1/4 steps completed'
+                  '[TEXT] material existing content extracted: 1/4 steps completed. Extracting the raw material content'
               },
               document_error_path: 'message'
             }
@@ -145,7 +145,7 @@ module.exports = {
               message_primary_id: 'material_id',
               postgres_method: 'update',
               postgres_literal_attrs: {
-                status: 'material content extracted: 2/4 steps completed'
+                status: '[TEXT] material content extracted: 2/4 steps completed. Retrieving translations'
               },
               document_error_path: 'message'
             }
@@ -200,7 +200,8 @@ module.exports = {
               message_primary_id: 'material_id',
               postgres_method: 'update',
               postgres_literal_attrs: {
-                status: 'material translations extracted: 3/4 steps completed'
+                status:
+                  '[TEXT] material translations extracted: 3/4 steps completed. Retrieving wikipedia concepts'
               },
               document_error_path: 'message'
             }
@@ -252,7 +253,8 @@ module.exports = {
               message_primary_id: 'material_id',
               postgres_method: 'update',
               postgres_literal_attrs: {
-                status: 'material wikipedia extracted: 4/4 steps completed'
+                status:
+                  '[TEXT] material wikipedia extracted: 4/4 steps completed. Updating the material'
               },
               document_error_path: 'message'
             }
@@ -281,7 +283,87 @@ module.exports = {
         kafka_host: config.kafka.host,
         kafka_topic: 'UPDATE.MATERIAL.CONTENT'
       }
-    }
+    },
+
+    // LOGGING STATE OF MATERIAL PROCESS
+    ...(productionMode
+      ? [
+          {
+            name: 'log.material.update.error',
+            type: 'inproc',
+            working_dir: './bolts',
+            cmd: 'log-message-postgresql.js',
+            inputs: [
+              ...(productionMode
+                ? [
+                    {
+                      source: 'log.material.update.started',
+                      stream_id: 'stream_error'
+                    }
+                  ]
+                : []),
+              ...(productionMode
+                ? [
+                    {
+                      source: 'log.material.update.get.material.content',
+                      stream_id: 'stream_error'
+                    }
+                  ]
+                : []),
+              {
+                source: 'extract.text.raw',
+                stream_id: 'stream_error'
+              },
+              ...(productionMode
+                ? [
+                    {
+                      source: 'log.material.update.extract.text.raw',
+                      stream_id: 'stream_error'
+                    }
+                  ]
+                : []),
+              {
+                source: 'extract.text.ttp',
+                stream_id: 'stream_error'
+              },
+              ...(productionMode
+                ? [
+                    {
+                      source: 'log.material.update.extract.text.ttp',
+                      stream_id: 'stream_error'
+                    }
+                  ]
+                : []),
+              {
+                source: 'extract.wikipedia',
+                stream_id: 'stream_error'
+              },
+              ...(productionMode
+                ? [
+                    {
+                      source: 'log.material.update.extract.wikipedia',
+                      stream_id: 'stream_error'
+                    }
+                  ]
+                : [])
+            ],
+            init: {
+              pg: config.pg,
+              postgres_table: 'material_update_queue',
+              postgres_primary_id: 'material_id',
+              message_primary_id: 'material_id',
+              postgres_method: 'update',
+              postgres_message_attrs: {
+                status: 'message'
+              },
+              postgres_time_attrs: {
+                end_process_time: true
+              },
+              final_bolt: true
+            }
+          }
+        ]
+      : [])
   ],
   variables: {}
 };

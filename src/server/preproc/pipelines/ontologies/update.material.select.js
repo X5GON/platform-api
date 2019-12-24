@@ -18,51 +18,58 @@ module.exports = {
       init: {
         pg: config.pg,
         sql_statement: `
-            WITH URLS AS (
-                SELECT
-                    COALESCE(m.material_id, c.material_id) AS material_id,
-                    COALESCE(m.provider_id, c.provider_id) AS provider_id,
-                    m.url AS material_url,
-                    c.url AS container_url,
-                    (SELECT COUNT(*) FROM user_activities AS ua WHERE ua.url_id = c.id) as u_count
-                FROM contains
-                LEFT JOIN urls m ON contains.contains_id = m.id
-                LEFT JOIN urls c ON contains.container_id = c.id
-                ORDER BY material_id
-            ),
+          WITH URLS AS (
+            SELECT
+              COALESCE(m.material_id, c.material_id) AS material_id,
+              COALESCE(m.provider_id, c.provider_id) AS provider_id,
+              m.url AS material_url,
+              c.url AS container_url,
+              (SELECT COUNT(*) FROM user_activities AS ua WHERE ua.url_id = c.id) as u_count
+            FROM contains
+            LEFT JOIN urls m ON contains.contains_id = m.id
+            LEFT JOIN urls c ON contains.container_id = c.id
+            ORDER BY material_id
+          ),
 
-            OERS AS (
-                SELECT
-                    URLS.material_id,
-                    oer.title,
-                    oer.description,
-                    oer.creation_date,
-                    oer.retrieved_date,
-                    oer.type,
-                    oer.mimetype,
-                    URLS.material_url,
-                    URLS.container_url AS provider_uri,
-                    URLS.u_count,
-                    oer.language,
-                    oer.license
+          OERS AS (
+            SELECT
+              URLS.material_id,
+              oer.title,
+              oer.description,
+              oer.creation_date,
+              oer.retrieved_date,
+              oer.type,
+              oer.mimetype,
+              URLS.material_url,
+              URLS.container_url AS provider_uri,
+              URLS.u_count,
+              oer.language,
+              oer.license
 
-                FROM URLS
-                LEFT JOIN oer_materials oer ON URLS.material_id = oer.id
-                LEFT JOIN providers     p   ON URLS.provider_id = p.id
-            ),
+            FROM URLS
+            LEFT JOIN oer_materials oer ON URLS.material_id = oer.id
+            LEFT JOIN providers     p   ON URLS.provider_id = p.id
+          ),
 
-            CONTENT AS (
-                SELECT
-                    material_id,
-                    array_agg(last_updated) AS lu
-                FROM material_contents
-                GROUP BY material_id
-            )
+          CONTENT AS (
+            SELECT
+              material_id,
+              array_agg(last_updated) AS lu
+            FROM material_contents
+            GROUP BY material_id
+          )
 
-            SELECT *
-            FROM OERS
-            ORDER BY u_count DESC
-            LIMIT 1000;
+          SELECT *
+          FROM OERS
+          WHERE material_id IN (
+            SELECT
+              material_id
+            FROM CONTENT
+            WHERE array_position(lu, NULL) IS NOT NULL
+          )
+          AND material_id NOT IN (SELECT material_id FROM material_update_queue)
+          ORDER BY u_count DESC
+          LIMIT 2500;
         `, // TODO: add the SQL statement for checking if the material is already in the queue
         // repeat every one day
         time_interval: 1 * 24 * 60 * 60 * 1000

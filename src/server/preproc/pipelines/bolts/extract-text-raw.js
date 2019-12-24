@@ -76,7 +76,12 @@ class ExtractTextRaw extends BasicBolt {
         const self = this;
 
         const materialUrl = self.get(message, this._documentLocationPath);
+        const materialText = self.get(message, this._documentTextPath);
 
+        if (materialText) {
+            // the material already have the raw text extracted
+            return this._onEmit(message, stream_id, callback);
+        }
         // extract raw text using the assigned method type
         textract[this._methodType](materialUrl, self._textractConfig, (error, text) => {
             if (error) {

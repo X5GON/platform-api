@@ -46,7 +46,7 @@ module.exports = {
                 start_process_time: true
               },
               postgres_literal_attrs: {
-                status: 'material update started: 0/4 steps completed'
+                status: '[VIDEO] material update started: 0/2 steps completed. Retrieving transcriptions and translations'
               },
               document_error_path: 'message'
             }
@@ -101,7 +101,7 @@ module.exports = {
               postgres_method: 'update',
               postgres_literal_attrs: {
                 status:
-                  'material transcriptions and translations retrieved: 1/4 steps completed'
+                  '[VIDEO] material transcriptions and translations retrieved: 1/2 steps completed. Retrieving wikipedia concepts'
               },
               document_error_path: 'message'
             }
@@ -137,7 +137,7 @@ module.exports = {
     ...(productionMode
       ? [
           {
-            name: 'log.material.process.extract.wikipedia',
+            name: 'log.material.update.extract.wikipedia',
             type: 'inproc',
             working_dir: './bolts',
             cmd: 'log-message-postgresql.js',
@@ -153,7 +153,7 @@ module.exports = {
               message_primary_id: 'material_id',
               postgres_method: 'update',
               postgres_literal_attrs: {
-                status: 'material wikified: 2/3 steps completed'
+                status: '[VIDEO] material wikified: 2/2 steps completed. Updating the material'
               },
               document_error_path: 'message'
             }
@@ -174,7 +174,7 @@ module.exports = {
       inputs: [
         {
           source: productionMode
-            ? 'log.material.process.extract.wikipedia'
+            ? 'log.material.update.extract.wikipedia'
             : 'extract.wikipedia'
         }
       ],
@@ -182,7 +182,68 @@ module.exports = {
         kafka_host: config.kafka.host,
         kafka_topic: 'UPDATE.MATERIAL.CONTENT'
       }
-    }
+    },
+
+
+    // LOGGING STATE OF MATERIAL PROCESS
+    ...(productionMode
+      ? [
+          {
+            name: 'log.material.update.error',
+            type: 'inproc',
+            working_dir: './bolts',
+            cmd: 'log-message-postgresql.js',
+            inputs: [
+              ...(productionMode
+                ? [
+                    {
+                      source: 'log.material.update.started',
+                      stream_id: 'stream_error'
+                    }
+                  ]
+                : []),
+              {
+                source: 'extract.video.ttp',
+                stream_id: 'stream_error'
+              },
+              ...(productionMode
+                ? [
+                    {
+                      source: 'log.material.update.extract.video.ttp',
+                      stream_id: 'stream_error'
+                    }
+                  ]
+                : []),
+              {
+                source: 'extract.wikipedia',
+                stream_id: 'stream_error'
+              },
+              ...(productionMode
+                ? [
+                    {
+                      source: 'log.material.update.extract.wikipedia',
+                      stream_id: 'stream_error'
+                    }
+                  ]
+                : []),
+            ],
+            init: {
+              pg: config.pg,
+              postgres_table: 'material_update_queue',
+              postgres_primary_id: 'material_id',
+              message_primary_id: 'material_id',
+              postgres_method: 'update',
+              postgres_message_attrs: {
+                status: 'message'
+              },
+              postgres_time_attrs: {
+                end_process_time: true
+              },
+              final_bolt: true
+            }
+          }
+        ]
+      : [])
   ],
   variables: {}
 };

@@ -53,7 +53,6 @@ class PGRecords {
         let self = this;
         self._pg.execute(self._sqlStatement, [], (error, records) => {
             if (error) { return; }
-            console.log(records.length);
             records.forEach(record => {
                 self._data.push(record);
             });

@@ -42,14 +42,6 @@ class StorePGMaterialUpdate {
     receive(message, stream_id, callback) {
         let self = this;
 
-        // update the material content records
-        return self._updateMaterialContent(message, callback);
-    }
-
-
-    _updateMaterialContent(message, callback) {
-        let self = this;
-
         const {
             material_id,
             language: origin_language,
@@ -60,9 +52,6 @@ class StorePGMaterialUpdate {
                 ttp_id
             }
         } = message;
-
-        console.log('\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/');
-        console.log(material_id);
 
         let tasks = [];
 
@@ -185,9 +174,7 @@ class StorePGMaterialUpdate {
         // RUN THE TASKS
         ///////////////////////////////////////////
 
-        console.log('\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\n');
         async.series(tasks, function (e) {
-            console.log(e);
             if (e) { return callback(null); }
             if (self._finalBolt) { return callback(); }
             return self._onEmit(message, stream_id, callback);

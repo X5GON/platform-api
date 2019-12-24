@@ -46,7 +46,7 @@ module.exports = {
                 start_process_time: true
               },
               postgres_literal_attrs: {
-                status: 'material processing started: 0/5 steps completed'
+                status: '[TEXT] material processing started: 0/5 steps completed. Transforming format'
               },
               document_error_path: 'message'
             }
@@ -109,7 +109,7 @@ module.exports = {
               postgres_method: 'update',
               postgres_literal_attrs: {
                 status:
-                  'material object schema transformed: 1/5 steps completed'
+                  '[TEXT] material object schema transformed: 1/5 steps completed. Extracting raw material content'
               },
               document_error_path: 'message'
             }
@@ -162,7 +162,7 @@ module.exports = {
               message_primary_id: 'material_url',
               postgres_method: 'update',
               postgres_literal_attrs: {
-                status: 'material content extracted: 2/5 steps completed'
+                status: '[TEXT] material content extracted: 2/5 steps completed. Retrieving translations'
               },
               document_error_path: 'message'
             }
@@ -217,7 +217,7 @@ module.exports = {
               message_primary_id: 'material_url',
               postgres_method: 'update',
               postgres_literal_attrs: {
-                status: 'material translations retrieved: 3/5 steps completed'
+                status: '[TEXT] material translations retrieved: 3/5 steps completed. Retrieving wikipedia concepts'
               },
               document_error_path: 'message'
             }
@@ -269,7 +269,7 @@ module.exports = {
               message_primary_id: 'material_url',
               postgres_method: 'update',
               postgres_literal_attrs: {
-                status: 'material wikified: 4/5 steps completed'
+                status: '[TEXT] material wikified: 4/5 steps completed. Validating material'
               },
               document_error_path: 'message'
             }
@@ -315,7 +315,7 @@ module.exports = {
               message_primary_id: 'material_url',
               postgres_method: 'update',
               postgres_literal_attrs: {
-                status: 'material validated: 5/5 steps completed'
+                status: '[TEXT] material validated: 5/5 steps completed. Storing the material'
               },
               document_error_path: 'message'
             }

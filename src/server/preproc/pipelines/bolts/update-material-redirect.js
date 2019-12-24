@@ -39,7 +39,7 @@ class UpdateRedirect {
 
         let date = new Date(retrieved_date);
         // check if the video and audio materials were retrieved before 2019-07-01
-        let limitDate = new Date("2019-07-01");
+        let limitDate = new Date("2019-08-01");
         if (mimetypes.video.includes(mimetype) && date < limitDate) {
             stream_id = "video";
         } else if (mimetypes.audio.includes(mimetype) && date < limitDate) {

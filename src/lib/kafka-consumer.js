@@ -59,6 +59,10 @@ class KafkaConsumer {
                 this.consumerGroup.pause();
             }
         });
+
+        this.consumerGroup.on('error', (error) => {
+            console.log(error);
+        });
     }
 
     /**
