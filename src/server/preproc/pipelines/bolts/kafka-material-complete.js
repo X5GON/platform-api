@@ -53,7 +53,13 @@ class KafkaMaterialComplete {
             retrieved_date,
             type,
             mimetype,
-            material_metadata,
+            material_metadata: {
+                wikipedia_concepts,
+                transcriptions,
+                raw_text,
+                metadata,
+                ttp_id
+            },
             provider: {
                 token: provider_token
             },
@@ -80,13 +86,13 @@ class KafkaMaterialComplete {
 
         let material_contents = [];
         // prepare list of material contents
-        if (material_metadata.transcriptions) {
-            let languages = Object.keys(material_metadata.transcriptions);
+        if (transcriptions) {
+            let languages = Object.keys(transcriptions);
             for (let language of languages) {
-                let extensions = Object.keys(material_metadata.transcriptions[language]);
+                let extensions = Object.keys(transcriptions[language]);
                 for (let extension of extensions) {
                     // get value of the language and extension
-                    const value = material_metadata.transcriptions[language][extension];
+                    const value = transcriptions[language][extension];
 
                     // define the type of the transcriptions
                     const type = language === origin_language ?
@@ -98,20 +104,20 @@ class KafkaMaterialComplete {
                         type,
                         extension,
                         value: { value },
-                        material_id: null
+                        material_id: null,
+                        last_updated: null
                     });
                 }
             }
-        } else if (material_metadata.raw_text) {
-            // get the raw text of the material
-            const value = material_metadata.raw_text;
+        } else if (raw_text) {
             // prepare the material content object
             material_contents.push({
                 language: origin_language,
                 type: 'transcription',
                 extension: 'plain',
-                value: { value },
-                material_id: null
+                value: { value: raw_text },
+                material_id: null,
+                last_updated: null
             });
         }
 
@@ -122,9 +128,10 @@ class KafkaMaterialComplete {
         // prepare of public feature - wikipedia concept
         let features_public = {
             name: 'wikipedia_concepts',
-            value: { value: material_metadata.wikipedia_concepts },
+            value: { value: wikipedia_concepts },
             re_required: true,
-            record_id: null
+            record_id: null,
+            last_updated: null
         };
 
         ///////////////////////////////////////////
@@ -142,7 +149,8 @@ class KafkaMaterialComplete {
                 type: type.toLowerCase(),
                 mimetype: mimetype.toLowerCase(),
                 license,
-                ...material_metadata.metadata && { metadata: material_metadata.metadata }
+                ttp_id,
+                ...metadata && { metadata }
             },
             material_contents,
             features_public,

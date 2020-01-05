@@ -1115,7 +1115,7 @@ const dbCreates = {
         COMMENT ON COLUMN ${schema}.admins.password
             IS 'The password of the admin';`,
 
-    material_process_pipeline:
+    material_process_queue:
         `CREATE TABLE ${schema}.material_process_pipeline (
             id           serial,
             url          varchar UNIQUE PRIMARY KEY,
@@ -1149,7 +1149,43 @@ const dbCreates = {
             IS 'The status of the process';
 
         COMMENT ON COLUMN ${schema}.material_process_pipeline.material_id
-            IS 'The id of the material it processed';`
+            IS 'The id of the material it processed';`,
+
+    material_update_queue:
+        `CREATE TABLE ${schema}.material_update_queue (
+            id                  serial,
+            start_process_time  timestamp with time zone DEFAULT (NOW() AT TIME ZONE 'utc'),
+            end_process_time    timestamp with time zone,
+            status              varchar NOT NULL DEFAULT 'in_queue',
+
+            material_id         integer UNIQUE PRIMARY KEY,
+
+            FOREIGN KEY (material_id) REFERENCES ${schema}.oer_materials(id) ON UPDATE CASCADE ON DELETE CASCADE
+        );
+
+        ALTER TABLE ${schema}.material_update_queue
+            OWNER TO ${config.pg.user};
+
+        CREATE INDEX material_update_queue_material_id
+            ON ${schema}.material_update_queue(material_id);
+
+        COMMENT ON TABLE ${schema}.material_update_queue
+            IS 'The database containing the material process information';
+
+        COMMENT ON COLUMN ${schema}.material_update_queue.id
+            IS 'The id of the material process';
+
+        COMMENT ON COLUMN ${schema}.material_update_queue.start_process_time
+            IS 'The start time of the material update process';
+
+        COMMENT ON COLUMN ${schema}.material_update_queue.end_process_time
+            IS 'The end time of the material update process';
+
+        COMMENT ON COLUMN ${schema}.material_update_queue.status
+            IS 'The status of the process';
+
+        COMMENT ON COLUMN ${schema}.material_update_queue.material_id
+            IS 'The id of the material it updated';`
 
 };
 
@@ -1198,6 +1234,47 @@ const dbUpdates = [{
     update: `
         ALTER TABLE ${schema}.oer_materials
         ADD COLUMN metadata jsonb;
+    `
+}, {
+    version: 6,
+    update: `
+        ALTER TABLE ${schema}.material_contents
+        ADD COLUMN last_updated timestamp with time zone;
+    `
+},  {
+    version: 7,
+    update: `
+        ALTER TABLE ${schema}.oer_materials
+        ADD COLUMN ttp_id varchar;
+    `
+}, {
+    version: 8,
+    update: `
+        ALTER TABLE ${schema}.features_public
+        ADD COLUMN last_updated timestamp with time zone;
+    `
+}, {
+    version: 9,
+    update: `
+        ALTER TABLE ${schema}.material_process_pipeline
+        RENAME TO material_process_queue;
+        ALTER TABLE ${schema}.material_process_queue
+        ADD COLUMN start_process_time timestamp with time zone,
+        ADD COLUMN end_process_time timestamp with time zone;
+        ALTER TABLE ${schema}.material_process_queue
+        RENAME COLUMN url TO material_url;
+    `
+}, {
+    version: 10,
+    update: `
+        ALTER TABLE ${schema}.material_process_queue
+        ALTER COLUMN status SET DEFAULT 'in_queue';
+    `
+}, {
+    version: 11,
+    update: `
+        ALTER TABLE ${schema}.material_process_queue
+        ADD COLUMN process_id varchar;
     `
 }];
 

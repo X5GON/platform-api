@@ -35,6 +35,7 @@ class KafkaConsumer {
             sessionTimeout: 15000,
             protocol: ['roundrobin'],
             fromOffset: 'latest',
+            fetchMaxBytes: 1024 * 2048,
             commitOffsetsOnFirstJoin: true,
             outOfRangeOffset: 'earliest',
             migrateHLC: false,
@@ -162,7 +163,8 @@ class KafkaSpout {
     }
 
     next(callback) {
-        callback(null, this._generator.next(), null, callback);
+        let message = this._generator.next();
+        callback(null, message, null, callback);
     }
 }
 

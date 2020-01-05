@@ -22,6 +22,8 @@ class StorePGMaterialPartial {
         // create the postgres connection
         this._pg = require('@library/postgresQL')(config.pg);
 
+        this._finalBolt = config.final_bolt || false;
+
         callback();
     }
 
@@ -31,9 +33,7 @@ class StorePGMaterialPartial {
 
     shutdown(callback) {
         // close connection to postgres database
-        this._pg.close();
-        // shutdown component
-        callback();
+        this._pg.close(callback);
     }
 
     receive(message, stream_id, callback) {
@@ -46,30 +46,9 @@ class StorePGMaterialPartial {
 
         self._pg.upsert(oer_materials_partial, { materialurl: null }, 'oer_materials_partial', (error, result) => {
             if (error) { return callback(error); }
-            return self._changeStatus(oer_materials_partial.materialurl, callback);
+            if (self._finalBolt) { return callback(); }
+            return this._onEmit(message, stream_id, callback);
         }); // self._pg.insert(oer_materials_partial)
-    }
-
-    /**
-     * Changes the status of the material process.
-     * @param {Object} url - The material url.
-     * @param {Function} callback - THe final callback function.
-     */
-    _changeStatus(url, callback) {
-
-        if (!this._productionModeFlag) {
-            // trigger the callback function
-            return callback();
-        }
-
-        return this._pg.update(
-            { status: 'material error when processing. See oer_materials_partial table or log files' },
-            { url },
-            'material_process_pipeline', () => {
-                // trigger the callback function
-                return callback();
-            }
-        );
     }
 }
 

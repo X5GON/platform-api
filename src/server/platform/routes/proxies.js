@@ -24,16 +24,16 @@ module.exports = function (app, config) {
     //     }
     // }));
 
-    // redirect to the quality assurance service
-    app.use('/api/v1/qa', proxy('/api/v1/qa', {
-        target: `http://127.0.0.1:${config.quality.port}`,
-        pathRewrite: {
-            '^/api/v1/qa': '/api/v1/qa'
-        },
-        logProvider: function (provider) {
-            // create logger for sending requests
-            return Logger.createInstance(`proxy`, 'info', 'platform', config.environment !== 'prod');
-        }
-    }));
+    // // redirect to the Recommendation System route
+    // app.use('/api/v1/qa', proxy('/api/v1/qa', {
+    //     target: `http://127.0.0.1:${config.quality.port}`,
+    //     pathRewrite: {
+    //         '^/api/v1/qa': '/api/v1/qa'
+    //     },
+    //     logProvider: function (provider) {
+    //         // create logger for sending requests
+    //         return Logger.createInstance(`proxy`, 'info', 'platform', config.environment !== 'prod');
+    //     }
+    // }));
 
 };

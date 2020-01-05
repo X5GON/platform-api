@@ -78,7 +78,7 @@ class VideolecturesAPI extends BasicRESTAPI {
                             // check if the material is already in the database
                             oer_materials.push(new Promise((resolve, reject) => {
 
-                                self._pg.select({ url: oer_material.materialurl }, 'material_process_pipeline', (xerror, results) => {
+                                self._pg.select({ url: oer_material.materialurl }, 'material_process_queue', (xerror, results) => {
                                     if (xerror) { return reject(xerror); }
                                     if (results.length === 0) {
                                         // the material is not in the database yet

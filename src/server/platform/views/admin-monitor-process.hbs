@@ -75,7 +75,7 @@
                   {{process.pm2_env.unstable_restarts}}
                 </td>
                 <td class="text-center align-middle">
-                  {{#if (isNotEqual process.name 'X5GON_PLATFORM')}}
+                  {{#if (isNotEqual process.name 'X5GON.PLATFORM')}}
                     {{#if (isEqual process.pm2_env.status 'online')}}
                       <button type="button" class="btn btn-danger btn-sm"
                         data-action="disable"
@@ -106,4 +106,3 @@
 
 <script src="/js/admin-process-monitor-socket.js"></script>
 <script src="/js/admin-process-monitor-actions.js"></script>
-
