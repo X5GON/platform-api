@@ -35,6 +35,7 @@ class KafkaConsumer {
             sessionTimeout: 15000,
             protocol: ['roundrobin'],
             fromOffset: 'latest',
+            fetchMaxBytes: 1024 * 2048,
             commitOffsetsOnFirstJoin: true,
             outOfRangeOffset: 'earliest',
             migrateHLC: false,
@@ -58,10 +59,6 @@ class KafkaConsumer {
                 this._highWaterClearing = true;
                 this.consumerGroup.pause();
             }
-        });
-
-        this.consumerGroup.on('error', (error) => {
-            console.log(error);
         });
     }
 
