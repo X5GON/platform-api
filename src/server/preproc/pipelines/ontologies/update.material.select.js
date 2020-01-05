@@ -69,7 +69,7 @@ module.exports = {
           )
           AND material_id NOT IN (SELECT material_id FROM material_update_queue)
           ORDER BY u_count DESC
-          LIMIT 1;
+          LIMIT 2500;
         `, // TODO: add the SQL statement for checking if the material is already in the queue
         // repeat every one day
         time_interval: 1 * 24 * 60 * 60 * 1000
