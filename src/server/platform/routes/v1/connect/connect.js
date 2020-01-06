@@ -99,7 +99,7 @@ module.exports = function (logger, config) {
      * The route used for on-premise Connect service integration.
      * @param {String} callbackURL - The URL used to return to the website.
      */
-    router.get('/snippet/tracker', (req, res) => {
+    router.get('/snippet/tracker', cors(), (req, res) => {
         // TODO: validate the parameters
 
         // get query parameters
@@ -117,7 +117,7 @@ module.exports = function (logger, config) {
      * Decides to which route to direct the request.
      * @param {String} test - The string/boolean if the request was done for testing or not.
      */
-    router.get('/snippet/log', (req, res) => {
+    router.get('/snippet/log', cors(), (req, res) => {
         // check and convert to boolean
         const testing = req.query.test === 'true' || false;
         if (testing) {
@@ -139,7 +139,7 @@ module.exports = function (logger, config) {
     /**
      * Returns beacon for testing/development case.
      */
-    router.get('/snippet/log/development', (req, res) => {
+    router.get('/snippet/log/development', cors(), (req, res) => {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, '../../../snippet/images/beacon.png');
         // get the options - snippet status headers
@@ -152,7 +152,7 @@ module.exports = function (logger, config) {
     /**
      * Returns the beacon for the production case.
      */
-    router.get(['/connect/visit', '/snippet/log/production'], (req, res) => {
+    router.get(['/connect/visit', '/snippet/log/production'], cors(), (req, res) => {
 
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, '../../../snippet/images/beacon.png');
@@ -236,7 +236,7 @@ module.exports = function (logger, config) {
     /**
      * Handles the video activities in the video.
      */
-    router.get(['/connect/video', '/snippet/log/video'], (req, res) => {
+    router.get(['/connect/video', '/snippet/log/video'], cors(), (req, res) => {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, '../../../snippet/images/beacon.png');
         // get the options - snippet status headers
