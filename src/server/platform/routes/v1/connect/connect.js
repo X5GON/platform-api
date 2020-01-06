@@ -69,7 +69,7 @@ module.exports = function (logger, config) {
         const validation = validator.validateSchema(userParameters, validator.schemas.userActivitySchema);
 
         // validate query schema
-        if (!Object.keys(userParameters).length || !validation.matching) {
+        if (!Object.keys(userParameters).length || !validation.isValid) {
             options.headers['x-snippet-status'] = 'failure';
             // TODO: add a good description of what went wrong
             options.headers['x-snippet-message'] = 'check if all parameters are set and if the date-time is in the correct format';
@@ -161,7 +161,7 @@ module.exports = function (logger, config) {
         // the user parameters object is either empty or is not in correct schema
         const provider = userParameters.cid ? userParameters.cid : 'unknown';
         // validate query schema
-        if (!validation.matching) {
+        if (!validation.isValid) {
             // log user parameters error
             logger.error('[error] client activity logging not in correct format',
                 logger.formatRequest(req, {

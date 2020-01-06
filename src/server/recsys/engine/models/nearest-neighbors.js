@@ -232,7 +232,7 @@ class NearestNeighbors {
                 // the threshold is larger than the similarity vector
                 maxCount = sort.perm.length;
             }
-            console.log("Max count: ", maxCount);
+
             for (let i = 0; i < sort.perm.length; i++) {
                 // get content id of (i+1)-th most similar content
                 let maxid = sort.perm[i];
