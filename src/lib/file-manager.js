@@ -42,7 +42,8 @@ exports.moveFile = function(oldPath, newPath) {
  */
 exports.removeFolder = function (sourcePath) {
     if (!fs.existsSync(sourcePath)) {
-        throw Error(`Folder does not exist: ${sourcePath}`);
+        console.log(`Folder does not exist: ${sourcePath}`);
+        return;
     }
 
     let source = path.resolve(sourcePath);
@@ -166,6 +167,3 @@ exports.getFileContent = function (filePath) {
     // read the file and return it's content
     return fs.readFileSync(filePath, 'utf8');
 };
-
-
-
