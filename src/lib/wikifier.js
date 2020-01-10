@@ -244,6 +244,9 @@ class Wikifier {
 
         // merge concepts with matching uri
         for (let conceptsBundle of concepts) {
+            if (!(typeof obj[Symbol.iterator] === 'function')) {
+                continue;
+            }
             for (let concept of conceptsBundle) {
                 if (conceptMapping[concept.uri]) {
                     // concept exists in mapping - add weighted pageRank
