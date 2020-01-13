@@ -244,7 +244,7 @@ class Wikifier {
 
         // merge concepts with matching uri
         for (let conceptsBundle of concepts) {
-            if (!(typeof conceptsBundle[Symbol.iterator] === 'function')) {
+            if (typeof conceptsBundle[Symbol.iterator] !== 'function') {
                 continue;
             }
             for (let concept of conceptsBundle) {
