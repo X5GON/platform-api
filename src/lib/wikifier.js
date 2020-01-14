@@ -51,10 +51,10 @@ class Wikifier {
 
                 // merge the returned wikipedia concepts
                 const wikipedia = self._mergeWikipediaConcepts(concepts);
-                const language = self._getDominantLanguage(wikipedia);
+                // const language = self._getDominantLanguage(wikipedia);
 
                 // return the statistics
-                return resolve({ wikipedia, language });
+                return resolve({ wikipedia, /* language */ });
             });
         });
         // return the promise of the wikipedia concepts
