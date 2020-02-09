@@ -384,6 +384,7 @@ class x5recommend {
         }
 
         const {
+            material_id,
             url,
             text,
             type,
@@ -391,7 +392,7 @@ class x5recommend {
         } = userQuery;
 
         // if none of the parameters are provided
-        if (!url && !text) {
+        if (!material_id && !url && !text) {
             // log the error for unsupported parameters
             let errorMessage = 'Unsupported recommendation parameters';
             self.logger.error('[error] x5recommend.recommendMaterials', {
@@ -409,7 +410,15 @@ class x5recommend {
 
         const maxCount = count ? count : 20;
 
-        if (url && (self.content.recordByName(url) || !text)) {
+        if (material_id) {
+            // decide on the model
+            model = type === 'support' ?
+                self.contentWikiSupportNN :
+                self.contentWikiNN;
+            // setup the query
+            query = { material_id, type };
+            recommendations = model.search(query, maxCount, 100, 10);
+        } else if (url && (self.content.recordByName(url) || !text)) {
             // decide on the model
             model = type === 'support' ?
                 self.contentWikiSupportNN :

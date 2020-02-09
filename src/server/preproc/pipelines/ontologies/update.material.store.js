@@ -38,6 +38,53 @@ module.exports = {
       ],
       init: {
         pg: config.pg,
+      }
+    },
+
+    // LOGGING STATE OF MATERIAL PROCESS
+    ...(productionMode
+      ? [
+          {
+            name: 'log.material.process.update.stored',
+            type: 'inproc',
+            working_dir: './bolts',
+            cmd: 'log-message-postgresql.js',
+            inputs: [
+              {
+                source: 'store.pg.material.update'
+              }
+            ],
+            init: {
+              pg: config.pg,
+              postgres_table: 'material_process_queue',
+              postgres_primary_id: 'material_url',
+              message_primary_id: 'material_url',
+              postgres_method: 'update',
+              postgres_literal_attrs: {
+                status:
+                  '[STORE] material stored inside the database. Updating the search index'
+              },
+              document_error_path: 'message'
+            }
+          }
+        ]
+      : []),
+
+    // update elasticsearch index
+    {
+      name: 'store.pg.material.elasticsearch',
+      type: 'inproc',
+      working_dir: './bolts',
+      cmd: 'es-patch-material.js',
+      inputs: [
+        {
+          source: productionMode
+            ? 'log.material.process.update.stored'
+            : 'store.pg.material.update'
+        }
+      ],
+      init: {
+        search_url: `http://localhost:${config.search.port}/api/v1/oer_materials`,
         final_bolt: !productionMode
       }
     },
@@ -52,7 +99,7 @@ module.exports = {
             cmd: 'log-message-postgresql.js',
             inputs: [
               {
-                source: 'store.pg.material.update'
+                source: 'store.pg.material.elasticsearch'
               }
             ],
             init: {

@@ -71,6 +71,8 @@ class StorePGMaterialUpdate {
         // SAVE MATERIAL CONTENTS
         ///////////////////////////////////////////
 
+        message.new_date = (new Date()).toISOString();
+
         // set the material contents
         let material_contents = [];
         // prepare list of material contents
@@ -91,7 +93,7 @@ class StorePGMaterialUpdate {
                         extension,
                         value: { value },
                         material_id,
-                        last_updated: (new Date()).toISOString()
+                        last_updated: message.new_date
                     });
                 }
             }
@@ -103,7 +105,7 @@ class StorePGMaterialUpdate {
                 extension: 'plain',
                 value: { value: raw_text },
                 material_id,
-                last_updated: (new Date()).toISOString()
+                last_updated: message.new_date
             });
         }
 
@@ -129,7 +131,7 @@ class StorePGMaterialUpdate {
             re_required: true,
             record_id: material_id,
             table_name: 'oer_materials',
-            last_updated: (new Date()).toISOString()
+            last_updated: message.new_date
         }
 
         tasks.push(function (xcallback) {
@@ -160,7 +162,7 @@ class StorePGMaterialUpdate {
         // add the task of pushing material contents
         tasks.push(function (xcallback) {
             const material_update = {
-                retrieved_date: (new Date()).toISOString(),
+                retrieved_date: message.new_date,
                 ttp_id
             };
             self._pg.update(material_update, { id: material_id }, "oer_materials", function (e) {

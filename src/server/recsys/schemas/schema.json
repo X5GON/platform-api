@@ -14,12 +14,15 @@
         { "name": "wikipediaConceptNames", "type": "string_v", "null": true },
         { "name": "wikipediaConceptSupport", "type": "float_v", "null": true },
         { "name": "wikipediaConceptCosine", "type": "float_v", "null": true },
-        { "name": "materialId", "type": "string"}
+        { "name": "materialId", "type": "string" }
     ],
     "joins": [
         { "name": "predecessor", "type": "field", "store": "Content", "inverse": "successor" },
         { "name": "successor", "type": "field", "store": "Content", "inverse": "predecessor" },
         { "name": "wasVisited", "type": "index", "store": "Activity", "inverse": "content" }
+    ],
+    "keys": [
+        { "field": "materialId", "type": "value" }
     ]
 }, {
     "name": "MaterialModel",

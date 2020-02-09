@@ -184,6 +184,13 @@ class NearestNeighbors {
                     wikipediaConceptSupport
                 });
 
+            } else if (query.material_id) {
+                // get material by url
+                const records = self.params.base.search({
+                    "$from": "Content",
+                    "materialId": query.material_id
+                });
+                queryRec = records.length ? records[0] : store.newRecord({ description: "" })
             } else if (query.url && store.recordByName(query.url)) {
                 // get material by url
                 queryRec = store.recordByName(query.url);
@@ -241,8 +248,9 @@ class NearestNeighbors {
 
                 // skip the most similar documents
                 if (sim[maxid] > maxSim) { continue; }
+
                 // skip the record used to find recommendations
-                if (query.url && maxid === queryRec.$id) { continue; }
+                if ((query.material_id || query.url) && maxid === queryRec.$id) { continue; }
 
                 // check if the similarity is close to an existing one
                 let toSimilar = false;
