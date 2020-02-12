@@ -1,15 +1,16 @@
 {
     "apps": [{
-        "name": "X5GON Platform",
-        "script": "platform.js",
-        "cwd": "./src/services/platform/",
+        "name": "X5GON Update Material Text",
+        "script": "pipeline.js",
+        "cwd": "./pipelines/",
+        "args": "-tn uuid.update.material.text -tp ./ontologies/update.material.text",
         "env": {
             "NODE_ENV": "dev"
         },
         "env_production": {
             "NODE_ENV": "prod"
         },
-        "instances": "1",
+        "instances": "5",
         "exec_mode": "cluster",
         "autorestart": true,
         "max_restarts": 20

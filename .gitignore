@@ -85,8 +85,10 @@ tmp
 *.pyc
 
 # temporary ignore visualizations
-src/server/visualizations
+src/services/visualizations
 development
 
 # ignore minified files
-src/server/**/*.min.js
+src/services/**/*.min.js
+
+docker/*.yml

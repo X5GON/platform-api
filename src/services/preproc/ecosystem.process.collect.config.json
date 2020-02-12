@@ -1,8 +1,8 @@
 {
     "apps": [{
-        "name": "X5GON Recommender Engine",
-        "script": "recsys.js",
-        "cwd": "./src/services/recsys/",
+        "name": "X5GON Process Material Collector",
+        "script": "material-collector.js",
+        "cwd": ".",
         "env": {
             "NODE_ENV": "dev"
         },
@@ -12,6 +12,6 @@
         "instances": "1",
         "exec_mode": "cluster",
         "autorestart": true,
-        "max_restarts": 10
+        "max_restarts": 20
     }]
 }

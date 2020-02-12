@@ -4,23 +4,16 @@
   "description": "Connecting OER repositories",
   "main": "index.js",
   "scripts": {
-    "postinstall": "npm run minify:snippet && git checkout -- src/lib/textract && npm run install:textract && npm audit fix",
-    "start": "npm run pm2:platform && npm run pm2:recsys && npm run pm2:preproc",
-    "start-dev": "npm run pm2:platform-dev && npm run pm2:recsys-dev && npm run pm2:preproc-dev",
+    "postinstall": "npm run minify:snippet && git checkout -- src/library/textract && npm run install:textract && npm audit fix",
+    "start": "cd scripts && sh start.sh",
     "postgres:create": "cd src/load && node -e 'require(`./create-postgres-database`).startDBCreate();'",
-    "minify:snippet": "cd src/server/platform/scripts && node minify-snippet.js",
-    "install:textract": "cd src/lib/textract && npm install && npm audit fix",
-    "react:start": "cd src/server/platform/frontend && npm start",
-    "react:build": "cd src/server/platform/frontend && npm run-script build",
+    "minify:snippet": "cd src/services/platform/scripts && node minify-snippet.js",
+    "install:textract": "cd src/library/textract && npm install && npm audit fix",
+    "react:start": "cd src/services/platform/frontend && npm start",
+    "react:build": "cd src/services/platform/frontend && npm run-script build",
     "test": "cd src/test && NODE_ENV=test mocha all.js",
-    "test:lib": "cd src/test/lib && NODE_ENV=test mocha *.js",
-    "test:recsys": "cd src/server/recsys/test && NODE_ENV=test mocha *.js",
-    "pm2:platform": "pm2 reload ecosystem.platform.config.json --env production",
-    "pm2:recsys": "pm2 reload ecosystem.recsys.config.json --env production",
-    "pm2:preproc": "cd src/server/preproc && pm2 reload ecosystem.collect.config.json --env production && pm2 reload ecosystem.process.text.config.json --env production && pm2 reload ecosystem.process.video.config.json --env production && pm2 reload ecosystem.store.config.json --env production",
-    "pm2:platform-dev": "pm2 reload ecosystem.platform.config.json",
-    "pm2:recsys-dev": "pm2 reload ecosystem.recsys.config.json",
-    "pm2:preproc-dev": "cd src/server/preproc && pm2 reload ecosystem.collect.config.json && pm2 reload ecosystem.process.text.config.json && pm2 reload ecosystem.process.video.config.json && pm2 reload ecosystem.store.config.json"
+    "test:library": "cd src/test/library && NODE_ENV=test mocha *.js",
+    "test:recsys": "cd src/services/recsys/test && NODE_ENV=test mocha *.js"
   },
   "repository": {
     "type": "git",
@@ -46,7 +39,7 @@
     "express-session": "^1.15.6",
     "file-type": "^8.0.0",
     "gatsby-plugin-express": "^1.1.6",
-    "handlebars": "^4.5.1",
+    "handlebars": "^4.7.3",
     "handlebars-helper-sri": "0.0.0",
     "http-proxy-middleware": "^0.18.0",
     "jsonschema": "^1.2.2",
@@ -77,9 +70,9 @@
     "ua-parser-js": "^0.7.18"
   },
   "_moduleAliases": {
-    "@library": "src/lib",
+    "@library": "src/library",
     "@config": "src/config",
-    "@platform_schemas": "src/server/platform/schemas",
-    "@recsys_schemas": "src/server/recsys/schemas"
+    "@platform_schemas": "src/services/platform/schemas",
+    "@recsys_schemas": "src/services/recsys/schemas"
   }
 }
