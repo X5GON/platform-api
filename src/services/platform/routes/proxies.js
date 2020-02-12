@@ -1,5 +1,6 @@
 // create proxy for api calls
 const proxy = require('http-proxy-middleware');
+const cors = require('cors');
 
 // logger for proxying requests
 const Logger = require('@library/logger');
@@ -19,7 +20,7 @@ module.exports = function (app, config) {
     app.use([
         '/api/v1/search',
         '/api/v1/recommend/oer_materials'
-    ], proxy({
+    ], cors(), proxy({
         target: `http://127.0.0.1:${config.search.port}`,
         pathRewrite: {
             "^/api/v1/search": "/api/v1/oer_materials",
