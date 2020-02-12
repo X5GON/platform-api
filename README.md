@@ -16,11 +16,11 @@ project.
 The repositories contains the following components:
 
 - **Platform baseline.** Sets up the service which connects all other
-  components. Link: [src/server/platform](./src/server/platform)
+  components. Link: [src/services/platform](./src/services/platform)
 - **Recommender engine.** The service providing material and user
-  recommendations. Link: [src/server/recsys](./src/server/recsys)
+  recommendations. Link: [src/services/recsys](./src/services/recsys)
 - **Material processing pipeline.** A service for retrieving and processing
-  OER materials. Link: [src/server/preproc](./src/server/preproc)
+  OER materials. Link: [src/services/preproc](./src/services/preproc)
 
 ## Prerequisites
 

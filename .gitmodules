@@ -1,6 +1,6 @@
-[submodule "src/server/platform/frontend"]
+[submodule "src/services/platform/frontend"]
 	path = src/services/platform/frontend
 	url = https://github.com/gregpr07/x5gon-gatsby.git
-[submodule "src/server/search"]
+[submodule "src/services/search"]
 	path = src/services/search
 	url = https://github.com/ErikNovak/X5GON-elasticsearch-microservice.git

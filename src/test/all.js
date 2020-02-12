@@ -4,5 +4,5 @@ require('./lib/logger-tests');
 require('./lib/postgresQL-tests');
 
 // recommender system unit tests
-require('../server/recsys/test/recommender-tests');
-require('../server/recsys/test/server-tests');
+require('../services/recsys/test/recommender-tests');
+require('../services/recsys/test/server-tests');
