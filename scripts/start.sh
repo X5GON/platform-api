@@ -56,10 +56,10 @@ pm2 reload ecosystem.process.text.config.json    --env production
 pm2 reload ecosystem.process.video.config.json   --env production
 pm2 reload ecosystem.process.store.config.json   --env production
 
-#pm2 reload ecosystem.update.collect.config.json --env production
-#pm2 reload ecosystem.update.text.config.json    --env production
-#pm2 reload ecosystem.update.video.config.json   --env production
-#pm2 reload ecosystem.update.store.config.json   --env production
+pm2 reload ecosystem.update.collect.config.json --env production
+pm2 reload ecosystem.update.text.config.json    --env production
+pm2 reload ecosystem.update.video.config.json   --env production
+pm2 reload ecosystem.update.store.config.json   --env production
 
 cd ../../..
 
