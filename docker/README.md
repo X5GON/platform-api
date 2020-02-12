@@ -3,7 +3,7 @@ This folder contains the configuration file for running docker images - more pre
 
 ## Preliminaries
 - docker v18 or higher, docker-compose v1.23 or higher
-- the docker-compose.yml file in this folder (see bellow for file schema)
+- the `docker-compose.yml` file in this folder (see bellow for file schema)
 
 ## Running docker
 
@@ -11,6 +11,7 @@ To initialize KAFKA using docker execute the following command
 ```bash
 sudo docker-compose up -d
 ```
+
 
 To check if the kafka service has been successfully initialized, run the following command:
 ```bash
@@ -24,6 +25,20 @@ ef8613361a00  wurstmeister/zookeeper  "/bin/sh -c '/usr/sb...'"  2 hours ago  Up
 To stop KAFKA execute the following command
 ```bash
 sudo docker-compose down
+```
+
+## Reloading docker containers
+If there are changes done in the `docker-compose.yml` file one will need to reload the docker containers with the new configurations. To do this, execute:
+
+```bash
+sudo docker-compose down
+sudo docker-compose up -d
+```
+
+To also check if there are new or updated docker images one will need to run a series of commands. These are all available in the `run-docker.sh` file and can be easily executed with:
+
+```bash
+sh run-docker.sh
 ```
 
 
