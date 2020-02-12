@@ -1,6 +1,6 @@
 {
     "apps": [{
-        "name": "UPDATE_MATERIAL_VIDEO",
+        "name": "X5GON Update Material Video",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
         "args": "-tn uuid.update.material.video -tp ./ontologies/update.material.video",

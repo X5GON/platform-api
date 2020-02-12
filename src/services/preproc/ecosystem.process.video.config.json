@@ -1,6 +1,6 @@
 {
     "apps": [{
-        "name": "PROCESS.MATERIAL.VIDEO",
+        "name": "X5GON Process Material Video",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
         "args": "-tn uuid.process.material.video -tp ./ontologies/process.material.video",

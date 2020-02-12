@@ -1,6 +1,6 @@
 {
     "apps": [{
-        "name": "UPDATE.MATERIAL.STORE",
+        "name": "X5GON Update Material Store",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
         "args": "-tn uuid.update.material.store -tp ./ontologies/update.material.store",

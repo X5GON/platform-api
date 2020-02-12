@@ -1,6 +1,6 @@
 {
     "apps": [{
-        "name": "PROCESSING.MATERIAL.COLLECTOR",
+        "name": "X5GON Process Material Collector",
         "script": "material-collector.js",
         "cwd": ".",
         "env": {

@@ -1,6 +1,6 @@
 {
     "apps": [{
-        "name": "PROCESS.MATERIAL.TEXT",
+        "name": "X5GON Process Material Text",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
         "args": "-tn uuid.process.material.text -tp ./ontologies/process.material.text",

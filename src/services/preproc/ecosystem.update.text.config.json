@@ -1,6 +1,6 @@
 {
     "apps": [{
-        "name": "UPDATE_MATERIAL_TEXT",
+        "name": "X5GON Update Material Text",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
         "args": "-tn uuid.update.material.text -tp ./ontologies/update.material.text",

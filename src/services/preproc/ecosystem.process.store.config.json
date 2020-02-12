@@ -1,6 +1,6 @@
 {
     "apps": [{
-        "name": "STORE.MATERIAL.COMPLETE",
+        "name": "X5GON Material Store Complete",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
         "args": "-tn uuid.store.material.complete -tp ./ontologies/store.material.complete",
@@ -15,7 +15,7 @@
         "autorestart": true,
         "max_restarts": 20
     }, {
-        "name": "STORE.MATERIAL.PARTIAL",
+        "name": "X5GON Material Store Partial",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
         "args": "-tn uuid.store.material.partial -tp ./ontologies/store.material.partial",
@@ -30,7 +30,7 @@
         "autorestart": true,
         "max_restarts": 20
     }, {
-        "name": "STORE.USERACTIVITY.CONNECT",
+        "name": "X5GON User Activity Store Connect",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
         "args": "-tn uuid.store.user-activities -tp ./ontologies/store.user-activities",
@@ -45,7 +45,7 @@
         "autorestart": true,
         "max_restarts": 20
     }, {
-        "name": "STORE.RECSYS.TRANSITIONS",
+        "name": "X5GON Recommender Engine Store Transition",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
         "args": "-tn uuid.store.recsys.transitions -tp ./ontologies/store.recsys.transitions",
@@ -60,7 +60,7 @@
         "autorestart": true,
         "max_restarts": 20
     }, {
-        "name": "STORE.PROVIDERS",
+        "name": "X5GON Provider Store",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
         "args": "-tn uuid.store.providers -tp ./ontologies/store.providers",

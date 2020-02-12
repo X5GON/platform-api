@@ -1,8 +1,8 @@
 {
     "apps": [{
-        "name": "X5GON.RECSYS",
+        "name": "X5GON Recommender Engine",
         "script": "recsys.js",
-        "cwd": "./src/server/recsys/",
+        "cwd": "./src/services/recsys/",
         "env": {
             "NODE_ENV": "dev"
         },
