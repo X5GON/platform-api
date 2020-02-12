@@ -188,7 +188,7 @@ module.exports = function (pg, logger, config) {
                                 return res.redirect(`${referrer}?unsuccessful=true`);
                             }
                             // redirect activity to information retrievers
-                            producer.send('STORING.PROVIDERS', { name, domain, contact, token });
+                            producer.send('STORE_PROVIDER', { name, domain, contact, token });
                             // render the form submition
                             return res.redirect(`/oer_provider?repositoryToken=${token}`);
                         });

@@ -14,7 +14,7 @@ module.exports = {
       cmd: 'kafka-spout.js',
       init: {
         kafka_host: config.kafka.host,
-        topic: 'STORING.USERACTIVITY.VISIT',
+        topic: 'STORE_USERACTIVITY_VISIT',
         groupId: config.kafka.groupId
       }
     },
@@ -25,7 +25,7 @@ module.exports = {
       cmd: 'kafka-spout.js',
       init: {
         kafka_host: config.kafka.host,
-        topic: 'STORING.USERACTIVITY.VIDEO',
+        topic: 'STORE_USERACTIVITY_VIDEO',
         groupId: config.kafka.groupId
       }
     }

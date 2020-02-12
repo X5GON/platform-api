@@ -105,7 +105,7 @@ module.exports = function (logger, config) {
         const recommended_urls = rec_urls ? rec_urls.split(',') : [];
 
         // send the message to the kafka topic
-        producer.send('STORING.RECSYS.TRANSITIONS', {
+        producer.send('STORE_RECSYS_TRANSITION', {
             from, to, selected_position, recommended_urls, uuid
         });
 

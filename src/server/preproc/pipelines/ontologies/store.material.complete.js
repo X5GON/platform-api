@@ -16,7 +16,7 @@ module.exports = {
       cmd: 'kafka-spout.js',
       init: {
         kafka_host: config.kafka.host,
-        topic: 'STORING.MATERIAL.COMPLETE',
+        topic: 'STORE_MATERIAL_COMPLETE',
         groupId: config.kafka.groupId
       }
     }

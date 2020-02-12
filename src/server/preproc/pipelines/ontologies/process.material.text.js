@@ -17,7 +17,7 @@ module.exports = {
       cmd: 'kafka-spout.js',
       init: {
         kafka_host: config.kafka.host,
-        topic: 'PROCESSING.MATERIAL.TEXT',
+        topic: 'PREPROC_MATERIAL_TEXT',
         groupId: config.kafka.groupId
       }
     }
@@ -342,7 +342,7 @@ module.exports = {
       ],
       init: {
         kafka_host: config.kafka.host,
-        kafka_topic: 'STORING.MATERIAL.COMPLETE'
+        kafka_topic: 'STORE_MATERIAL_COMPLETE'
       }
     },
 
@@ -480,7 +480,7 @@ module.exports = {
       ],
       init: {
         kafka_host: config.kafka.host,
-        kafka_topic: 'STORING.MATERIAL.PARTIAL'
+        kafka_topic: 'STORE_MATERIAL_PARTIAL'
       }
     }
   ],

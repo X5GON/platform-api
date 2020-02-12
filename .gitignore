@@ -90,3 +90,5 @@ development
 
 # ignore minified files
 src/server/**/*.min.js
+
+docker/*.yml

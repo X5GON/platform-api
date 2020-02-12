@@ -22,8 +22,8 @@ module.exports = function (pg, logger, config) {
     // initialize kafka producer
     const producer = new KafkaProducer(config.kafka.host);
     // define topic names
-    const text_topic  = 'PROCESSING.MATERIAL.TEXT';
-    const video_topic = 'PROCESSING.MATERIAL.VIDEO';
+    const text_topic  = 'PREPROC_MATERIAL_TEXT';
+    const video_topic = 'PREPROC_MATERIAL_VIDEO';
 
 
     /**********************************

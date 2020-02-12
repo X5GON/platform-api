@@ -69,11 +69,11 @@ function _sendToKafka(material) {
     }
 
     let topic = material.type.mime && material.type.mime.includes('video') || material.type.mime.includes('audio') ?
-        'PROCESSING.MATERIAL.VIDEO' : (material.type.mime && material.type.mime.includes('image') ?
-        'STORING.MATERIAL.PARTIAL' : 'PROCESSING.MATERIAL.TEXT');
+        'PREPROC_MATERIAL_VIDEO' : (material.type.mime && material.type.mime.includes('image') ?
+        'STORE_MATERIAL_PARTIAL' : 'PREPROC_MATERIAL_TEXT');
 
     let message = {};
-    if (topic === 'STORING.MATERIAL.PARTIAL') {
+    if (topic === 'STORE_MATERIAL_PARTIAL') {
         delete material.author;
         material.message = '[XML-PARSER] Unsupported material type';
         message = {

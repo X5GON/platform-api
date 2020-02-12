@@ -2,13 +2,14 @@
 This folder contains the configuration file for running docker images - more precisely the [docker-kafka](https://wurstmeister.github.io/kafka-docker/).
 
 ## Preliminaries
-docker v18 or higher, docker-compose v1.23 or higher
+- docker v18 or higher, docker-compose v1.23 or higher
+- the docker-compose.yml file in this folder (see bellow for file schema)
 
-## Running docker 
+## Running docker
 
 To initialize KAFKA using docker execute the following command
 ```bash
-sudo IP="machine-network-id" docker-compose up -d
+sudo docker-compose up -d
 ```
 
 To check if the kafka service has been successfully initialized, run the following command:
@@ -22,16 +23,15 @@ ef8613361a00  wurstmeister/zookeeper  "/bin/sh -c '/usr/sb...'"  2 hours ago  Up
 
 To stop KAFKA execute the following command
 ```bash
-sudo docker-compose down -d
+sudo docker-compose down
 ```
 
 
-
 ## docker-compose.yml
-The docker-compose file contains the configurations for running the kafka service. It initializes two services - kafka and zookeeper. The configuration enables connecting the platfrom with the kafka service.
+The docker-compose file contains the configurations for running the kafka service. It initializes two services - kafka and zookeeper. The configuration enables connecting the platfrom with the kafka service. Create this file and insert the appropriate values in the `${parts}` of the file.
 
 ```docker
-version: '2'
+version: '3'
 services:
   zookeeper:
     image: wurstmeister/zookeeper
@@ -44,19 +44,29 @@ services:
     ports:
       - "9092:9092"
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: ${IP}
+      KAFKA_ADVERTISED_HOST_NAME: ${insert-machine-local-ip}
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'false'
+      KAFKA_REPLICA_FETCH_MAX_BYTES: 15000000
+      KAFKA_MESSAGE_MAX_BYTES: 20000000
+
       KAFKA_CREATE_TOPICS_SEPARATOR: "$$'\n'"
       KAFKA_CREATE_TOPICS: |
-        PROCESSING.MATERIAL.VIDEO:3:1
-        PROCESSING.MATERIAL.TEXT:5:1
-        STORING.MATERIAL.COMPLETE:5:1
-        STORING.MATERIAL.PARTIAL:3:1
-        STORING.RECSYS.TRANSITIONS:3:1
-        STORING.RECSYS.SELECTIONS:3:1
-        STORING.USERACTIVITY.VISIT:3:1
-        STORING.USERACTIVITY.VIDEO:3:1
-        STORING.PROVIDERS:2:1
+        PREPROC_MATERIAL_TEXT:5:1
+        PREPROC_MATERIAL_VIDEO:3:1
+        UPDATE_MATERIAL_TEXT:5:1
+        UPDATE_MATERIAL_VIDEO:4:1
+        UPDATE_MATERIAL_CONTENT:2:1
+        STORE_MATERIAL_CONTENT:2:1
+        STORE_MATERIAL_COMPLETE:5:1
+        STORE_MATERIAL_PARTIAL:3:1
+        STORE_RECSYS_TRANSITION:3:1
+        STORE_RECSYS_SELECTION:3:1
+        STORE_USERACTIVITY_VISIT:3:1
+        STORE_USERACTIVITY_VIDEO:3:1
+        STORE_PROVIDER:2:1
+
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ${path-to-the-external-kafka-folder-for-persistence}:/kafka
 ```

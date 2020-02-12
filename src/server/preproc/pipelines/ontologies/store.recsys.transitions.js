@@ -14,7 +14,7 @@ module.exports = {
       cmd: 'kafka-spout.js',
       init: {
         kafka_host: config.kafka.host,
-        topic: 'STORING.RECSYS.TRANSITIONS',
+        topic: 'STORE_RECSYS_TRANSITION',
         groupId: config.kafka.groupId
       }
     }

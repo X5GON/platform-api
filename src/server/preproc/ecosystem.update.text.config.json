@@ -1,6 +1,6 @@
 {
     "apps": [{
-        "name": "UPDATE.MATERIAL.TEXT",
+        "name": "UPDATE_MATERIAL_TEXT",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
         "args": "-tn uuid.update.material.text -tp ./ontologies/update.material.text",

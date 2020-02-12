@@ -1,6 +1,6 @@
 {
     "apps": [{
-        "name": "UPDATE.MATERIAL.VIDEO",
+        "name": "UPDATE_MATERIAL_VIDEO",
         "script": "pipeline.js",
         "cwd": "./pipelines/",
         "args": "-tn uuid.update.material.video -tp ./ontologies/update.material.video",

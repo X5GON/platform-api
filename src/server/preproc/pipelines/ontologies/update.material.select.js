@@ -195,7 +195,7 @@ module.exports = {
       ],
       init: {
         kafka_host: config.kafka.host,
-        kafka_topic: 'UPDATE.MATERIAL.TEXT'
+        kafka_topic: 'UPDATE_MATERIAL_TEXT'
       }
     },
     {
@@ -211,7 +211,7 @@ module.exports = {
       ],
       init: {
         kafka_host: config.kafka.host,
-        kafka_topic: 'UPDATE.MATERIAL.VIDEO'
+        kafka_topic: 'UPDATE_MATERIAL_VIDEO'
       }
     }
   ],

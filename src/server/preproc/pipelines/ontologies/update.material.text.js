@@ -17,7 +17,7 @@ module.exports = {
       cmd: 'kafka-spout.js',
       init: {
         kafka_host: config.kafka.host,
-        topic: 'UPDATE.MATERIAL.TEXT',
+        topic: 'UPDATE_MATERIAL_TEXT',
         groupId: config.kafka.groupId
       }
     }
@@ -281,7 +281,7 @@ module.exports = {
       ],
       init: {
         kafka_host: config.kafka.host,
-        kafka_topic: 'UPDATE.MATERIAL.CONTENT'
+        kafka_topic: 'UPDATE_MATERIAL_CONTENT'
       }
     },
 

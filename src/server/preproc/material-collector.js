@@ -41,11 +41,11 @@ class MaterialCollector {
         this._pg = postgresQL(config.pg);
 
         // set kafka consumer & producers
-        this._consumer = new KafkaConsumer(config.kafka.host, 'STORING.USERACTIVITY.VISIT', `${config.kafka.groupId}.MATERIAL.COLLECTOR`);
+        this._consumer = new KafkaConsumer(config.kafka.host, 'STORE_USERACTIVITY_VISIT', `${config.kafka.groupId}.MATERIAL.COLLECTOR`);
         this._producer = new KafkaProducer(config.kafka.host);
         // define kafka topic names
-        this._text_topic  = 'PROCESSING.MATERIAL.TEXT';
-        this._video_topic = 'PROCESSING.MATERIAL.VIDEO';
+        this._text_topic  = 'PREPROC_MATERIAL_TEXT';
+        this._video_topic = 'PREPROC_MATERIAL_VIDEO';
 
         // initialize retriever list
         this._apis = [];

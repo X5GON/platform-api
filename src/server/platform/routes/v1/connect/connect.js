@@ -226,7 +226,7 @@ module.exports = function (logger, config) {
             ...(material && { material })
         };
         // redirect activity to information retrievers
-        producer.send('STORING.USERACTIVITY.VISIT', activity);
+        producer.send('STORE_USERACTIVITY_VISIT', activity);
         // send beacon image to user
         return res.sendFile(beaconPath, options);
 
@@ -275,7 +275,7 @@ module.exports = function (logger, config) {
         }
 
         // redirect activity to information retrievers
-        producer.send('STORING.USERACTIVITY.VIDEO', video);
+        producer.send('STORE_USERACTIVITY_VIDEO', video);
         // send beacon image to user
         return res.sendFile(beaconPath, options);
 
