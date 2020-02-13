@@ -50,10 +50,12 @@ version: '3'
 services:
   zookeeper:
     image: wurstmeister/zookeeper
+    restart: always
     ports:
       - "2181:2181"
   kafka:
     image: wurstmeister/kafka
+    restart: always
     depends_on:
       - zookeeper
     ports:
