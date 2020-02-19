@@ -20,12 +20,13 @@ class KafkaConsumer {
      * @param {String} host - The host address of the kafka service.
      * @param {String} topic - The topic kafka consumer is listening to.
      */
-    constructor(host, topic, groupId, HIGH_WATER=100, LOW_WATER=10) {
+    constructor({ host, topic, group_id: groupId, high_water: HIGH_WATER, low_water: LOW_WATER, from_offset: FROM_OFFSET }) {
         // the message container
         this._data = [];
         // set the data limits
         this.HIGH_WATER = HIGH_WATER;
         this.LOW_WATER = LOW_WATER;
+        const fromOffset = FROM_OFFSET || 'latest';
 
         // setup the consumer options
         const options = {
@@ -34,8 +35,8 @@ class KafkaConsumer {
             groupId,
             sessionTimeout: 15000,
             protocol: ['roundrobin'],
-            fromOffset: 'latest',
-            fetchMaxBytes: 1024 * 2048,
+            fromOffset,
+            fetchMaxBytes: 2000000, // 2 MB
             commitOffsetsOnFirstJoin: true,
             outOfRangeOffset: 'earliest',
             migrateHLC: false,
@@ -66,7 +67,6 @@ class KafkaConsumer {
      * @description Enables message consumption.
      */
     enable() {
-
         if (!this._enabled) {
             if (!this._highWaterClearing) {
                 this.consumerGroup.resume();
@@ -137,13 +137,14 @@ class KafkaSpout {
         this._name = name;
         this._context = context;
         this._prefix = `[KafkaSpout ${this._name}]`;
-        this._generator = new KafkaConsumer(
-            config.kafka_host,
-            config.topic,
-            config.groupId,
-            config.HIGH_WATER,
-            config.LOW_WATER
-        );
+        this._generator = new KafkaConsumer({
+            host: config.kafka_host,
+            topic: config.topic,
+            group_id: config.group_id,
+            high_water: config.high_water,
+            low_water: config.low_water,
+            from_offset: config.from_offset
+        });
         callback();
     }
 

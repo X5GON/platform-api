@@ -15,7 +15,10 @@ module.exports = {
       init: {
         kafka_host: config.kafka.host,
         topic: 'STORE_PROVIDER',
-        groupId: config.kafka.groupId
+        group_id: config.kafka.groupId,
+        high_water: 10,
+        low_water: 1,
+        from_offset: 'latest'
       }
     }
   ],
