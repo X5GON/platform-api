@@ -17,7 +17,10 @@ module.exports = {
       init: {
         kafka_host: config.kafka.host,
         topic: 'UPDATE_MATERIAL_CONTENT',
-        groupId: config.kafka.groupId
+        group_id: config.kafka.groupId,
+        high_water: 10,
+        low_water: 2,
+        from_offset: 'earliest'
       }
     }
   ],
