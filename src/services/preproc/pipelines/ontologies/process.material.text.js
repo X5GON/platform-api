@@ -21,7 +21,7 @@ module.exports = {
         group_id: config.kafka.groupId,
         high_water: 1,
         low_water: 0,
-        from_offset: 'earliest'
+        from_offset: 'latest'
       }
     }
   ],
