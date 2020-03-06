@@ -36,7 +36,7 @@ class KafkaConsumer {
             sessionTimeout: 15000,
             protocol: ['roundrobin'],
             fromOffset,
-            fetchMaxBytes: 2000000, // 2 MB
+            fetchMaxBytes: 10000000, // 10 MB - negates "Error: Not a message set. Magic byte is 2"
             commitOffsetsOnFirstJoin: true,
             outOfRangeOffset: 'earliest',
             migrateHLC: false,
