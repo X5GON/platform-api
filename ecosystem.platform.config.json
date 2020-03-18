@@ -9,7 +9,7 @@
         "env_production": {
             "NODE_ENV": "prod"
         },
-        "instances": "1",
+        "instances": "3",
         "exec_mode": "cluster",
         "autorestart": true,
         "max_restarts": 20
