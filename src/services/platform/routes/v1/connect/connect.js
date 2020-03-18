@@ -86,6 +86,9 @@ module.exports = function (logger, config) {
      * @private
      */
     function _isBot(req) {
+        if (!req.get('user-agent')) {
+            return true;
+        }
         let userAgent = req.get('user-agent').toLowerCase();
         return userAgent.includes('bot') || userAgent.includes('preview');
     }

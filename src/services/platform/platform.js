@@ -49,8 +49,8 @@ app.use(session({
     secret: config.platform.sessionSecret,
     saveUninitialized: false,
     resave: false,
-     cookie: {
-         ...(config.environment === 'prod' && { domain: '.x5gon.org' })
+    cookie: {
+        ...(config.environment === 'prod' && { domain: '.x5gon.org' })
     }
 }));
 // use flash messages
@@ -62,6 +62,13 @@ app.use(passport.session({ secret: config.platform.sessionSecret }));
 require('./config/passport')(passport, pg);
 // socket.io configuration
 require('./config/sockets')(http, monitor);
+
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next();
+});
+
 // add handlebars configurations
 require('./config/handlebars')(app);
 
