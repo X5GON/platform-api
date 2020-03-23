@@ -1,4 +1,4 @@
-/************************************************
+/** **********************************************
  * Kafka Producer Module
  * This module creates a kafka producer which
  * can create new messages and send them to
@@ -6,13 +6,12 @@
  */
 
 // external modules
-const k = require('kafka-node');
+const k = require("kafka-node");
 
 /**
  * Kafka producer class.
  */
 class KafkaProducer {
-
     /**
      * Initializes a kafka producer.
      * @param {String} host - The kafka host in the form of ip:port (Example: 127.0.0.1:9092).
@@ -31,8 +30,7 @@ class KafkaProducer {
         self._producer = new k.HighLevelProducer(client);
 
         // make the producer ready
-        self._producer.on('ready', function () {
-
+        self._producer.on("ready", () => {
             self._ready = true;
             // check if there are any messages not sent
             if (self._messages.length) {
@@ -49,7 +47,6 @@ class KafkaProducer {
                 }
             }
         });
-
     }
 
     /**
@@ -64,8 +61,8 @@ class KafkaProducer {
 
 
         // get set callback value
-        let callback = cb && typeof(cb) === 'function' ?
-            cb : function (error) { if (error) console.log(error); };
+        let callback = cb && typeof (cb) === "function"
+            ? cb : function (error) { if (error) console.log(error); };
 
 
         // prepare the message in string
@@ -83,7 +80,6 @@ class KafkaProducer {
             return callback(null);
         }
     }
-
 }
 
 module.exports = KafkaProducer;

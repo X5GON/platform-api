@@ -4,7 +4,7 @@
  * JSON Schema validator component.
  */
 
- // basic bolt template
+// basic bolt template
 const BasicBolt = require("./basic-bolt");
 
 class MessageValidate extends BasicBolt {

@@ -1,4 +1,4 @@
-/************************************************
+/** **********************************************
  * Winston Logger with
  * Winston Daily Rotate File Module
  * This module creates a logger which is able
@@ -8,36 +8,37 @@
  */
 
 // module for path creation
-const path = require('path');
+const path = require("path");
 
 // file management module
-const fileManager = require('@library/file-manager');
+const fileManager = require("@library/file-manager");
 
 // main logging modules
-const { createLogger, format, transports, addColors } = require('winston');
+const {
+    createLogger, format, transports, addColors
+} = require("winston");
 // add daily rotate file configuration
-require('winston-daily-rotate-file');
+require("winston-daily-rotate-file");
 
 
 // archive required modules
-const fs = require('fs');
-const archiver = require('archiver');
+const fs = require("fs");
+const archiver = require("archiver");
 
 class Logger {
-
     /**
      * @description Prepares the logs folder.
      */
     constructor() {
         // set log folder path
-        this.folder = path.join(__dirname, '../../logs/');
+        this.folder = path.join(__dirname, "../../logs/");
         // create log folder
         fileManager.createDirectoryPath(this.folder);
         // add colorization to console logs
         const colors = {
-            info: 'grey',
-            warn: 'yellow',
-            error: 'red'
+            info: "grey",
+            warn: "yellow",
+            error: "red"
         };
         addColors(colors);
     }
@@ -51,16 +52,16 @@ class Logger {
      */
     _transportCreator(fileName, folderPath, level) {
         if (!fileName) {
-            throw Error(`Parameter 'fileName' not provided`);
+            throw Error("Parameter 'fileName' not provided");
         }
 
         // create daily transport
         let transport = new (transports.DailyRotateFile)({
             filename: fileName,
             dirname: folderPath,
-            datePattern: 'YYYY-MM-DD',
+            datePattern: "YYYY-MM-DD",
             name: fileName,
-            level: level,
+            level,
             prepend: false,
             format: format.combine(
                 format.timestamp(),
@@ -73,10 +74,10 @@ class Logger {
         }
 
         // action on rotate event
-        transport.on('rotate', function (oldFilename, newFilename) {
+        transport.on("rotate", (oldFilename, newFilename) => {
             // get dates of the filenames
-            const oldDate = oldFilename.split('.')[1].split('-');
-            const newDate = newFilename.split('.')[1].split('-');
+            const oldDate = oldFilename.split(".")[1].split("-");
+            const newDate = newFilename.split(".")[1].split("-");
             // create a folder to store the old files (format: YYYY-MM)
             const monthFolderPath = path.join(folderPath, createFilename(level, oldDate[0], oldDate[1]));
             fileManager.createFolder(monthFolderPath);
@@ -100,16 +101,16 @@ class Logger {
                     // only the current and previous month logs are not archived
                     const output = fs.createWriteStream(`${prevFolderPath}.tar.gz`);
 
-                    output.on('close', function() {
+                    output.on("close", () => {
                         // archiver has finalized and the output file description has closed
                     });
 
-                    output.on('end', function () {
+                    output.on("end", () => {
 
                     });
 
                     // zip up the archive folders
-                    let archive = archiver('tar', {
+                    let archive = archiver("tar", {
                         gzip: true,
                         gzipOptions: { level: 9 } // set the compression level
                     });
@@ -118,15 +119,15 @@ class Logger {
                     archive.pipe(output);
 
                     // catching warnings
-                    archive.on('warning', function (error) {
-                        if (error.code === 'ENOENT') {
+                    archive.on("warning", (error) => {
+                        if (error.code === "ENOENT") {
                             // logging errors
                         } else {
                             throw error;
                         }
                     });
 
-                    archive.on('error', function (error) {
+                    archive.on("error", (error) => {
                         throw error;
                     });
 
@@ -137,7 +138,6 @@ class Logger {
                         .then(() => { fileManager.removeFolder(prevFolderPath); });
                 }
             }
-
         });
 
         return transport;
@@ -150,7 +150,7 @@ class Logger {
      * @param {String} [subFolder=''] - The folder where the files are saved.
      * @param {Boolean} [consoleFlag=true] - Enable console logging.
      */
-    createInstance(fileName, level='info', subFolder='', consoleFlag=true) {
+    createInstance(fileName, level = "info", subFolder = "", consoleFlag = true) {
         let logger_transports = [];
         // initialize folder path and create it
         let folderPath = path.join(this.folder, subFolder);
@@ -189,7 +189,7 @@ class Logger {
      * @param {String} [subFolder=''] - The folder where the files are saved.
      * @param {Boolean} [consoleFlag=true] - Enable console logging.
      */
-    createGroupInstance(fileName, subFolder='', consoleFlag=true) {
+    createGroupInstance(fileName, subFolder = "", consoleFlag = true) {
         let logger_transports = [];
         // initialize folder path and create it
         let folderPath = path.join(this.folder, subFolder);
@@ -205,9 +205,9 @@ class Logger {
             }));
         }
         // add a file rotation transport for `info`, `warn` and `error`
-        logger_transports.push(this._transportCreator(`${fileName}-info`,  folderPath, 'info'));
-        logger_transports.push(this._transportCreator(`${fileName}-warn`,  folderPath, 'warn'));
-        logger_transports.push(this._transportCreator(`${fileName}-error`, folderPath, 'error'));
+        logger_transports.push(this._transportCreator(`${fileName}-info`, folderPath, "info"));
+        logger_transports.push(this._transportCreator(`${fileName}-warn`, folderPath, "warn"));
+        logger_transports.push(this._transportCreator(`${fileName}-error`, folderPath, "error"));
 
         // create a logger instance
         let logger = createLogger({
@@ -227,7 +227,9 @@ class Logger {
      */
     _formatRequest(request, extraParams = {}) {
         // get request parameters
-        const { method, originalUrl, query, body, params } = request;
+        const {
+            method, originalUrl, query, body, params
+        } = request;
         // store the method request parameters
         let obj = {
             method,
@@ -242,8 +244,6 @@ class Logger {
         // join created object with the extra parameters
         return Object.assign(obj, extraParams);
     }
-
-
 }
 
 module.exports = new Logger();

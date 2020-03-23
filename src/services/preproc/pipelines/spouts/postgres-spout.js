@@ -1,12 +1,10 @@
 
-
 class PGRecords {
-
     constructor(config, sql_statement, time_interval) {
         // the record container
         this._data = [];
         // esablish connection with database
-        this._pg = require('@library/postgresQL')(config);
+        this._pg = require("@library/postgresQL")(config);
         // store the SQL statement for future use
         this._sqlStatement = sql_statement;
         // store the interval value for continuous retrieval
@@ -53,15 +51,12 @@ class PGRecords {
         let self = this;
         self._pg.execute(self._sqlStatement, [], (error, records) => {
             if (error) { return; }
-            records.forEach(record => {
+            records.forEach((record) => {
                 self._data.push(record);
             });
         });
     }
-
 }
-
-
 
 
 /**
@@ -70,11 +65,10 @@ class PGRecords {
  * and sends it to the
  */
 class PostgresqlSpout {
-
     constructor() {
         this._name = null;
         this._context = null;
-        this._prefix = '';
+        this._prefix = "";
         this._generator = null;
     }
 

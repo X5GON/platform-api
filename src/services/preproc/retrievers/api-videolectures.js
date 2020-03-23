@@ -1,18 +1,17 @@
-/**********************************************************
+/** ********************************************************
  * Videolectures API
  * This class is used to retrieve lecture metadata
  * from Videolectures.NET.
  */
 
 // import basic api class
-const BasicRESTAPI = require('./api-rest-basic');
+const BasicRESTAPI = require("./api-rest-basic");
 
 /**
  * @class VideolecturesAPI
  * @description The class for retrieving videolectures materials.
  */
 class VideolecturesAPI extends BasicRESTAPI {
-
     /**
      * Initialize the Videolectures API class.
      * @param {Object} args - The constructor parameters.
@@ -21,7 +20,7 @@ class VideolecturesAPI extends BasicRESTAPI {
     constructor(args) {
         super(args);
         // set retriever parameters
-        this._domain = 'http://videolectures.net';
+        this._domain = "http://videolectures.net";
         this._apikey = args.apikey || null;
         // enable retriever
         this._enabled = true;
@@ -33,21 +32,20 @@ class VideolecturesAPI extends BasicRESTAPI {
      * @param {Function} cb - Function specifying what to do with the data.
      */
     getMaterial(url, cb) {
-
         let self = this;
 
         if (!url) {
-            const error = new Error('[VideolecturesAPI.getMaterial] url not provided');
+            const error = new Error("[VideolecturesAPI.getMaterial] url not provided");
             return cb(error);
         }
 
         // extract the slug from the full material provider
-        const slug = url.split('/')[3];
+        const slug = url.split("/")[3];
         // setup the url to get the videolectures metadata
         const lectureURL = `${this._domain}/site/api/lectures?apikey=${this._apikey}&slug=${slug}`;
 
         // get the lecture information
-        super.get(lectureURL).then(lecture => {
+        super.get(lectureURL).then((lecture) => {
             if (!lecture || (!lecture.results && !lecture.results[0])) {
                 throw new Error(`[API-Videolectures get] lecture not found for url=${url}`);
             }
@@ -61,7 +59,7 @@ class VideolecturesAPI extends BasicRESTAPI {
                 materialRequests.push(super.get(videoURL));
             }
             // return the material requests
-            Promise.all(materialRequests).then(content => {
+            Promise.all(materialRequests).then((content) => {
                 if (!content) {
                     throw new Error(`[API-Videolectures get] no content found for url=${url}`);
                 }
@@ -73,12 +71,11 @@ class VideolecturesAPI extends BasicRESTAPI {
                     // go through all attachments
                     for (let file of attachments.attachments) {
                         const display = file.type_display;
-                        if (display && (display.includes('Slide Presentation') || display.includes('generic video source'))) {
+                        if (display && (display.includes("Slide Presentation") || display.includes("generic video source"))) {
                             const oer_material = this._prepareMaterial({ materials, file, part: attachments.part });
                             // check if the material is already in the database
                             oer_materials.push(new Promise((resolve, reject) => {
-
-                                self._pg.select({ url: oer_material.materialurl }, 'material_process_queue', (xerror, results) => {
+                                self._pg.select({ url: oer_material.materialurl }, "material_process_queue", (xerror, results) => {
                                     if (xerror) { return reject(xerror); }
                                     if (results.length === 0) {
                                         // the material is not in the database yet
@@ -88,24 +85,19 @@ class VideolecturesAPI extends BasicRESTAPI {
                                         return resolve(null);
                                     }
                                 });
-
                             }));
                         }
-
                     }
                 }
 
                 // wait for the materials
-                Promise.all(oer_materials).then(materials => {
-                    const newMaterials = materials.filter(material => material);
+                Promise.all(oer_materials).then((materials) => {
+                    const newMaterials = materials.filter((material) => material);
                     // return the material through the callback
                     return cb(null, newMaterials);
-
-                }).catch(error => cb(error));
-
-            }).catch(error => cb(error));
-
-        }).catch(error => cb(error));
+                }).catch((error) => cb(error));
+            }).catch((error) => cb(error));
+        }).catch((error) => cb(error));
     }
 
     /**
@@ -113,7 +105,7 @@ class VideolecturesAPI extends BasicRESTAPI {
      */
     start() {
         this._enabled = true;
-     }
+    }
 
     /**
      * Stops the retriever.
@@ -133,9 +125,9 @@ class VideolecturesAPI extends BasicRESTAPI {
         this.stop(); this.start();
     }
 
-    ///////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////
     // Helper Functions
-    ///////////////////////////////////////////////////////
+    // /////////////////////////////////////////////////////
 
     /**
      * @description Formats the videolectures material.
@@ -164,8 +156,8 @@ class VideolecturesAPI extends BasicRESTAPI {
         } = params;
 
         // fix mimetype and extension if required
-        mimetype = mimetype ? mimetype : super.mimetype(src);
-        ext = ext ? ext : super.extension(mimetype);
+        mimetype = mimetype || super.mimetype(src);
+        ext = ext || super.extension(mimetype);
 
         // return the material object
         return {
@@ -173,8 +165,8 @@ class VideolecturesAPI extends BasicRESTAPI {
             description,
             provider_uri: `${this._domain}/${slug}/`,
             material_url: src,
-            author: authors.join(','),
-            language: language,
+            author: authors.join(","),
+            language,
             type: {
                 ext,
                 mime: mimetype
@@ -188,7 +180,7 @@ class VideolecturesAPI extends BasicRESTAPI {
                     part
                 }
             },
-            license: 'Creative Commons BY-NC-ND 3.0'
+            license: "Creative Commons BY-NC-ND 3.0"
         };
     }
 
@@ -199,13 +191,13 @@ class VideolecturesAPI extends BasicRESTAPI {
      */
     _fetchLecture(url, cb) {
         let self = this;
-        super.get(url).then(lectures => {
+        super.get(url).then((lectures) => {
             if (!lectures || !lectures.results) {
                 throw new Error(`[API-Videolectures _fetchLecture] lectures not found for url=${url}`);
             }
 
             const openLectures = lectures.results
-                .filter(lecture => lecture.enabled && lecture.public);
+                .filter((lecture) => lecture.enabled && lecture.public);
 
             // process the lecture results - show only enabled and public materials
             cb(null, openLectures);
@@ -214,7 +206,7 @@ class VideolecturesAPI extends BasicRESTAPI {
             if (self._enabled && lectures.next) {
                 self._fetchLecture(lectures.next, cb);
             }
-        }).catch(error => cb(error));
+        }).catch((error) => cb(error));
     }
 
     /**
@@ -238,8 +230,6 @@ class VideolecturesAPI extends BasicRESTAPI {
             }
         };
     }
-
-
 }
 
 module.exports = VideolecturesAPI;

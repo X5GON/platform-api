@@ -5,10 +5,10 @@
         "cwd": "./pipelines/",
         "args": "-tn uuid.store.material.complete -tp ./ontologies/store.material.complete",
         "env": {
-            "NODE_ENV": "dev"
+            "NODE_ENV": "development"
         },
         "env_production": {
-            "NODE_ENV": "prod"
+            "NODE_ENV": "production"
         },
         "instances": "1",
         "exec_mode": "cluster",
@@ -20,10 +20,10 @@
         "cwd": "./pipelines/",
         "args": "-tn uuid.store.material.partial -tp ./ontologies/store.material.partial",
         "env": {
-            "NODE_ENV": "dev"
+            "NODE_ENV": "development"
         },
         "env_production": {
-            "NODE_ENV": "prod"
+            "NODE_ENV": "production"
         },
         "instances": "1",
         "exec_mode": "cluster",
@@ -35,10 +35,10 @@
         "cwd": "./pipelines/",
         "args": "-tn uuid.store.user-activities -tp ./ontologies/store.user-activities",
         "env": {
-            "NODE_ENV": "dev"
+            "NODE_ENV": "development"
         },
         "env_production": {
-            "NODE_ENV": "prod"
+            "NODE_ENV": "production"
         },
         "instances": "1",
         "exec_mode": "cluster",
@@ -50,10 +50,10 @@
         "cwd": "./pipelines/",
         "args": "-tn uuid.store.recsys.transitions -tp ./ontologies/store.recsys.transitions",
         "env": {
-            "NODE_ENV": "dev"
+            "NODE_ENV": "development"
         },
         "env_production": {
-            "NODE_ENV": "prod"
+            "NODE_ENV": "production"
         },
         "instances": "1",
         "exec_mode": "cluster",
@@ -65,10 +65,10 @@
         "cwd": "./pipelines/",
         "args": "-tn uuid.store.providers -tp ./ontologies/store.providers",
         "env": {
-            "NODE_ENV": "dev"
+            "NODE_ENV": "development"
         },
         "env_production": {
-            "NODE_ENV": "prod"
+            "NODE_ENV": "production"
         },
         "instances": "1",
         "exec_mode": "cluster",

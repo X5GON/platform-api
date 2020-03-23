@@ -4,22 +4,22 @@
  * and then crawls pages that were previously not seen.
  *
  */
-require(`module-alias/register`);
+require("module-alias/register");
 
 // configurations
-const config = require('@config/config');
+const config = require("@config/config");
 // internal modules
-const KafkaConsumer = require('@library/kafka-consumer');
-const KafkaProducer = require('@library/kafka-producer');
+const KafkaConsumer = require("@library/kafka-consumer");
+const KafkaProducer = require("@library/kafka-producer");
 // material mimetypes used for type selection
-const mimetypes = require('@config/mimetypes');
+const mimetypes = require("@config/mimetypes");
 // setup connection with the database
-const postgresQL = require('@library/postgresQL');
+const postgresQL = require("@library/postgresQL");
 // logger for storing activity
-const Logger = require('@library/logger');
+const Logger = require("@library/logger");
 
 // create a logger for platform requests
-const logger = Logger.createGroupInstance('material-collector', 'preproc', config.environment !== 'prod');
+const logger = Logger.createGroupInstance("material-collector", "preproc", config.environment !== "prod");
 
 /**
  * @class MaterialCollector
@@ -27,7 +27,6 @@ const logger = Logger.createGroupInstance('material-collector', 'preproc', confi
  * provided user activity data.
  */
 class MaterialCollector {
-
     /**
      * Initialize the OER collector.
      * @param {Object} config - The configuration file.
@@ -41,11 +40,11 @@ class MaterialCollector {
         this._pg = postgresQL(config.pg);
 
         // set kafka consumer & producers
-        this._consumer = new KafkaConsumer(config.kafka.host, 'STORE_USERACTIVITY_VISIT', `${config.kafka.groupId}.MATERIAL.COLLECTOR`);
+        this._consumer = new KafkaConsumer(config.kafka.host, "STORE_USERACTIVITY_VISIT", `${config.kafka.groupId}.MATERIAL.COLLECTOR`);
         this._producer = new KafkaProducer(config.kafka.host);
         // define kafka topic names
-        this._text_topic  = 'PREPROC_MATERIAL_TEXT';
-        this._video_topic = 'PREPROC_MATERIAL_VIDEO';
+        this._text_topic = "PREPROC_MATERIAL_TEXT";
+        this._video_topic = "PREPROC_MATERIAL_VIDEO";
 
         // initialize retriever list
         this._apis = [];
@@ -57,9 +56,9 @@ class MaterialCollector {
             this.addRetriever(retriever);
         }
         // set the production mode flag
-        this._productionModeFlag = config.environment === 'prod';
+        this._productionModeFlag = config.environment === "prod";
         // got initialization process
-        logger.info('[MaterialCollector] collector initialized');
+        logger.info("[MaterialCollector] collector initialized");
     }
 
     /**
@@ -89,7 +88,7 @@ class MaterialCollector {
             token: settings.token,
             retriever
         });
-        logger.info('[Retriever] Adding new retriever', {
+        logger.info("[Retriever] Adding new retriever", {
             name: settings.name,
             domain: settings.domain
         });
@@ -106,7 +105,7 @@ class MaterialCollector {
         // go through all of the apis and remove the appropriate retriever
         for (let i = 0; i < this._apis.length; i++) {
             if (token === this._apis[i].token) {
-                logger.info('[Retriever] removing retriever', {
+                logger.info("[Retriever] removing retriever", {
                     name: this._apis[i].name,
                     domain: this._apis[i].domain
                 });
@@ -132,7 +131,7 @@ class MaterialCollector {
         // go through all of the apis and start the appropriate retriever
         for (let i = 0; i < this._apis.length; i++) {
             if (token === this._apis[i].token) {
-                logger.info('[Retriever] start retriever', {
+                logger.info("[Retriever] start retriever", {
                     name: this._apis[i].name,
                     domain: this._apis[i].domain
                 });
@@ -149,11 +148,11 @@ class MaterialCollector {
      * @param {Boolean} [allFlag=false] - If true, stop all retrievers.
      * @returns {Boolean} True if the retriever was stopped. Otherwise, returns false.
      */
-    stopRetriever(token, allFlag=false) {
+    stopRetriever(token, allFlag = false) {
         if (allFlag) {
             // stop all retrievers
             for (let i = 0; i < this._apis.length; i++) {
-                logger.info('[Retriever] stop all retrievers');
+                logger.info("[Retriever] stop all retrievers");
                 this._apis[i].retriever.stop();
             }
             return true;
@@ -162,7 +161,7 @@ class MaterialCollector {
             // go through all of the apis and stop the appropriate retriever
             for (let i = 0; i < this._apis.length; i++) {
                 if (token === this._apis[i].token) {
-                    logger.info('[Retriever] stop retriever', {
+                    logger.info("[Retriever] stop retriever", {
                         name: this._apis[i].name,
                         domain: this._apis[i].domain
                     });
@@ -189,23 +188,22 @@ class MaterialCollector {
             const url = log.material.materialurl;
             // check if the material is already in the database
             // (should have an URL in the urls table)
-            return self._pg.select({ url }, 'material_process_queue', (error, results) => {
+            return self._pg.select({ url }, "material_process_queue", (error, results) => {
                 if (error) {
                     // log postgres error
-                    logger.error('error [postgres.select]: unable to select a material',
-                        { error: error.message }
-                    );
+                    logger.error("error [postgres.select]: unable to select a material",
+                        { error: error.message });
                     return null;
                 }
                 if (!results.length) {
-                    logger.info('[Retriever] process next material from log', {
+                    logger.info("[Retriever] process next material from log", {
                         materialurl: url,
                         timestamp: log.visitedOn
                     });
                     // send the material directly to the pipeline
                     return self._sendMaterials(null, [log.material]);
                 }
-                logger.info('[Retriever] material already in processing pipeline', {
+                logger.info("[Retriever] material already in processing pipeline", {
                     materialurl: url,
                     timestamp: log.visitedOn
                 });
@@ -215,7 +213,7 @@ class MaterialCollector {
             for (let api of self._apis) {
                 // find the retriver based on the provider token
                 if (log.provider === api.token) {
-                    logger.info('[Retriever] process next log with retriever', {
+                    logger.info("[Retriever] process next log with retriever", {
                         retrieverName: api.name,
                         retrieverDomain: api.domain,
                         materialUrl: log.url
@@ -224,12 +222,11 @@ class MaterialCollector {
                     return api.retriever.getMaterial(log.url, self._sendMaterials.bind(self));
                 }
             }
-            logger.warn('[Retriever] no retrievers to process log', {
+            logger.warn("[Retriever] no retrievers to process log", {
                 provider: log.provider,
                 url: log.url
             });
         }
-
     }
 
     /**
@@ -240,7 +237,7 @@ class MaterialCollector {
     _sendMaterials(error, materials) {
         let self = this;
         if (error) {
-            logger.error('[Retriever] error when processing materials', {
+            logger.error("[Retriever] error when processing materials", {
                 error: {
                     message: error.message,
                     stack: error.stack
@@ -253,13 +250,13 @@ class MaterialCollector {
             // get material mimetype and decide where to send the material metadata
             const mimetype = material.type.mime;
             if (mimetype && mimetypes.video.includes(mimetype)) {
-                self._sendToKafka(material, self._video_topic, 'video');
+                self._sendToKafka(material, self._video_topic, "video");
             } else if (mimetype && mimetypes.audio.includes(mimetype)) {
-                self._sendToKafka(material, self._video_topic, 'audio');
+                self._sendToKafka(material, self._video_topic, "audio");
             } else if (mimetype && mimetypes.text.includes(mimetype)) {
-                self._sendToKafka(material, self._text_topic, 'text');
+                self._sendToKafka(material, self._text_topic, "text");
             } else {
-                logger.warn('[Retriever] material mimetype not recognized', {
+                logger.warn("[Retriever] material mimetype not recognized", {
                     mimetype
                 });
             }
@@ -284,9 +281,9 @@ class MaterialCollector {
         }
 
         // insert to postgres process pipeline
-        this._pg.upsert({ url: material.material_url }, { url: null }, 'material_process_queue', (xerror) => {
+        this._pg.upsert({ url: material.material_url }, { url: null }, "material_process_queue", (xerror) => {
             if (xerror) {
-                logger.error('[error] postgresql', {
+                logger.error("[error] postgresql", {
                     error: {
                         message: xerror.message,
                         stack: xerror.stack
@@ -298,16 +295,12 @@ class MaterialCollector {
             // send the video material
             return self._producer.send(topic, material);
         });
-
-
     }
-
-
 }
 
-///////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////
 // Start Collector Processes
-///////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////
 
 
 // initialize a material collector
@@ -331,19 +324,19 @@ function shutdown(error) {
     // stop the Kafka consumer before
     // shutting down the process
     collector._consumer.stop(() => {
-        console.log('Stopped retrieving requests');
+        console.log("Stopped retrieving requests");
         return process.exit(0);
     });
 }
 
 // do something when app is closing
-process.on('exit', shutdown);
+process.on("exit", shutdown);
 // catches ctrl+c event
-process.on('SIGINT', shutdown);
+process.on("SIGINT", shutdown);
 // catches uncaught exceptions
-process.on('uncaughtException', shutdown);
+process.on("uncaughtException", shutdown);
 
 // handles message
-process.on('message', (msg) => {
-    process.send(collector._apis.map(api => api.name));
+process.on("message", (msg) => {
+    process.send(collector._apis.map((api) => api.name));
 });

@@ -1,4 +1,4 @@
-/************************************************
+/** **********************************************
  * Kafka Consumer Module
  * This module creates a kafka consumer which
  * can be used to listen on a particular kafka
@@ -6,7 +6,7 @@
  */
 
 // external modules
-const k = require('kafka-node');
+const k = require("kafka-node");
 
 /**
  * @class KafkaConsumer
@@ -14,13 +14,12 @@ const k = require('kafka-node');
  * and stores and prepares the messages for consumption.
  */
 class KafkaConsumer {
-
     /**
      * @description Initialize the Kafka consumer instance.
      * @param {String} host - The host address of the kafka service.
      * @param {String} topic - The topic kafka consumer is listening to.
      */
-    constructor(host, topic, groupId, HIGH_WATER=100, LOW_WATER=10) {
+    constructor(host, topic, groupId, HIGH_WATER = 100, LOW_WATER = 10) {
         // the message container
         this._data = [];
 
@@ -33,11 +32,11 @@ class KafkaConsumer {
             ssl: true,
             groupId,
             sessionTimeout: 15000,
-            protocol: ['roundrobin'],
-            fromOffset: 'latest',
+            protocol: ["roundrobin"],
+            fromOffset: "latest",
             fetchMaxBytes: 1024 * 2048,
             commitOffsetsOnFirstJoin: true,
-            outOfRangeOffset: 'earliest',
+            outOfRangeOffset: "earliest",
             migrateHLC: false,
             migrateRolling: true,
             onRebalance: (isAlreadyMember, callback) => { callback(); }
@@ -49,8 +48,8 @@ class KafkaConsumer {
         this._enabled = true;
 
         // setup the listener
-        this.consumerGroup.on('message', (message) => {
-            if (message.value === '') { return; }
+        this.consumerGroup.on("message", (message) => {
+            if (message.value === "") { return; }
             // push the new message to the container
             this._data.push(JSON.parse(message.value));
 
@@ -66,7 +65,6 @@ class KafkaConsumer {
      * @description Enables message consumption.
      */
     enable() {
-
         if (!this._enabled) {
             if (!this._highWaterClearing) {
                 this.consumerGroup.resume();

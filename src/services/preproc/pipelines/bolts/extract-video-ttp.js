@@ -113,8 +113,8 @@ class ExtractVideoTTP extends BasicBolt {
                         qs: { ...self._TTPOptions, id },
                         json: true
                     })
-                    .then((xparams) => resolve(xparams))
-                    .catch((error) => reject(error));
+                        .then((xparams) => resolve(xparams))
+                        .catch((error) => reject(error));
                 }, self._TTPTimeoutMillis);
             });
 

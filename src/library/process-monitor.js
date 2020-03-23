@@ -1,4 +1,4 @@
-/************************************************
+/** **********************************************
  * Node Process Monitor Module
  * This module access the node processes that
  * are running using the pm2 API plugin
@@ -26,41 +26,40 @@ function msToTime(mSeconds) {
     // construct string with given values
     let time = [];
     if (days) { time.push(`${days} days`); }
-    if (hrs)  { time.push(`${hrs}h`); }
+    if (hrs) { time.push(`${hrs}h`); }
     if (mins) { time.push(`${mins}min`); }
     if (secs) { time.push(`${secs}s`); }
     // return the human readable format
-    return time.join(' ');
+    return time.join(" ");
 }
 
 class Monitor {
-
     /**
      * Initialize the Monitor instance. It connects to or
      * creates a pm2 deamon and retrieves a list of processes
      * currently running in the deamon.
      */
     constructor() {
-            let self = this;
-            // sets the pm2 object used to monitor
-            this.pm2 = require('pm2');
-            this._connected = false;
-            this._processList = [];
-            // create new/connect to the pm2 deamon
-            this.pm2.connect((error) => {
-                if (error) { console.log(error); return; }
-                self._connected = true;
-                // retrieve the list or running processes
-                self.listProcesses((xerror, processes) => {
-                    if (error) { console.log(xerror); return; }
-                    self._processList = processes.map(process => ({
-                        name: process.name,
-                        pid: process.pid,
-                        pm_id: process.pm_id,
-                        status: process.pm2_env.status
-                    }));
-                });
+        let self = this;
+        // sets the pm2 object used to monitor
+        this.pm2 = require("pm2");
+        this._connected = false;
+        this._processList = [];
+        // create new/connect to the pm2 deamon
+        this.pm2.connect((error) => {
+            if (error) { console.log(error); return; }
+            self._connected = true;
+            // retrieve the list or running processes
+            self.listProcesses((xerror, processes) => {
+                if (error) { console.log(xerror); return; }
+                self._processList = processes.map((process) => ({
+                    name: process.name,
+                    pid: process.pid,
+                    pm_id: process.pm_id,
+                    status: process.pm2_env.status
+                }));
             });
+        });
     }
 
     /**
@@ -96,7 +95,7 @@ class Monitor {
                 return cb(null, process);
             });
         });
-     }
+    }
 
     /**
      * Restart the process with the process name.
@@ -163,8 +162,8 @@ class Monitor {
         this.pm2.list((error, processes) => {
             if (error) { return cb(error); }
             // TODO: prepare the list of processes
-            const cleanList = processes.sort((a, b) => a.name < b.name ? -1 : a.name > b.name ? 1 : 0)
-                .map(process => ({
+            const cleanList = processes.sort((a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0))
+                .map((process) => ({
                     name: process.name,
                     pid: process.pid,
                     pm_id: process.pm_id,
@@ -173,18 +172,17 @@ class Monitor {
                         status: process.pm2_env.status,
                         created_at: process.pm2_env.created_at,
                         created_at_clean: (new Date(process.pm2_env.created_at)).toUTCString().substr(4),
-                        running_time: process.pm2_env.status === 'online' ?
-                            msToTime(Date.now() - process.pm2_env.created_at) : '',
-                        pm_uptime: process.pm2_env.status === 'online' ?
-                            msToTime(Date.now() - process.pm2_env.pm_uptime) : '',
+                        running_time: process.pm2_env.status === "online"
+                            ? msToTime(Date.now() - process.pm2_env.created_at) : "",
+                        pm_uptime: process.pm2_env.status === "online"
+                            ? msToTime(Date.now() - process.pm2_env.pm_uptime) : "",
                         unstable_restarts: process.pm2_env.unstable_restarts,
                         restart_time: process.pm2_env.restart_time,
                         exec_interpreter: process.pm2_env.exec_interpreter,
                         instances: process.pm2_env.instances,
                         pm_exec_path: process.pm2_env.pm_exec_path,
                     }
-                })
-            );
+                }));
             return cb(null, cleanList);
         });
     }
@@ -195,7 +193,7 @@ class Monitor {
      */
     _checkConnection(cb) {
         if (!this._connected) {
-            return cb(new Error('Monitor: not connected'));
+            return cb(new Error("Monitor: not connected"));
         }
     }
 
@@ -209,11 +207,10 @@ class Monitor {
         let processExists = false;
         // check if the process exists
         for (let process of this._processList) {
-
             let compareValue = null;
-            if (typeof processId === 'string') {
+            if (typeof processId === "string") {
                 compareValue = process.name;
-            } else if (typeof processId === 'number') {
+            } else if (typeof processId === "number") {
                 compareValue = process.pm_id;
             }
             if (compareValue === processId) {
@@ -225,7 +222,7 @@ class Monitor {
         if (!processExists) {
             return cb(new Error(`Monitor: process does not exists - ${processId}`));
         }
-   }
+    }
 }
 
 module.exports = Monitor;

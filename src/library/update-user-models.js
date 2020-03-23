@@ -1,4 +1,4 @@
-/************************************************
+/** **********************************************
  * User Models Update Module
  * This module exports the function used for
  * updating the user model using the provided
@@ -6,10 +6,10 @@
  */
 
 // configurations
-const config = require('@config/config');
+const config = require("@config/config");
 
 // internal modules
-const pg = require('@library/postgresQL')(config.pg);
+const pg = require("@library/postgresQL")(config.pg);
 
 // get postgres schema
 const schema = config.pg.schema;
@@ -54,10 +54,9 @@ function multiplyObjects(objectA, num) {
  * @param {Function} [callback] - The function to be executed after the process is done.
  */
 function updateUserModel(activity, cb) {
-
     // setup the default callback function
-    const callback = cb && typeof(cb) === 'function' ?
-        cb : function (error) { if (error) console.log(error); };
+    const callback = cb && typeof (cb) === "function"
+        ? cb : function (error) { if (error) console.log(error); };
 
     // extract activity data
     const {
@@ -71,19 +70,19 @@ function updateUserModel(activity, cb) {
         FROM ${schema}.rec_sys_user_model
         WHERE uuid='${uuid}';`;
 
-    pg.execute(query, [], function(error, user_model) {
+    pg.execute(query, [], (error, user_model) => {
         if (error) {
-            console.log('Error fetching user model: ' + error);
+            console.log(`Error fetching user model: ${error}`);
             return callback(error);
         }
 
         // escape the provider uri and query for material models
-        let escapedUris = urls.map(url => url.replace('\'', '\'\''));
+        let escapedUris = urls.map((url) => url.replace("'", "''"));
 
         let query = `
             SELECT *
             FROM ${schema}.rec_sys_material_model
-            WHERE provider_uri SIMILAR TO '%(${escapedUris.join('|')})%'`;
+            WHERE provider_uri SIMILAR TO '%(${escapedUris.join("|")})%'`;
 
         let user;
         if (user_model.length === 0) {
@@ -98,10 +97,10 @@ function updateUserModel(activity, cb) {
             };
         } else { user = user_model[0]; }
 
-        pg.executeLarge(query, [], 10, function(xerror, material_models, cb) {
+        pg.executeLarge(query, [], 10, (xerror, material_models, cb) => {
             if (xerror) {
-                console.log('Error fetching material model: ' + xerror);
-                console.log('Query: ' + query);
+                console.log(`Error fetching material model: ${xerror}`);
+                console.log(`Query: ${query}`);
                 return callback(xerror);
             }
 
@@ -144,24 +143,21 @@ function updateUserModel(activity, cb) {
             cb();
         }, (error) => {
             if (error) {
-                console.log('Error', error);
+                console.log("Error", error);
                 return callback(error);
             }
 
-            console.log('Processing user:', activity.uuid, 'url count:', urls.length);
+            console.log("Processing user:", activity.uuid, "url count:", urls.length);
             // insert or update the user model to the database
-            pg.upsert(user, { uuid: null }, `${schema}.rec_sys_user_model` , function(yerror) {
+            pg.upsert(user, { uuid: null }, `${schema}.rec_sys_user_model`, (yerror) => {
                 if (yerror) {
-                    console.log('Error upserting user model: ', + yerror);
+                    console.log("Error upserting user model: ", +yerror);
                     return callback(yerror);
                 }
                 return callback();
             });
-
         }); // pg.execute('rec_sys_material_model')
-
     }); // pg.execute('rec_sys_user_model')
-
 } // function updateUserModel
 
 // export the user model updating function

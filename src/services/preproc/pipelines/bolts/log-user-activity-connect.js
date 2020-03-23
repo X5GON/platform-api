@@ -1,16 +1,15 @@
-/********************************************************************
+/** ******************************************************************
  * Material Format Component
  * This component receives the OER material in its raw form and it
  * formats into a common schema.
  */
 
-const Logger = require('@library/logger');
+const Logger = require("@library/logger");
 
 /**
  * Formats Material into a common schema.
  */
 class LoggerUserActivityConnect {
-
     constructor() {
         this._name = null;
         this._onEmit = null;
@@ -47,7 +46,7 @@ class LoggerUserActivityConnect {
 
     receive(message, stream_id, callback) {
         // do not change any requests and log the message
-        this._logger.info('user_activity', message);
+        this._logger.info("user_activity", message);
 
         // send the formatted material to next component
         return callback(null);

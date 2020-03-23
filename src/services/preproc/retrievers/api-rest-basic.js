@@ -1,9 +1,8 @@
 // external modules
-const rp = require('request-promise-native');
-const mime = require('mime-types');
+const rp = require("request-promise-native");
+const mime = require("mime-types");
 
 class BasicRESTAPI {
-
     /**
      * Initializes the API Basic class.
      * @param {Object} [args] - The constructor parameters.
@@ -22,15 +21,15 @@ class BasicRESTAPI {
     }
 
     start() {
-        throw new Error('[BasicAPI start] not implemented');
+        throw new Error("[BasicAPI start] not implemented");
     }
 
     stop() {
-        throw new Error('[BasicAPI stop] not implemented');
+        throw new Error("[BasicAPI stop] not implemented");
     }
 
     update() {
-        throw new Error('[BasicAPI update] not implemented');
+        throw new Error("[BasicAPI update] not implemented");
     }
 
     /**
@@ -40,7 +39,7 @@ class BasicRESTAPI {
      */
     get(url) {
         // send a request to the API to get the material
-        return rp({ method: 'GET', url, json: true });
+        return rp({ method: "GET", url, json: true });
     }
 
     /**
@@ -51,7 +50,9 @@ class BasicRESTAPI {
      */
     post(url, body) {
         // send a request to the API to get the material
-        return rp({ method: 'POST', url, body, json: true });
+        return rp({
+            method: "POST", url, body, json: true
+        });
     }
 
     /**

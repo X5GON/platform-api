@@ -1,8 +1,8 @@
 // external modules
-const router = require('express').Router();
+const router = require("express").Router();
 
 // internal modules
-const KafkaProducer = require('@library/kafka-producer');
+const KafkaProducer = require("@library/kafka-producer");
 
 /**
  * @description Adds API routes for logging user activity.
@@ -10,25 +10,23 @@ const KafkaProducer = require('@library/kafka-producer');
  * @param {Object} config - The configuration object.
  */
 module.exports = function (logger, config) {
-
     // parameters used within the routes
     const x5gonCookieName = config.platform.cookieID;
 
     // initialize kafka producer
     const producer = new KafkaProducer(config.kafka.host);
 
-    /**********************************
+    /** ********************************
      * Helper functions
-     *********************************/
+     ******************************** */
 
     // TODO: write helper functions
 
-    /**********************************
+    /** ********************************
      * Middleware
-     *********************************/
+     ******************************** */
 
-    router.use('/transitions', (req, res, next) => {
-
+    router.use("/transitions", (req, res, next) => {
         // transform query parameters into lowercase
         const query_parameters = {};
         for (let key in req.query) {
@@ -38,29 +36,29 @@ module.exports = function (logger, config) {
         // get query parameters
         const { from, to } = query_parameters;
 
-        /**********************************
+        /** ********************************
          * check user parameters
-         *********************************/
+         ******************************** */
 
         // set error message container
         let error_msgs = [];
 
         if (!from) {
-            error_msgs.push('Query parameter "from" must be provided');
+            error_msgs.push("Query parameter \"from\" must be provided");
         } else if (!from.match(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi)) {
-            error_msgs.push('Query parameter "from" must be a valid url');
+            error_msgs.push("Query parameter \"from\" must be a valid url");
         }
 
         if (!to) {
-            error_msgs.push('Query parameter "to" must be provided');
+            error_msgs.push("Query parameter \"to\" must be provided");
         } else if (!to.match(/https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/gi)) {
-            error_msgs.push('Query parameter "to" must be a valid url');
+            error_msgs.push("Query parameter \"to\" must be a valid url");
         }
 
-        /**********************************
+        /** ********************************
          * notify the user about
          * the query parameter errors
-         *********************************/
+         ******************************** */
 
         if (error_msgs.length) {
             // notify the users of the parameters change
@@ -69,14 +67,14 @@ module.exports = function (logger, config) {
             });
         }
 
-        /**********************************
+        /** ********************************
          * continue with request
-         *********************************/
+         ******************************** */
 
         // get the user id from the X5GON tracker
-        query_parameters.uuid = req.cookies[x5gonCookieName] ?
-                                req.cookies[x5gonCookieName] :
-                                'unknown';
+        query_parameters.uuid = req.cookies[x5gonCookieName]
+            ? req.cookies[x5gonCookieName]
+            : "unknown";
 
         // store the modified query parameters
         req.query_parameters = query_parameters;
@@ -84,11 +82,11 @@ module.exports = function (logger, config) {
     });
 
 
-    /**********************************
+    /** ********************************
      * Routes
-     *********************************/
+     ******************************** */
 
-    router.get('/transitions', (req, res) => {
+    router.get("/transitions", (req, res) => {
         // get the query parameters
         const {
             from,
@@ -98,14 +96,14 @@ module.exports = function (logger, config) {
             rec_urls
         } = req.query_parameters;
 
-        /**********************************
+        /** ********************************
          * send the request to kafka
-         *********************************/
+         ******************************** */
 
-        const recommended_urls = rec_urls ? rec_urls.split(',') : [];
+        const recommended_urls = rec_urls ? rec_urls.split(",") : [];
 
         // send the message to the kafka topic
-        producer.send('STORE_RECSYS_TRANSITION', {
+        producer.send("STORE_RECSYS_TRANSITION", {
             from, to, selected_position, recommended_urls, uuid
         });
 
@@ -114,13 +112,11 @@ module.exports = function (logger, config) {
     });
 
 
-    router.post('/transitions', (req, res) => {
-        // get material id
+    router.post("/transitions", (req, res) =>
+    // get material id
 
         // TODO: implement the route
-        return res.send(new Error('Route not implemented'));
-
-    });
+        res.send(new Error("Route not implemented")));
 
     return router;
 };

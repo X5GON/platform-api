@@ -1,18 +1,18 @@
-/************************************************
+/** **********************************************
  * File Manager Module
  * This module contains methods for manipulating
  * with files and folders.
  */
 
 // internal modules
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 /**
  * @description Removes the file.
  * @param {String} fileName - Name of the file to be removed.
  */
-exports.removeFile = function(fileName) {
+exports.removeFile = function (fileName) {
     // check if file exists
     if (fs.existsSync(fileName)) {
         fs.unlinkSync(fileName);
@@ -26,12 +26,12 @@ exports.removeFile = function(fileName) {
  * @param {String} oldPath - Name of the file to be moved.
  * @param {String} newPath - New destination of the file.
  */
-exports.moveFile = function(oldPath, newPath) {
+exports.moveFile = function (oldPath, newPath) {
     // check if file exists
     if (fs.existsSync(oldPath)) {
         // move the file to other folder
         fs.renameSync(oldPath, newPath);
-    }else {
+    } else {
         throw Error(`File does not exist: ${oldPath}`);
     }
 };
@@ -72,7 +72,7 @@ exports.removeFolder = function (sourcePath) {
  * @param {String} source - The source folder.
  * @param {String} destination - The destination folder.
  */
-exports.copyFolder = function(source, destination) {
+exports.copyFolder = function (source, destination) {
     // check if source exists
     if (!fs.existsSync(source)) {
         throw new Error(`ParamError: source not exists ${source}`);
@@ -103,8 +103,8 @@ exports.copyFolder = function(source, destination) {
  * @description Creates a directory.
  * @param {String} dirPath - Directory path.
  */
-exports.createFolder = function(dirPath) {
-    if (!fs.existsSync(dirPath)){
+exports.createFolder = function (dirPath) {
+    if (!fs.existsSync(dirPath)) {
         fs.mkdirSync(dirPath);
     }
 };
@@ -113,15 +113,15 @@ exports.createFolder = function(dirPath) {
  * @description Creates all directories in path.
  * @param {String} dirPath - Directory path.
  */
-exports.createDirectoryPath = function(dirPath) {
+exports.createDirectoryPath = function (dirPath) {
     // resolve path
     let resolvedPath = path.resolve(dirPath);
     // split to get it's directories
     let directories = resolvedPath.split(/[\/\\]/g);
-    let currentDir = directories[0].length ? directories[0] : '/';
+    let currentDir = directories[0].length ? directories[0] : "/";
     // add and create directories in path
     for (let i = 1; i < directories.length; i++) {
-        currentDir = path.join(currentDir,directories[i]);
+        currentDir = path.join(currentDir, directories[i]);
         exports.createFolder(currentDir);
     }
 };
@@ -165,5 +165,5 @@ exports.getFileContent = function (filePath) {
         throw Error(`file does not exist: ${filePath}`);
     }
     // read the file and return it's content
-    return fs.readFileSync(filePath, 'utf8');
+    return fs.readFileSync(filePath, "utf8");
 };

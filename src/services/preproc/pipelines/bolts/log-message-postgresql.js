@@ -103,7 +103,7 @@ class LogMessagePostgreSQL extends BasicBolt {
             return this._onEmit(message, stream_id, callback);
         });
     }
-};
+}
 
 exports.create = function (context) {
     return new LogMessagePostgreSQL(context);

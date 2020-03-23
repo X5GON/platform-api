@@ -1,9 +1,9 @@
 // create proxy for api calls
-const proxy = require('http-proxy-middleware');
-const cors = require('cors');
+const proxy = require("http-proxy-middleware");
+const cors = require("cors");
 
 // logger for proxying requests
-const Logger = require('@library/logger');
+const Logger = require("@library/logger");
 
 
 /**
@@ -11,24 +11,23 @@ const Logger = require('@library/logger');
  * @param {Object} app - Express app.
  */
 module.exports = function (app, config) {
-
-    ////////////////////////////////////////
+    // //////////////////////////////////////
     // Recommender Engine Proxy
-    ////////////////////////////////////////
+    // //////////////////////////////////////
 
     // redirect to the Recommendation System route
     app.use([
-        '/api/v1/search',
-        '/api/v1/recommend/oer_materials'
+        "/api/v1/search",
+        "/api/v1/recommend/oer_materials"
     ], cors(), proxy({
         target: `http://127.0.0.1:${config.search.port}`,
         pathRewrite: {
             "^/api/v1/search": "/api/v1/oer_materials",
             "^/api/v1/recommend/oer_materials": "/api/v1/oer_materials"
         },
-        logProvider: function (provider) {
+        logProvider(provider) {
             // create logger for sending requests
-            return Logger.createInstance(`proxy`, 'info', 'platform', config.environment !== 'prod');
+            return Logger.createInstance("proxy", "info", "platform", config.environment !== "prod");
         }
     }));
 
@@ -43,5 +42,4 @@ module.exports = function (app, config) {
     //         return Logger.createInstance(`proxy`, 'info', 'platform', config.environment !== 'prod');
     //     }
     // }));
-
 };

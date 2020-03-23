@@ -86,8 +86,7 @@ class ElastisearchPost extends BasicBolt {
         }
 
         // check for provider in database
-        self._pg.select({ token: provider_token }, 'providers', (xe, results) => {
-
+        self._pg.select({ token: provider_token }, "providers", (xe, results) => {
             const {
                 id: provider_id,
                 name: provider_name,
@@ -119,18 +118,17 @@ class ElastisearchPost extends BasicBolt {
                 body: { record },
                 json: true
             })
-            .then(() => {
+                .then(() => {
                 // continue with the last patching
-                if (self._finalBolt) { return callback(); }
-                return self._onEmit(message, stream_id, callback);
-            })
-            .catch((error) => {
-                if (self._finalBolt) { return callback(); }
-                // log error message and store the not completed material
-                self.set(message, self._documentErrorPath, `${self._prefix} ${error.message}`);
-                return self._onEmit(message, stream_id, callback);
-            });
-
+                    if (self._finalBolt) { return callback(); }
+                    return self._onEmit(message, stream_id, callback);
+                })
+                .catch((error) => {
+                    if (self._finalBolt) { return callback(); }
+                    // log error message and store the not completed material
+                    self.set(message, self._documentErrorPath, `${self._prefix} ${error.message}`);
+                    return self._onEmit(message, stream_id, callback);
+                });
         });
     }
 }

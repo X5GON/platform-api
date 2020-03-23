@@ -1,30 +1,30 @@
-/************************************************
+/** **********************************************
  * Creates the postgresql database to store
  * OER materials, user activities and other
  * data used in the platform.
  */
 
-require('module-alias/register');
-/////////////////////////////////////////////////
+require("module-alias/register");
+// ///////////////////////////////////////////////
 // Modules and configurations
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
 
 // external modules
-const async = require('async');
+const async = require("async");
 
 // configuration data
-const config = require('@config/config');
+const config = require("@config/config");
 
 // postgresql connection to the database
-const pg = require('@library/postgresQL')(config.pg);
+const pg = require("@library/postgresQL")(config.pg);
 
 
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
 // Script parameters
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
 
 // get schema
-const schema  = config.pg.schema;
+const schema = config.pg.schema;
 
 // Statement for checking if the provided schema exists
 const schemaExistsString = `
@@ -1241,7 +1241,7 @@ const dbUpdates = [{
         ALTER TABLE ${schema}.material_contents
         ADD COLUMN last_updated timestamp with time zone;
     `
-},  {
+}, {
     version: 7,
     update: `
         ALTER TABLE ${schema}.oer_materials
@@ -1279,14 +1279,14 @@ const dbUpdates = [{
 }];
 
 // get the requested database version
-const pgVersion = config.pg.version === '*' ?
-                  dbUpdates.length :
-                  config.pg.version;
+const pgVersion = config.pg.version === "*"
+    ? dbUpdates.length
+    : config.pg.version;
 
 
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
 // Helper functions
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
 
 
 /**
@@ -1296,7 +1296,7 @@ const pgVersion = config.pg.version === '*' ?
 function prepareSchema() {
     // returns row containing boolean true if schema in config exists, false otherwise
     return new Promise((resolve, reject) => {
-        pg.execute(schemaExistsString, [], function (error, result) {
+        pg.execute(schemaExistsString, [], (error, result) => {
             if (error) {
                 // on error reject the process
                 return reject(error);
@@ -1308,7 +1308,7 @@ function prepareSchema() {
             console.log(`Creating new schema=${schema.toUpperCase()}`);
 
             // creates new schema from the configurations
-            pg.execute(createSchemaString, [], function (xerror, xresult) {
+            pg.execute(createSchemaString, [], (xerror, xresult) => {
                 if (xerror) {
                     console.log(`Error creating schema= ${xerror.message}`);
                     return reject(xerror);
@@ -1326,10 +1326,9 @@ function prepareSchema() {
  * database tables.
  */
 function prepareTables() {
-
     return new Promise((resolve, reject) => {
         // check if the tables exist in the database
-        pg.execute(tablesExistString, [], function (error, result) {
+        pg.execute(tablesExistString, [], (error, result) => {
             if (error) { return reject(error); }
 
             // delete already existing tables from dbCreates object
@@ -1343,24 +1342,21 @@ function prepareTables() {
 
             async.eachSeries(tableNames,
                 // 2nd param is the function that each item is passed to
-                function (tableName, callback) {
+                (tableName, callback) => {
                     const sqlStatement = dbCreates[tableName];
                     // execute create query from dbCreates for a specific table
-                    pg.execute(sqlStatement, [], function (xerror, result) {
+                    pg.execute(sqlStatement, [], (xerror, result) => {
                         if (xerror) { return callback(xerror); }
                         return callback();
                     });
-
                 },
-                function (xerror) {
+                (xerror) => {
                     // All tasks are done now
                     if (xerror) { return reject(xerror); }
                     return resolve();
-                }
-            ); // async.eachSeries(tableCreates)
+                }); // async.eachSeries(tableCreates)
         }); // pg.execute(tablesExistString)
     }); // Promise(resolve, reject)
-
 } // prepareTables()
 
 
@@ -1379,26 +1375,25 @@ function prepareTables() {
  * @description Updates the database tables.
  * @returns {Promise} The promise of updating the database tables.
  */
-function updateTables () {
-
+function updateTables() {
     return new Promise((resolve, reject) => {
         // setup the goal and the maximum database version
         const vGoal = parseInt(pgVersion);
-        const vMax = (dbUpdates.length)? dbUpdates[dbUpdates.length - 1].version : 0;
+        const vMax = (dbUpdates.length) ? dbUpdates[dbUpdates.length - 1].version : 0;
         let vCurrent = 0;
 
         console.log(`About to update DB to version ${vGoal} out of max version: ${vMax}`);
 
-        /////////////////////////////////////////////////
+        // ///////////////////////////////////////////////
         // Internal helper functions
-        /////////////////////////////////////////////////
+        // ///////////////////////////////////////////////
 
         /**
          * @description Updates the database version.
          * @param {Number | String} _version - The current database version.
          * @param {Function} callback - The function called after the process ends.
          */
-        function updateDatabaseVersion (_version, callback) {
+        function updateDatabaseVersion(_version, callback) {
             const version = parseInt(_version);
 
             console.log(`Updating database version : v${version} => v${version + 1}`);
@@ -1413,9 +1408,7 @@ function updateTables () {
             }
 
             // execute the version update statement
-            pg.execute(query, [], function (error, r) {
-                return callback(error);
-            });
+            pg.execute(query, [], (error, r) => callback(error));
         }
 
 
@@ -1426,12 +1419,10 @@ function updateTables () {
          * @param {Function} callback - The function executed at the end of the process.
          */
         function updateDatabaseTables(_version, _sql, callback) {
-
             if (vCurrent < _version && _version <= vGoal) {
-
-                if (_sql == '') {
+                if (_sql == "") {
                     // update the database version
-                    return updateDatabaseVersion(vCurrent, function (error) {
+                    return updateDatabaseVersion(vCurrent, (error) => {
                         if (error) { return callback(error); }
 
                         vCurrent++;
@@ -1439,56 +1430,51 @@ function updateTables () {
                     }); // updateDatabaseVersion(vCurrent)
                 }
 
-                pg.execute(_sql, [], function (error, result) {
+                pg.execute(_sql, [], (error, result) => {
                     if (error) { return callback(error); }
 
                     // update the database version
-                    return updateDatabaseVersion(vCurrent, function (xerror) {
+                    return updateDatabaseVersion(vCurrent, (xerror) => {
                         if (xerror) { return callback(xerror); }
 
                         vCurrent++;
                         return callback(null);
                     }); // updateDatabaseVersion(vCurrent)
                 }); // pg.execute(_sql)
-
             } else { return callback(null); }
-
         } // updateDatabase(_version, _sql, callback)
 
 
-        /////////////////////////////////////////////////
+        // ///////////////////////////////////////////////
         // Function execution
-        /////////////////////////////////////////////////
+        // ///////////////////////////////////////////////
 
         // returns a row containing integer version of DB
-        pg.execute(checkVersion, [], function (error, result) {
+        pg.execute(checkVersion, [], (error, result) => {
             if (error) { return reject(error); }
 
             // were there any versions already stored
             if (result.length > 0) {
                 // get the latest version
-                vCurrent = result.map(rec => rec.version)
-                                .reduce((prev, curr) => Math.max(prev, curr), 0);
+                vCurrent = result.map((rec) => rec.version)
+                    .reduce((prev, curr) => Math.max(prev, curr), 0);
             }
             console.log(`Current version is ${vCurrent}`);
 
             // loop through all database updates and execute the change
             async.eachSeries(dbUpdates,
                 // 2nd param is the function that each item is passed to
-                function (dbUpdate, callback) {
+                (dbUpdate, callback) => {
                     updateDatabaseTables(dbUpdate.version, dbUpdate.update, callback);
                 },
                 // 3rd param is the function to call when everything's done
-                function (xerror) {
+                (xerror) => {
                     // All tasks are done now
                     if (xerror) { return reject(xerror); }
                     return resolve();
-                }
-            );//async.eachSeries(dbUpdates)
+                });// async.eachSeries(dbUpdates)
         }); // pg.execute(checkVersion)
-
     }); // Promise(resolve, reject)
-
 } // updateTables()
 
 
@@ -1497,25 +1483,25 @@ function updateTables () {
  * @param {Function} [callback] - The function executed at the end of the process.
  */
 function startDBCreate(callback) {
-    console.log('Checking whether to update database');
+    console.log("Checking whether to update database");
     return prepareSchema()
         .then(prepareTables)
         .then(updateTables)
         .then(() => {
             // execute callback if present
-            if (callback && typeof(callback) === 'function') {
+            if (callback && typeof (callback) === "function") {
                 callback();
             }
         })
-        .catch(error => {
-            console.log('Error when creating database', error);
+        .catch((error) => {
+            console.log("Error when creating database", error);
         })
         .then(() => { pg.close(); });
 } // startDBCreate(callback)
 
 
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
 // Script export
-/////////////////////////////////////////////////
+// ///////////////////////////////////////////////
 
 exports.startDBCreate = startDBCreate;

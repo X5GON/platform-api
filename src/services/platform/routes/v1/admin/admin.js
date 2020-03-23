@@ -1,5 +1,5 @@
 // external modules
-const router = require('express').Router();
+const router = require("express").Router();
 
 /**
  * @description Adds API routes for platform website requests.
@@ -8,13 +8,11 @@ const router = require('express').Router();
  * @param {Object} config - The configuration object.
  */
 module.exports = function (pg, logger, config, passport, monitor) {
-
-
     function _checkAuthentication(req, res, next) {
         // if user is authenticated in the session, carry on
         if (req.isAuthenticated()) { return next(); }
         // they aren't, redirect them to the admin login
-        res.redirect('/admin/login');
+        res.redirect("/admin/login");
     }
 
 
@@ -35,14 +33,14 @@ module.exports = function (pg, logger, config, passport, monitor) {
          * @returns {String} The fixed number.
          */
         function toFixed(number) {
-            return number <= 10 ? number.toFixed(2) :
-                number <= 100 ? number.toFixed(1) :
-                number.toFixed(0);
+            return number <= 10 ? number.toFixed(2)
+                : number <= 100 ? number.toFixed(1)
+                    : number.toFixed(0);
         }
         // format based on the quotient
-        if (billions>= 1) {
+        if (billions >= 1) {
             return `${toFixed(billions)}B`;
-        } else if (millions>= 1) {
+        } else if (millions >= 1) {
             return `${toFixed(millions)}M`;
         } else if (thousands >= 1) {
             return `${toFixed(thousands)}k`;
@@ -52,44 +50,42 @@ module.exports = function (pg, logger, config, passport, monitor) {
     }
 
 
-    /**********************************
+    /** ********************************
      * Admin login and main page
-     *********************************/
+     ******************************** */
 
 
-    router.get('/admin/login', (req, res) => {
+    router.get("/admin/login", (req, res) => {
         // if user is authenticated in the session, continue to admin
         if (req.isAuthenticated()) {
-            return res.redirect('/admin');
+            return res.redirect("/admin");
         }
 
         // return the admin login page
-        return res.render('admin-login', {
-            layout: 'admin-submain',
-            title: 'Admin Login',
-            message: req.flash('error')
+        return res.render("admin-login", {
+            layout: "admin-submain",
+            title: "Admin Login",
+            message: req.flash("error")
         });
     });
 
 
-    router.post('/admin/login',
+    router.post("/admin/login",
         // return the admin login page
-        passport.authenticate('local', {
-            successRedirect: '/admin',
-            failureRedirect: '/admin/login',
-            failureFlash: 'Invalid username or password.'
-        })
-    );
+        passport.authenticate("local", {
+            successRedirect: "/admin",
+            failureRedirect: "/admin/login",
+            failureFlash: "Invalid username or password."
+        }));
 
 
-    router.get('/admin/logout', (req, res) => {
+    router.get("/admin/logout", (req, res) => {
         req.logout();
-        res.redirect('/');
+        res.redirect("/");
     });
 
 
-    router.get('/admin', _checkAuthentication, (req, res) => {
-
+    router.get("/admin", _checkAuthentication, (req, res) => {
         /**
          * Gets the statistics of the given data type.
          * @param {String} type - The type of data to select.
@@ -110,39 +106,36 @@ module.exports = function (pg, logger, config, passport, monitor) {
         }
 
         // get number of materials, user activity data and unique users
-        const materialCount = retrieveStats('oer_materials');
-        const userActivitesCount = retrieveStats('user_activities');
-        const cookiesCount = retrieveStats('cookies');
+        const materialCount = retrieveStats("oer_materials");
+        const userActivitesCount = retrieveStats("user_activities");
+        const cookiesCount = retrieveStats("cookies");
 
-        Promise.all([materialCount, userActivitesCount, cookiesCount]).then(stats => {
+        Promise.all([materialCount, userActivitesCount, cookiesCount]).then((stats) =>
 
             // return the admin homepage
-            return res.render('admin-homepage', {
-                layout: 'admin',
-                title: 'Admin',
+            res.render("admin-homepage", {
+                layout: "admin",
+                title: "Admin",
                 stats: {
                     oer_materials: numberFormat(stats[0].count),
                     user_activities: numberFormat(stats[1].count),
                     unique_users: numberFormat(stats[2].count)
                 }
-            });
-        }).catch(error => {
+            })).catch((error) =>
 
             // return the admin homepage
-            return res.render('admin-homepage', {
-                layout: 'admin',
-                title: 'Admin'
-            });
-        });
-
+            res.render("admin-homepage", {
+                layout: "admin",
+                title: "Admin"
+            }));
     });
 
 
-    /**********************************
+    /** ********************************
      * Admin OER providers
-     *********************************/
+     ******************************** */
 
-    router.get('/admin/oer_providers', _checkAuthentication, (req, res) => {
+    router.get("/admin/oer_providers", _checkAuthentication, (req, res) => {
         /**
          * Gets the API keys from database.
          * @returns {Promise} The promise of the API keys data.
@@ -159,41 +152,39 @@ module.exports = function (pg, logger, config, passport, monitor) {
         // get the API keys
         const providers = retrieveProviders();
 
-        providers.then(bundles => {
+        providers.then((bundles) => {
             // get bundle statistics
             const stats = {
                 oer_materials: numberFormat(
-                    bundles.map(provider => provider.material_count)
+                    bundles.map((provider) => provider.material_count)
                         .reduce((sum, acc) => sum + acc, 0)
                 ),
                 user_activities: numberFormat(
-                    bundles.map(provider => provider.visit_count)
+                    bundles.map((provider) => provider.visit_count)
                         .reduce((sum, acc) => sum + acc, 0)
                 )
             };
 
             // render the page
-            return res.render('admin-oer-providers', {
-                layout: 'admin',
-                title: 'OER Providers',
+            return res.render("admin-oer-providers", {
+                layout: "admin",
+                title: "OER Providers",
                 providers: bundles,
                 stats
             });
-        }).catch(error => {
+        }).catch((error) =>
             // render the page
-            return res.render('admin-oer-providers', {
-                layout: 'admin',
-                title: 'OER Providers',
+            res.render("admin-oer-providers", {
+                layout: "admin",
+                title: "OER Providers",
                 error
-            });
-        });
-
+            }));
     });
 
 
-    /**********************************
+    /** ********************************
      * Admin API Key
-     *********************************/
+     ******************************** */
 
     /**
      * Prepares the API key instance for consumption by formating the date_created
@@ -206,21 +197,21 @@ module.exports = function (pg, logger, config, passport, monitor) {
         instance.date_created = (new Date(instance.date_created)).toUTCString().substr(4);
         // beautify the permission list
         instance.permissions = Object.keys(instance.permissions)
-            .map(key => `${key}[${instance.permissions[key].join(',')}]`)
-            .join('\n');
+            .map((key) => `${key}[${instance.permissions[key].join(",")}]`)
+            .join("\n");
         // return the instance
         return instance;
     }
 
 
-    router.get('/admin/api_keys', _checkAuthentication, (req, res) => {
+    router.get("/admin/api_keys", _checkAuthentication, (req, res) => {
         /**
          * Gets the API keys from database.
          * @returns {Promise} The promise of the API keys data.
          */
         function retrieveAPIKeys() {
             return new Promise((resolve, reject) => {
-                pg.select({}, 'api_keys', (error, results) => {
+                pg.select({}, "api_keys", (error, results) => {
                     if (error) { return reject(error); }
                     results.forEach(prepareAPIKeyData);
                     return resolve(results);
@@ -230,31 +221,28 @@ module.exports = function (pg, logger, config, passport, monitor) {
         // get the API keys
         const apiKeys = retrieveAPIKeys();
 
-        apiKeys.then(bundles => {
+        apiKeys.then((bundles) =>
             // render the page
-            return res.render('admin-api-keys', {
-                layout: 'admin',
-                title: 'Platform API Keys',
+            res.render("admin-api-keys", {
+                layout: "admin",
+                title: "Platform API Keys",
                 apiKeys: bundles
-            });
-        }).catch(error => {
+            })).catch((error) =>
             // render the page
-            return res.render('admin-api-keys', {
-                layout: 'admin',
-                title: 'Platform API Keys',
+            res.render("admin-api-keys", {
+                layout: "admin",
+                title: "Platform API Keys",
                 error
-            });
-        });
-
+            }));
     });
 
 
-    router.post('/admin/api_keys/api/create', _checkAuthentication, (req, res) => {
+    router.post("/admin/api_keys/api/create", _checkAuthentication, (req, res) => {
         const { owner } = req.body;
 
         // validate that the owner is a string
-        if (typeof owner !== 'string') {
-            return res.status(400).send({ error: 'owner parameter is not a string' });
+        if (typeof owner !== "string") {
+            return res.status(400).send({ error: "owner parameter is not a string" });
         }
 
         /**
@@ -263,10 +251,10 @@ module.exports = function (pg, logger, config, passport, monitor) {
          */
         function generateUUID() {
             let time = new Date().getTime();
-            const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxxxxxx'.replace(/[xy]/g, char => {
+            const uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxxxxxx".replace(/[xy]/g, (char) => {
                 let hash = (time + Math.random() * 16) % 16 | 0;
                 time = Math.floor(time / 16);
-                return (char === 'x' ? hash : (hash & 0x3 | 0x8)).toString(16);
+                return (char === "x" ? hash : (hash & 0x3 | 0x8)).toString(16);
             });
             return uuid;
         }
@@ -278,7 +266,7 @@ module.exports = function (pg, logger, config, passport, monitor) {
          */
         function insertAPIKey({ owner, key, permissions }) {
             return new Promise((resolve, reject) => {
-                pg.insert({ owner, key, permissions }, 'api_keys', (error, results) => {
+                pg.insert({ owner, key, permissions }, "api_keys", (error, results) => {
                     if (error) { return reject(error); }
                     results.forEach(prepareAPIKeyData);
                     return resolve(results);
@@ -291,22 +279,18 @@ module.exports = function (pg, logger, config, passport, monitor) {
             owner,
             key: generateUUID(),
             permissions: {
-                upload: ['materials']
+                upload: ["materials"]
             }
         };
 
         // delete the API keys
         const apiKeys = insertAPIKey(userAPIKey);
 
-        apiKeys.then(results => {
-            return res.status(200).send(results);
-        }).catch(error => {
-            return res.status(400).send({ error: 'Unable to create API key' });
-        });
+        apiKeys.then((results) => res.status(200).send(results)).catch((error) => res.status(400).send({ error: "Unable to create API key" }));
     });
 
 
-    router.get('/admin/api_keys/api/:id/delete', _checkAuthentication, (req, res) => {
+    router.get("/admin/api_keys/api/:id/delete", _checkAuthentication, (req, res) => {
         const id = parseInt(req.params.id);
         /**
          * Deletes the API keys from database.
@@ -315,7 +299,7 @@ module.exports = function (pg, logger, config, passport, monitor) {
          */
         function deleteAPIKeys(id) {
             return new Promise((resolve, reject) => {
-                pg.delete({ id }, 'api_keys', (error, results) => {
+                pg.delete({ id }, "api_keys", (error, results) => {
                     if (error) { return reject(error); }
                     return resolve(results);
                 });
@@ -324,26 +308,20 @@ module.exports = function (pg, logger, config, passport, monitor) {
         // delete the API keys
         const apiKeys = deleteAPIKeys(id);
 
-        apiKeys.then(results => {
-            return res.status(200).send(results);
-        }).catch(error => {
-            return res.status(400).send({ error: 'Unable to delete API key' });
-        });
+        apiKeys.then((results) => res.status(200).send(results)).catch((error) => res.status(400).send({ error: "Unable to delete API key" }));
     });
 
-    /**********************************
+    /** ********************************
      * Admin Monitor Process
-     *********************************/
+     ******************************** */
 
-    router.get('/admin/monitor/process', _checkAuthentication, (req, res) => {
+    router.get("/admin/monitor/process", _checkAuthentication, (req, res) => {
         // currently redirect to form page
-        monitor.listProcesses((error, processList) => {
-            return res.render('admin-monitor-process', {
-                layout: 'admin',
-                title: 'Process Monitor',
-                processList
-            });
-        });
+        monitor.listProcesses((error, processList) => res.render("admin-monitor-process", {
+            layout: "admin",
+            title: "Process Monitor",
+            processList
+        }));
     });
 
     /**
@@ -355,7 +333,7 @@ module.exports = function (pg, logger, config, passport, monitor) {
      *
      * @apiParam {String} id - The id of the process.
      */
-    router.get('/admin/monitor/api/process/:id/stop', _checkAuthentication, (req, res) => {
+    router.get("/admin/monitor/api/process/:id/stop", _checkAuthentication, (req, res) => {
         const id = parseInt(req.params.id);
         monitor.stopProcess(id, (error, status) => {
             if (error) { return res.status(400).send({ error: error.message }); }
@@ -372,7 +350,7 @@ module.exports = function (pg, logger, config, passport, monitor) {
      *
      * @apiParam {String} id - The id of the process.
      */
-    router.get('/admin/monitor/api/process/:id/start', _checkAuthentication, (req, res) => {
+    router.get("/admin/monitor/api/process/:id/start", _checkAuthentication, (req, res) => {
         const id = parseInt(req.params.id);
         monitor.restartProcess(id, (error, status) => {
             if (error) { return res.status(400).send({ error: error.message }); }
@@ -381,9 +359,9 @@ module.exports = function (pg, logger, config, passport, monitor) {
     });
 
 
-    /**********************************
+    /** ********************************
      * Admins List
-     *********************************/
+     ******************************** */
 
     /**
      * Prepares the admin instance for consumption by creating the password_hidden
@@ -394,21 +372,21 @@ module.exports = function (pg, logger, config, passport, monitor) {
     function prepareAdmins(instance) {
         // beautify the date created value
         // beautify the permission list
-        instance.password_hidden = instance.password.replace(/./g, '*');
+        instance.password_hidden = instance.password.replace(/./g, "*");
         // return the instance
         return instance;
     }
 
-    router.get('/admin/list', _checkAuthentication, (req, res) => {
+    router.get("/admin/list", _checkAuthentication, (req, res) => {
         /**
          * Gets the API keys from database.
          * @returns {Promise} The promise of the API keys data.
          */
         function retrieveAdminList() {
             return new Promise((resolve, reject) => {
-                pg.select({}, 'admins', (error, results) => {
+                pg.select({}, "admins", (error, results) => {
                     if (error) { return reject(error); }
-                    results.forEach(prepareAdmins)
+                    results.forEach(prepareAdmins);
                     return resolve(results);
                 });
             });
@@ -416,25 +394,24 @@ module.exports = function (pg, logger, config, passport, monitor) {
         // get the API keys
         const admins = retrieveAdminList();
 
-        admins.then(bundles => {
+        admins.then((bundles) =>
             // currently redirect to form page
-            return res.render('admin-list', {
-                layout: 'admin',
-                title: 'Admin List',
+            res.render("admin-list", {
+                layout: "admin",
+                title: "Admin List",
                 admins: bundles
-            });
-        });
+            }));
     });
 
 
-    router.post('/admin/list/api/create', _checkAuthentication, (req, res) => {
+    router.post("/admin/list/api/create", _checkAuthentication, (req, res) => {
         const { username, password } = req.body;
 
         // validate that the owner is a string
-        if (typeof username !== 'string') {
-            return res.status(400).send({ error: 'username parameter is not a string' });
-        } else if (typeof password !== 'string') {
-            return res.status(400).send({ error: 'password parameter is not a string' });
+        if (typeof username !== "string") {
+            return res.status(400).send({ error: "username parameter is not a string" });
+        } else if (typeof password !== "string") {
+            return res.status(400).send({ error: "password parameter is not a string" });
         }
 
         /**
@@ -444,7 +421,7 @@ module.exports = function (pg, logger, config, passport, monitor) {
          */
         function insertAdmin({ username, password }) {
             return new Promise((resolve, reject) => {
-                pg.insert({ username, password }, 'admins', (error, results) => {
+                pg.insert({ username, password }, "admins", (error, results) => {
                     if (error) { return reject(error); }
                     results.forEach(prepareAdmins);
                     return resolve(results);
@@ -461,15 +438,11 @@ module.exports = function (pg, logger, config, passport, monitor) {
         // delete the API keys
         const admin = insertAdmin(newAdmin);
 
-        admin.then(results => {
-            return res.status(200).send(results);
-        }).catch(error => {
-            return res.status(400).send({ error: 'Unable to create admin' });
-        });
+        admin.then((results) => res.status(200).send(results)).catch((error) => res.status(400).send({ error: "Unable to create admin" }));
     });
 
 
-    router.get('/admin/list/api/:id/delete', _checkAuthentication, (req, res) => {
+    router.get("/admin/list/api/:id/delete", _checkAuthentication, (req, res) => {
         const id = parseInt(req.params.id);
         /**
          * Deletes the API keys from database.
@@ -478,7 +451,7 @@ module.exports = function (pg, logger, config, passport, monitor) {
          */
         function deleteAdmin(id) {
             return new Promise((resolve, reject) => {
-                pg.delete({ id }, 'admins', (error, results) => {
+                pg.delete({ id }, "admins", (error, results) => {
                     if (error) { return reject(error); }
                     return resolve(results);
                 });
@@ -487,13 +460,9 @@ module.exports = function (pg, logger, config, passport, monitor) {
         // delete the API keys
         const admin = deleteAdmin(id);
 
-        admin.then(results => {
-            return res.status(200).send(results);
-        }).catch(error => {
-            return res.status(400).send({ error: 'Unable to delete admin' });
-        });
+        admin.then((results) => res.status(200).send(results)).catch((error) => res.status(400).send({ error: "Unable to delete admin" }));
     });
 
 
     return router;
-}
+};

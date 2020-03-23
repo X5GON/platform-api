@@ -1,9 +1,9 @@
 // external modules
-const router = require('express').Router();
-const request = require('request');
+const router = require("express").Router();
+const request = require("request");
 
 // internal modules
-const KafkaProducer = require('@library/kafka-producer');
+const KafkaProducer = require("@library/kafka-producer");
 
 /**
  * @description Adds API routes for platform website requests.
@@ -11,10 +11,9 @@ const KafkaProducer = require('@library/kafka-producer');
  * @param {Object} logger - The logger object.
  */
 module.exports = function (pg, logger, config) {
-
-    ////////////////////////////////////////
+    // //////////////////////////////////////
     // Helper functions
-    ////////////////////////////////////////
+    // //////////////////////////////////////
 
     // initialize kafka producer
     const producer = new KafkaProducer(config.kafka.host);
@@ -55,61 +54,56 @@ module.exports = function (pg, logger, config) {
                     response: gRecaptchaResponse,
                 }
             }, (error, httpResponse, body) => {
-                    // handle error on request
-                    if (error) { return reject(error); }
-                    // otherwise return the request body
-                    return resolve(JSON.parse(body));
-                }
-            );
+                // handle error on request
+                if (error) { return reject(error); }
+                // otherwise return the request body
+                return resolve(JSON.parse(body));
+            });
         });
     }
 
 
-    ////////////////////////////////////////
+    // //////////////////////////////////////
     // Portal Pages
-    ////////////////////////////////////////
+    // //////////////////////////////////////
 
-    router.get('/api/v1/oer_provider', (req, res) => {
+    router.get("/api/v1/oer_provider", (req, res) => {
         // get token used for accessing data
         const token = req.query.providerId;
 
         if (!token) {
-             // provider is not registered in the platform
-             logger.warn('[warn] token was not provided by the user',
-             logger.formatRequest(req)
-         );
-         // redirect user to previous page
-         return res.json({ error: 'token was not provided by the user' });
+            // provider is not registered in the platform
+            logger.warn("[warn] token was not provided by the user",
+                logger.formatRequest(req));
+            // redirect user to previous page
+            return res.json({ error: "token was not provided by the user" });
         }
 
         // check if the repository already exists - return existing token
         pg.selectProviderStats(token, (error, results) => {
             if (error) {
                 // error when retrieving provider data
-                logger.error('[error] postgresql',
+                logger.error("[error] postgresql",
                     logger.formatRequest(req, {
                         error: {
                             message: error.message,
                             stack: error.stack
                         }
-                    })
-                );
+                    }));
                 // redirect user to previous page
-                return res.json({ error: 'error on server side' });
-             }
+                return res.json({ error: "error on server side" });
+            }
 
             if (results.length === 0) {
                 // provider is not registered in the platform
-                logger.warn('[warn] postgresql provider not registered in X5GON platform',
-                    logger.formatRequest(req)
-                );
+                logger.warn("[warn] postgresql provider not registered in X5GON platform",
+                    logger.formatRequest(req));
                 // redirect user to previous page
-                return res.json({ error: 'no OER provider registered with the given token' });
+                return res.json({ error: "no OER provider registered with the given token" });
             } else {
                 // provider is not registered in the platform
-                logger.info('[info] provider requested for its information',
-                    logger.formatRequest(req)
-                );
+                logger.info("[info] provider requested for its information",
+                    logger.formatRequest(req));
                 // render the form submition
                 return res.send({
                     ...results[0]
@@ -119,7 +113,7 @@ module.exports = function (pg, logger, config) {
     });
 
     // send repository
-    router.post('/api/v1/oer_provider', (req, res) => {
+    router.post("/api/v1/oer_provider", (req, res) => {
         // get body request
         const body = req.body;
 
@@ -127,39 +121,36 @@ module.exports = function (pg, logger, config) {
         const name = body.name;
         const domain = body.domain;
         const contact = body.contact;
-        const referrer = req.header('Referrer') ?
-            req.header('Referrer').split('?')[0] :
-            '/join';
+        const referrer = req.header("Referrer")
+            ? req.header("Referrer").split("?")[0]
+            : "/join";
 
         // verify user through google validation
         const gRecaptchaResponse = body["g-recaptcha-response"];
 
         _googleVerifyUser(gRecaptchaResponse)
-            .then(validation => {
-
+            .then((validation) => {
                 // if not validated - redirect to join form
                 if (!validation.success) {
                     // provider is a robot
-                    logger.warn('[warn] provider is a robot',
-                        logger.formatRequest(req)
-                    );
+                    logger.warn("[warn] provider is a robot",
+                        logger.formatRequest(req));
                     // redirect user to join page
                     return res.redirect(`${referrer}?invalid=true`);
                 }
 
                 // check if the repository already exists - return existing token
-                pg.select({ name, domain, contact }, 'providers', (error, results) => {
+                pg.select({ name, domain, contact }, "providers", (error, results) => {
                     // log error
                     if (error) {
                         // error when retrieving data
-                        logger.error('[error] postgresql',
+                        logger.error("[error] postgresql",
                             logger.formatRequest(req, {
                                 error: {
                                     message: error.message,
                                     stack: error.stack
                                 }
-                            })
-                        );
+                            }));
                         // redirect user to previous page
                         return res.redirect(`${referrer}?invalid=true`);
                     }
@@ -173,26 +164,28 @@ module.exports = function (pg, logger, config) {
                         const token = _generateToken(seed);
 
                         // insert repository information to postgres
-                        pg.insert({ name, domain, contact, token }, 'providers', (xerror, xresults) => {
+                        pg.insert({
+                            name, domain, contact, token
+                        }, "providers", (xerror, xresults) => {
                             if (xerror) {
                                 // error when retrieving data
-                                logger.error('[error] inserting provider data',
+                                logger.error("[error] inserting provider data",
                                     logger.formatRequest(req, {
                                         error: {
                                             message: xerror.message,
                                             stack: xerror.stack
                                         }
-                                    })
-                                );
+                                    }));
                                 // redirect user to previous page
                                 return res.redirect(`${referrer}?unsuccessful=true`);
                             }
                             // redirect activity to information retrievers
-                            producer.send('STORE_PROVIDER', { name, domain, contact, token });
+                            producer.send("STORE_PROVIDER", {
+                                name, domain, contact, token
+                            });
                             // render the form submition
                             return res.redirect(`/oer_provider?repositoryToken=${token}`);
                         });
-
                     } else {
                         // there are registered repositories in the database
                         const { token } = results[0];
@@ -201,38 +194,36 @@ module.exports = function (pg, logger, config) {
                     }
                 });
             })
-            .catch(error => {
+            .catch((error) => {
                 // provider is not registered in the platform
-                logger.error('[error] google user verification error',
+                logger.error("[error] google user verification error",
                     logger.formatRequest(req, {
                         error: {
                             message: error.message,
                             stack: error.stack
                         }
-                    })
-                );
+                    }));
                 // redirect user to join page
-                return res.redirect('/join?invalid=true');
+                return res.redirect("/join?invalid=true");
             });
     });
 
 
-    ////////////////////////////////////////
+    // //////////////////////////////////////
     // Material Search
-    ////////////////////////////////////////
+    // //////////////////////////////////////
 
     // maximum numbers of documents in recommendation list
     const MAX_DOCS = 10;
 
-    router.get('/search', (req, res) => {
+    router.get("/search", (req, res) =>
         // redirect user to join page
-        return res.redirect('http://discovery.x5gon.org/');
-    });
+        res.redirect("http://discovery.x5gon.org/"));
 
 
-    ////////////////////////////////////////
+    // //////////////////////////////////////
     // Recommendation Embeddings
-    ////////////////////////////////////////
+    // //////////////////////////////////////
 
     /**
      * @api {GET} /embed/recommendations Ember-ready recommendation list
@@ -250,7 +241,7 @@ module.exports = function (pg, logger, config) {
      *      <iframe src="https://platform.x5gon.org/embed/recommendations?url=https://platform.x5gon.org/materialUrl&text=education"
      *          style="border:0px;height:425px;"></iframe>
      */
-    router.get('/embed/recommendations', (req, res) => {
+    router.get("/embed/recommendations", (req, res) => {
         const query = req.query;
 
         // recommender list style parameters
@@ -260,57 +251,54 @@ module.exports = function (pg, logger, config) {
             fontSize: query.fontSize
         };
 
-        let options = { layout: 'empty', style, empty: true };
-        let queryString = Object.keys(query).map(key => `${key}=${encodeURIComponent(query[key])}`).join('&');
+        let options = { layout: "empty", style, empty: true };
+        let queryString = Object.keys(query).map((key) => `${key}=${encodeURIComponent(query[key])}`).join("&");
         request(`http://localhost:${config.recsys.port}/api/v1/recommend/bundles?${queryString}`, (error, httpRequest, body) => {
-
             if (error) {
                 // error when making material request
-                logger.error('[error] request for material bundles',
+                logger.error("[error] request for material bundles",
                     logger.formatRequest(req, {
                         error: {
                             message: error.message,
                             stack: error.stack
                         }
-                    })
-                );
+                    }));
                 // render recommendations
-                return res.render('recommendations', options);
+                return res.render("recommendations", options);
             }
 
             try {
                 const recommendations = JSON.parse(body);
-                options.empty = recommendations.length !== 0 || recommendations.error ? false : true;
+                options.empty = !(recommendations.length !== 0 || recommendations.error);
                 options.query = query;
                 options.recommendations = recommendations;
 
                 if (options.query.url) {
                     // encode query url if present
                     options.query.url = encodeURIComponent(options.query.url);
-                    options.recommendations.forEach(material => material.url = encodeURIComponent(material.url));
+                    options.recommendations.forEach((material) => { material.url = encodeURIComponent(material.url); });
                 }
                 // encode all material urls
-                options.recommended_urls = options.recommendations.map(material => encodeURIComponent(material.url));
+                options.recommended_urls = options.recommendations.map((material) => encodeURIComponent(material.url));
             } catch (xerror) {
                 // error when processing materials
-                logger.error('[error] processing material bundles',
+                logger.error("[error] processing material bundles",
                     logger.formatRequest(req, {
                         error: {
                             message: xerror.message,
                             stack: xerror.stack
                         }
-                    })
-                );
+                    }));
             }
             // render recommendations
-            return res.render('recommendations', options);
+            return res.render("recommendations", options);
         });
     });
 
 
-    ////////////////////////////////////////
+    // //////////////////////////////////////
     // End of Router
-    ////////////////////////////////////////
+    // //////////////////////////////////////
 
     return router;
 };

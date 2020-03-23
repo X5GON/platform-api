@@ -1,16 +1,16 @@
-require(`module-alias/register`);
+require("module-alias/register");
 // external modules
-const qtopology = require('qtopology');
+const qtopology = require("qtopology");
 
 // parse the command line
 const params = qtopology.parseCommandLineEx(process.argv, {
-    tn: 'topologyName',
-    tp: 'topologyPath',
+    tn: "topologyName",
+    tp: "topologyPath",
 });
 
 // load the associated topology
 let config = require(params.topologyPath);
-qtopology.validate({ config: config, exitOnError: true });
+qtopology.validate({ config, exitOnError: true });
 
 // create the pipeline topology
 let topology = new qtopology.TopologyLocal();
@@ -35,13 +35,13 @@ function shutdown() {
 }
 
 // do something when app is closing
-process.on('exit', shutdown);
+process.on("exit", shutdown);
 
 // catches ctrl+c event
-process.on('SIGINT', shutdown);
+process.on("SIGINT", shutdown);
 
 // catches uncaught exceptions
-process.on('uncaughtException', e => {
+process.on("uncaughtException", (e) => {
     console.log(e);
     process.exit(1);
 });

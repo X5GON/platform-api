@@ -75,9 +75,9 @@ class ElastisearchPatch extends BasicBolt {
                     const value = transcriptions[language][extension];
 
                     // define the type of the transcriptions
-                    const type = language === origin_language ?
-                        'transcription' :
-                        'translation';
+                    const type = language === origin_language
+                        ? "transcription"
+                        : "translation";
 
                     material_contents.push({
                         language,
@@ -91,8 +91,8 @@ class ElastisearchPatch extends BasicBolt {
             // prepare the material content object
             material_contents.push({
                 language: origin_language,
-                type: 'transcription',
-                extension: 'plain',
+                type: "transcription",
+                extension: "plain",
                 value: raw_text,
             });
         }
@@ -101,7 +101,7 @@ class ElastisearchPatch extends BasicBolt {
             retrieved_date: new_date,
             contents: material_contents,
             wikipedia: wikipedia_concepts
-        }
+        };
 
         rp({
             method: "PATCH",
@@ -109,17 +109,17 @@ class ElastisearchPatch extends BasicBolt {
             body: { record },
             json: true
         })
-        .then(() => {
+            .then(() => {
             // continue with the last patching
-            if (self._finalBolt) { return callback(); }
-            return self._onEmit(message, stream_id, callback);
-        })
-        .catch((error) => {
-            if (self._finalBolt) { return callback(); }
-            // log error message and store the not completed material
-            self.set(message, self._documentErrorPath, `${self._prefix} ${error.message}`);
-            return self._onEmit(message, stream_id, callback);
-        });
+                if (self._finalBolt) { return callback(); }
+                return self._onEmit(message, stream_id, callback);
+            })
+            .catch((error) => {
+                if (self._finalBolt) { return callback(); }
+                // log error message and store the not completed material
+                self.set(message, self._documentErrorPath, `${self._prefix} ${error.message}`);
+                return self._onEmit(message, stream_id, callback);
+            });
     }
 }
 

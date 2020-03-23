@@ -1,13 +1,12 @@
-/********************************************************************
+/** ******************************************************************
  * PostgresQL storage process for user activity data
  * This component receives the verified OER material object and
  * stores it into postgresQL database.
  */
 
-const mimetypes = require('@config/mimetypes');
+const mimetypes = require("@config/mimetypes");
 
 class UpdateRedirect {
-
     constructor() {
         this._name = null;
         this._onEmit = null;

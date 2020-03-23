@@ -1,4 +1,4 @@
-/********************************************************************
+/** ******************************************************************
  * PostgresQL storage process for user activity data
  * This component receives the verified OER material object and
  * stores it into postgresQL database.
@@ -6,8 +6,8 @@
 
 // basic bolt template
 const BasicBolt = require("./basic-bolt");
-class RetrieveMaterialMetadata extends BasicBolt {
 
+class RetrieveMaterialMetadata extends BasicBolt {
     constructor() {
         super();
         this._name = null;
@@ -21,7 +21,7 @@ class RetrieveMaterialMetadata extends BasicBolt {
         this._onEmit = config.onEmit;
         this._prefix = `[RetrieveMaterialMetadata ${this._name}]`;
         // create the postgres connection
-        this._pg = require('@library/postgresQL')(config.pg);
+        this._pg = require("@library/postgresQL")(config.pg);
         callback();
     }
 
@@ -43,7 +43,7 @@ class RetrieveMaterialMetadata extends BasicBolt {
             material_id
         } = material;
 
-        this._pg.select({ material_id, type: "text_extraction" }, "material_contents", function (error, response) {
+        this._pg.select({ material_id, type: "text_extraction" }, "material_contents", (error, response) => {
             if (error) { return callback(); }
 
             if (!response[0]) {
@@ -51,12 +51,10 @@ class RetrieveMaterialMetadata extends BasicBolt {
                 return self._onEmit(material, stream_id, callback);
             }
             const { value } = response[0];
-            self.set(material, 'material_metadata.raw_text', value.value);
+            self.set(material, "material_metadata.raw_text", value.value);
             // redirect the material
             return self._onEmit(material, stream_id, callback);
         });
-
-
     }
 }
 

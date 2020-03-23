@@ -1,11 +1,11 @@
-/************************************************
+/** **********************************************
  * Material Preparation Module
  * This module prepares OER materials that were
  * sent via different LMS plugins.
  */
 
 // file type detection/extraction libraries
-const fileTypeManual = require('mime-types');
+const fileTypeManual = require("mime-types");
 
 /**
  * @class PrepareMaterials
@@ -13,8 +13,7 @@ const fileTypeManual = require('mime-types');
  * non-crawler requests.
  */
 class PrepareMaterials {
-
-    constructor () { }
+    constructor() { }
 
     /**
      * Prepares the moodle request.
@@ -60,13 +59,12 @@ class PrepareMaterials {
      * @returns {Object|Null} The prepared material if existing. Otherwise, null.
      */
     prepare(request) {
-        if (request.providertype === 'moodle' && request.type === 'resource') {
+        if (request.providertype === "moodle" && request.type === "resource") {
             return this._prepareMoodle(request);
         } else {
             return null;
         }
     }
-
 }
 
 module.exports = PrepareMaterials;

@@ -1,18 +1,17 @@
-/********************************************************************
+/** ******************************************************************
  * PostgresQL storage process
  * This component receives the verified OER material object and
  * stores it into postgresQL database.
  */
 
 // internal modules
-const KafkaProducer = require('@library/kafka-producer');
+const KafkaProducer = require("@library/kafka-producer");
 
 /**
  * @class KafkaSender
  * @description Sends the messages to the corresponding kafka topic.
  */
 class KafkaMaterialPartial {
-
     constructor() {
         this._name = null;
         this._onEmit = null;
@@ -43,9 +42,9 @@ class KafkaMaterialPartial {
         // rebrand the attribute name
         let authors = material.author;
         if (authors) {
-            authors = authors.replace(/[{\"}]/g, '');
-            authors = authors.split(',').map(str => str.trim());
-            if (authors.length === 1 && authors[0] === '') {
+            authors = authors.replace(/[{\"}]/g, "");
+            authors = authors.split(",").map((str) => str.trim());
+            if (authors.length === 1 && authors[0] === "") {
                 authors = null;
             }
         }
@@ -57,11 +56,10 @@ class KafkaMaterialPartial {
         };
 
         // send the message to the database topics
-        this._producer.send(this._kafka_topic, message, function (error) {
+        this._producer.send(this._kafka_topic, message, (error) => {
             if (error) { return callback(error); }
             return callback();
         });
-
     }
 }
 

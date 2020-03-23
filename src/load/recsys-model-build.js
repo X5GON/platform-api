@@ -1,36 +1,36 @@
-/********************************************************************
+/** ******************************************************************
  * Build OER material recommender System
  * This script loads the oer materials from PostgresQL and builds
  * the content based recommendation models using raw content and
  * wikipedia concepts, extracted from the raw content using wikifier
  * (http://wikifier.org).
  */
-require('module-alias/register');
+require("module-alias/register");
 
 // configurations
-const config = require('@config/config');
+const config = require("@config/config");
 
 // internal modules
-const Logger = require('@library/logger');
+const Logger = require("@library/logger");
 
 // create a logger instance for logging recommendation requests
 const { environment } = config;
-const logger = Logger.createGroupInstance('recommendation-model-build', 'x5recommend', environment === 'dev');
+const logger = Logger.createGroupInstance("recommendation-model-build", "x5recommend", environment === "dev");
 
 // initialize connection with postgresql
-const pg = require('@library/postgresQL')(config.pg);
+const pg = require("@library/postgresQL")(config.pg);
 // check if config.schema is defined
 const schema = config.pg.schema;
 
 
-/********************************************
+/** ******************************************
  * Run Script
- *******************************************/
+ ****************************************** */
 
 // initialize database
-let x5recommend = new (require('../services/recsys/engine/x5recommend'))({
-    mode: 'createClean',
-    path: '../../data/recsys'
+let x5recommend = new (require("../services/recsys/engine/x5recommend"))({
+    mode: "createClean",
+    path: "../../data/recsys"
 });
 
 /**
@@ -38,7 +38,6 @@ let x5recommend = new (require('../services/recsys/engine/x5recommend'))({
  * @param {Function} callback - The function called at the end of the process.
  */
 function build(callback) {
-
     // select all required values for building the recommender models
     const query = `
         WITH urls_extended AS (
@@ -115,11 +114,10 @@ function build(callback) {
         SELECT * FROM oer_material_models;`;
 
 
-
     pg.executeLarge(query, [], 10, (error, results, cb) => {
         // handle error and close the postgres connection
         if (error) {
-            logger.error('error when retrieving from postgres', { error: error.message });
+            logger.error("error when retrieving from postgres", { error: error.message });
             return;
         }
         for (let material of results) {
@@ -143,15 +141,15 @@ function build(callback) {
             materialId = materialId.toString();
 
             // get raw text from the material
-            let rawContent = text_extraction ? text_extraction : transcription;
+            let rawContent = text_extraction || transcription;
 
             // store wikipedia concepts data
-            let wikipediaConceptNames    = [];
-            let wikipediaConceptSupport  = [];
+            let wikipediaConceptNames = [];
+            let wikipediaConceptSupport = [];
 
             // prepare wikipedia concepts if they exist
             if (wikipediaConcepts) {
-                wikipediaConcepts.forEach(concept => {
+                wikipediaConcepts.forEach((concept) => {
                     // set the wikipedia concepts for the record
                     let uri = concept.secUri ? concept.secUri : concept.uri;
                     wikipediaConceptNames.push(uri);
@@ -178,28 +176,26 @@ function build(callback) {
             // push to the recommendation model
             x5recommend.pushRecordContent(record);
             logger.info(`pushed record with id=${material.id}`, { url });
-
         }
         // get the next batch of data
         cb();
-
-    }, (error) => {    // write the material jsons
+    }, (error) => { // write the material jsons
         if (error) {
-            logger.error('error when processing data from postgres', { error: error.message });
-            logger.info('closing models and connections');
+            logger.error("error when processing data from postgres", { error: error.message });
+            logger.info("closing models and connections");
             x5recommend.close();
             // close the connection with postgres
-            logger.info('closed');
+            logger.info("closed");
         } else {
-            logger.info('Processing material models.');
-            pg.selectLarge({ }, 'rec_sys_material_model', 10, (error, results, cb) => {
+            logger.info("Processing material models.");
+            pg.selectLarge({ }, "rec_sys_material_model", 10, (error, results, cb) => {
                 if (error) {
-                    logger.error('error when retrieving from postgres', { error: error.message });
+                    logger.error("error when retrieving from postgres", { error: error.message });
                     return;
                 }
                 for (let material of results) {
                     logger.info(`next record being processed id=${material.id}`);
-                    let wikipediaConceptNames   = [];
+                    let wikipediaConceptNames = [];
                     let wikipediaConceptSupport = [];
 
                     // prepare wikipedia concepts if they exist
@@ -240,18 +236,18 @@ function build(callback) {
                 cb();
             }, (error) => {
                 if (error) {
-                    logger.error('error when processing data from postgres', { error: error.message });
+                    logger.error("error when processing data from postgres", { error: error.message });
                 } else {
                     // build the models
-                    logger.info('building recommendation models');
+                    logger.info("building recommendation models");
                     x5recommend.createModels();
-                    logger.info('recommendation models built successfully');
+                    logger.info("recommendation models built successfully");
                 }
-                logger.info('closing models and connections');
+                logger.info("closing models and connections");
                 x5recommend.close();
                 // close the connection with postgres
-                logger.info('closed');
-                if (callback && typeof(callback) === 'function') {
+                logger.info("closed");
+                if (callback && typeof (callback) === "function") {
                     return callback();
                 }
             });

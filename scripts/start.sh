@@ -12,7 +12,6 @@ pm2 delete all
 # install all node packages
 npm install
 
-
 ###########################################################
 # Reload docker containers
 ###########################################################
@@ -22,31 +21,19 @@ cd docker/
 sh run-docker.sh
 cd ..
 
-
 ###########################################################
 # Prepare submodule components
 ###########################################################
 
-# rebuild the frontend
-cd src/services/platform/frontend
-npm install
-npm run-script build
-cd ../../../..
-
-
-# reload the search engine system
+# prepare the search engine
 cd src/services/search
 npm install
-pm2 reload ecosystem.config.json --env production
+npm run build
 cd ../../..
-
 
 ###########################################################
 # Prepare main components
 ###########################################################
-
-# reload the recommender engine system
-pm2 reload ecosystem.recsys.config.json --env production
 
 # reload the processing pipelines
 cd src/services/preproc
@@ -64,7 +51,7 @@ pm2 reload ecosystem.update.store.config.json   --env production
 cd ../../..
 
 # reload the platform
-pm2 reload ecosystem.platform.config.json --env production
+pm2 reload ecosystem.config.json --env production
 
 
 ###########################################################

@@ -1,23 +1,23 @@
-/************************************************
+/** **********************************************
  * The X5GON recommendation class.
  * Contains all of the recommendation models.
  */
 
 // configurations and mimetypes
-const config = require('@config/config');
-const mimetypes = require('@config/mimetypes');
+const config = require("@config/config");
+const mimetypes = require("@config/mimetypes");
 
 // external modules
-const path = require('path');
-const fs = require('fs');
-const qm = require('qminer');
+const path = require("path");
+const fs = require("fs");
+const qm = require("qminer");
 
 // internal modules
-const NearestNeighbor = require('./models/nearest-neighbors');
-const Logger = require('@library/logger');
+const NearestNeighbor = require("./models/nearest-neighbors");
+const Logger = require("@library/logger");
 
 // postgresql connections
-const pg = require('@library/postgresQL')(config.pg);
+const pg = require("@library/postgresQL")(config.pg);
 
 
 /**
@@ -26,7 +26,6 @@ const pg = require('@library/postgresQL')(config.pg);
  * the x5gon project users.mimetypes
  */
 class x5recommend {
-
     /**
      * @description Creates or loads database used for recommender system.
      * @param {Object} params - The parameter object used for initialization.
@@ -41,17 +40,16 @@ class x5recommend {
         // parse parameters
         self.params = params;
         // set the recommender requests logger
-        self.logger = Logger.createGroupInstance(`recommendation`, 'x5recommend',
-            config.environment === 'dev');
+        self.logger = Logger.createGroupInstance("recommendation", "x5recommend",
+            config.environment === "dev");
 
         // load database
         self._loadBase();
 
-        if (self.params.mode === 'readOnly') {
+        if (self.params.mode === "readOnly") {
             // load the recommendation models
             self._loadModels();
         }
-
     }
 
     /**
@@ -68,25 +66,25 @@ class x5recommend {
             storeCache: 10000
         };
 
-        if (self.params.mode === 'create' || self.params.mode === 'createClean') {
+        if (self.params.mode === "create" || self.params.mode === "createClean") {
             // open database in create mode - create the database from scratch
             baseParams.mode = self.params.mode;
-            baseParams.schema = require(path.join(__dirname, '../schemas/schema'));
-        } else if (self.params.mode === 'open') {
+            baseParams.schema = require(path.join(__dirname, "../schemas/schema"));
+        } else if (self.params.mode === "open") {
             // open database in open mode - allowing records to be pushed to stores
-            baseParams.mode = 'open';
-        } else if (self.params.mode === 'readOnly') {
+            baseParams.mode = "open";
+        } else if (self.params.mode === "readOnly") {
             // open database in readOnly mode - don't allow changing store records
-            baseParams.mode = 'openReadOnly';
+            baseParams.mode = "openReadOnly";
             // remove the lock file if present
-            const lockPath = path.normalize(path.join(self.params.path, 'lock'));
+            const lockPath = path.normalize(path.join(self.params.path, "lock"));
             if (fs.existsSync(lockPath)) {
                 fs.unlinkSync(lockPath);
             }
         } else {
             // unsupported qminer mode - log the error
             let errorMessage = `Value of parameter 'mode' is not supported: ${self.params.mode}`;
-            self.logger.error('[error] x5recommend._loadBase', {
+            self.logger.error("[error] x5recommend._loadBase", {
                 error: errorMessage
             });
             throw Error(errorMessage);
@@ -96,8 +94,8 @@ class x5recommend {
         self.base = new qm.Base(baseParams);
 
         // get and save database store
-        self.content = self.base.store('Content');
-        self.materialModel = self.base.store('MaterialModel');
+        self.content = self.base.store("Content");
+        self.materialModel = self.base.store("MaterialModel");
     }
 
     /**
@@ -115,7 +113,7 @@ class x5recommend {
         let self = this;
 
         // TODO: validate record schema programmatically
-        function validateRecordSchema(record){
+        function validateRecordSchema(record) {
             if (!record.url) {
                 return false;
             }
@@ -132,12 +130,12 @@ class x5recommend {
         }
         if (!validateRecordSchema(record) /* check record validation */) {
             // log the difference in schemas
-            self.logger.warn('[warn] x5recommend.pushRecordContent', {
-                error: { message: 'record is not in correct format' },
+            self.logger.warn("[warn] x5recommend.pushRecordContent", {
+                error: { message: "record is not in correct format" },
                 record
             });
             // record is not in correct format - throw an error
-            return new Error('Record not in correct format');
+            return new Error("Record not in correct format");
         }
 
         // push the record to the content store
@@ -153,7 +151,7 @@ class x5recommend {
         let self = this;
 
         // TODO: validate record schema
-        function validateRecordSchema(record){
+        function validateRecordSchema(record) {
             if (!record.url) {
                 return false;
             }
@@ -170,12 +168,12 @@ class x5recommend {
         }
         if (!validateRecordSchema(record) /* check record validation */) {
             // log the difference in schemas
-            self.logger.warn('[warn] x5recommend.pushRecordMaterialModel', {
-                error: { message: 'record is not in correct format' },
+            self.logger.warn("[warn] x5recommend.pushRecordMaterialModel", {
+                error: { message: "record is not in correct format" },
                 record
             });
             // record is not in correct format - throw an error
-            return new Error('Record not in correct format');
+            return new Error("Record not in correct format");
         }
 
         // push the record to the content store
@@ -183,9 +181,9 @@ class x5recommend {
         return self.content.length;
     }
 
-    /********************************************
+    /** ******************************************
      * Recommendation Models
-     *******************************************/
+     ****************************************** */
 
     /**
      * @description Create the Nearest Neighbor model for Content store based on
@@ -196,13 +194,16 @@ class x5recommend {
         let self = this;
         // create the content nearest neighbor model
         self.contentTextNN = new NearestNeighbor({
-            mode: 'create',
+            mode: "create",
             base: self.base,
-            modelPath: path.join(self.params.path, '/contentTextNN.dat'),
+            modelPath: path.join(self.params.path, "/contentTextNN.dat"),
             store: self.content,
             features: [{
-                type: 'text', source: 'Content', field: ['title', 'description', 'rawContent'],
-                ngrams: 2, hashDimension: 20000
+                type: "text",
+                source: "Content",
+                field: ["title", "description", "rawContent"],
+                ngrams: 2,
+                hashDimension: 20000
             }]
         });
     }
@@ -216,10 +217,10 @@ class x5recommend {
         let self = this;
         // load the nearest neighbor model used for content recommendation
         self.contentTextNN = new NearestNeighbor({
-            mode: 'load',
+            mode: "load",
             base: self.base,
             store: self.content,
-            modelPath: path.join(self.params.path, '/contentTextNN.dat')
+            modelPath: path.join(self.params.path, "/contentTextNN.dat")
         });
     }
 
@@ -232,13 +233,14 @@ class x5recommend {
         let self = this;
         // create the content nearest neighbor model
         self.contentWikiNN = new NearestNeighbor({
-            mode: 'create',
+            mode: "create",
             base: self.base,
-            modelPath: path.join(self.params.path, '/contentWikiNN.dat'),
+            modelPath: path.join(self.params.path, "/contentWikiNN.dat"),
             store: self.content,
             features: [{
-                type: 'multinomial', source: 'Content',
-                field: 'wikipediaConceptNames'
+                type: "multinomial",
+                source: "Content",
+                field: "wikipediaConceptNames"
             }]
         });
     }
@@ -252,10 +254,10 @@ class x5recommend {
         let self = this;
         // load the nearest neighbor model used for content recommendation
         self.contentWikiNN = new NearestNeighbor({
-            mode: 'load',
+            mode: "load",
             base: self.base,
             store: self.content,
-            modelPath: path.join(self.params.path, '/contentWikiNN.dat'),
+            modelPath: path.join(self.params.path, "/contentWikiNN.dat"),
         });
     }
 
@@ -268,14 +270,15 @@ class x5recommend {
         let self = this;
         // create the content nearest neighbor model
         self.contentWikiSupportNN = new NearestNeighbor({
-            mode: 'create',
+            mode: "create",
             base: self.base,
-            modelPath: path.join(self.params.path, '/contentWikiSupportNN.dat'),
+            modelPath: path.join(self.params.path, "/contentWikiSupportNN.dat"),
             store: self.content,
             features: [{
-                type: 'multinomial', source: 'Content',
-                field: 'wikipediaConceptNames',
-                valueField: 'wikipediaConceptSupport'
+                type: "multinomial",
+                source: "Content",
+                field: "wikipediaConceptNames",
+                valueField: "wikipediaConceptSupport"
             }]
         });
     }
@@ -289,14 +292,14 @@ class x5recommend {
         let self = this;
         // load the nearest neighbor model used for content recommendation
         self.contentWikiSupportNN = new NearestNeighbor({
-            mode: 'load',
+            mode: "load",
             base: self.base,
             store: self.content,
-            modelPath: path.join(self.params.path, '/contentWikiSupportNN.dat')
+            modelPath: path.join(self.params.path, "/contentWikiSupportNN.dat")
         });
     }
 
-        /**
+    /**
      * @description Create the Nearest Neighbor model for MaterialModel store based on
      * Wikipedia concept support metrics.
      * @private
@@ -305,14 +308,15 @@ class x5recommend {
         let self = this;
         // create the content nearest neighbor model
         self.userMaterialSimNN = new NearestNeighbor({
-            mode: 'create',
+            mode: "create",
             base: self.base,
-            modelPath: path.join(self.params.path, '/userMaterialSimNN.dat'),
+            modelPath: path.join(self.params.path, "/userMaterialSimNN.dat"),
             store: self.materialModel,
             features: [{
-                type: 'multinomial', source: 'MaterialModel',
-                field: 'wikipediaConceptNames',
-                valueField: 'wikipediaConceptSupport'
+                type: "multinomial",
+                source: "MaterialModel",
+                field: "wikipediaConceptNames",
+                valueField: "wikipediaConceptSupport"
             }]
         });
     }
@@ -326,10 +330,10 @@ class x5recommend {
         let self = this;
         // load the nearest neighbor model used for content recommendation
         self.userMaterialSimNN = new NearestNeighbor({
-            mode: 'load',
+            mode: "load",
             base: self.base,
             store: self.materialModel,
-            modelPath: path.join(self.params.path, '/userMaterialSimNN.dat')
+            modelPath: path.join(self.params.path, "/userMaterialSimNN.dat")
         });
     }
 
@@ -356,9 +360,9 @@ class x5recommend {
         self._loadUserMaterialSimNNModel();
     }
 
-    /********************************************
+    /** ******************************************
      * Content Recommendation Functions
-     *******************************************/
+     ****************************************** */
 
     /**
      * @description Get content based recommendations.
@@ -374,13 +378,13 @@ class x5recommend {
 
         // distinguish between the url and title & description query methods
         if (!userQuery) {
-            let errorMessage = 'Missing query';
-            self.logger.error('[error] x5recommend.recommendMaterials', {
+            let errorMessage = "Missing query";
+            self.logger.error("[error] x5recommend.recommendMaterials", {
                 error: { message: errorMessage },
                 query: userQuery
             });
             // not supported query option - return error
-            return Promise.reject({ error: errorMessage });
+            return Promise.reject(new Error(errorMessage));
         }
 
         const {
@@ -394,35 +398,35 @@ class x5recommend {
         // if none of the parameters are provided
         if (!material_id && !url && !text) {
             // log the error for unsupported parameters
-            let errorMessage = 'Unsupported recommendation parameters';
-            self.logger.error('[error] x5recommend.recommendMaterials', {
+            let errorMessage = "Unsupported recommendation parameters";
+            self.logger.error("[error] x5recommend.recommendMaterials", {
                 error: { message: errorMessage },
                 query: userQuery
             });
             // not supported query option - return error
-            return Promise.reject({ error: errorMessage });
+            return Promise.reject(new Error(errorMessage));
         }
 
         // get the model of the respected type
-        let model,
-            query,
-            recommendations;
+        let model;
+        let query;
+        let recommendations;
 
-        const maxCount = count ? count : 20;
+        const maxCount = count || 20;
 
         if (material_id) {
             // decide on the model
-            model = type === 'support' ?
-                self.contentWikiSupportNN :
-                self.contentWikiNN;
+            model = type === "support"
+                ? self.contentWikiSupportNN
+                : self.contentWikiNN;
             // setup the query
             query = { material_id, type };
             recommendations = model.search(query, maxCount, 100, 10);
         } else if (url && (self.content.recordByName(url) || !text)) {
             // decide on the model
-            model = type === 'support' ?
-                self.contentWikiSupportNN :
-                self.contentWikiNN;
+            model = type === "support"
+                ? self.contentWikiSupportNN
+                : self.contentWikiNN;
             // setup the query
             query = { url, type };
             recommendations = model.search(query, maxCount, 0.95);
@@ -433,22 +437,21 @@ class x5recommend {
         }
 
         if (!recommendations) {
-            let errorMessage = 'Empty query object';
-            self.logger.warn('[warn] x5recommend.recommendMaterials', {
+            let errorMessage = "Empty query object";
+            self.logger.warn("[warn] x5recommend.recommendMaterials", {
                 error: { message: errorMessage },
                 query: userQuery
             });
             // not supported query option - return error
-            return Promise.reject({ error: errorMessage });
-
+            return Promise.reject(new Error(errorMessage));
         } else if (recommendations.error) {
             // log the error given by the recommendation search
-            self.logger.warn('[warn] x5recommend.recommendMaterials', {
+            self.logger.warn("[warn] x5recommend.recommendMaterials", {
                 error: { message: recommendations.error },
                 query: userQuery
             });
             // not supported query option - return error
-            return Promise.reject({ error: recommendations.error });
+            return Promise.reject(new Error(recommendations.error));
         }
 
         return Promise.resolve(recommendations);
@@ -470,13 +473,13 @@ class x5recommend {
 
         // distinguish between the url and title & description query methods
         if (!userQuery) {
-            let errorMessage = 'Missing query';
-            self.logger.error('[error] x5recommend.recommendBundles', {
+            let errorMessage = "Missing query";
+            self.logger.error("[error] x5recommend.recommendBundles", {
                 error: { message: errorMessage },
                 query: userQuery
             });
             // not supported query option - return error
-            return Promise.reject({ error: errorMessage });
+            return Promise.reject(new Error(errorMessage));
         }
 
         const {
@@ -486,11 +489,11 @@ class x5recommend {
             count
         } = userQuery;
 
-        let model,
-            query,
-            recommendations;
+        let model;
+        let query;
+        let recommendations;
 
-        const maxCount = count ? count : 20;
+        const maxCount = count || 20;
 
         // get the model of the respected type
         if (url && (self.materialModel.recordByName(url) || !text)) {
@@ -505,41 +508,40 @@ class x5recommend {
             recommendations = model.search(query, maxCount);
         } else {
             // log the error for unsupported parameters
-            let errorMessage = 'Unsupported recommendation parameters';
-            self.logger.error('[error] x5recommend.recommendBundles', {
+            let errorMessage = "Unsupported recommendation parameters";
+            self.logger.error("[error] x5recommend.recommendBundles", {
                 error: { message: errorMessage },
                 query: userQuery
             });
             // not supported query option - return error
-            return Promise.reject({ error: errorMessage });
+            return Promise.reject(new Error(errorMessage));
         }
 
         if (!recommendations) {
-            let errorMessage = 'Empty query object';
-            self.logger.warn('[warn] x5recommend.recommendBundles', {
+            let errorMessage = "Empty query object";
+            self.logger.warn("[warn] x5recommend.recommendBundles", {
                 error: { message: errorMessage },
                 query: userQuery
             });
             // not supported query option - return error
-            return Promise.reject({ error: errorMessage });
-
+            return Promise.reject(new Error(errorMessage));
         } else if (recommendations.error) {
             // log the error given by the recommendation search
-            self.logger.warn('[warn] x5recommend.recommendBundles', {
+            self.logger.warn("[warn] x5recommend.recommendBundles", {
                 error: { message: recommendations.error },
                 query: userQuery
             });
             // not supported query option - return error
-            return Promise.reject({ error: errorMessage });
+            return Promise.reject(new Error(recommendations.error));
         }
 
         return Promise.resolve(recommendations);
     }
 
 
-    /********************************************
+    /** ******************************************
      * Personalized Recommendation Functions
-     ********************************************/
+     ******************************************* */
 
     /**
       * @description Get content based recommendations.
@@ -553,20 +555,20 @@ class x5recommend {
     recommendPersonalized(query) {
         let self = this;
 
-        return new Promise(function (resolve, reject) {
+        return new Promise(((resolve, reject) => {
             if (!query) {
-                let errorMessage = 'Missing query';
-                self.logger.error('[error] x5recommend.recommendPersonalized', {
+                let errorMessage = "Missing query";
+                self.logger.error("[error] x5recommend.recommendPersonalized", {
                     error: { message: errorMessage },
                     query
                 });
                 // not supported query option - return error
-                return reject({ error: errorMessage });
+                return reject(new Error(errorMessage));
             }
 
-            pg.select({ uuid: query.uuid }, 'rec_sys_user_model', function(error, results) {
+            pg.select({ uuid: query.uuid }, "rec_sys_user_model", (error, results) => {
                 if (error) {
-                    self.logger.error('[error] x5recommend.recommendPersonalized', {
+                    self.logger.error("[error] x5recommend.recommendPersonalized", {
                         error: { message: error.message, stack: error.stack },
                         query
                     });
@@ -574,11 +576,11 @@ class x5recommend {
                 }
 
                 if (!results || results.length === 0) {
-                    self.logger.warn('[warn] x5recommend.recommendPersonalized', {
-                        error: { message: 'cookie not available in the database' },
+                    self.logger.warn("[warn] x5recommend.recommendPersonalized", {
+                        error: { message: "cookie not available in the database" },
                         query
                     });
-                    return reject({ error: 'Cookie is not in the database - unable to fetch the user' });
+                    return reject(new Error("Cookie is not in the database - unable to fetch the user"));
                 }
 
                 results = results[0];
@@ -592,8 +594,8 @@ class x5recommend {
 
                 query = {
                     uuid: results.uuid,
-                    wikipediaConceptNames: wikipediaConceptNames,
-                    wikipediaConceptSupport: wikipediaConceptSupport
+                    wikipediaConceptNames,
+                    wikipediaConceptSupport
                 };
 
                 const maxCount = query.count ? query.count : 20;
@@ -601,25 +603,21 @@ class x5recommend {
                 let recommendations = self.userMaterialSimNN.search(query, maxCount);
 
                 if (!recommendations) {
-                    self.logger.warn('[warn] x5recommend.recommendPersonalized', {
-                        error: { message: 'no recommendations acquired' },
+                    self.logger.warn("[warn] x5recommend.recommendPersonalized", {
+                        error: { message: "no recommendations acquired" },
                         query
                     });
-                    recommendations = {
-                        error: 'Error fetching recommendations'
-                    };
-                    return reject(recommendations);
+                    return reject(new Error("Error fetching recommendations"));
                 }
 
                 return resolve(recommendations);
             });
-        });
-
+        }));
     }
 
-    /******************************************************
+    /** ****************************************************
       * Collaborative Filtering Recommendation Functions
-      *****************************************************/
+      **************************************************** */
 
     /**
       * @description Get content based recommendations.
@@ -632,20 +630,20 @@ class x5recommend {
       * @param {String} [query.type] - The metrics type.
       * @returns {Array.<Object>} An array of recommended learning material.
       */
-     recommendCollaborativeFiltering(userQuery) {
+    recommendCollaborativeFiltering(userQuery) {
         let self = this;
         let recommendations;
 
         let count = userQuery.count ? userQuery.count : 20;
 
-        return new Promise(function (resolve, reject){
+        return new Promise(((resolve, reject) => {
             if (!userQuery) {
-                let errorMessage = 'recommendPersonalized: Missing query';
+                let errorMessage = "recommendPersonalized: Missing query";
                 self.logger.error(`error [x5recommend.recommendContent]: ${errorMessage}`, {
                     error: errorMessage, userQuery
                 });
                 // not supported query option - return error
-                reject({ error: errorMessage });
+                reject(new Error(errorMessage));
                 return;
             }
 
@@ -665,20 +663,20 @@ class x5recommend {
             )
             SELECT url_count.*, rsmm.* FROM url_count, rec_sys_material_model AS rsmm WHERE url_count.url_id = rsmm.url_id ORDER BY count DESC LIMIT ${count};`;
 
-            pg.execute(queryPG, [] , function(err, res){
-                if (err){
-                    self.logger.error('Error fetching collaborative filtering recommendations from'     + ' database: ' + err);
-                    reject({error: 'Error fetching collaborative filtering recommendations from'       + 'database'});
+            pg.execute(queryPG, [], (err, res) => {
+                if (err) {
+                    self.logger.error(`"Error fetching collaborative filtering recommendations from database: ${err}`);
+                    reject(new Error("Error fetching collaborative filtering recommendations from database"));
                     return;
                 }
 
-                if (!res || res.length == 0){
-                    reject({error: 'Cookie is not in the database - unable to fetch the ' +            'collaborative filtering recommendations.'});
+                if (!res || res.length == 0) {
+                    reject(new Error("Cookie is not in the database - unable to fetch the collaborative filtering recommendations."));
                     return;
                 }
 
                 let materials = [];
-                let weights =  [];
+                let weights = [];
 
                 /**
                 * Detects the type of the material.
@@ -687,18 +685,18 @@ class x5recommend {
                 */
 
                 function detectType(mimetype) {
-                    let mime = mimetype.split('/');
-                    if (mime[0] === 'video') {
-                        return 'video';
+                    let mime = mimetype.split("/");
+                    if (mime[0] === "video") {
+                        return "video";
                     } else {
-                        return 'text';
+                        return "text";
                     }
                 }
 
-                for (let material of res){
+                for (let material of res) {
                     let wikipediaConceptNames = [];
                     let wikipediaConceptSupport = [];
-                    for (let concept in material.concepts){
+                    for (let concept in material.concepts) {
                         wikipediaConceptNames.push(concept);
                         wikipediaConceptSupport.push(material.concepts[concept]);
                     }
@@ -721,33 +719,31 @@ class x5recommend {
                 recommendations = [materials, weights];
 
                 if (!recommendations) {
-                    let errorMessage = 'Error fetching collaborative filtering recommendations';
-                    self.logger.warn('[warn] x5recommend.recommendMaterials', {
+                    let errorMessage = "Error fetching collaborative filtering recommendations";
+                    self.logger.warn("[warn] x5recommend.recommendMaterials", {
                         error: { message: errorMessage },
                         query: userQuery
                     });
                     // not supported query option - return error
-                    return reject({ error: errorMessage });
-
+                    return reject(new Error(errorMessage));
                 } else if (recommendations.error) {
                     // log the error given by the recommendation search
-                    self.logger.warn('[warn] x5recommend.recommendCollaborativeFiltering', {
+                    self.logger.warn("[warn] x5recommend.recommendCollaborativeFiltering", {
                         error: { message: recommendations.error },
                         query: userQuery
                     });
                     // not supported query option - return error
-                    return reject({ error: recommendations.error });
+                    return reject(new Error(recommendations.error));
                 }
 
                 return resolve(recommendations);
-
             });
-        });
+        }));
     }
 
-    /********************************************
+    /** ******************************************
      * General Interface for Recommendations
-     *******************************************/
+     ****************************************** */
 
     /**
      * Get recommendations.
@@ -756,40 +752,36 @@ class x5recommend {
      * @returns {Array.<Object>} An array of recommended learning material.
      */
 
-    recommend(query, type='materials') {
+    recommend(query, type = "materials") {
         const self = this;
 
         let recommendations;
-        if (type === 'materials') {
+        if (type === "materials") {
             recommendations = self.recommendMaterials(query);
-        } else if (type === 'bundle') {
+        } else if (type === "bundle") {
             recommendations = self.recommendBundles(query);
-        } else if (type === 'personal') {
+        } else if (type === "personal") {
             recommendations = self.recommendPersonalized(query);
-        } else if (type === 'collaborative') {
+        } else if (type === "collaborative") {
             recommendations = self.recommendCollaborativeFiltering(query);
         } else {
-            recommendations = Promise.resolve([[],[]]);
+            recommendations = Promise.resolve([[], []]);
         }
         // return an object
-        return recommendations.then(results => {
+        return recommendations.then((results) => {
             if (results.error) {
                 return results;
             }
             // return the list of recommended materials with their weights
             return results[0].map((material, id) =>
-                self._materialFormat(material, results[1][id])
-            );
-        }).catch((error) => {
-            return error;
-        });
-
+                self._materialFormat(material, results[1][id]));
+        }).catch((error) => error);
     }
 
 
-    /********************************************
+    /** ******************************************
      * Helper Functions
-     ********************************************/
+     ******************************************* */
 
     /**
      * Detects the type of the material.
@@ -830,7 +822,7 @@ class x5recommend {
 
         // get the top 3 wikipedia concepts
         let sort = wikipediaConceptSupport.sortPerm(false);
-        const maxCount = 10 > sort.perm.length ? sort.perm.length : 10;
+        const maxCount = sort.perm.length < 10 ? sort.perm.length : 10;
         // store wikipedia names
         let wikipedia = [];
         for (let i = 0; i < maxCount; i++) {
@@ -854,7 +846,5 @@ class x5recommend {
             type: self._detectType(mimetype)
         };
     }
-
-
 }
 module.exports = x5recommend;

@@ -1,11 +1,10 @@
-/********************************************************************
+/** ******************************************************************
  * PostgresQL storage process for materials
  * This component receives the verified OER material object and
  * stores it into postgresQL database.
  */
 
 class StorePGRecsysTransitions {
-
     constructor() {
         this._name = null;
         this._onEmit = null;
@@ -19,7 +18,7 @@ class StorePGRecsysTransitions {
         this._prefix = `[StorePGRecsysTransitions ${this._name}]`;
 
         // create the postgres connection
-        this._pg = require('@library/postgresQL')(config.pg);
+        this._pg = require("@library/postgresQL")(config.pg);
 
         callback();
     }
@@ -48,7 +47,7 @@ class StorePGRecsysTransitions {
         } = message;
 
         const fromMaterialModelId = new Promise((resolve, reject) => {
-            self._pg.select({ provider_uri: from }, 'rec_sys_material_model', function (error, result) {
+            self._pg.select({ provider_uri: from }, "rec_sys_material_model", (error, result) => {
                 if (error) { return reject(error); }
                 // return the id of the material model
                 const id = result.length ? result[0].id : null;
@@ -57,7 +56,7 @@ class StorePGRecsysTransitions {
         });
 
         const toMaterialModelId = new Promise((resolve, reject) => {
-            self._pg.select({ provider_uri: to }, 'rec_sys_material_model', function (error, result) {
+            self._pg.select({ provider_uri: to }, "rec_sys_material_model", (error, result) => {
                 if (error) { return reject(error); }
                 // return the id of the material model
                 const id = result.length ? result[0].id : null;
@@ -66,28 +65,25 @@ class StorePGRecsysTransitions {
         });
 
 
-        Promise.all([fromMaterialModelId, toMaterialModelId]).then(materialModalIds => {
+        Promise.all([fromMaterialModelId, toMaterialModelId]).then((materialModalIds) => {
             // create user transitions values
             const rec_sys_user_transitions = {
-                uuid: !uuid.includes('unknown') ? uuid : null,
-                from_url:               from,
-                to_url:                 to,
+                uuid: !uuid.includes("unknown") ? uuid : null,
+                from_url: from,
+                to_url: to,
                 from_material_model_id: materialModalIds[0],
-                to_material_model_id:   materialModalIds[1],
+                to_material_model_id: materialModalIds[1],
                 selected_position,
                 recommended_urls,
                 num_of_recommendations: recommended_urls.length
             };
 
-            self._pg.insert(rec_sys_user_transitions, 'rec_sys_user_transitions', function (error, result) {
+            self._pg.insert(rec_sys_user_transitions, "rec_sys_user_transitions", (error, result) => {
                 if (error) { return callback(error); }
                 // return the id of the material model
                 return callback(null);
             });
-
-        }).catch(error => {
-            return callback(error);
-        });
+        }).catch((error) => callback(error));
     }
 }
 

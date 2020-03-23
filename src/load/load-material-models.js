@@ -1,24 +1,24 @@
-/********************************************************************
+/** ******************************************************************
  * Load Material Models
  * This script creates and stores the material models in the database.
  * The material models are then used for creating user models.
  */
-require('module-alias/register');
+require("module-alias/register");
 
 // external modules
-const async = require('async');
+const async = require("async");
 
 
 // configurations
-const config = require('@config/config');
-const mimetypes = require('@config/mimetypes');
+const config = require("@config/config");
+const mimetypes = require("@config/mimetypes");
 
 // get the schema of the database
 const schema = config.pg.schema;
 
 // internal modules
-const updateHelper = require('@library/update-user-models');
-const pg = require('@library/postgresQL')(config.pg);
+const updateHelper = require("@library/update-user-models");
+const pg = require("@library/postgresQL")(config.pg);
 
 
 /**
@@ -26,15 +26,12 @@ const pg = require('@library/postgresQL')(config.pg);
  * @returns {Promise} The promise of creating material models.
  */
 function prepareMaterialModels() {
-
     return new Promise((resolve, reject) => {
-
         /**
          * The promise of getting container urls.
          * @returns {String[]} The urls of pages that contain OER materials.
          */
         const OERQuery = new Promise((resolve, reject) => {
-
             // get urls that contain OER materials
             const query = `
                 WITH url_containers AS (
@@ -52,13 +49,13 @@ function prepareMaterialModels() {
                 WHERE material_id IS NULL;
             `;
 
-            pg.execute(query, [], function(error, result) {
+            pg.execute(query, [], (error, result) => {
                 if (error) {
-                    console.log('Error executing query:', error);
+                    console.log("Error executing query:", error);
                     return reject(error);
                 }
                 // get all provider uri values
-                const providerUris = result.map(rec => rec.url);
+                const providerUris = result.map((rec) => rec.url);
                 return resolve(providerUris);
             });
         });
@@ -75,28 +72,26 @@ function prepareMaterialModels() {
                 FROM ${schema}.rec_sys_material_model;
             `;
 
-            pg.execute(query, [], function(error, result) {
+            pg.execute(query, [], (error, result) => {
                 if (error) {
-                    console.log('Error executing query:', error);
+                    console.log("Error executing query:", error);
                     return reject(error);
                 }
                 // get all provider uri values
-                const providerUris = result.map(rec => rec.provider_uri);
+                const providerUris = result.map((rec) => rec.provider_uri);
                 return resolve(providerUris);
             });
         });
 
 
         // process both promises and start creating material models
-        Promise.all([OERQuery, MaterialQuery]).then(response => {
+        Promise.all([OERQuery, MaterialQuery]).then((response) => {
             // filter out the urls that have already been processed
             console.log(response[0].length, response[1].length);
-            return response[0].filter(uri => !response[1].includes(uri));
-
-        }).then(providerUris => {
+            return response[0].filter((uri) => !response[1].includes(uri));
+        }).then((providerUris) => {
             // iterate through all of the provider uris
-            async.eachSeries(providerUris, function (provider_uri, xcallback) {
-
+            async.eachSeries(providerUris, (provider_uri, xcallback) => {
                 // large query for getting all required material attributes (due to database schema)
                 let query = `
                     WITH urls_extended AS (
@@ -157,22 +152,21 @@ function prepareMaterialModels() {
                     SELECT * FROM oer_material_models;`;
 
 
-                pg.execute(query, [], function(error, results) {
+                pg.execute(query, [], (error, results) => {
                     if (error) {
-                        console.log('Error fetching material metadata:' + error + '\nQuery: '+ query);
+                        console.log(`Error fetching material metadata:${error}\nQuery: ${query}`);
                         return xcallback(error);
                     }
                     // prepare placeholders
-                    let type        = {},
-                        language    = {},
-                        wiki        = {},
-                        title       = null,
-                        description = null,
-                        provider    = null,
-                        supportLen  = 0;
+                    let type = {};
+                    let language = {};
+                    let wiki = {};
+                    let title = null;
+                    let description = null;
+                    let provider = null;
+                    let supportLen = 0;
 
                     for (let oer_material of results) {
-
                         // update provider uri mimetype distribution
                         if (!oer_material.mimetype) { type[oer_material.mimetype] = 0; }
                         type[oer_material.mimetype] += 1;
@@ -200,7 +194,6 @@ function prepareMaterialModels() {
 
                         // update provider uri provider information
                         for (let j = 0; j < oer_material.wikipedia_concepts.length; j++) {
-
                             // get concept names and support
                             const {
                                 name,
@@ -209,7 +202,7 @@ function prepareMaterialModels() {
                             } = oer_material.wikipedia_concepts[j];
 
                             // save concept name
-                            let concept = (secName ? secName : name);
+                            let concept = (secName || name);
 
                             // temporary store the support length
                             let tmp = conceptSupportLen;
@@ -220,7 +213,6 @@ function prepareMaterialModels() {
                             }
                             wiki[concept] += tmp;
                         }
-
                     }
 
                     // normalize wikipedia concept weight
@@ -263,24 +255,23 @@ function prepareMaterialModels() {
                     };
 
                     // store the material model
-                    pg.upsert(values, { provider_uri: null }, `${schema}.rec_sys_material_model`, function(xerror, xresult) {
-                        if (xerror){
-                            console.log('Error inserting material model:', xerror, '\nprovider_uri:', values.provider_uri);
+                    pg.upsert(values, { provider_uri: null }, `${schema}.rec_sys_material_model`, (xerror, xresult) => {
+                        if (xerror) {
+                            console.log("Error inserting material model:", xerror, "\nprovider_uri:", values.provider_uri);
                             return xcallback(xerror);
                         }
-                        console.log('Processed material:', values.provider_uri);
+                        console.log("Processed material:", values.provider_uri);
                         return xcallback(null);
                     });
                 });
-
-            }, function(error) {
+            }, (error) => {
                 // all jobs are done
                 if (error) {
-                    console.log('There was error. Not doing anything');
+                    console.log("There was error. Not doing anything");
                     return reject(error);
                 }
                 else {
-                    console.log('Material models created');
+                    console.log("Material models created");
                     return resolve(null);
                 }
             });
@@ -289,28 +280,26 @@ function prepareMaterialModels() {
 } // prepareMaterialModels()
 
 
-
 /**
  * Creates and loads the user models into the database.
  * @returns {Promise} The promise of creating user models.
  */
 function prepareUserModels() {
-
     return new Promise((resolve, reject) => {
         // the query of getting the user models' cookie ids
         let query = `
             SELECT DISTINCT uuid
             FROM ${schema}.rec_sys_user_model;`;
 
-        pg.execute(query, [], function(error, result) {
+        pg.execute(query, [], (error, result) => {
             if (error) {
-                console.log('Error checking user models: ' + error);
+                console.log(`Error checking user models: ${error}`);
                 return reject(error);
             }
 
             // there are no user models in the database
             if (result.length !== 0) {
-                console.log('Nothing to update');
+                console.log("Nothing to update");
                 return resolve(null);
             }
 
@@ -343,29 +332,27 @@ function prepareUserModels() {
                 SELECT * FROM cookie_url;
             `;
 
-            pg.execute(query, [], function(xerror, xresult) {
+            pg.execute(query, [], (xerror, xresult) => {
                 if (xerror) {
-                    console.log('Error fetching user activity: ' + xerror);
+                    console.log(`Error fetching user activity: ${xerror}`);
                     return reject(xerror);
                 }
-                async.eachSeries(xresult, function(action, callback) {
+                async.eachSeries(xresult, (action, callback) => {
                     // update user models with the given activity information
                     updateHelper.updateUserModel(action, callback);
-
-                }, function (xerror) {
+                }, (xerror) => {
                     // all jobs are done
                     if (xerror) {
-                        console.log('Error when processing user models:', xerror);
+                        console.log("Error when processing user models:", xerror);
                         return reject(xerror);
                     }
                     else {
-                        console.log('User models created');
+                        console.log("User models created");
                         resolve(null);
                     }
                 });
             }); // pg.execute('cookie_url')
         }); // pg.execute('rec_sys_user_model')
-
     }); // new Promise(resolve, reject)
 } // prepareUserModels()
 
@@ -375,23 +362,21 @@ function prepareUserModels() {
  * @param {Function} [callback] - The function to run after the process.
  */
 function initialModelsImport(callback) {
-
-    console.log('Checking whether to update models');
+    console.log("Checking whether to update models");
 
     prepareMaterialModels()
         .then(prepareUserModels)
-        .then(function () {
+        .then(() => {
             // execute the callback function
             // (building the recommender engine)
-            console.log('FINISHED: initialModelsImport');
-            if (callback && typeof(callback) === 'function') {
+            console.log("FINISHED: initialModelsImport");
+            if (callback && typeof (callback) === "function") {
                 callback();
             }
-        }).then(function () {
+        }).then(() => {
             // after whole process: close postgres connection
             pg.close();
         });
-
 } // initialModelsImport(callback)
 
 // export initial models import

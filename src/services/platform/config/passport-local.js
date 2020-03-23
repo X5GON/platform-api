@@ -1,5 +1,5 @@
 // get the local strategy
-const LocalStrategy = require('passport-local').Strategy;
+const LocalStrategy = require("passport-local").Strategy;
 
 /**
  * Adds the local passport strategy.
@@ -7,7 +7,6 @@ const LocalStrategy = require('passport-local').Strategy;
  * @param {Object} pg - The postgresql object.
  */
 module.exports = function (passport, pg) {
-
     /**
      * Verifies the password.
      * @param {Object} user - The user object containing the user password.
@@ -19,9 +18,9 @@ module.exports = function (passport, pg) {
     }
 
     passport.use(new LocalStrategy(
-        function (username, password, done) {
+        ((username, password, done) => {
             // get the user specifications
-            pg.select({ username: username }, 'admins', function (error, users) {
+            pg.select({ username }, "admins", (error, users) => {
                 if (error) { return done(error); }
 
                 if (users.length === 0 || users.length > 1) {
@@ -37,7 +36,6 @@ module.exports = function (passport, pg) {
                 // return the user information
                 return done(null, user);
             });
-        }
+        })
     ));
-
-}
+};

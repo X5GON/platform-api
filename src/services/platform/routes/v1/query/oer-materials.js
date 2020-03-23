@@ -1,9 +1,9 @@
 // external modules
-const router = require('express').Router();
-const cors = require('cors');
+const router = require("express").Router();
+const cors = require("cors");
 
 // internal modules
-const mimetypes = require('@config/mimetypes');
+const mimetypes = require("@config/mimetypes");
 
 /**
  * @description Adds API routes for logging user activity.
@@ -11,10 +11,9 @@ const mimetypes = require('@config/mimetypes');
  * @param {Object} logger - The logger object.
  */
 module.exports = function (pg, logger, config) {
-
-    /**********************************
+    /** ********************************
      * Required configuration
-     *********************************/
+     ******************************** */
 
     // postgresql schema used in the API
     const schema = config.pg.schema;
@@ -23,9 +22,9 @@ module.exports = function (pg, logger, config) {
     const DEFAULT_OFFSET = 0;
     const DEFAULT_LIMIT = 20;
 
-    /**********************************
+    /** ********************************
      * Helper functions
-     *********************************/
+     ******************************** */
 
 
     function oerMaterialQuery(params) {
@@ -48,7 +47,7 @@ module.exports = function (pg, logger, config) {
                 FROM ${schema}.urls LEFT JOIN ${schema}.providers
                 ON ${schema}.urls.provider_id=${schema}.providers.id
 
-                ${PROVIDER_IDS.length ? `WHERE ${schema}.urls.provider_id IN (${PROVIDER_IDS.join(',')})` : ''}
+                ${PROVIDER_IDS.length ? `WHERE ${schema}.urls.provider_id IN (${PROVIDER_IDS.join(",")})` : ""}
             ),
 
             oer_materials_query AS (
@@ -64,11 +63,11 @@ module.exports = function (pg, logger, config) {
                 FROM ${schema}.oer_materials INNER JOIN urls_extended
                 ON ${schema}.oer_materials.id=urls_extended.material_id
 
-                ${LANGUAGES.length ? `WHERE ${schema}.oer_materials.language IN (${LANGUAGES.join(',')})` : ''}
+                ${LANGUAGES.length ? `WHERE ${schema}.oer_materials.language IN (${LANGUAGES.join(",")})` : ""}
 
                 ORDER BY ${schema}.oer_materials.id
-                ${LIMIT  ? `LIMIT ${LIMIT}` : ''}
-                ${OFFSET ? `OFFSET ${OFFSET}` : ''}
+                ${LIMIT ? `LIMIT ${LIMIT}` : ""}
+                ${OFFSET ? `OFFSET ${OFFSET}` : ""}
             ),
 
             oer_materials_wiki AS (
@@ -234,11 +233,10 @@ module.exports = function (pg, logger, config) {
             FROM ${schema}.material_contents
             WHERE ${schema}.material_contents.material_id=${materialId}
 
-            ${contentId ? `AND ${schema}.material_contents.id=${contentId}` : ''}
+            ${contentId ? `AND ${schema}.material_contents.id=${contentId}` : ""}
         `;
 
         return query;
-
     }
 
 
@@ -255,13 +253,13 @@ module.exports = function (pg, logger, config) {
         // construct the query parameters string
         let query = [];
         // list the languages used in the query
-        for (let id=0; id < LANGUAGES.length; id++) {
+        for (let id = 0; id < LANGUAGES.length; id++) {
             // add the array notation of the query
             query.push(`languages[${id}]=${LANGUAGES[id]}`);
         }
         // list the provider ids used in the query
-        for (let id=0; id < PROVIDER_IDS.length; id++) {
-            if (query.length) { query += '&'; }
+        for (let id = 0; id < PROVIDER_IDS.length; id++) {
+            if (query.length) { query += "&"; }
             // add the array notation of the query
             query.push(`provider_ids[${id}]=${PROVIDER_IDS[id]}`);
         }
@@ -271,19 +269,19 @@ module.exports = function (pg, logger, config) {
         const MAX_OFFSET = Math.floor(fullCount / LIMIT) * LIMIT;
 
         // construct create the domain
-        const domain = 'https://platform.x5gon.org';
+        const domain = "https://platform.x5gon.org";
         // set the base url
         let baseUrl = `${domain}${req.baseUrl}${req.path}`;
 
         // get the query params for the self url together
         let selfQuery = query.slice(0);
-        if (LIMIT!==DEFAULT_LIMIT)   { selfQuery.push(`limit=${LIMIT}`); }
-        if (OFFSET!==DEFAULT_OFFSET) { selfQuery.push(`offset=${OFFSET}`); }
+        if (LIMIT !== DEFAULT_LIMIT) { selfQuery.push(`limit=${LIMIT}`); }
+        if (OFFSET !== DEFAULT_OFFSET) { selfQuery.push(`offset=${OFFSET}`); }
 
         // build the self, next and last links
-        const selfQueryString = selfQuery.length ? `?${selfQuery.join('&')}` : '';
-        const nextQueryString = '?' + query.join('&') + (query.length ? '&' : '') + `limit=${LIMIT}&offset=${NEXT_OFFSET}`;
-        const lastQueryString = '?' + query.join('&') + (query.length ? '&' : '') + `limit=${LIMIT}&offset=${MAX_OFFSET}`;
+        const selfQueryString = selfQuery.length ? `?${selfQuery.join("&")}` : "";
+        const nextQueryString = `?${query.join("&")}${query.length ? "&" : ""}limit=${LIMIT}&offset=${NEXT_OFFSET}`;
+        const lastQueryString = `?${query.join("&")}${query.length ? "&" : ""}limit=${LIMIT}&offset=${MAX_OFFSET}`;
 
         // the links to other similar queries
         const self = `${baseUrl}${selfQueryString}`;
@@ -299,7 +297,6 @@ module.exports = function (pg, logger, config) {
 
         // return the urls of the query
         return links;
-
     }
 
 
@@ -357,7 +354,8 @@ module.exports = function (pg, logger, config) {
                 provider_domain
             },
             license,
-            ...wikipedia && { wikipedia: JSON.parse(wikipedia).map(concept => ({
+            ...wikipedia && {
+                wikipedia: JSON.parse(wikipedia).map((concept) => ({
                     uri: concept.uri,
                     name: concept.name,
                     secUri: concept.secUri,
@@ -370,7 +368,6 @@ module.exports = function (pg, logger, config) {
             },
             metadata
         };
-
     }
 
     function oerMaterialContentFormat(pg_content, fields) {
@@ -391,17 +388,15 @@ module.exports = function (pg, logger, config) {
             value,
             language
         };
-
     }
 
 
-    /**********************************
+    /** ********************************
      * Middleware
-     *********************************/
+     ******************************** */
 
     // check query validity
     router.use((req, res, next) => {
-
         // transform query parameters into lowercase
         const query_parameters = {};
         for (let key in req.query) {
@@ -417,88 +412,84 @@ module.exports = function (pg, logger, config) {
         } = query_parameters;
 
 
-        /**********************************
+        /** ********************************
          * check user parameters
-         *********************************/
+         ******************************** */
 
         // set error message container
         let error_msgs = [];
 
         if (limit && limit.match(/[^0-9,\.]+/gi)) {
-            error_msgs.push('Query parameter "limit" is not a number');
+            error_msgs.push("Query parameter \"limit\" is not a number");
         }
 
         if (offset && offset.match(/[^0-9,\.]+/gi)) {
-            error_msgs.push('Query parameter "offset" is not a number');
+            error_msgs.push("Query parameter \"offset\" is not a number");
         }
 
         if (page && page.match(/[^0-9,\.]+/gi)) {
-            error_msgs.push('Query parameter "page" is not a number');
+            error_msgs.push("Query parameter \"page\" is not a number");
         }
 
-        if (languages && !(Array.isArray(languages) || typeof(languages) === 'string')) {
-            error_msgs.push('Query parameter "languages" is not a string or array');
+        if (languages && !(Array.isArray(languages) || typeof (languages) === "string")) {
+            error_msgs.push("Query parameter \"languages\" is not a string or array");
         } else if (languages) {
-
             // get languages
             let LANGUAGES = [];
-            if (typeof(languages) === 'string') {
+            if (typeof (languages) === "string") {
                 // split the languages string and trim them
-                LANGUAGES = languages.split(',').map(lang => lang.trim());
+                LANGUAGES = languages.split(",").map((lang) => lang.trim());
             } else if (Array.isArray(languages)) {
                 // trim each language entry
-                LANGUAGES = languages.map(lang => lang.trim());
+                LANGUAGES = languages.map((lang) => lang.trim());
             }
 
             for (let lang of LANGUAGES) {
                 // check if all language entries are of length 2
                 if (lang.length !== 2) {
-                    error_msgs.push('Query parameter "languages" is not in ISO 639-1 code');
+                    error_msgs.push("Query parameter \"languages\" is not in ISO 639-1 code");
                     break;
                 }
             }
             // setup languages
-            query_parameters.languages = LANGUAGES.map(lang => `'${lang}'`);
+            query_parameters.languages = LANGUAGES.map((lang) => `'${lang}'`);
         }
 
-        if (provider_ids && !(Array.isArray(provider_ids) || typeof(provider_ids) === 'string')) {
-            error_msgs.push('Query parameter "provider_ids" is not a number or array of numbers');
+        if (provider_ids && !(Array.isArray(provider_ids) || typeof (provider_ids) === "string")) {
+            error_msgs.push("Query parameter \"provider_ids\" is not a number or array of numbers");
         } else if (provider_ids) {
-
             // get providers
             let PROVIDER_IDS = [];
-            if (typeof(provider_ids) === 'string') {
+            if (typeof (provider_ids) === "string") {
                 // split the languages string and trim them
-                PROVIDER_IDS = provider_ids.split(',').map(lang => lang.trim());
+                PROVIDER_IDS = provider_ids.split(",").map((lang) => lang.trim());
             } else if (Array.isArray(provider_ids)) {
                 // trim each language entry
-                PROVIDER_IDS = provider_ids.map(lang => lang.trim());
+                PROVIDER_IDS = provider_ids.map((lang) => lang.trim());
             }
 
             for (let id of PROVIDER_IDS) {
                 // check if the provider ids are integers
                 if (id.match(/[^0-9,\.]+/gi)) {
-                    error_msgs.push('Query parameter "provider_ids" are not numbers');
+                    error_msgs.push("Query parameter \"provider_ids\" are not numbers");
                     break;
                 }
             }
             // setup languages
-            query_parameters.provider_ids = PROVIDER_IDS.map(id => parseInt(id));
-
+            query_parameters.provider_ids = PROVIDER_IDS.map((id) => parseInt(id));
         }
 
 
-        /**********************************
+        /** ********************************
          * notify the user about
          * the query parameter errors
-         *********************************/
+         ******************************** */
 
         if (error_msgs.length) {
-            logger.warn('[warn] query parameters not in correct format',
+            logger.warn("[warn] query parameters not in correct format",
                 logger.formatRequest(req, {
                     error: error_msgs
-                })
-            );
+                }));
             // notify the users of the parameters change
             return res.status(400).send({
                 errors: { msgs: error_msgs }
@@ -506,21 +497,19 @@ module.exports = function (pg, logger, config) {
         }
 
 
-        /**********************************
+        /** ********************************
          * continue with request
-         *********************************/
+         ******************************** */
 
         // store the modified query parameters
         req.query_parameters = query_parameters;
         // continue the request
         return next();
-
     });
 
 
     // check parameter validity
     router.get((req, res, next) => {
-
         // set error message container
         let error_msgs = [];
 
@@ -532,41 +521,39 @@ module.exports = function (pg, logger, config) {
             }
         }
 
-        /**********************************
+        /** ********************************
          * notify the user about
          * the url parameter errors
-         *********************************/
+         ******************************** */
 
         if (error_msgs.length) {
-            logger.warn('[warn] query parameters not in correct format',
+            logger.warn("[warn] query parameters not in correct format",
                 logger.formatRequest(req, {
                     error: error_msgs
-                })
-            );
+                }));
             // notify the users of the parameters change
             return res.status(400).send({
                 errors: { msgs: error_msgs }
             });
         }
 
-        /**********************************
+        /** ********************************
          * continue with request
-         *********************************/
+         ******************************** */
 
         // continue the request
         return next();
     });
 
 
-    /**********************************
+    /** ********************************
      * Routes
-     *********************************/
+     ******************************** */
 
-    router.get('/oer_materials', cors(), (req, res) => {
-
-        /**********************************
+    router.get("/oer_materials", cors(), (req, res) => {
+        /** ********************************
          * setup user parameters
-         *********************************/
+         ******************************** */
 
         // get user query parameters
         const {
@@ -587,21 +574,21 @@ module.exports = function (pg, logger, config) {
 
         // get languages
         let LANGUAGES = [];
-        if (languages && typeof(languages) === 'string') {
+        if (languages && typeof (languages) === "string") {
             // split the languages string and trim them
-            LANGUAGES = languages.split(',').map(lang => lang.trim());
+            LANGUAGES = languages.split(",").map((lang) => lang.trim());
         } else if (languages && Array.isArray(languages)) {
             // trim each language entry
-            LANGUAGES = languages.map(lang => lang.trim());
+            LANGUAGES = languages.map((lang) => lang.trim());
         }
 
         // get providers
-        let PROVIDER_IDS = provider_ids ? provider_ids : [];
+        let PROVIDER_IDS = provider_ids || [];
 
 
-        /**********************************
+        /** ********************************
          * construct user query
-         *********************************/
+         ******************************** */
 
         // create the query
         const query = oerMaterialQuery({
@@ -612,20 +599,19 @@ module.exports = function (pg, logger, config) {
         });
 
         // execute the user query
-        pg.execute(query, [], function (error, records) {
+        pg.execute(query, [], (error, records) => {
             if (error) {
-                logger.error('[error] postgresql error',
+                logger.error("[error] postgresql error",
                     logger.formatRequest(req, {
                         error: {
                             message: error.message,
                             stack: error.stack
                         }
-                    })
-                );
+                    }));
                 // something went wrong on server side
                 return res.status(500).send({
                     errors: {
-                        msg: 'Error on server side'
+                        msg: "Error on server side"
                     }
                 });
             }
@@ -636,9 +622,9 @@ module.exports = function (pg, logger, config) {
             }
 
 
-            /**********************************
+            /** ********************************
              * prepare query results
-             *********************************/
+             ******************************** */
 
             // get full count of the records
             const { full_count: fullCount } = records[0];
@@ -652,7 +638,7 @@ module.exports = function (pg, logger, config) {
             });
 
             // convert the materials
-            const materials = records.map(material => oerMaterialFormat(material));
+            const materials = records.map((material) => oerMaterialFormat(material));
 
             // send the materials to the user
             return res.status(200).send({
@@ -660,10 +646,9 @@ module.exports = function (pg, logger, config) {
                 oer_materials: materials
             });
         });
-
     });
 
-    router.get('/oer_materials/:material_id', cors(), (req, res) => {
+    router.get("/oer_materials/:material_id", cors(), (req, res) => {
         // get material id
         const { material_id } = req.params;
 
@@ -671,20 +656,19 @@ module.exports = function (pg, logger, config) {
         const query = specificOERMaterialQuery(material_id);
 
         // execute the user query
-        pg.execute(query, [], function (error, records) {
+        pg.execute(query, [], (error, records) => {
             if (error) {
-                logger.error('[error] postgresql error',
+                logger.error("[error] postgresql error",
                     logger.formatRequest(req, {
                         error: {
                             message: error.message,
                             stack: error.stack
                         }
-                    })
-                );
+                    }));
                 // something went wrong on server side
                 return res.status(500).send({
                     errors: {
-                        msg: 'Error on server side'
+                        msg: "Error on server side"
                     }
                 });
             }
@@ -697,15 +681,15 @@ module.exports = function (pg, logger, config) {
                 // query should not return multiple records
                 return res.status(500).send({
                     errors: {
-                        msg: 'Error on server side'
+                        msg: "Error on server side"
                     }
                 });
             }
 
 
-            /**********************************
+            /** ********************************
              * prepare query results
-             *********************************/
+             ******************************** */
 
             // convert the materials
             const materials = oerMaterialFormat(records[0]);
@@ -715,11 +699,9 @@ module.exports = function (pg, logger, config) {
                 oer_materials: materials
             });
         });
-
     });
 
-    router.get('/oer_materials/:material_id/contents', cors(), (req, res) => {
-
+    router.get("/oer_materials/:material_id/contents", cors(), (req, res) => {
         // get material id
         const {
             material_id
@@ -732,20 +714,19 @@ module.exports = function (pg, logger, config) {
         const query = contentsOERMaterialQuery({ materialId });
 
         // execute the user query
-        pg.execute(query, [], function (error, records) {
+        pg.execute(query, [], (error, records) => {
             if (error) {
-                logger.error('[error] postgresql error',
+                logger.error("[error] postgresql error",
                     logger.formatRequest(req, {
                         error: {
                             message: error.message,
                             stack: error.stack
                         }
-                    })
-                );
+                    }));
                 // something went wrong on server side
                 return res.status(500).send({
                     errors: {
-                        msg: 'Error on server side'
+                        msg: "Error on server side"
                     }
                 });
             }
@@ -757,17 +738,17 @@ module.exports = function (pg, logger, config) {
                         id: materialId
                     },
                     error: {
-                        message: `No contents associated with material`
+                        message: "No contents associated with material"
                     }
                 });
             }
 
-            /**********************************
+            /** ********************************
              * prepare query results
-             *********************************/
+             ******************************** */
 
             // convert the materials
-            const oer_contents = records.map(content => oerMaterialContentFormat(content));
+            const oer_contents = records.map((content) => oerMaterialContentFormat(content));
 
             // send the materials to the user
             return res.status(200).send({
@@ -777,10 +758,9 @@ module.exports = function (pg, logger, config) {
                 oer_contents
             });
         });
-
     });
 
-    router.get('/oer_materials/:material_id/contents/:content_id', cors(), (req, res) => {
+    router.get("/oer_materials/:material_id/contents/:content_id", cors(), (req, res) => {
         // get material and content ids
         const {
             material_id,
@@ -795,20 +775,19 @@ module.exports = function (pg, logger, config) {
         const query = contentsOERMaterialQuery({ materialId, contentId });
 
         // execute the user query
-        pg.execute(query, [], function (error, records) {
+        pg.execute(query, [], (error, records) => {
             if (error) {
-                logger.error('[error] postgresql error',
+                logger.error("[error] postgresql error",
                     logger.formatRequest(req, {
                         error: {
                             message: error.message,
                             stack: error.stack
                         }
-                    })
-                );
+                    }));
                 // something went wrong on server side
                 return res.status(500).send({
                     errors: {
-                        msg: 'Error on server side'
+                        msg: "Error on server side"
                     }
                 });
             }
@@ -825,12 +804,12 @@ module.exports = function (pg, logger, config) {
                 });
             }
 
-            /**********************************
+            /** ********************************
              * prepare query results
-             *********************************/
+             ******************************** */
 
             // convert the materials
-            const oer_contents = records.map(content => oerMaterialContentFormat(content))[0];
+            const oer_contents = records.map((content) => oerMaterialContentFormat(content))[0];
 
             // send the materials to the user
             return res.status(200).send({
@@ -842,7 +821,7 @@ module.exports = function (pg, logger, config) {
         });
     });
 
-    router.get('/oer_materials/:material_id/contents/:content_id/value', cors(), (req, res) => {
+    router.get("/oer_materials/:material_id/contents/:content_id/value", cors(), (req, res) => {
         // get material and content ids
         const {
             material_id,
@@ -857,20 +836,19 @@ module.exports = function (pg, logger, config) {
         const query = contentsOERMaterialQuery({ materialId, contentId });
 
         // execute the user query
-        pg.execute(query, [], function (error, records) {
+        pg.execute(query, [], (error, records) => {
             if (error) {
-                logger.error('[error] postgresql error',
+                logger.error("[error] postgresql error",
                     logger.formatRequest(req, {
                         error: {
                             message: error.message,
                             stack: error.stack
                         }
-                    })
-                );
+                    }));
                 // something went wrong on server side
                 return res.status(500).send({
                     errors: {
-                        msg: 'Error on server side'
+                        msg: "Error on server side"
                     }
                 });
             }
@@ -887,12 +865,12 @@ module.exports = function (pg, logger, config) {
                 });
             }
 
-            /**********************************
+            /** ********************************
              * prepare query results
-             *********************************/
+             ******************************** */
 
             // convert the materials
-            const oer_contents = records.map(content => oerMaterialContentFormat(content));
+            const oer_contents = records.map((content) => oerMaterialContentFormat(content));
 
             // send the materials to the user
             const value = oer_contents[0] && oer_contents[0].value

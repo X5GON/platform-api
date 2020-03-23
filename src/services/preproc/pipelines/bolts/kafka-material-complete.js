@@ -1,18 +1,17 @@
-/********************************************************************
+/** ******************************************************************
  * PostgresQL storage process
  * This component receives the verified OER material object and
  * stores it into postgresQL database.
  */
 
 // internal modules
-const KafkaProducer = require('@library/kafka-producer');
+const KafkaProducer = require("@library/kafka-producer");
 
 /**
  * @class KafkaSender
  * @description Sends the messages to the corresponding kafka topic.
  */
 class KafkaMaterialComplete {
-
     constructor() {
         this._name = null;
         this._onEmit = null;
@@ -40,7 +39,6 @@ class KafkaMaterialComplete {
     }
 
     receive(material, stream_id, callback) {
-
         // split the material into pieces and send the data in the correct order
         const {
             title,
@@ -66,23 +64,23 @@ class KafkaMaterialComplete {
             license
         } = material;
 
-        ///////////////////////////////////////////
+        // /////////////////////////////////////////
         // PREPARE MATERIAL AUTHORS
-        ///////////////////////////////////////////
+        // /////////////////////////////////////////
 
         let authors_copy = authors;
 
         if (authors_copy) {
-            authors_copy = authors_copy.replace(/[{\"}]/g, '');
-            authors_copy = authors_copy.split(',').map(str => str.trim());
-            if (authors_copy.length === 1 && authors_copy[0] === '') {
+            authors_copy = authors_copy.replace(/[{\"}]/g, "");
+            authors_copy = authors_copy.split(",").map((str) => str.trim());
+            if (authors_copy.length === 1 && authors_copy[0] === "") {
                 authors_copy = null;
             }
         }
 
-        ///////////////////////////////////////////
+        // /////////////////////////////////////////
         // PREPARE MATERIAL CONTENTS
-        ///////////////////////////////////////////
+        // /////////////////////////////////////////
 
         let material_contents = [];
         // prepare list of material contents
@@ -95,9 +93,9 @@ class KafkaMaterialComplete {
                     const value = transcriptions[language][extension];
 
                     // define the type of the transcriptions
-                    const type = language === origin_language ?
-                        'transcription' :
-                        'translation';
+                    const type = language === origin_language
+                        ? "transcription"
+                        : "translation";
 
                     material_contents.push({
                         language,
@@ -113,30 +111,30 @@ class KafkaMaterialComplete {
             // prepare the material content object
             material_contents.push({
                 language: origin_language,
-                type: 'transcription',
-                extension: 'plain',
+                type: "transcription",
+                extension: "plain",
                 value: { value: raw_text },
                 material_id: null,
                 last_updated: null
             });
         }
 
-        ///////////////////////////////////////////
+        // /////////////////////////////////////////
         // PREPARE FEATURES PUBLIC
-        ///////////////////////////////////////////
+        // /////////////////////////////////////////
 
         // prepare of public feature - wikipedia concept
         let features_public = {
-            name: 'wikipedia_concepts',
+            name: "wikipedia_concepts",
             value: { value: wikipedia_concepts },
             re_required: true,
             record_id: null,
             last_updated: null
         };
 
-        ///////////////////////////////////////////
+        // /////////////////////////////////////////
         // SEND TO THE DATABASES
-        ///////////////////////////////////////////
+        // /////////////////////////////////////////
 
         const message = {
             oer_materials: {
@@ -162,11 +160,10 @@ class KafkaMaterialComplete {
         };
 
         // send the message to the database topics
-        this._producer.send(this._kafka_topic, message, function (error) {
+        this._producer.send(this._kafka_topic, message, (error) => {
             if (error) { return callback(error); }
             return callback();
         });
-
     }
 }
 

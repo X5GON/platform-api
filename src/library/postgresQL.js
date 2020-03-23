@@ -1,21 +1,20 @@
-/************************************************
+/** **********************************************
  * PostgresQL Module
  * This module connect to the PostgresQL database
  * and allows execution of simple commands.
  */
 
 // external libraries
-const { Pool } = require('pg');
-const Cursor = require('pg-cursor');
+const { Pool } = require("pg");
+const Cursor = require("pg-cursor");
 
 // async values handler
-const async = require('async');
+const async = require("async");
 
 /**
  * The postgresql wrapper class.
  */
 class PostgreSQL {
-
     /**
      * @description Initialize postgresql pool connections.
      * @param {Object} config - The postgres config object.
@@ -43,9 +42,9 @@ class PostgreSQL {
         // create a pool of connections
         self._pool = new Pool(self._config);
         // put event handler
-        self._pool.on('error', (error, client) => {
+        self._pool.on("error", (error, client) => {
             // how to handle errors of the idle clients
-            console.error('idle client error', error.message, error.stack);
+            console.error("idle client error", error.message, error.stack);
             // TODO: expect the client - find a possible reason for exit
         });
     }
@@ -59,8 +58,8 @@ class PostgreSQL {
      */
     _extractKeysAndValues(params, index) {
         // prepare query and params
-        let keys = [],
-            values = [];
+        let keys = [];
+        let values = [];
 
         // iterate thorugh the parameters
         for (let key in params) {
@@ -90,28 +89,28 @@ class PostgreSQL {
      */
     _getConditions(conditions, idx) {
         let self = this;
-        let condition, params = [],
-            limitOffset = { };
+        let condition; let params = [];
+        let limitOffset = { };
         if (conditions instanceof Array) {
             // get all conditions together
-            let conditionKeys = [ ];
+            let conditionKeys = [];
             for (let cond of conditions) {
                 // extract the conditions and values, concat in an array
                 let { index, keys, values } = self._extractKeysAndValues(cond, idx);
-                conditionKeys.push(`(${keys.join(' AND ')})`);
+                conditionKeys.push(`(${keys.join(" AND ")})`);
                 params = params.concat(values);
                 idx = index;
             }
             // join the conditions
-            condition = (conditionKeys.join(' OR '));
+            condition = (conditionKeys.join(" OR "));
         } else {
             let { keys, values } = self._extractKeysAndValues(conditions, idx);
-            if (keys === 'limit' || keys === 'offset') {
+            if (keys === "limit" || keys === "offset") {
                 limitOffset[keys] = values;
             } else {
                 // join the conditions and prepare the params
                 params = params.concat(values);
-                condition = keys.join(' AND ');
+                condition = keys.join(" AND ");
             }
         }
         return { condition, params, limitOffset };
@@ -126,8 +125,8 @@ class PostgreSQL {
      */
     _getValues(values, index) {
         // prepare query and params
-        let keys = [],
-            params = [];
+        let keys = [];
+        let params = [];
 
         // check what are the conditions
         for (let key in values) {
@@ -145,7 +144,7 @@ class PostgreSQL {
      */
     close(callback) {
         let self = this;
-        if (callback && typeof(callback) === 'function') {
+        if (callback && typeof (callback) === "function") {
             self._pool.end().then(callback);
         } else {
             self._pool.end();
@@ -164,7 +163,7 @@ class PostgreSQL {
             if (error) { release(); return callback(error); }
 
             // execute statement
-            if (params.length == 0){
+            if (params.length == 0) {
                 client.query(statement, (xerror, results) => {
                     // once we get the results we release the client
                     release();
@@ -202,9 +201,9 @@ class PostgreSQL {
             if (error) { release(); return callback(error); }
 
             // create a cursor - with or without the parameters provided
-            let cursor = params.length ?
-                client.query(new Cursor(statement, params)) :
-                client.query(new Cursor(statement));
+            let cursor = params.length
+                ? client.query(new Cursor(statement, params))
+                : client.query(new Cursor(statement));
 
             // until the last batch is of full batch-size, continue the process
             let lastBatch = batchSize;
@@ -260,7 +259,7 @@ class PostgreSQL {
         // get the record keys and values
         const recordKeys = Object.keys(record);
         const recordValIds = [...Array(recordKeys.length).keys()]
-                            .map((id) => '$'+(id+1)).join(',');
+            .map((id) => `$${id + 1}`).join(",");
 
         // prepare the record values - sent with the query
         let params = [];
@@ -268,7 +267,7 @@ class PostgreSQL {
             params.push(record[key]);
         }
         // prepare the query command
-        let query = `INSERT INTO ${table} (${recordKeys.join(',')}) VALUES
+        let query = `INSERT INTO ${table} (${recordKeys.join(",")}) VALUES
             (${recordValIds}) RETURNING *;`;
 
         // execute the query
@@ -287,17 +286,17 @@ class PostgreSQL {
         // set the conditions and parameters
         let { condition, params, limitOffset } = self._getConditions(conditions, 1);
 
-        let limitations = '';
+        let limitations = "";
         if (Object.keys(limitOffset).length) {
             limitations = Object.keys(limitOffset)
-                .map(key => `${key.toUpperCase()} ${limitOffset[key]}`)
-                .join(' ');
+                .map((key) => `${key.toUpperCase()} ${limitOffset[key]}`)
+                .join(" ");
         }
 
         // prepare the query command
-        let query = params.length ?
-            `SELECT * FROM ${table} WHERE ${condition} ${limitations};` :
-            `SELECT * FROM ${table} ${limitations};`;
+        let query = params.length
+            ? `SELECT * FROM ${table} WHERE ${condition} ${limitations};`
+            : `SELECT * FROM ${table} ${limitations};`;
 
         // execute the query
         return self.execute(query, params, callback);
@@ -310,15 +309,15 @@ class PostgreSQL {
      * @param {Integer} batchSize - The size of the result returnes at once
      * @param {Function} callback - The callback function.
      */
-    selectLarge(conditions, table, batchSize,  batchCallback, callback) {
+    selectLarge(conditions, table, batchSize, batchCallback, callback) {
         let self = this;
 
         // set the conditions and parameters
         let { condition, params } = self._getConditions(conditions, 1);
         // prepare the query command
-        let query = params.length ?
-            `SELECT * FROM ${table} WHERE ${condition};` :
-            `SELECT * FROM ${table};`;
+        let query = params.length
+            ? `SELECT * FROM ${table} WHERE ${condition};`
+            : `SELECT * FROM ${table};`;
 
         // execute the query
         self.executeLarge(query, params, batchSize, batchCallback, callback);
@@ -336,17 +335,17 @@ class PostgreSQL {
         // set the conditions and parameters
         let { condition, params, limitOffset } = self._getConditions(conditions, 1);
 
-        let limitations = '';
+        let limitations = "";
         if (Object.keys(limitOffset).length) {
             limitations = Object.keys(limitOffset)
-                .map(key => `${key.toUpperCase()} ${limitOffset[key]}`)
-                .join(' ');
+                .map((key) => `${key.toUpperCase()} ${limitOffset[key]}`)
+                .join(" ");
         }
 
         // prepare the query command
-        let query = params.length ?
-            `SELECT COUNT(*) FROM ${table} WHERE ${condition} ${limitations};` :
-            `SELECT COUNT(*) FROM ${table} ${limitations};`;
+        let query = params.length
+            ? `SELECT COUNT(*) FROM ${table} WHERE ${condition} ${limitations};`
+            : `SELECT COUNT(*) FROM ${table} ${limitations};`;
 
         // execute the query
         return self.execute(query, params, callback);
@@ -369,7 +368,7 @@ class PostgreSQL {
         // get joint parameters
         const params = updateParams.concat(conditionParams);
         // prepare query and params
-        const query = `UPDATE ${table} SET ${keys.join(', ')} ${condition ? `WHERE ${condition}` : ''} RETURNING *;`;
+        const query = `UPDATE ${table} SET ${keys.join(", ")} ${condition ? `WHERE ${condition}` : ""} RETURNING *;`;
 
         // execute the query
         return self.execute(query, params, callback);
@@ -386,7 +385,7 @@ class PostgreSQL {
 
         // get the conditions and prepare the query
         let { condition, params } = self._getConditions(conditions, 1);
-        const query = `DELETE FROM ${table} ${condition ? `WHERE ${condition}` : ''} RETURNING *;`;
+        const query = `DELETE FROM ${table} ${condition ? `WHERE ${condition}` : ""} RETURNING *;`;
 
         // execute the query
         return self.execute(query, params, callback);
@@ -404,7 +403,7 @@ class PostgreSQL {
         // get the record keys and values
         const recordKeys = Object.keys(record);
         const recordValIds = [...Array(recordKeys.length).keys()]
-                            .map(id => '$'+(id+1)).join(',');
+            .map((id) => `$${id + 1}`).join(",");
 
         // get the values used to update the records
         let { keys, params } = self._getValues(record, 1);
@@ -412,20 +411,20 @@ class PostgreSQL {
         // get the condition keys - must be UNIQUE
         let conditionKeys = Object.keys(conditions);
         if (conditionKeys.length > 1) {
-            const error = new Error(`[PostgresQL upsert] Too many conditions ${conditionKeys.join(',')}`);
+            const error = new Error(`[PostgresQL upsert] Too many conditions ${conditionKeys.join(",")}`);
             return callback(error);
         }
         // create the query command
-        const query = `INSERT INTO ${table} (${recordKeys.join(',')}) VALUES (${recordValIds})
-           ON CONFLICT (${conditionKeys.join(', ')}) DO UPDATE SET ${keys.join(', ')} RETURNING *;`;
+        const query = `INSERT INTO ${table} (${recordKeys.join(",")}) VALUES (${recordValIds})
+           ON CONFLICT (${conditionKeys.join(", ")}) DO UPDATE SET ${keys.join(", ")} RETURNING *;`;
 
         // execute the query
         return self.execute(query, params, callback);
     }
 
-    /**********************************
+    /** ********************************
      * X5GON specific queries
-     *********************************/
+     ******************************** */
 
     /**
      * Fixes and formats the number to show its value in an abbriviated form.
@@ -444,14 +443,14 @@ class PostgreSQL {
          * @returns {String} The fixed number.
          */
         function toFixed(number) {
-            return number <= 10 ? number.toFixed(2) :
-                number <= 100 ? number.toFixed(1) :
-                number.toFixed(0);
+            return number <= 10 ? number.toFixed(2)
+                : number <= 100 ? number.toFixed(1)
+                    : number.toFixed(0);
         }
         // format based on the quotient
-        if (billions>= 1) {
+        if (billions >= 1) {
             return `${toFixed(billions)}B`;
-        } else if (millions>= 1) {
+        } else if (millions >= 1) {
             return `${toFixed(millions)}M`;
         } else if (thousands >= 1) {
             return `${toFixed(thousands)}k`;
@@ -485,10 +484,10 @@ class PostgreSQL {
         }
 
         // add token based contraint
-        let constraint = '';
+        let constraint = "";
         if (Array.isArray(tokens)) {
-            constraint = `WHERE providers.token IN (${tokens.join(',')})`;
-        } else if (typeof tokens === 'string') {
+            constraint = `WHERE providers.token IN (${tokens.join(",")})`;
+        } else if (typeof tokens === "string") {
             constraint = `WHERE providers.token='${tokens}'`;
         }
         // create the query string
@@ -542,13 +541,12 @@ class PostgreSQL {
         `;
 
         // execute the query
-        return self.execute(query, [], function (error, results) {
+        return self.execute(query, [], (error, results) => {
             if (error) { return callback(error); }
             results.forEach(prepareOERProviders);
             return callback(null, results);
         });
     }
-
 }
 
 module.exports = function (config) {

@@ -1,4 +1,4 @@
-/********************************************************************
+/** ******************************************************************
  * PostgresQL storage process for materials
  * This component receives the verified OER material object and
  * stores it into postgresQL database.
@@ -6,7 +6,6 @@
 
 
 class StorePGMaterialPartial {
-
     constructor() {
         this._name = null;
         this._onEmit = null;
@@ -20,7 +19,7 @@ class StorePGMaterialPartial {
         this._prefix = `[StorePGMaterialPartial ${this._name}]`;
 
         // create the postgres connection
-        this._pg = require('@library/postgresQL')(config.pg);
+        this._pg = require("@library/postgresQL")(config.pg);
 
         this._finalBolt = config.final_bolt || false;
 
@@ -44,7 +43,7 @@ class StorePGMaterialPartial {
             oer_materials_partial
         } = message;
 
-        self._pg.upsert(oer_materials_partial, { materialurl: null }, 'oer_materials_partial', (error, result) => {
+        self._pg.upsert(oer_materials_partial, { materialurl: null }, "oer_materials_partial", (error, result) => {
             if (error) { return callback(error); }
             if (self._finalBolt) { return callback(); }
             return this._onEmit(message, stream_id, callback);

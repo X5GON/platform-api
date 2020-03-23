@@ -1,10 +1,10 @@
 // external modules
-const router = require('express').Router();
-const request = require('request').defaults({ jar: true });
-const cors = require('cors');
-/********************************************
+const router = require("express").Router();
+const request = require("request").defaults({ jar: true });
+const cors = require("cors");
+/** ******************************************
  * Helper functions
- *******************************************/
+ ****************************************** */
 
 /**
  * @description Adds API routes for platform website requests.
@@ -12,20 +12,18 @@ const cors = require('cors');
  * @param {Object} logger - The logger object.
  */
 module.exports = function (pg, logger, config) {
-
-
-    ////////////////////////////////////////
+    // //////////////////////////////////////
     // Helper functions
-    ////////////////////////////////////////
+    // //////////////////////////////////////
 
     // TODO: write helper functions
 
     // x5gon cookie name
     const x5gonCookieName = config.platform.cookieID;
 
-     ////////////////////////////////////////
+    // //////////////////////////////////////
     // Material Search
-    ////////////////////////////////////////
+    // //////////////////////////////////////
 
     // maximum numbers of documents in recommendation list
     const MAX_DOCS = 10;
@@ -56,15 +54,13 @@ module.exports = function (pg, logger, config) {
      * @apiExample  Example usage:
      *      https://platform.x5gon.org/api/v1/search?url=https://platform.x5gon.org/materialUrl&text=deep+learning
      */
-    router.get('/recommend/oer_bundles', cors(), (req, res) => {
-
+    router.get("/recommend/oer_bundles", cors(), (req, res) => {
         if (!Object.keys(req.query).length) {
             return res.send({
                 error: {
-                    message: 'No query parameters provided'
+                    message: "No query parameters provided"
                 }
             });
-
         }
 
         // get user query parameters and/or set initial ones
@@ -72,9 +68,8 @@ module.exports = function (pg, logger, config) {
         queryParams.page = parseInt(queryParams.page) || 1;
         queryParams.count = parseInt(queryParams.count) || 10000;
 
-        let queryString = Object.keys(queryParams).map(key => `${key}=${encodeURIComponent(queryParams[key])}`).join('&');
+        let queryString = Object.keys(queryParams).map((key) => `${key}=${encodeURIComponent(queryParams[key])}`).join("&");
         request(`http://localhost:${config.recsys.port}/api/v1/recommend/bundles?${queryString}`, (error, httpRequest, body) => {
-
             // set query parameters
             let query = {
                 ...queryParams.url && { url: queryParams.url },
@@ -85,18 +80,16 @@ module.exports = function (pg, logger, config) {
 
             if (error) {
                 // error when making search request
-                logger.error('making search request',
+                logger.error("making search request",
                     logger.formatRequest(req, {
                         error: {
                             message: error.message,
                             stack: error.stack
                         }
-                    })
-                );
+                    }));
                 options.error = {
-                    message: 'Error when retrieving bundle recommendations'
+                    message: "Error when retrieving bundle recommendations"
                 };
-
             } else {
                 try {
                     const recommendations = JSON.parse(body);
@@ -108,31 +101,26 @@ module.exports = function (pg, logger, config) {
                         count: recLength,
                         max_pages: Math.ceil(recLength / MAX_DOCS)
                     };
-
-
                 } catch (xerror) {
-                    logger.error('search request processing',
+                    logger.error("search request processing",
                         logger.formatRequest(req, {
                             error: {
                                 message: xerror.message,
                                 stack: xerror.stack
                             }
-                        })
-                    );
+                        }));
                     options.error = {
-                        message: 'Error when processing bundle recommendations'
+                        message: "Error when processing bundle recommendations"
                     };
                 }
             }
             // create to search results
             return res.send(options);
-
         });
     });
 
 
-    router.get('/recommend/personalized', cors(), (req, res) => {
-
+    router.get("/recommend/personalized", cors(), (req, res) => {
         const j = request.jar();
         const cookie = request.cookie(`x5gonTrack=${req.cookies[x5gonCookieName]}`);
         const url = `http://localhost:${config.recsys.port}/api/v1/recommend/personalized`;
@@ -144,7 +132,6 @@ module.exports = function (pg, logger, config) {
         queryParams.page = parseInt(queryParams.page) || 1;
 
         request({ url, jar: j }, (error, httpRequest, body) => {
-
             // set query parameters
             let query = {
                 page: queryParams.page
@@ -157,18 +144,16 @@ module.exports = function (pg, logger, config) {
 
             if (error) {
                 // error when making search request
-                logger.error('making search request',
+                logger.error("making search request",
                     logger.formatRequest(req, {
                         error: {
                             message: error.message,
                             stack: error.stack
                         }
-                    })
-                );
+                    }));
                 options.error = {
-                    message: 'Error when retrieving recommendations'
+                    message: "Error when retrieving recommendations"
                 };
-
             } else {
                 try {
                     const recommendations = JSON.parse(body);
@@ -180,31 +165,26 @@ module.exports = function (pg, logger, config) {
                         count: recLength,
                         max_pages: Math.ceil(recLength / MAX_DOCS)
                     };
-
-
                 } catch (xerror) {
-                    logger.error('search request processing',
+                    logger.error("search request processing",
                         logger.formatRequest(req, {
                             error: {
                                 message: xerror.message,
                                 stack: xerror.stack
                             }
-                        })
-                    );
+                        }));
                     options.error = {
-                        message: 'Error when processing bundle recommendations'
+                        message: "Error when processing bundle recommendations"
                     };
                 }
             }
             // create to search results
             return res.send(options);
-
         });
     });
 
 
-    router.get('/recommend/collaborative_filtering', cors(), (req, res) => {
-
+    router.get("/recommend/collaborative_filtering", cors(), (req, res) => {
         const j = request.jar();
         const cookie = request.cookie(`x5gonTrack=${req.cookies[x5gonCookieName]}`);
         const url = `http://localhost:${config.recsys.port}/api/v1/recommend/collaborativeFiltering`;
@@ -216,7 +196,6 @@ module.exports = function (pg, logger, config) {
         queryParams.page = parseInt(queryParams.page) || 1;
 
         request({ url, jar: j }, (error, httpRequest, body) => {
-
             // set query parameters
             let query = {
                 page: queryParams.page
@@ -229,18 +208,16 @@ module.exports = function (pg, logger, config) {
 
             if (error) {
                 // error when making search request
-                logger.error('making search request',
+                logger.error("making search request",
                     logger.formatRequest(req, {
                         error: {
                             message: error.message,
                             stack: error.stack
                         }
-                    })
-                );
+                    }));
                 options.error = {
-                    message: 'Error when retrieving recommendations'
+                    message: "Error when retrieving recommendations"
                 };
-
             } else {
                 try {
                     const recommendations = JSON.parse(body);
@@ -252,32 +229,28 @@ module.exports = function (pg, logger, config) {
                         count: recLength,
                         max_pages: Math.ceil(recLength / MAX_DOCS)
                     };
-
-
                 } catch (xerror) {
-                    logger.error('search request processing',
+                    logger.error("search request processing",
                         logger.formatRequest(req, {
                             error: {
                                 message: xerror.message,
                                 stack: xerror.stack
                             }
-                        })
-                    );
+                        }));
                     options.error = {
-                        message: 'Error when processing bundle recommendations'
+                        message: "Error when processing bundle recommendations"
                     };
                 }
             }
             // create to search results
             return res.send(options);
-
         });
     });
 
 
-    ////////////////////////////////////////
+    // //////////////////////////////////////
     // End of Router
-    ////////////////////////////////////////
+    // //////////////////////////////////////
 
     return router;
 };
