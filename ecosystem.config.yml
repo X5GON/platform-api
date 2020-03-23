@@ -1,0 +1,42 @@
+apps:
+  - script: "dist/index.js"
+    name: "X5search"
+    cwd: "./src/services/search/"
+    instances: 4,
+    exec_mode: "cluster"
+    autorestart: true
+    watch: false
+    max_memory_restart: "1G"
+
+    env:
+      NODE_ENV: "development"
+    env_production:
+      NODE_ENV: "production"
+
+  - script: "recsys.js"
+    name: "X5recommend"
+    cwd: "./src/services/recsys/"
+    instances: 1,
+    exec_mode: "fork"
+    autorestart: true
+    watch: false
+    max_memory_restart: "7G"
+
+    env:
+      NODE_ENV: "development"
+    env_production:
+      NODE_ENV: "production"
+
+  - script: "platform.js"
+    name: "X5platform"
+    cwd: "./src/services/platform/"
+    instances: 1,
+    exec_mode: "fork"
+    autorestart: true
+    watch: false
+    max_memory_restart: "1G"
+
+    env:
+      NODE_ENV: "development"
+    env_production:
+      NODE_ENV: "production"
