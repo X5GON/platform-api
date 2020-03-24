@@ -21,7 +21,7 @@ const Logger = require("@library/logger");
 const Monitor = require("@library/process-monitor");
 
 // create a logger for platform requests
-const logger = Logger.createGroupInstance("requests", "platform", config.environment !== "prod");
+const logger = Logger.createGroupInstance("requests", "platform", config.isProduction);
 // create process monitoring instance
 const monitor = new Monitor();
 
@@ -42,7 +42,7 @@ require("./routes/proxies")(app, config);
 app.use(cookieParser(config.platform.sessionSecret));
 
 // add session configurations
-if (config.environment === "prod") {
+if (config.isProduction) {
     app.set("trust proxy", 1);
 }
 app.use(session({
@@ -50,7 +50,7 @@ app.use(session({
     saveUninitialized: false,
     resave: false,
     cookie: {
-        ...(config.environment === "prod" && { domain: ".x5gon.org" })
+        ...(config.isProduction && { domain: ".x5gon.org" })
     }
 }));
 // use flash messages

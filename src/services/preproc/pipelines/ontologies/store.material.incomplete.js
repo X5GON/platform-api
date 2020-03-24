@@ -1,7 +1,7 @@
 // configurations
 const config = require("@config/config");
 
-const productionMode = config.environment === "prod";
+const productionMode = config.isProduction;
 
 module.exports = {
     general: {

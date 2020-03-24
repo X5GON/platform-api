@@ -14,6 +14,7 @@ const env = process.env.NODE_ENV || "development";
 // the common configurations
 const common = {
     environment: env,
+    isProduction: env === "production",
     platform: {
         cookieID: "x5gonTrack",
         google: {

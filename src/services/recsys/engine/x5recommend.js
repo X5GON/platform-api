@@ -41,7 +41,7 @@ class x5recommend {
         self.params = params;
         // set the recommender requests logger
         self.logger = Logger.createGroupInstance("recommendation", "x5recommend",
-            config.environment === "dev");
+            config.isProduction);
 
         // load database
         self._loadBase();

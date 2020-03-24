@@ -64,7 +64,7 @@ npm install
 ## Run Components
 
 Before you run any of the components you must first create an `.env` file containing the process
-environments. For more detail see [README](./src/config/README.md).
+environments. For more detail see [README](./env/README.md).
 
 ### Component Initialization
 

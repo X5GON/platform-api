@@ -27,7 +27,7 @@ module.exports = function (app, config) {
         },
         logProvider(provider) {
             // create logger for sending requests
-            return Logger.createInstance("proxy", "info", "platform", config.environment !== "prod");
+            return Logger.createInstance("proxy", "info", "platform", config.isProduction);
         }
     }));
 
@@ -39,7 +39,7 @@ module.exports = function (app, config) {
     //     },
     //     logProvider: function (provider) {
     //         // create logger for sending requests
-    //         return Logger.createInstance(`proxy`, 'info', 'platform', config.environment !== 'prod');
+    //         return Logger.createInstance(`proxy`, 'info', 'platform', config.isProduction);
     //     }
     // }));
 };

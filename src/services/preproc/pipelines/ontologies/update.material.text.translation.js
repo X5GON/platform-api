@@ -1,7 +1,7 @@
 // global configuration
 const config = require("@config/config");
 
-const productionMode = config.environment === "prod";
+const productionMode = config.isProduction;
 
 // topology definition
 module.exports = {

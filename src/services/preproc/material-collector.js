@@ -19,7 +19,7 @@ const postgresQL = require("@library/postgresQL");
 const Logger = require("@library/logger");
 
 // create a logger for platform requests
-const logger = Logger.createGroupInstance("material-collector", "preproc", config.environment !== "prod");
+const logger = Logger.createGroupInstance("material-collector", "preproc", config.isProduction);
 
 /**
  * @class MaterialCollector
@@ -56,7 +56,7 @@ class MaterialCollector {
             this.addRetriever(retriever);
         }
         // set the production mode flag
-        this._productionModeFlag = config.environment === "prod";
+        this._productionModeFlag = config.isProduction;
         // got initialization process
         logger.info("[MaterialCollector] collector initialized");
     }
