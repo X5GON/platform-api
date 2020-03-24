@@ -6,7 +6,7 @@
 const path = require("path");
 
 // import configured node variables
-require("dotenv").config({ path: path.resolve(__dirname, ".env") });
+require("dotenv").config({ path: path.resolve(__dirname, "../../env/.env") });
 
 // get process environment
 const env = process.env.NODE_ENV || "development";

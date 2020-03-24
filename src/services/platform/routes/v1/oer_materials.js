@@ -550,7 +550,7 @@ module.exports = function (pg, logger, config) {
      * Routes
      ******************************** */
 
-    router.get("/oer_materials", cors(), (req, res) => {
+    router.get("/api/v1/oer_materials", cors(), (req, res) => {
         /** ********************************
          * setup user parameters
          ******************************** */
@@ -648,7 +648,7 @@ module.exports = function (pg, logger, config) {
         });
     });
 
-    router.get("/oer_materials/:material_id", cors(), (req, res) => {
+    router.get("/api/v1/oer_materials/:material_id", cors(), (req, res) => {
         // get material id
         const { material_id } = req.params;
 
@@ -701,7 +701,7 @@ module.exports = function (pg, logger, config) {
         });
     });
 
-    router.get("/oer_materials/:material_id/contents", cors(), (req, res) => {
+    router.get("/api/v1/oer_materials/:material_id/contents", cors(), (req, res) => {
         // get material id
         const {
             material_id
@@ -760,7 +760,7 @@ module.exports = function (pg, logger, config) {
         });
     });
 
-    router.get("/oer_materials/:material_id/contents/:content_id", cors(), (req, res) => {
+    router.get("/api/v1/oer_materials/:material_id/contents/:content_id", cors(), (req, res) => {
         // get material and content ids
         const {
             material_id,
@@ -821,7 +821,7 @@ module.exports = function (pg, logger, config) {
         });
     });
 
-    router.get("/oer_materials/:material_id/contents/:content_id/value", cors(), (req, res) => {
+    router.get("/api/v1/oer_materials/:material_id/contents/:content_id/value", cors(), (req, res) => {
         // get material and content ids
         const {
             material_id,

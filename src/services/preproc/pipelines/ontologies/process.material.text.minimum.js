@@ -11,22 +11,22 @@ module.exports = {
     },
     spouts: [
         {
-            name: "input.kafka.video",
+            name: "input.kafka.text",
             type: "inproc",
             working_dir: "./spouts",
             cmd: "kafka-spout.js",
             init: {
                 kafka_host: config.kafka.host,
-                topic: "PREPROC_MATERIAL_VIDEO",
+                topic: "PREPROC_MATERIAL_TEXT_MINIMUM",
                 group_id: config.kafka.groupId,
-                high_water: 1,
+                high_water: 10,
                 low_water: 0,
                 from_offset: "latest"
             }
         }
     ],
     bolts: [
-    // LOGGING STATE OF MATERIAL PROCESS
+        // LOGGING STATE OF MATERIAL PROCESS
         ...(productionMode
             ? [
                 {
@@ -36,7 +36,7 @@ module.exports = {
                     cmd: "log-message-postgresql.js",
                     inputs: [
                         {
-                            source: "input.kafka.video"
+                            source: "input.kafka.text"
                         }
                     ],
                     init: {
@@ -49,7 +49,7 @@ module.exports = {
                             start_process_time: true
                         },
                         postgres_literal_attrs: {
-                            status: "[VIDEO] material processing started: 0/4 steps completed. Transforming format"
+                            status: "[TEXT] material processing started: 0/4 steps completed. Transforming format"
                         },
                         document_error_path: "message"
                     }
@@ -66,7 +66,7 @@ module.exports = {
                 {
                     source: productionMode
                         ? "log.material.process.started"
-                        : "input.kafka.video"
+                        : "input.kafka.text"
                 }
             ],
             init: {
@@ -77,10 +77,10 @@ module.exports = {
                     material_url: "material_url",
                     authors: "author",
                     language: "language",
-                    type: "type.ext",
-                    mimetype: "type.mime",
                     creation_date: "date_created",
                     retrieved_date: "retrieved_date",
+                    type: "type.ext",
+                    mimetype: "type.mime",
                     provider: { token: "provider_token" },
                     license: "license",
                     material_metadata: {
@@ -91,7 +91,6 @@ module.exports = {
                 }
             }
         },
-
         // LOGGING STATE OF MATERIAL PROCESS
         ...(productionMode
             ? [
@@ -112,8 +111,7 @@ module.exports = {
                         message_primary_id: "material_url",
                         postgres_method: "update",
                         postgres_literal_attrs: {
-                            status:
-                  "[VIDEO] material object schema transformed: 1/4 steps completed. Retrieving transcriptions and translations"
+                            status: "[TEXT] material object schema transformed: 1/4 steps completed. Extracting raw material content"
                         },
                         document_error_path: "message"
                     }
@@ -122,10 +120,10 @@ module.exports = {
             : []),
 
         {
-            name: "extract.video.ttp",
+            name: "extract.text.raw",
             type: "inproc",
             working_dir: "./bolts",
-            cmd: "extract-video-ttp.js",
+            cmd: "extract-text-raw.js",
             inputs: [
                 {
                     source: productionMode
@@ -134,17 +132,15 @@ module.exports = {
                 }
             ],
             init: {
-                ttp: {
-                    user: config.preproc.ttp.user,
-                    token: config.preproc.ttp.token
+                textract_config: {
+                    preserve_line_breaks: true,
+                    preserve_only_multiple_line_breaks: false,
+                    include_alt_text: true
                 },
-                document_language_path: "language",
                 document_location_path: "material_url",
-                document_authors_path: "authors",
-                document_title_path: "title",
+                document_location_type: "remote",
                 document_text_path: "material_metadata.raw_text",
-                document_transcriptions_path: "material_metadata.transcriptions",
-                ttp_id_path: "material_metadata.ttp_id"
+                document_error_path: "message"
             }
         },
 
@@ -152,13 +148,13 @@ module.exports = {
         ...(productionMode
             ? [
                 {
-                    name: "log.material.process.extract.video.ttp",
+                    name: "log.material.process.extract.text.raw",
                     type: "inproc",
                     working_dir: "./bolts",
                     cmd: "log-message-postgresql.js",
                     inputs: [
                         {
-                            source: "extract.video.ttp"
+                            source: "extract.text.raw"
                         }
                     ],
                     init: {
@@ -168,8 +164,7 @@ module.exports = {
                         message_primary_id: "material_url",
                         postgres_method: "update",
                         postgres_literal_attrs: {
-                            status:
-                  "[VIDEO] material transcriptions and translations retrieved: 2/4 steps completed. Retrieving wikipedia concepts"
+                            status: "[TEXT] material content extracted: 2/4 steps completed. Retrieving translations"
                         },
                         document_error_path: "message"
                     }
@@ -185,8 +180,8 @@ module.exports = {
             inputs: [
                 {
                     source: productionMode
-                        ? "log.material.process.extract.video.ttp"
-                        : "extract.video.ttp"
+                        ? "log.material.process.extract.text.raw"
+                        : "extract.text.raw"
                 }
             ],
             init: {
@@ -221,7 +216,7 @@ module.exports = {
                         message_primary_id: "material_url",
                         postgres_method: "update",
                         postgres_literal_attrs: {
-                            status: "[VIDEO] material wikified: 3/4 steps completed. Validating material"
+                            status: "[TEXT] material wikified: 3/4 steps completed. Validating material"
                         },
                         document_error_path: "message"
                     }
@@ -267,7 +262,7 @@ module.exports = {
                         message_primary_id: "material_url",
                         postgres_method: "update",
                         postgres_literal_attrs: {
-                            status: "[VIDEO] material validated: 4/4 steps completed. Storing the material"
+                            status: "[TEXT] material validated: 4/4 steps completed. Storing the material"
                         },
                         document_error_path: "message"
                     }
@@ -326,13 +321,25 @@ module.exports = {
                     ]
                     : []),
                 {
-                    source: "extract.video.ttp",
+                    source: "extract.text.raw",
                     stream_id: "stream_error"
                 },
                 ...(productionMode
                     ? [
                         {
-                            source: "log.material.process.extract.video.ttp",
+                            source: "log.material.process.extract.text.raw",
+                            stream_id: "stream_error"
+                        }
+                    ]
+                    : []),
+                {
+                    source: "extract.text.ttp",
+                    stream_id: "stream_error"
+                },
+                ...(productionMode
+                    ? [
+                        {
+                            source: "log.material.process.extract.text.ttp",
                             stream_id: "stream_error"
                         }
                     ]
@@ -420,7 +427,7 @@ module.exports = {
             ],
             init: {
                 kafka_host: config.kafka.host,
-                kafka_topic: "STORE_MATERIAL_PARTIAL"
+                kafka_topic: "STORE_MATERIAL_INCOMPLETE"
             }
         }
     ],

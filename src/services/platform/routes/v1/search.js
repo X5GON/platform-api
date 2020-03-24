@@ -54,7 +54,7 @@ module.exports = function (pg, logger, config) {
      * @apiExample  Example usage:
      *      https://platform.x5gon.org/api/v1/search?url=https://platform.x5gon.org/materialUrl&text=deep+learning
      */
-    router.get("/recommend/oer_bundles", cors(), (req, res) => {
+    router.get("/api/v1/recommend/oer_bundles", cors(), (req, res) => {
         if (!Object.keys(req.query).length) {
             return res.send({
                 error: {
@@ -120,7 +120,7 @@ module.exports = function (pg, logger, config) {
     });
 
 
-    router.get("/recommend/personalized", cors(), (req, res) => {
+    router.get("/api/v1/recommend/personalized", cors(), (req, res) => {
         const j = request.jar();
         const cookie = request.cookie(`x5gonTrack=${req.cookies[x5gonCookieName]}`);
         const url = `http://localhost:${config.recsys.port}/api/v1/recommend/personalized`;
@@ -184,7 +184,7 @@ module.exports = function (pg, logger, config) {
     });
 
 
-    router.get("/recommend/collaborative_filtering", cors(), (req, res) => {
+    router.get("/api/v1/recommend/collaborative_filtering", cors(), (req, res) => {
         const j = request.jar();
         const cookie = request.cookie(`x5gonTrack=${req.cookies[x5gonCookieName]}`);
         const url = `http://localhost:${config.recsys.port}/api/v1/recommend/collaborativeFiltering`;

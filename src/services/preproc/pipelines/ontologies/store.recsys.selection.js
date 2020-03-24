@@ -8,13 +8,13 @@ module.exports = {
     },
     spouts: [
         {
-            name: "kafka.recsys.transitions",
+            name: "kafka.recsys.selection",
             type: "inproc",
             working_dir: "./spouts",
             cmd: "kafka-spout.js",
             init: {
                 kafka_host: config.kafka.host,
-                topic: "STORE_RECSYS_TRANSITION",
+                topic: "STORE_RECSYS_SELECTION",
                 group_id: config.kafka.groupId,
                 high_water: 10,
                 low_water: 1,
@@ -24,13 +24,13 @@ module.exports = {
     ],
     bolts: [
         {
-            name: "store.pg.recsys.transitions",
+            name: "store.pg.recsys.selection",
             type: "inproc",
             working_dir: "./bolts",
-            cmd: "store-pg-recsys-transitions.js",
+            cmd: "store-pg-recsys-selections.js",
             inputs: [
                 {
-                    source: "kafka.recsys.transitions"
+                    source: "kafka.recsys.selection"
                 }
             ],
             init: {

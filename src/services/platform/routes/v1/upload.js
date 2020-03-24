@@ -200,7 +200,7 @@ module.exports = function (pg, logger, config) {
      * Routes
      ******************************** */
 
-    router.post("/oer_materials", checkAPIKey, (req, res) => {
+    router.post("/api/v1/oer_materials", checkAPIKey, (req, res) => {
         // get oer_materials
         const { oer_materials } = req.body;
         // prepare variables

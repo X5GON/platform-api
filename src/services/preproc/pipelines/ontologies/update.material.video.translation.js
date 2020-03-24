@@ -19,7 +19,7 @@ module.exports = {
                 kafka_host: config.kafka.host,
                 topic: "UPDATE_MATERIAL_VIDEO",
                 group_id: config.kafka.groupId,
-                high_water: 1,
+                high_water: 10,
                 low_water: 0,
                 from_offset: "latest"
             }

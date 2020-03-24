@@ -102,7 +102,7 @@ module.exports = function (logger, config) {
      * The route used for on-premise Connect service integration.
      * @param {String} callbackURL - The URL used to return to the website.
      */
-    router.get("/snippet/tracker", cors(), (req, res) => {
+    router.get("/api/v1/snippet/tracker", cors(), (req, res) => {
         // TODO: validate the parameters
 
         // get query parameters
@@ -120,7 +120,7 @@ module.exports = function (logger, config) {
      * Decides to which route to direct the request.
      * @param {String} test - The string/boolean if the request was done for testing or not.
      */
-    router.get("/snippet/log", cors(), (req, res) => {
+    router.get("/api/v1/snippet/log", cors(), (req, res) => {
         // check and convert to boolean
         const testing = req.query.test === "true" || false;
         if (testing) {
@@ -142,7 +142,7 @@ module.exports = function (logger, config) {
     /**
      * Returns beacon for testing/development case.
      */
-    router.get("/snippet/log/development", cors(), (req, res) => {
+    router.get("/api/v1/snippet/log/development", cors(), (req, res) => {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, "../../../snippet/images/beacon.png");
         // get the options - snippet status headers
@@ -155,7 +155,7 @@ module.exports = function (logger, config) {
     /**
      * Returns the beacon for the production case.
      */
-    router.get(["/connect/visit", "/snippet/log/production"], cors(), (req, res) => {
+    router.get(["/api/v1/connect/visit", "/api/v1/snippet/log/production"], cors(), (req, res) => {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, "../../../snippet/images/beacon.png");
         // get the options - snippet status headers
@@ -234,7 +234,7 @@ module.exports = function (logger, config) {
     /**
      * Handles the video activities in the video.
      */
-    router.get(["/connect/video", "/snippet/log/video"], cors(), (req, res) => {
+    router.get(["/api/v1/connect/video", "/api/v1/snippet/log/video"], cors(), (req, res) => {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, "../../../snippet/images/beacon.png");
         // get the options - snippet status headers
@@ -280,7 +280,7 @@ module.exports = function (logger, config) {
     /**
      * Provides the script/file containing the x5gon-log file.
      */
-    router.get(["/connect/:version/x5gon-connect(.min)?.js", "/snippet/:version/x5gon-log(.min)?.js"], cors(), (req, res) => {
+    router.get(["/api/v1/connect/:version/x5gon-connect(.min)?.js", "/api/v1/snippet/:version/x5gon-log(.min)?.js"], cors(), (req, res) => {
         // TODO: check if the parameters are valid
 
         // get the version parameter

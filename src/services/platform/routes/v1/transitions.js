@@ -26,7 +26,7 @@ module.exports = function (logger, config) {
      * Middleware
      ******************************** */
 
-    router.use("/transitions", (req, res, next) => {
+    router.use("/api/v1/transitions", (req, res, next) => {
         // transform query parameters into lowercase
         const query_parameters = {};
         for (let key in req.query) {
@@ -86,7 +86,7 @@ module.exports = function (logger, config) {
      * Routes
      ******************************** */
 
-    router.get("/transitions", (req, res) => {
+    router.get("/api/v1/transitions", (req, res) => {
         // get the query parameters
         const {
             from,
@@ -103,7 +103,7 @@ module.exports = function (logger, config) {
         const recommended_urls = rec_urls ? rec_urls.split(",") : [];
 
         // send the message to the kafka topic
-        producer.send("STORE_RECSYS_TRANSITION", {
+        producer.send("STORE_RECSYS_SELECTION", {
             from, to, selected_position, recommended_urls, uuid
         });
 
@@ -112,7 +112,7 @@ module.exports = function (logger, config) {
     });
 
 
-    router.post("/transitions", (req, res) =>
+    router.post("/api/v1/transitions", (req, res) =>
     // get material id
 
         // TODO: implement the route

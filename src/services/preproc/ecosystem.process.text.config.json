@@ -1,18 +1,19 @@
 {
     "apps": [{
-        "name": "X5GON Process Material Text",
+        "name": "X5process_material_text_translations",
         "script": "pipeline.js",
+        "args": "-tn uuid.process.material.text.translations -tp ./ontologies/process.material.text.translations",
         "cwd": "./pipelines/",
-        "args": "-tn uuid.process.material.text -tp ./ontologies/process.material.text",
+        "instances": "3",
+        "exec_mode": "cluster",
+        "autorestart": true,
+        "max_restarts": 20,
+
         "env": {
             "NODE_ENV": "development"
         },
         "env_production": {
             "NODE_ENV": "production"
-        },
-        "instances": "3",
-        "exec_mode": "cluster",
-        "autorestart": true,
-        "max_restarts": 20
+        }
     }]
 }
