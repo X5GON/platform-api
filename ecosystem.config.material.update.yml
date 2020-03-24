@@ -1,7 +1,7 @@
 apps:
   - script: "pipeline.js"
     name: "X5update_collect"
-    cwd: "./src/services/preproc/pipelines/"
+    cwd: "./src/services/preproc/src/pipelines/"
     args: "-tn uuid.update.material.collect -tp ./ontologies/update.material.collect"
     instances: 1,
     exec_mode: "fork"
@@ -15,7 +15,7 @@ apps:
 
   - script: "pipeline.js"
     name: "X5update_material_text_translation"
-    cwd: "./src/services/preproc/pipelines/"
+    cwd: "./src/services/preproc/src/pipelines/"
     args: "-tn uuid.update.material.text.translation -tp ./ontologies/update.material.text.translation"
     instances: 2,
     exec_mode: "cluster"
@@ -29,7 +29,7 @@ apps:
 
   - script: "pipeline.js"
     name: "X5update_material_video_translation"
-    cwd: "./src/services/preproc/pipelines/"
+    cwd: "./src/services/preproc/src/pipelines/"
     args: "-tn uuid.update.material.video.translation -tp ./ontologies/update.material.video.translation"
     instances: 2,
     exec_mode: "cluster"
