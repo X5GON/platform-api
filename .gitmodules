@@ -1,6 +1,11 @@
-[submodule "src/services/platform/frontend"]
+[submodule "Platform UI"]
 	path = src/services/platform/frontend
 	url = https://github.com/gregpr07/x5gon-gatsby.git
-[submodule "src/services/search"]
+
+[submodule "Preprocessing Pipelines"]
+	path = src/service/preproc
+	url = https://github.com/ErikNovak/X5GON-preprocessing-pipeline.git
+
+[submodule "OER Search"]
 	path = src/services/search
 	url = https://github.com/ErikNovak/X5GON-elasticsearch-microservice.git
