@@ -9,3 +9,6 @@
 [submodule "OER Search"]
 	path = src/services/search
 	url = https://github.com/ErikNovak/X5GON-elasticsearch-microservice.git
+[submodule "src/services/preproc"]
+	path = src/services/preproc
+	url = https://github.com/ErikNovak/X5GON-preprocessing-pipeline.git
