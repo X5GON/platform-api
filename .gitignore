@@ -92,3 +92,5 @@ development
 src/services/**/*.min.js
 
 docker/*.yml
+
+dist

@@ -25,27 +25,6 @@ const common = {
             }
         }
     },
-    preproc: {
-        retrievers: [
-            {
-                name: "Videolectures.NET",
-                domain: "http://videolectures.net/",
-                script: "api-videolectures",
-                token: process.env.TOKEN_VIDEOLECTURES,
-                config: {
-                    apikey: process.env.RETRIEVERS_VL_APIKEY
-                }
-            }
-        ],
-        wikifier: {
-            wikifierUrl: process.env.PREPROC_WIKIFIER_URL,
-            userKey: process.env.PREPROC_WIKIFIER_USERKEY
-        },
-        ttp: {
-            user: process.env.PREPROC_TTP_USER,
-            token: process.env.PREPROC_TTP_TOKEN,
-        }
-    },
     quality: {
         // used for proxying to the quality assurance service
         port: parseInt(process.env.SERVICE_QUALITY_PORT) || 6001

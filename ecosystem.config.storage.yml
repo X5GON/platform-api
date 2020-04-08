@@ -1,8 +1,8 @@
 apps:
   - script: "pipeline.js"
-    name: "X5store_process_material_complete"
-    cwd: "./src/services/preproc/src/pipelines/"
-    args: "-tn uuid.store.material.complete -tp ./ontologies/store.material.complete"
+    name: "x5store_process_material_complete"
+    cwd: "./preproc/dist/"
+    args: "-tn uuid.store.material.complete -tp ../ontologies/store.material.complete"
     instances: 1,
     exec_mode: "fork"
     autorestart: true
@@ -14,9 +14,9 @@ apps:
       NODE_ENV: "production"
 
   - script: "pipeline.js"
-    name: "X5store_process_material_incomplete"
-    cwd: "./src/services/preproc/src/pipelines/"
-    args: "-tn uuid.store.material.incomplete -tp ./ontologies/store.material.incomplete"
+    name: "x5store_process_material_incomplete"
+    cwd: "./preproc/dist/"
+    args: "-tn uuid.store.material.incomplete -tp ../ontologies/store.material.incomplete"
     instances: 1,
     exec_mode: "fork"
     autorestart: true
@@ -28,9 +28,9 @@ apps:
       NODE_ENV: "production"
 
   - script: "pipeline.js"
-    name: "X5store_update_material_complete"
-    cwd: "./src/services/preproc/src/pipelines/"
-    args: "-tn uuid.store.material.update -tp ./ontologies/store.material.update"
+    name: "x5store_update_material_complete"
+    cwd: "./preproc/dist/"
+    args: "-tn uuid.store.material.update -tp ../ontologies/store.material.update"
     instances: 1,
     exec_mode: "fork"
     autorestart: true
@@ -42,9 +42,9 @@ apps:
       NODE_ENV: "production"
 
   - script: "pipeline.js"
-    name: "X5store_user_activity_connect"
-    cwd: "./src/services/preproc/src/pipelines/"
-    args: "-tn uuid.store.user_activity.connect -tp ./ontologies/store.user_activity.connect"
+    name: "x5store_user_activity_connect"
+    cwd: "./preproc/dist/"
+    args: "-tn uuid.store.user_activity.connect -tp ../ontologies/store.user_activity.connect"
     instances: 1,
     exec_mode: "fork"
     autorestart: true
@@ -56,9 +56,9 @@ apps:
       NODE_ENV: "production"
 
   - script: "pipeline.js"
-    name: "X5store_recsys_selection"
-    cwd: "./src/services/preproc/src/pipelines/"
-    args: "-tn uuid.store.recsys.selection -tp ./ontologies/store.recsys.selection"
+    name: "x5store_recsys_selection"
+    cwd: "./preproc/dist/"
+    args: "-tn uuid.store.recsys.selection -tp ../ontologies/store.recsys.selection"
     instances: 1,
     exec_mode: "fork"
     autorestart: true
@@ -71,9 +71,9 @@ apps:
 
 
   - script: "pipeline.js"
-    name: "X5store_join_providers"
-    cwd: "./src/services/preproc/src/pipelines/"
-    args: "-tn uuid.store.join.providers -tp ./ontologies/store.join.providers"
+    name: "x5store_join_providers"
+    cwd: "./preproc/dist/"
+    args: "-tn uuid.store.join.providers -tp ../ontologies/store.join.providers"
     instances: 1,
     exec_mode: "fork"
     autorestart: true

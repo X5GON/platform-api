@@ -1,7 +1,7 @@
 apps:
   - script: "material-collector.js"
-    name: "X5process_collect"
-    cwd: "./src/services/preproc/src/"
+    name: "x5process_collect"
+    cwd: "./preproc/dist/"
     instances: 1,
     exec_mode: "fork"
     autorestart: true
@@ -13,9 +13,9 @@ apps:
       NODE_ENV: "production"
 
   - script: "pipeline.js"
-    name: "X5process_text_minimum"
-    cwd: "./src/services/preproc/src/pipelines/"
-    args: "-tn uuid.process.material.text.minimum -tp ./ontologies/process.material.text.minimum"
+    name: "x5process_text_indexing"
+    cwd: "./preproc/dist/"
+    args: "-tn uuid.process.material.text.indexing -tp ../ontologies/process.material.text.indexing"
     instances: 3,
     exec_mode: "cluster"
     autorestart: true
@@ -27,9 +27,9 @@ apps:
       NODE_ENV: "production"
 
   # - script: "pipeline.js"
-  #   name: "X5process_text_translation"
-  #   cwd: "./src/services/preproc/src/pipelines/"
-  #   args: "-tn uuid.process.material.text.translation -tp ./ontologies/process.material.text.translation"
+  #   name: "x5process_text_translation"
+  #   cwd: "./preproc/dist/"
+  #   args: "-tn uuid.process.material.text.translation -tp ../ontologies/process.material.text.translation"
   #   instances: 3,
   #   exec_mode: "cluster"
   #   autorestart: true
@@ -41,9 +41,9 @@ apps:
   #     NODE_ENV: "production"
 
   # - script: "pipeline.js"
-  #   name: "X5process_video_translation"
-  #   cwd: "./src/services/preproc/src/pipelines/"
-  #   args: "-tn uuid.process.material.video.translation -tp ./ontologies/process.material.video.translation"
+  #   name: "x5process_video_translation"
+  #   cwd: "./preproc/dist/"
+  #   args: "-tn uuid.process.material.video.translation -tp ../ontologies/process.material.video.translation"
   #   instances: 3,
   #   exec_mode: "cluster"
   #   autorestart: true

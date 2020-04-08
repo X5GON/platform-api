@@ -7,8 +7,8 @@
 	url = https://github.com/ErikNovak/X5GON-preprocessing-pipeline.git
 
 [submodule "OER Search"]
-	path = src/services/search
+	path = search
 	url = https://github.com/ErikNovak/X5GON-elasticsearch-microservice.git
 [submodule "src/services/preproc"]
-	path = src/services/preproc
+	path = preproc
 	url = https://github.com/ErikNovak/X5GON-preprocessing-pipeline.git

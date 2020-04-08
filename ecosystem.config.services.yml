@@ -1,7 +1,7 @@
 apps:
-  - script: "dist/index.js"
-    name: "X5search"
-    cwd: "./src/services/search/"
+  - script: "index.js"
+    name: "x5search"
+    cwd: "./search/dist/"
     instances: 4,
     exec_mode: "cluster"
     autorestart: true
@@ -14,7 +14,7 @@ apps:
       NODE_ENV: "production"
 
   - script: "recsys.js"
-    name: "X5recommend"
+    name: "x5recommend"
     cwd: "./src/services/recsys/"
     instances: 1,
     exec_mode: "fork"
@@ -28,7 +28,7 @@ apps:
       NODE_ENV: "production"
 
   - script: "platform.js"
-    name: "X5platform"
+    name: "x5platform"
     cwd: "./src/services/platform/"
     instances: 1,
     exec_mode: "fork"

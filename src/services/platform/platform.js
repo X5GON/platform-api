@@ -17,6 +17,7 @@ const config = require("@config/config");
 
 // internal modules
 const pg = require("@library/postgresQL")(config.pg);
+const pgSession = require("connect-pg-simple")(session);
 const Logger = require("@library/logger");
 const Monitor = require("@library/process-monitor");
 
@@ -46,10 +47,14 @@ if (config.isProduction) {
     app.set("trust proxy", 1);
 }
 app.use(session({
+    store: new pgSession({
+        pool: pg._pool
+    }),
     secret: config.platform.sessionSecret,
     saveUninitialized: false,
     resave: false,
     cookie: {
+        maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
         ...(config.isProduction && { domain: ".x5gon.org" })
     }
 }));
