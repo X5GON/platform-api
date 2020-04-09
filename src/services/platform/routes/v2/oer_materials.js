@@ -3,7 +3,7 @@ const express = require("express");
 const querystring = require("querystring");
 const iso6391 = require("iso-639-1");
 const cors = require("cors");
-const request = require("request").defaults({ jar: true });
+const bent = require("bent");
 
 // validating the query parameters
 const { query, param } = require("express-validator");
@@ -18,7 +18,7 @@ const router = express.Router();
  * @param {Object} pg - Postgres connection wrapper.
  * @param {Object} logger - The logger object.
  */
-module.exports = function (pg, logger) {
+module.exports = function (pg, logger, config) {
     /** ********************************
      * Required configuration
      ******************************** */
@@ -187,6 +187,41 @@ module.exports = function (pg, logger) {
         };
     }
 
+    function createEmbed(material_url, mimetype) {
+        return `
+            <embed src="${material_url}" type="${mimetype}" width="100%" height="100%" />
+        `;
+    }
+
+    function createTrack(content_id, lang_long, lang_short, isDefault) {
+        return `
+            <track
+                label="${lang_long}"
+                kind="subtitles"
+                srclang="${lang_short}"
+                src="http://localhost:8080/api/v2/oer_contents/${content_id}/content"
+                ${isDefault ? "default" : ""}
+            >`;
+    }
+
+    function createVideo(material_id, material_url, mimetype, tracks = "") {
+        return `
+            <video id="material-video-${material_id}" controls preload="metadata" width="100%">
+                <source src="${material_url}" type="${mimetype}">
+                ${tracks}
+            </video>
+        `;
+    }
+
+    function createHTML(content) {
+        return `
+            <html>
+                <body style="margin: 0px;">
+                    ${content}
+                </body>
+            </html>`;
+    }
+
     /** ********************************
      * Routes
      ******************************** */
@@ -200,7 +235,7 @@ module.exports = function (pg, logger) {
             .customSanitizer((value) => (value && value.length ? value.toLowerCase().split(",") : null)),
         query("limit").optional().toInt(),
         query("page").optional().toInt()
-    ], (req, res, next) => {
+    ], (req, res) => {
         /** ********************************
          * setup user parameters
          ******************************** */
@@ -367,6 +402,7 @@ module.exports = function (pg, logger) {
     });
 
 
+    const getContents = bent("GET", `http://127.0.0.1:${config.platform.port}`, "json", 200);
     router.get("/api/v2/oer_materials/:material_id/embed_ready", cors(), [
         param("material_id").optional().toInt()
     ], (req, res) => {
@@ -383,7 +419,7 @@ module.exports = function (pg, logger) {
         const query = oerMaterialQuery({ material_ids: [material_id] });
 
         // execute the user query
-        pg.execute(query, [material_id], (error, records) => {
+        pg.execute(query, [material_id], async (error, records) => {
             if (error) {
                 logger.error("[error] postgresql error",
                     logger.formatRequest(req, {
@@ -406,53 +442,44 @@ module.exports = function (pg, logger) {
 
             // convert the output
             const output = records.map((material) => oerMaterialFormat(material));
-            // get the material of the
-            const material = output[0];
+            const {
+                material_id,
+                material_url,
+                lang_short: mlshort,
+                type: material_type,
+                mimetype
+            } = output[0];
 
-            if (material.type === "text") {
-                const {
-                    material_url,
-                    mimetype
-                } = material;
+            if (material_type === "text") {
                 // embed the text
-                const text = `
-                    <embed src="${material_url}" type="${mimetype}" width="100%" height="100%" />
-                `;
-
+                const text = createEmbed(material_url, mimetype);
+                const HTML = createHTML(text);
                 // send the materials to the user
-                return res.status(200).send(text);
-            } else {
-                // TODO: get all webvtt captions to support the video
-                const contentURL = `http://127.0.0.1:8080/api/v2/oer_contents?material_ids=${material.material_id}&extensions=webvtt`;
-                request(contentURL, (error, httpRequest, body) => {
-                    const { oer_contents } = JSON.parse(body);
-
-                    const {
-                        material_id,
-                        material_url,
-                        lang_short: mlshort,
-                        mimetype
-                    } = material;
-
-                    // embed the video or audio file
-                    const video = `
-                        <video id="material-video-${material_id}" controls preload="metadata" width="100%">
-                            <source src="${material_url}" type="${mimetype}">
-                            ${oer_contents.map((content) => {
-        const {
-            lang_long: cllong,
-            lang_short: clshort,
-            content_id
-        } = content;
-        return `<track label="${cllong}" kind="subtitles" srclang="${clshort}" src="http://localhost:8080/api/v2/oer_contents/${content_id}/content" ${clshort === mlshort ? "default" : ""}>`;
-    }).join("\n")}
-                        </video>
-                    `;
-
-                    // send the materials to the user
-                    return res.status(200).send(video);
-                });
+                return res.status(200).send(HTML);
             }
+            // prepare video container
+            let video;
+
+            try {
+                const { oer_contents } = await getContents(`/api/v2/oer_contents?material_ids=${material_id}&extensions=webvtt`);
+                // generate the tracks out of the oer contents information
+                const tracks = oer_contents.map((content) => {
+                    const {
+                        content_id,
+                        lang_long: cllong,
+                        lang_short: clshort
+                    } = content;
+                    return createTrack(content_id, cllong, clshort, clshort === mlshort);
+                }).join("\n");
+                // embed the video or audio file
+                video = createVideo(material_id, material_url, mimetype, tracks);
+            } catch (error) {
+                // video without the tracks
+                video = createVideo(material_id, material_url, mimetype);
+            }
+            const HTML = createHTML(video);
+            // send the materials to the user
+            return res.status(200).send(HTML);
         });
     });
 

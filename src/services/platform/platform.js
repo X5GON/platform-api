@@ -2,8 +2,6 @@
  * Runs the X5GON platform server
  */
 
-require("module-alias/register");
-
 // external modules
 const gatsbyExpress = require("gatsby-plugin-express");
 const express = require("express");
@@ -13,18 +11,20 @@ const session = require("express-session");
 const passport = require("passport");
 const flash = require("connect-flash");
 // configurations
-const config = require("@config/config");
+const config = require("../../config/config");
 
 // internal modules
-const pg = require("@library/postgresQL")(config.pg);
+const PostgreSQL = require("./library/postgresQL");
 const pgSession = require("connect-pg-simple")(session);
-const Logger = require("@library/logger");
-const Monitor = require("@library/process-monitor");
+const Logger = require("../../library/logger");
+const Monitor = require("../../library/process-monitor");
 
 // create a logger for platform requests
 const logger = Logger.createGroupInstance("requests", "platform", config.isProduction);
 // create process monitoring instance
 const monitor = new Monitor();
+
+const pg = new PostgreSQL(config.pg);
 
 // create express app
 let app = express();
@@ -64,9 +64,9 @@ app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session({ secret: config.platform.sessionSecret }));
 // passport configuration
-require("./config/passport")(passport, pg);
+require("./settings/passport")(passport, pg);
 // socket.io configuration
-require("./config/sockets")(http, monitor);
+require("./settings/sockets")(http, monitor);
 
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -75,7 +75,7 @@ app.use((req, res, next) => {
 });
 
 // add handlebars configurations
-require("./config/handlebars")(app);
+require("./settings/handlebars")(app);
 
 // sets the API routes - adding the postgresql connection, logger, config file,
 // passport object (for authentication), and monitoring object

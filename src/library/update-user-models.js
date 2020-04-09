@@ -6,10 +6,10 @@
  */
 
 // configurations
-const config = require("@config/config");
+const config = require("../config/config");
 
 // internal modules
-const pg = require("@library/postgresQL")(config.pg);
+const pg = require("./postgresQL")(config.pg);
 
 // get postgres schema
 const schema = config.pg.schema;

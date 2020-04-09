@@ -2,15 +2,15 @@
 const router = require("express").Router();
 
 // internal modules
-const KafkaProducer = require("@library/kafka-producer");
+const KafkaProducer = require("../../../../library/kafka-producer");
 
 // initialize validator with
-const validator = require("@library/schema-validator")({
-    oer_material_schema: require("@platform_schemas/oer-material-schema")
+const validator = require("../../../../library/schema-validator")({
+    oer_material_schema: require("../../schemas/oer-material-schema")
 });
 
 // import mimetypes for comparison
-const mimetypes = require("@config/mimetypes");
+const mimetypes = require("../../../../config/mimetypes");
 
 /**
  * @description Adds API routes for logging user activity.
@@ -50,23 +50,11 @@ module.exports = function (pg, logger, config) {
      * @param {Object} res - Express response.
      * @param {Function} next - The next function.
      */
-    function checkAPIKey(req, res, next) {
+    async function checkAPIKey(req, res, next) {
         const { api_key } = req.body;
 
-        pg.select({ key: api_key }, "api_keys", (error, results) => {
-            if (error) {
-                logger.error("[error] postgresql",
-                    logger.formatRequest(req, {
-                        error: {
-                            message: error.message,
-                            stack: error.stack
-                        }
-                    }));
-                return res.status(500).send({
-                    errors: { msgs: ["error on validating API key, please try later"] }
-                });
-            }
-
+        try {
+            const results = await pg.select({ key: api_key }, "api_keys");
             if (results.length === 0) {
                 // provider is not registered in the platform
                 logger.warn("[warn] postgresql API key not registered in X5GON platform",
@@ -92,7 +80,18 @@ module.exports = function (pg, logger, config) {
             } else {
                 return next();
             }
-        });
+        } catch (error) {
+            logger.error("[error] postgresql",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
+                    }
+                }));
+            return res.status(500).send({
+                errors: { msgs: ["error on validating API key, please try later"] }
+            });
+        }
     }
 
 
@@ -101,7 +100,7 @@ module.exports = function (pg, logger, config) {
      * @param {Object} material - The material object.
      * @param {Object[]} list - List of objects
      */
-    function _sendMaterial(material, list) {
+    async function _sendMaterial(material, list) {
         // validate the material
         const { isValid, errors } = validator.validateSchema(
             material,
@@ -114,93 +113,93 @@ module.exports = function (pg, logger, config) {
             list.push({ material, errors: messages });
             return;
         }
-        pg.select({ material_url: material.material_url }, "material_process_queue", (error, results) => {
-            if (error) {
+
+        let results;
+        try {
+            results = await pg.select({ material_url: material.material_url }, "material_process_queue");
+        } catch (error) {
+            logger.error("[error] postgresql", {
+                error: {
+                    message: error.message,
+                    stack: error.stack
+                }
+            });
+            list.push({ material, errors: ["Error on server side"] });
+            return;
+        }
+
+        if (results.length) {
+            logger.error("[upload] material already in the processing pipeline",
+                { material_url: material.material_url });
+            // list the material
+            list.push({ material, errors: [`material at location = ${material.material_url} already in processing`] });
+            return;
+        }
+
+        const process_id = generateUUID();
+
+        // get material mimetype and decide where to send the material metadata
+        const mimetype = material.type.mime;
+        if (mimetype && mimetypes.video.includes(mimetype)) {
+            try {
+                await pg.insert({ process_id, material_url: material.material_url }, "material_process_queue");
+                logger.info(`[upload] video material = ${material.material_url}`);
+                material.retrieved_date = (new Date()).toISOString();
+                // send the video material
+                producer.send(video_topic, material);
+            } catch (xerror) {
                 logger.error("[error] postgresql", {
                     error: {
-                        message: error.message,
-                        stack: error.stack
+                        message: xerror.message,
+                        stack: xerror.stack
                     }
                 });
                 list.push({ material, errors: ["Error on server side"] });
-                return;
             }
-            if (results.length) {
-                logger.error("[upload] material already in the processing pipeline",
-                    { material_url: material.material_url });
-                // list the material
-                list.push({ material, errors: [`material at location = ${material.material_url} already in processing`] });
-                return;
+        } else if (mimetype && mimetypes.audio.includes(mimetype)) {
+            try {
+                await pg.insert({ process_id, material_url: material.material_url }, "material_process_queue");
+                logger.info(`[upload] audio material = ${material.material_url}`);
+                material.retrieved_date = (new Date()).toISOString();
+                // send the audio material
+                producer.send(video_topic, material);
+            } catch (xerror) {
+                logger.error("[error] postgresql", {
+                    error: {
+                        message: xerror.message,
+                        stack: xerror.stack
+                    }
+                });
+                list.push({ material, errors: ["Error on server side"] });
             }
-
-            const process_id = generateUUID();
-
-            // get material mimetype and decide where to send the material metadata
-            const mimetype = material.type.mime;
-            if (mimetype && mimetypes.video.includes(mimetype)) {
-                pg.insert({ process_id, material_url: material.material_url }, "material_process_queue", (xerror) => {
-                    if (xerror) {
-                        logger.error("[error] postgresql", {
-                            error: {
-                                message: xerror.message,
-                                stack: xerror.stack
-                            }
-                        });
-                        list.push({ material, errors: ["Error on server side"] });
-                        return;
+        } else if (mimetype && mimetypes.text.includes(mimetype)) {
+            try {
+                await pg.insert({ process_id, material_url: material.material_url }, "material_process_queue");
+                logger.info(`[upload] text material = ${material.material_url}`);
+                material.retrieved_date = (new Date()).toISOString();
+                // send the text material
+                producer.send(text_topic, material);
+            } catch (xerror) {
+                logger.error("[error] postgresql", {
+                    error: {
+                        message: xerror.message,
+                        stack: xerror.stack
                     }
-                    logger.info(`[upload] video material = ${material.material_url}`);
-                    material.retrieved_date = (new Date()).toISOString();
-                    // send the video material
-                    producer.send(video_topic, material);
                 });
-            } else if (mimetype && mimetypes.audio.includes(mimetype)) {
-                pg.insert({ process_id, material_url: material.material_url }, "material_process_queue", (xerror) => {
-                    if (xerror) {
-                        logger.error("[error] postgresql", {
-                            error: {
-                                message: xerror.message,
-                                stack: xerror.stack
-                            }
-                        });
-                        list.push({ material, errors: ["Error on server side"] });
-                        return;
-                    }
-                    logger.info(`[upload] audio material = ${material.material_url}`);
-                    material.retrieved_date = (new Date()).toISOString();
-                    // send the audio material
-                    producer.send(video_topic, material);
-                });
-            } else if (mimetype && mimetypes.text.includes(mimetype)) {
-                pg.insert({ process_id, material_url: material.material_url }, "material_process_queue", (xerror) => {
-                    if (xerror) {
-                        logger.error("[error] postgresql", {
-                            error: {
-                                message: xerror.message,
-                                stack: xerror.stack
-                            }
-                        });
-                        list.push({ material, errors: ["Error on server side"] });
-                        return;
-                    }
-                    logger.info(`[upload] text material = ${material.material_url}`);
-                    material.retrieved_date = (new Date()).toISOString();
-                    // send the text material
-                    producer.send(text_topic, material);
-                });
-            } else {
-                // store the invalid material for the user
-                const messages = ["Material type not supported"];
-                list.push({ material, errors: messages });
+                list.push({ material, errors: ["Error on server side"] });
             }
-        });
+        } else {
+            // store the invalid material for the user
+            const messages = ["Material type not supported"];
+            list.push({ material, errors: messages });
+        }
     }
 
     /** ********************************
      * Routes
      ******************************** */
 
-    router.post("/api/v1/oer_materials", checkAPIKey, (req, res) => {
+    router.post("/api/v1/oer_materials", checkAPIKey, async (req, res) => {
         // get oer_materials
         const { oer_materials } = req.body;
         // prepare variables
@@ -220,16 +219,19 @@ module.exports = function (pg, logger, config) {
             });
         }
 
+
         // check if parameter is an array or an object
         if (Array.isArray(oer_materials)) {
+            const sendingMaterials = [];
             for (let material of oer_materials) {
                 // validate if material is in correct format
-                _sendMaterial(material, invalid_materials);
+                sendingMaterials.push(_sendMaterial(material, invalid_materials));
             }
+            await Promise.all(sendingMaterials);
             num_submitted = oer_materials.length - invalid_materials.length;
         } else if (typeof oer_materials === "object") {
             // validate if material is in correct format
-            _sendMaterial(oer_materials, invalid_materials);
+            await _sendMaterial(oer_materials, invalid_materials);
             num_submitted = 1 - invalid_materials.length;
         } else {
             // log the worng parameter

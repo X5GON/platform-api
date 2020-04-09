@@ -5,20 +5,18 @@
  * wikipedia concepts, extracted from the raw content using wikifier
  * (http://wikifier.org).
  */
-require("module-alias/register");
-
 // configurations
-const config = require("@config/config");
+const config = require("../config/config");
 
 // internal modules
-const Logger = require("@library/logger");
+const Logger = require("../library/logger");
 
 // create a logger instance for logging recommendation requests
 const { environment } = config;
 const logger = Logger.createGroupInstance("recommendation-model-build", "x5recommend", environment === "dev");
 
 // initialize connection with postgresql
-const pg = require("@library/postgresQL")(config.pg);
+const pg = require("../library/postgresQL")(config.pg);
 // check if config.schema is defined
 const schema = config.pg.schema;
 

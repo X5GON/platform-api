@@ -11,7 +11,7 @@
 const path = require("path");
 
 // file management module
-const fileManager = require("@library/file-manager");
+const fileManager = require("./file-manager");
 
 // main logging modules
 const {

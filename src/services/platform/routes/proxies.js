@@ -3,7 +3,7 @@ const proxy = require("http-proxy-middleware");
 const cors = require("cors");
 
 // logger for proxying requests
-const Logger = require("@library/logger");
+const Logger = require("../../../library/logger");
 
 
 /**

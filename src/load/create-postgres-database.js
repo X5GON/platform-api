@@ -4,7 +4,6 @@
  * data used in the platform.
  */
 
-require("module-alias/register");
 // ///////////////////////////////////////////////
 // Modules and configurations
 // ///////////////////////////////////////////////
@@ -13,10 +12,10 @@ require("module-alias/register");
 const async = require("async");
 
 // configuration data
-const config = require("@config/config");
+const config = require("../config/config");
 
 // postgresql connection to the database
-const pg = require("@library/postgresQL")(config.pg);
+const pg = require("../library/postgresQL")(config.pg);
 
 
 // ///////////////////////////////////////////////

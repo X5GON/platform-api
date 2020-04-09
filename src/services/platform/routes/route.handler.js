@@ -9,8 +9,9 @@ module.exports = function (app, pg, logger, config, passport, monitor) {
     // Version 2 API
     // //////////////////////////////////////
 
-    app.use(require("./v2/oer_materials")(pg, logger));
+    app.use(require("./v2/oer_materials")(pg, logger, config));
     app.use(require("./v2/oer_contents")(pg, logger));
+    app.use(require("./v2/oer_providers")(pg));
     app.use(require("./v2/wikipedia")(pg, logger));
 
     app.use(require("./v2/search")(logger, config));

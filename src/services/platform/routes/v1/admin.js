@@ -12,7 +12,7 @@ module.exports = function (pg, logger, config, passport, monitor) {
         // if user is authenticated in the session, carry on
         if (req.isAuthenticated()) { return next(); }
         // they aren't, redirect them to the admin login
-        res.redirect("/admin/login");
+        return res.redirect("/admin/login");
     }
 
 
@@ -85,24 +85,19 @@ module.exports = function (pg, logger, config, passport, monitor) {
     });
 
 
-    router.get("/admin", _checkAuthentication, (req, res) => {
+    router.get("/admin", _checkAuthentication, async (req, res) => {
         /**
          * Gets the statistics of the given data type.
-         * @param {String} type - The type of data to select.
+         * @param {String} tableName - The type of data to select.
          * @returns {Promise} The promise of the data type statistics.
          */
-        function retrieveStats(type) {
-            return new Promise((resolve, reject) => {
-                pg.selectCount({}, type, (error, results) => {
-                    if (error) { return reject(error); }
-                    results[0] = {
-                        ...results[0],
-                        type,
-                        count: parseInt(results[0].count)
-                    };
-                    return resolve(results[0]);
-                });
-            });
+        async function retrieveStats(tableName) {
+            const results = await pg.selectCount({}, tableName);
+            return {
+                ...results[0],
+                type: tableName,
+                count: parseInt(results[0].count, 10)
+            };
         }
 
         // get number of materials, user activity data and unique users
@@ -110,10 +105,10 @@ module.exports = function (pg, logger, config, passport, monitor) {
         const userActivitesCount = retrieveStats("user_activities");
         const cookiesCount = retrieveStats("cookies");
 
-        Promise.all([materialCount, userActivitesCount, cookiesCount]).then((stats) =>
-
+        try {
+            const stats = await Promise.all([materialCount, userActivitesCount, cookiesCount]);
             // return the admin homepage
-            res.render("admin-homepage", {
+            return res.render("admin-homepage", {
                 layout: "admin",
                 title: "Admin",
                 stats: {
@@ -121,13 +116,14 @@ module.exports = function (pg, logger, config, passport, monitor) {
                     user_activities: numberFormat(stats[1].count),
                     unique_users: numberFormat(stats[2].count)
                 }
-            })).catch((error) =>
-
+            });
+        } catch (error) {
             // return the admin homepage
-            res.render("admin-homepage", {
+            return res.render("admin-homepage", {
                 layout: "admin",
                 title: "Admin"
-            }));
+            });
+        }
     });
 
 
@@ -135,32 +131,26 @@ module.exports = function (pg, logger, config, passport, monitor) {
      * Admin OER providers
      ******************************** */
 
-    router.get("/admin/oer_providers", _checkAuthentication, (req, res) => {
+    router.get("/admin/oer_providers", _checkAuthentication, async (req, res) => {
         /**
          * Gets the API keys from database.
          * @returns {Promise} The promise of the API keys data.
          */
-        function retrieveProviders() {
-            return new Promise((resolve, reject) => {
-                pg.selectProviderStats(null, (error, results) => {
-                    if (error) { return reject(error); }
-                    // return the results
-                    return resolve(results);
-                });
-            });
+        async function retrieveProviders() {
+            return await pg.selectProviderStats(null);
         }
-        // get the API keys
-        const providers = retrieveProviders();
+        try {
+            // get the API keys
+            const providers = await retrieveProviders();
 
-        providers.then((bundles) => {
             // get bundle statistics
             const stats = {
                 oer_materials: numberFormat(
-                    bundles.map((provider) => provider.material_count)
+                    providers.map((provider) => provider.material_count)
                         .reduce((sum, acc) => sum + acc, 0)
                 ),
                 user_activities: numberFormat(
-                    bundles.map((provider) => provider.visit_count)
+                    providers.map((provider) => provider.visit_count)
                         .reduce((sum, acc) => sum + acc, 0)
                 )
             };
@@ -169,18 +159,18 @@ module.exports = function (pg, logger, config, passport, monitor) {
             return res.render("admin-oer-providers", {
                 layout: "admin",
                 title: "OER Providers",
-                providers: bundles,
+                providers,
                 stats
             });
-        }).catch((error) =>
+        } catch (error) {
             // render the page
-            res.render("admin-oer-providers", {
+            return res.render("admin-oer-providers", {
                 layout: "admin",
                 title: "OER Providers",
                 error
-            }));
+            });
+        }
     });
-
 
     /** ********************************
      * Admin API Key
@@ -204,40 +194,37 @@ module.exports = function (pg, logger, config, passport, monitor) {
     }
 
 
-    router.get("/admin/api_keys", _checkAuthentication, (req, res) => {
+    router.get("/admin/api_keys", _checkAuthentication, async (req, res) => {
         /**
          * Gets the API keys from database.
          * @returns {Promise} The promise of the API keys data.
          */
-        function retrieveAPIKeys() {
-            return new Promise((resolve, reject) => {
-                pg.select({}, "api_keys", (error, results) => {
-                    if (error) { return reject(error); }
-                    results.forEach(prepareAPIKeyData);
-                    return resolve(results);
-                });
-            });
+        async function retrieveAPIKeys() {
+            const results = await pg.select({}, "api_keys");
+            return results.map(prepareAPIKeyData);
         }
-        // get the API keys
-        const apiKeys = retrieveAPIKeys();
 
-        apiKeys.then((bundles) =>
+        try {
+            // get the API keys
+            const bundles = await retrieveAPIKeys();
             // render the page
-            res.render("admin-api-keys", {
+            return res.render("admin-api-keys", {
                 layout: "admin",
                 title: "Platform API Keys",
                 apiKeys: bundles
-            })).catch((error) =>
+            });
+        } catch (error) {
             // render the page
-            res.render("admin-api-keys", {
+            return res.render("admin-api-keys", {
                 layout: "admin",
                 title: "Platform API Keys",
                 error
-            }));
+            });
+        }
     });
 
 
-    router.post("/admin/api_keys/api/create", _checkAuthentication, (req, res) => {
+    router.post("/admin/api_keys/api/create", _checkAuthentication, async (req, res) => {
         const { owner } = req.body;
 
         // validate that the owner is a string
@@ -260,20 +247,16 @@ module.exports = function (pg, logger, config, passport, monitor) {
         }
 
         /**
-         * Deletes the API keys from database.
-         * @param {Integer} id - The id of the API key to delete.
          * @returns {Promise} The promise of the API keys data will be deleted.
          */
-        function insertAPIKey({ owner, key, permissions }) {
-            return new Promise((resolve, reject) => {
-                pg.insert({ owner, key, permissions }, "api_keys", (error, results) => {
-                    if (error) { return reject(error); }
-                    results.forEach(prepareAPIKeyData);
-                    return resolve(results);
-                });
-            });
-        }
+        async function insertAPIKey({ owner, key, permissions }) {
+            try {
+                const results = await pg.insert({ owner, key, permissions }, "api_keys");
+                return results.map(prepareAPIKeyData);
+            } catch (error) {
 
+            }
+        }
         // create user API key object
         const userAPIKey = {
             owner,
@@ -282,33 +265,36 @@ module.exports = function (pg, logger, config, passport, monitor) {
                 upload: ["materials"]
             }
         };
-
-        // delete the API keys
-        const apiKeys = insertAPIKey(userAPIKey);
-
-        apiKeys.then((results) => res.status(200).send(results)).catch((error) => res.status(400).send({ error: "Unable to create API key" }));
+        try {
+            const results = await insertAPIKey(userAPIKey);
+            return res.status(200).send(results);
+        } catch (error) {
+            return res.status(400).send({
+                error: "Unable to create API key"
+            });
+        }
     });
 
 
-    router.get("/admin/api_keys/api/:id/delete", _checkAuthentication, (req, res) => {
-        const id = parseInt(req.params.id);
+    router.get("/admin/api_keys/api/:api_id/delete", _checkAuthentication, async (req, res) => {
+        const api_id = parseInt(req.params.api_id, 10);
         /**
          * Deletes the API keys from database.
          * @param {Integer} id - The id of the API key to delete.
          * @returns {Promise} The promise of the API keys data will be deleted.
          */
-        function deleteAPIKeys(id) {
-            return new Promise((resolve, reject) => {
-                pg.delete({ id }, "api_keys", (error, results) => {
-                    if (error) { return reject(error); }
-                    return resolve(results);
-                });
+        async function deleteAPIKeys(id) {
+            return await pg.delete({ id }, "api_keys");
+        }
+        try {
+            // delete the API keys
+            const results = await deleteAPIKeys(api_id);
+            return res.status(200).send(results);
+        } catch (error) {
+            return res.status(400).send({
+                error: "Unable to delete API key"
             });
         }
-        // delete the API keys
-        const apiKeys = deleteAPIKeys(id);
-
-        apiKeys.then((results) => res.status(200).send(results)).catch((error) => res.status(400).send({ error: "Unable to delete API key" }));
     });
 
     /** ********************************
@@ -377,34 +363,28 @@ module.exports = function (pg, logger, config, passport, monitor) {
         return instance;
     }
 
-    router.get("/admin/list", _checkAuthentication, (req, res) => {
+    router.get("/admin/list", _checkAuthentication, async (req, res) => {
         /**
          * Gets the API keys from database.
          * @returns {Promise} The promise of the API keys data.
          */
-        function retrieveAdminList() {
-            return new Promise((resolve, reject) => {
-                pg.select({}, "admins", (error, results) => {
-                    if (error) { return reject(error); }
-                    results.forEach(prepareAdmins);
-                    return resolve(results);
-                });
-            });
+        async function retrieveAdminList() {
+            const results = await pg.select({}, "admins");
+            return results.map(prepareAdmins);
         }
         // get the API keys
-        const admins = retrieveAdminList();
+        const admins = await retrieveAdminList();
 
-        admins.then((bundles) =>
-            // currently redirect to form page
-            res.render("admin-list", {
-                layout: "admin",
-                title: "Admin List",
-                admins: bundles
-            }));
+        // currently redirect to form page
+        res.render("admin-list", {
+            layout: "admin",
+            title: "Admin List",
+            admins
+        });
     });
 
 
-    router.post("/admin/list/api/create", _checkAuthentication, (req, res) => {
+    router.post("/admin/list/api/create", _checkAuthentication, async (req, res) => {
         const { username, password } = req.body;
 
         // validate that the owner is a string
@@ -419,14 +399,9 @@ module.exports = function (pg, logger, config, passport, monitor) {
          * @param {Integer} id - The id of the API key to delete.
          * @returns {Promise} The promise of the API keys data will be deleted.
          */
-        function insertAdmin({ username, password }) {
-            return new Promise((resolve, reject) => {
-                pg.insert({ username, password }, "admins", (error, results) => {
-                    if (error) { return reject(error); }
-                    results.forEach(prepareAdmins);
-                    return resolve(results);
-                });
-            });
+        async function insertAdmin({ username, password }) {
+            const results = await pg.insert({ username, password }, "admins");
+            return results.map(prepareAdmins);
         }
 
         // create user API key object
@@ -435,32 +410,37 @@ module.exports = function (pg, logger, config, passport, monitor) {
             password
         };
 
-        // delete the API keys
-        const admin = insertAdmin(newAdmin);
-
-        admin.then((results) => res.status(200).send(results)).catch((error) => res.status(400).send({ error: "Unable to create admin" }));
+        try {
+            // delete the API keys
+            const admin = await insertAdmin(newAdmin);
+            return res.status(200).send(admin);
+        } catch (error) {
+            return res.status(400).send({
+                error: "Unable to create admin"
+            });
+        }
     });
 
 
-    router.get("/admin/list/api/:id/delete", _checkAuthentication, (req, res) => {
-        const id = parseInt(req.params.id);
+    router.get("/admin/list/api/:api_id/delete", _checkAuthentication, async (req, res) => {
+        const api_id = parseInt(req.params.api_id);
         /**
          * Deletes the API keys from database.
          * @param {Integer} id - The id of the API key to delete.
          * @returns {Promise} The promise of the API keys data will be deleted.
          */
-        function deleteAdmin(id) {
-            return new Promise((resolve, reject) => {
-                pg.delete({ id }, "admins", (error, results) => {
-                    if (error) { return reject(error); }
-                    return resolve(results);
-                });
+        async function deleteAdmin(id) {
+            return await pg.delete({ id }, "admins");
+        }
+        try {
+            // delete the API keys
+            const admin = await deleteAdmin(api_id);
+            return res.status(200).send(admin);
+        } catch (error) {
+            return res.status(400).send({
+                error: "Unable to delete admin"
             });
         }
-        // delete the API keys
-        const admin = deleteAdmin(id);
-
-        admin.then((results) => res.status(200).send(results)).catch((error) => res.status(400).send({ error: "Unable to delete admin" }));
     });
 
 

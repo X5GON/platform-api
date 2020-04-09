@@ -3,7 +3,7 @@ const router = require("express").Router();
 const cors = require("cors");
 
 // internal modules
-const mimetypes = require("@config/mimetypes");
+const mimetypes = require("../../../../config/mimetypes");
 
 /**
  * @description Adds API routes for logging user activity.
@@ -550,7 +550,7 @@ module.exports = function (pg, logger, config) {
      * Routes
      ******************************** */
 
-    router.get("/api/v1/oer_materials", cors(), (req, res) => {
+    router.get("/api/v1/oer_materials", cors(), async (req, res) => {
         /** ********************************
          * setup user parameters
          ******************************** */
@@ -598,29 +598,13 @@ module.exports = function (pg, logger, config) {
             PROVIDER_IDS
         });
 
-        // execute the user query
-        pg.execute(query, [], (error, records) => {
-            if (error) {
-                logger.error("[error] postgresql error",
-                    logger.formatRequest(req, {
-                        error: {
-                            message: error.message,
-                            stack: error.stack
-                        }
-                    }));
-                // something went wrong on server side
-                return res.status(500).send({
-                    errors: {
-                        msg: "Error on server side"
-                    }
-                });
-            }
-
+        try {
+            // execute the user query
+            const records = await pg.execute(query, []);
             if (records.length === 0) {
                 // respond to the user there are no materials
                 return res.status(204).send();
             }
-
 
             /** ********************************
              * prepare query results
@@ -645,34 +629,33 @@ module.exports = function (pg, logger, config) {
                 links,
                 oer_materials: materials
             });
-        });
+        } catch (error) {
+            logger.error("[error] postgresql error",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
+                    }
+                }));
+            // something went wrong on server side
+            return res.status(500).send({
+                errors: {
+                    msg: "Error on server side"
+                }
+            });
+        }
     });
 
-    router.get("/api/v1/oer_materials/:material_id", cors(), (req, res) => {
+    router.get("/api/v1/oer_materials/:material_id", cors(), async (req, res) => {
         // get material id
         const { material_id } = req.params;
 
         // constuct the material
         const query = specificOERMaterialQuery(material_id);
 
+        try {
         // execute the user query
-        pg.execute(query, [], (error, records) => {
-            if (error) {
-                logger.error("[error] postgresql error",
-                    logger.formatRequest(req, {
-                        error: {
-                            message: error.message,
-                            stack: error.stack
-                        }
-                    }));
-                // something went wrong on server side
-                return res.status(500).send({
-                    errors: {
-                        msg: "Error on server side"
-                    }
-                });
-            }
-
+            const records = await pg.execute(query, []);
             if (records.length === 0) {
                 // respond to the user there are no materials
                 return res.status(204).send();
@@ -686,7 +669,6 @@ module.exports = function (pg, logger, config) {
                 });
             }
 
-
             /** ********************************
              * prepare query results
              ******************************** */
@@ -698,10 +680,24 @@ module.exports = function (pg, logger, config) {
             return res.status(200).send({
                 oer_materials: materials
             });
-        });
+        } catch (error) {
+            logger.error("[error] postgresql error",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
+                    }
+                }));
+            // something went wrong on server side
+            return res.status(500).send({
+                errors: {
+                    msg: "Error on server side"
+                }
+            });
+        }
     });
 
-    router.get("/api/v1/oer_materials/:material_id/contents", cors(), (req, res) => {
+    router.get("/api/v1/oer_materials/:material_id/contents", cors(), async (req, res) => {
         // get material id
         const {
             material_id
@@ -713,24 +709,9 @@ module.exports = function (pg, logger, config) {
         // constuct the query
         const query = contentsOERMaterialQuery({ materialId });
 
+        try {
         // execute the user query
-        pg.execute(query, [], (error, records) => {
-            if (error) {
-                logger.error("[error] postgresql error",
-                    logger.formatRequest(req, {
-                        error: {
-                            message: error.message,
-                            stack: error.stack
-                        }
-                    }));
-                // something went wrong on server side
-                return res.status(500).send({
-                    errors: {
-                        msg: "Error on server side"
-                    }
-                });
-            }
-
+            const records = await pg.execute(query, []);
             if (records.length === 0) {
                 // respond to the user there are no materials
                 return res.status(204).send({
@@ -757,10 +738,24 @@ module.exports = function (pg, logger, config) {
                 },
                 oer_contents
             });
-        });
+        } catch (error) {
+            logger.error("[error] postgresql error",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
+                    }
+                }));
+            // something went wrong on server side
+            return res.status(500).send({
+                errors: {
+                    msg: "Error on server side"
+                }
+            });
+        }
     });
 
-    router.get("/api/v1/oer_materials/:material_id/contents/:content_id", cors(), (req, res) => {
+    router.get("/api/v1/oer_materials/:material_id/contents/:content_id", cors(), async (req, res) => {
         // get material and content ids
         const {
             material_id,
@@ -774,24 +769,9 @@ module.exports = function (pg, logger, config) {
         // constuct the query
         const query = contentsOERMaterialQuery({ materialId, contentId });
 
+        try {
         // execute the user query
-        pg.execute(query, [], (error, records) => {
-            if (error) {
-                logger.error("[error] postgresql error",
-                    logger.formatRequest(req, {
-                        error: {
-                            message: error.message,
-                            stack: error.stack
-                        }
-                    }));
-                // something went wrong on server side
-                return res.status(500).send({
-                    errors: {
-                        msg: "Error on server side"
-                    }
-                });
-            }
-
+            const records = await pg.execute(query, []);
             if (records.length === 0) {
                 // respond to the user there are no materials
                 return res.status(204).send({
@@ -818,10 +798,24 @@ module.exports = function (pg, logger, config) {
                 },
                 oer_contents
             });
-        });
+        } catch (error) {
+            logger.error("[error] postgresql error",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
+                    }
+                }));
+            // something went wrong on server side
+            return res.status(500).send({
+                errors: {
+                    msg: "Error on server side"
+                }
+            });
+        }
     });
 
-    router.get("/api/v1/oer_materials/:material_id/contents/:content_id/value", cors(), (req, res) => {
+    router.get("/api/v1/oer_materials/:material_id/contents/:content_id/value", cors(), async (req, res) => {
         // get material and content ids
         const {
             material_id,
@@ -835,24 +829,9 @@ module.exports = function (pg, logger, config) {
         // constuct the query
         const query = contentsOERMaterialQuery({ materialId, contentId });
 
-        // execute the user query
-        pg.execute(query, [], (error, records) => {
-            if (error) {
-                logger.error("[error] postgresql error",
-                    logger.formatRequest(req, {
-                        error: {
-                            message: error.message,
-                            stack: error.stack
-                        }
-                    }));
-                // something went wrong on server side
-                return res.status(500).send({
-                    errors: {
-                        msg: "Error on server side"
-                    }
-                });
-            }
-
+        try {
+            // execute the user query
+            const records = await pg.execute(query, []);
             if (records.length === 0) {
                 // respond to the user there are no materials
                 return res.status(204).send({
@@ -876,7 +855,21 @@ module.exports = function (pg, logger, config) {
             const value = oer_contents[0] && oer_contents[0].value
                 ? oer_contents[0].value.value : null;
             return res.status(200).send(value);
-        });
+        } catch (error) {
+            logger.error("[error] postgresql error",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
+                    }
+                }));
+            // something went wrong on server side
+            return res.status(500).send({
+                errors: {
+                    msg: "Error on server side"
+                }
+            });
+        }
     });
 
 

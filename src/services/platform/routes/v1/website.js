@@ -3,7 +3,7 @@ const router = require("express").Router();
 const request = require("request");
 
 // internal modules
-const KafkaProducer = require("@library/kafka-producer");
+const KafkaProducer = require("../../../../library/kafka-producer");
 
 /**
  * @description Adds API routes for platform website requests.
@@ -67,7 +67,7 @@ module.exports = function (pg, logger, config) {
     // Portal Pages
     // //////////////////////////////////////
 
-    router.get("/api/v1/oer_provider", (req, res) => {
+    router.get("/api/v1/oer_provider", async (req, res) => {
         // get token used for accessing data
         const token = req.query.providerId;
 
@@ -79,21 +79,9 @@ module.exports = function (pg, logger, config) {
             return res.json({ error: "token was not provided by the user" });
         }
 
-        // check if the repository already exists - return existing token
-        pg.selectProviderStats(token, (error, results) => {
-            if (error) {
-                // error when retrieving provider data
-                logger.error("[error] postgresql",
-                    logger.formatRequest(req, {
-                        error: {
-                            message: error.message,
-                            stack: error.stack
-                        }
-                    }));
-                // redirect user to previous page
-                return res.json({ error: "error on server side" });
-            }
-
+        try {
+            // check if the repository already exists - return existing token
+            const results = await pg.selectProviderStats(token);
             if (results.length === 0) {
                 // provider is not registered in the platform
                 logger.warn("[warn] postgresql provider not registered in X5GON platform",
@@ -109,11 +97,22 @@ module.exports = function (pg, logger, config) {
                     ...results[0]
                 });
             }
-        });
+        } catch (error) {
+            // error when retrieving provider data
+            logger.error("[error] postgresql",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
+                    }
+                }));
+            // redirect user to previous page
+            return res.json({ error: "error on server side" });
+        }
     });
 
     // send repository
-    router.post("/api/v1/oer_provider", (req, res) => {
+    router.post("/api/v1/oer_provider", async (req, res) => {
         // get body request
         const body = req.body;
 
@@ -128,84 +127,86 @@ module.exports = function (pg, logger, config) {
         // verify user through google validation
         const gRecaptchaResponse = body["g-recaptcha-response"];
 
-        _googleVerifyUser(gRecaptchaResponse)
-            .then((validation) => {
-                // if not validated - redirect to join form
-                if (!validation.success) {
-                    // provider is a robot
-                    logger.warn("[warn] provider is a robot",
-                        logger.formatRequest(req));
-                    // redirect user to join page
-                    return res.redirect(`${referrer}?invalid=true`);
-                }
-
-                // check if the repository already exists - return existing token
-                pg.select({ name, domain, contact }, "providers", (error, results) => {
-                    // log error
-                    if (error) {
-                        // error when retrieving data
-                        logger.error("[error] postgresql",
-                            logger.formatRequest(req, {
-                                error: {
-                                    message: error.message,
-                                    stack: error.stack
-                                }
-                            }));
-                        // redirect user to previous page
-                        return res.redirect(`${referrer}?invalid=true`);
+        let validation;
+        try {
+            validation = await _googleVerifyUser(gRecaptchaResponse);
+        } catch (error) {
+            // provider is not registered in the platform
+            logger.error("[error] google user verification error",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
                     }
+                }));
+            // redirect user to join page
+            return res.redirect("/join?invalid=true");
+        }
 
-                    if (results.length === 0) {
-                        // there is no registered repositories in the database
 
-                        // create the repository token
-                        let seed = `${name}${domain}${Date.now()}
-                                    ${Math.random().toString(36).substring(2)}`.repeat(3);
-                        const token = _generateToken(seed);
+        // if not validated - redirect to join form
+        if (!validation.success) {
+            // provider is a robot
+            logger.warn("[warn] provider is a robot",
+                logger.formatRequest(req));
+            // redirect user to join page
+            return res.redirect(`${referrer}?invalid=true`);
+        }
 
-                        // insert repository information to postgres
-                        pg.insert({
-                            name, domain, contact, token
-                        }, "providers", (xerror, xresults) => {
-                            if (xerror) {
-                                // error when retrieving data
-                                logger.error("[error] inserting provider data",
-                                    logger.formatRequest(req, {
-                                        error: {
-                                            message: xerror.message,
-                                            stack: xerror.stack
-                                        }
-                                    }));
-                                // redirect user to previous page
-                                return res.redirect(`${referrer}?unsuccessful=true`);
-                            }
-                            // redirect activity to information retrievers
-                            producer.send("STORE_PROVIDER", {
-                                name, domain, contact, token
-                            });
-                            // render the form submition
-                            return res.redirect(`/oer_provider?repositoryToken=${token}`);
-                        });
-                    } else {
-                        // there are registered repositories in the database
-                        const { token } = results[0];
-                        // render the form submition
-                        return res.redirect(`/oer_provider?repositoryToken=${token}`);
+        let results;
+        try {
+            // check if the repository already exists - return existing token
+            results = await pg.select({ name, domain, contact }, "providers");
+        } catch (error) {
+            // error when retrieving data
+            logger.error("[error] postgresql",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
                     }
+                }));
+            // redirect user to previous page
+            return res.redirect(`${referrer}?invalid=true`);
+        }
+
+        if (results.length === 0) {
+            // there is no registered repositories in the database
+
+            // create the repository token
+            let seed = `${name}${domain}${Date.now()}
+                        ${Math.random().toString(36).substring(2)}`.repeat(3);
+            const token = _generateToken(seed);
+
+            try {
+                // insert repository information to postgres
+                await pg.insert({
+                    name, domain, contact, token
+                }, "providers");
+                // redirect activity to information retrievers
+                producer.send("STORE_PROVIDER", {
+                    name, domain, contact, token
                 });
-            })
-            .catch((error) => {
-                // provider is not registered in the platform
-                logger.error("[error] google user verification error",
+                // render the form submition
+                return res.redirect(`/oer_provider?repositoryToken=${token}`);
+            } catch (xerror) {
+                // error when retrieving data
+                logger.error("[error] inserting provider data",
                     logger.formatRequest(req, {
                         error: {
-                            message: error.message,
-                            stack: error.stack
+                            message: xerror.message,
+                            stack: xerror.stack
                         }
                     }));
-                // redirect user to join page
-                return res.redirect("/join?invalid=true");
-            });
+                // redirect user to previous page
+                return res.redirect(`${referrer}?unsuccessful=true`);
+            }
+        } else {
+            // there are registered repositories in the database
+            const { token } = results[0];
+            // render the form submition
+            return res.redirect(`/oer_provider?repositoryToken=${token}`);
+        }
     });
 
 
