@@ -6,7 +6,7 @@
 
 // external modules
 const qm = require("qminer");
-const mimetypes = require("@config/mimetypes");
+const mimetypes = require("../../../../config/mimetypes");
 
 /**
  * The Nearest Neighbors model class.

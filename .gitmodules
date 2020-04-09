@@ -2,13 +2,10 @@
 	path = src/services/platform/frontend
 	url = https://github.com/gregpr07/x5gon-gatsby.git
 
-[submodule "Preprocessing Pipelines"]
-	path = src/service/preproc
-	url = https://github.com/ErikNovak/X5GON-preprocessing-pipeline.git
-
 [submodule "OER Search"]
 	path = search
 	url = https://github.com/ErikNovak/X5GON-elasticsearch-microservice.git
-[submodule "src/services/preproc"]
+
+[submodule "OER Preproc"]
 	path = preproc
 	url = https://github.com/ErikNovak/X5GON-preprocessing-pipeline.git

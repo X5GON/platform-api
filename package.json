@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/JozefStefanInstitute/x5gon.git"
+    "url": "git+https://github.com/JozefStefanInstitute/x5gon-platform.git"
   },
   "author": "Erik Novak",
   "contributors": [
@@ -28,9 +28,9 @@
   ],
   "license": "BSD-2-Clause",
   "bugs": {
-    "url": "https://github.com/JozefStefanInstitute/x5gon/issues"
+    "url": "https://github.com/JozefStefanInstitute/x5gon-platform/issues"
   },
-  "homepage": "https://github.com/JozefStefanInstitute/x5gon#readme",
+  "homepage": "https://github.com/JozefStefanInstitute/x5gon-platform#readme",
   "dependencies": {
     "archiver": "^3.0.0",
     "async": "^2.6.0",

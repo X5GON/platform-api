@@ -9,10 +9,6 @@ module.exports = function (pg) {
      * Helper functions
      ******************************** */
 
-    function isNull(object) {
-        return object === undefined || object === null;
-    }
-
     /**
      * Gets the API keys from database.
      * @returns {Promise} The promise of the API keys data.
