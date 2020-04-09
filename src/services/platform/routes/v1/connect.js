@@ -108,7 +108,7 @@ module.exports = function (logger, config) {
         // get query parameters
         let query = req.query;
         // create a handlebars compiler
-        let activityTracker = fs.readFileSync(path.join(__dirname, "../../../snippet/templates/tracker.hbs"));
+        let activityTracker = fs.readFileSync(path.join(__dirname, "../../snippet/templates/tracker.hbs"));
         let hbs = handlebars.compile(activityTracker.toString("utf-8"));
 
         // send the website with cookie generation
@@ -144,7 +144,7 @@ module.exports = function (logger, config) {
      */
     router.get("/api/v1/snippet/log/development", cors(), (req, res) => {
         // the beacon used to acquire user activity data
-        let beaconPath = path.join(__dirname, "../../../snippet/images/beacon.png");
+        let beaconPath = path.join(__dirname, "../../snippet/images/beacon.png");
         // get the options - snippet status headers
         const { options } = _evaluateLog(req);
         // send beacon image to user
@@ -157,7 +157,7 @@ module.exports = function (logger, config) {
      */
     router.get(["/api/v1/connect/visit", "/api/v1/snippet/log/production"], cors(), (req, res) => {
         // the beacon used to acquire user activity data
-        let beaconPath = path.join(__dirname, "../../../snippet/images/beacon.png");
+        let beaconPath = path.join(__dirname, "../../snippet/images/beacon.png");
         // get the options - snippet status headers
         const { options, userParameters, validation } = _evaluateLog(req);
         // the user parameters object is either empty or is not in correct schema
@@ -236,7 +236,7 @@ module.exports = function (logger, config) {
      */
     router.get(["/api/v1/connect/video", "/api/v1/snippet/log/video"], cors(), (req, res) => {
         // the beacon used to acquire user activity data
-        let beaconPath = path.join(__dirname, "../../../snippet/images/beacon.png");
+        let beaconPath = path.join(__dirname, "../../snippet/images/beacon.png");
         // get the options - snippet status headers
         const { options, userParameters } = _evaluateLog(req);
         // the user parameters object is either empty or is not in correct schema
@@ -290,7 +290,7 @@ module.exports = function (logger, config) {
         const file = originalUrl[originalUrl.length - 1].split("?")[0];
 
         // create the file path
-        const filePath = path.join(__dirname, `../../../snippet/global/${version}/${file}`);
+        const filePath = path.join(__dirname, `../../snippet/global/${version}/${file}`);
 
         // send the file of the appropriate version
         res.sendFile(filePath);

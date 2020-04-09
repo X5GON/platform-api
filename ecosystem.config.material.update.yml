@@ -1,17 +1,17 @@
 apps:
-  # - script: "pipeline.js"
-  #   name: "x5update_collect"
-  #   cwd: "./preproc/dist/"
-  #   args: "-tn uuid.update.material.collect -tp ../ontologies/update.material.collect"
-  #   instances: 1,
-  #   exec_mode: "fork"
-  #   autorestart: true
-  #   watch: false
+  - script: "pipeline.js"
+    name: "x5update_collect"
+    cwd: "./preproc/dist/"
+    args: "-tn uuid.update.material.collect -tp ../ontologies/update.material.collect"
+    instances: 1,
+    exec_mode: "fork"
+    autorestart: true
+    watch: false
 
-  #   env:
-  #     NODE_ENV: "development"
-  #   env_production:
-  #     NODE_ENV: "production"
+    env:
+      NODE_ENV: "development"
+    env_production:
+      NODE_ENV: "production"
 
   - script: "pipeline.js"
     name: "x5update_material_text_translation"
