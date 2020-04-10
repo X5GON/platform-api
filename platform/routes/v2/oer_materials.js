@@ -37,20 +37,31 @@ module.exports = function (pg, logger, config) {
         return object === undefined || object === null;
     }
 
+    function getTypeMimetypes(types) {
+        let queryMimetypes = [];
+        for (const type of types) {
+            if (mimetypes[type]) {
+                queryMimetypes = queryMimetypes.concat(mimetypes[type]);
+            }
+        }
+        return queryMimetypes;
+    }
+
     function oerMaterialQuery(params) {
         // extract parameters
         const {
             material_ids,
             provider_ids,
             languages,
+            queryMimetypes,
             limit,
             offset
         } = params;
 
-        const conditionsFlag = !isNull(material_ids) || !isNull(provider_ids) || !isNull(languages);
-        const afterMaterialAND = !isNull(material_ids) && (!isNull(provider_ids) || !isNull(languages)) ? "AND" : "";
-        const afterProviderAND = !isNull(provider_ids) && (!isNull(languages)) ? "AND" : "";
-
+        const conditionsFlag = !isNull(material_ids) || !isNull(provider_ids) || !isNull(languages) || !isNull(queryMimetypes);
+        const afterMaterialAND = !isNull(material_ids) && (!isNull(provider_ids) || !isNull(languages) || !isNull(queryMimetypes)) ? "AND" : "";
+        const afterProviderAND = !isNull(provider_ids) && (!isNull(languages) || !isNull(queryMimetypes)) ? "AND" : "";
+        const afterLanguagesAND = !isNull(languages) && !isNull(queryMimetypes) ? "AND" : "";
         let count = 1;
 
         const query = `
@@ -94,6 +105,8 @@ module.exports = function (pg, logger, config) {
                 ${!isNull(provider_ids) ? `URLS.provider_id IN (${provider_ids.map(() => `$${count++}`).join(",")})` : ""}
                 ${afterProviderAND}
                 ${!isNull(languages) ? `oer.language IN (${languages.map(() => `$${count++}`).join(",")})` : ""}
+                ${afterLanguagesAND}
+                ${!isNull(queryMimetypes) ? `oer.mimetype IN (${queryMimetypes.map(() => `$${count++}`).join(",")})` : ""}
 
                 ${!isNull(limit) ? `LIMIT ${limit}` : ""}
                 ${!isNull(offset) ? `OFFSET ${offset}` : ""}
@@ -233,9 +246,11 @@ module.exports = function (pg, logger, config) {
             .customSanitizer((value) => (value && value.length ? value.toLowerCase().split(",").map((id) => parseInt(id, 10)) : null)),
         query("languages").optional().trim()
             .customSanitizer((value) => (value && value.length ? value.toLowerCase().split(",") : null)),
+        query("types").optional().trim()
+            .customSanitizer((value) => (value && value.length ? value.toLowerCase().split(",") : null)),
         query("limit").optional().toInt(),
         query("page").optional().toInt()
-    ], (req, res) => {
+    ], async (req, res) => {
         /** ********************************
          * setup user parameters
          ******************************** */
@@ -245,6 +260,7 @@ module.exports = function (pg, logger, config) {
             material_ids,
             provider_ids,
             languages,
+            types,
             limit: queryLimit,
             page: queryPage
         } = req.query;
@@ -276,87 +292,95 @@ module.exports = function (pg, logger, config) {
         // Create query
         // ------------------------------------
 
+        const queryMimetypes = getTypeMimetypes(types);
+
+        console.log(types);
+        console.log(queryMimetypes);
+
         // create the query out of the given parameters
         const query = oerMaterialQuery({
             material_ids,
             provider_ids,
             languages,
+            ...(queryMimetypes.length && { queryMimetypes }),
             limit,
             offset
         });
 
+        console.log(query);
         // ------------------------------------
         // Create query parameters
         // ------------------------------------
 
-        const parameters = [material_ids, provider_ids, languages]
+        const parameters = [material_ids, provider_ids, languages, queryMimetypes]
             .filter((object) => !isNull(object))
             .reduce((prev, curr) => prev.concat(curr), []);
 
-        // execute the user query
-        pg.execute(query, parameters, (error, records) => {
-            if (error) {
-                logger.error("[error] postgresql error",
-                    logger.formatRequest(req, {
-                        error: {
-                            message: error.message,
-                            stack: error.stack
-                        }
-                    }));
-                // something went wrong on server side
-                return res.status(500).send({
-                    errors: {
-                        msg: "Error on server side"
+        let records;
+        try {
+            // execute the user query
+            records = await pg.execute(query, parameters);
+        } catch (error) {
+            logger.error("[error] postgresql error",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
                     }
-                });
-            }
-
-            /** ********************************
-             * prepare query results
-             ******************************** */
-
-            // get full count of the records
-            const total_count = parseInt(records[0].total_count, 10);
-
-            // convert the materials
-            const output = records.map((material) => oerMaterialFormat(material));
-
-            // prepare the parameters for the previous query
-            const prevQuery = {
-                ...req.query,
-                ...page && { page: page - 1 }
-            };
-
-            // prepare the parameters for the next query
-            const nextQuery = {
-                ...req.query,
-                ...page && { page: page + 1 }
-            };
-
-            // prepare the metadata used to navigate through the search
-            const totalHits = total_count;
-            const totalPages = Math.ceil(total_count / limit);
-            const prevPage = page - 1 > 0 ? `${BASE_URL}?${querystring.stringify(prevQuery)}` : null;
-            const nextPage = totalPages >= page + 1 ? `${BASE_URL}?${querystring.stringify(nextQuery)}` : null;
-
-            // send the materials to the user
-            return res.status(200).send({
-                query: req.query,
-                oer_contents: output,
-                metadata: {
-                    total_hits: totalHits,
-                    total_pages: totalPages,
-                    prev_page: prevPage,
-                    next_page: nextPage
+                }));
+            // something went wrong on server side
+            return res.status(500).send({
+                errors: {
+                    msg: "Error on server side"
                 }
             });
+        }
+
+        /** ********************************
+         * prepare query results
+         ******************************** */
+
+        // get full count of the records
+        const total_count = parseInt(records[0].total_count, 10);
+
+        // convert the materials
+        const output = records.map((material) => oerMaterialFormat(material));
+
+        // prepare the parameters for the previous query
+        const prevQuery = {
+            ...req.query,
+            ...page && { page: page - 1 }
+        };
+
+        // prepare the parameters for the next query
+        const nextQuery = {
+            ...req.query,
+            ...page && { page: page + 1 }
+        };
+
+        // prepare the metadata used to navigate through the search
+        const totalHits = total_count;
+        const totalPages = Math.ceil(total_count / limit);
+        const prevPage = page - 1 > 0 ? `${BASE_URL}?${querystring.stringify(prevQuery)}` : null;
+        const nextPage = totalPages >= page + 1 ? `${BASE_URL}?${querystring.stringify(nextQuery)}` : null;
+
+        // send the materials to the user
+        return res.status(200).send({
+            query: req.query,
+            oer_contents: output,
+            metadata: {
+                total_hits: totalHits,
+                total_pages: totalPages,
+                prev_page: prevPage,
+                next_page: nextPage
+            }
         });
     });
 
 
     router.get("/api/v2/oer_materials/:material_id", cors(), [
         param("material_id").optional().toInt()
-    ], (req, res) => {
+    ], async (req, res) => {
         // get material id
         const {
             material_id
@@ -369,35 +393,36 @@ module.exports = function (pg, logger, config) {
         // create the query out of the given parameters
         const query = oerMaterialQuery({ material_ids: [material_id] });
 
-        // execute the user query
-        pg.execute(query, [material_id], (error, records) => {
-            if (error) {
-                logger.error("[error] postgresql error",
-                    logger.formatRequest(req, {
-                        error: {
-                            message: error.message,
-                            stack: error.stack
-                        }
-                    }));
-                // something went wrong on server side
-                return res.status(500).send({
-                    errors: {
-                        msg: "Error on server side"
+        let records;
+        try {
+            // execute the user query
+            records = await pg.execute(query, [material_id]);
+        } catch (error) {
+            logger.error("[error] postgresql error",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
                     }
-                });
-            }
-
-            /** ********************************
-             * prepare query results
-             ******************************** */
-
-            // convert the output
-            const output = records.map((material) => oerMaterialFormat(material));
-
-            // send the materials to the user
-            return res.status(200).send({
-                oer_materials: output[0]
+                }));
+            // something went wrong on server side
+            return res.status(500).send({
+                errors: {
+                    msg: "Error on server side"
+                }
             });
+        }
+
+        /** ********************************
+         * prepare query results
+         ******************************** */
+
+        // convert the output
+        const output = records.map((material) => oerMaterialFormat(material));
+
+        // send the materials to the user
+        return res.status(200).send({
+            oer_materials: output[0]
         });
     });
 
@@ -405,7 +430,7 @@ module.exports = function (pg, logger, config) {
     const getContents = bent("GET", `http://127.0.0.1:${config.platform.port}`, "json", 200);
     router.get("/api/v2/oer_materials/:material_id/embed_ready", cors(), [
         param("material_id").optional().toInt()
-    ], (req, res) => {
+    ], async (req, res) => {
         // get material id
         const {
             material_id
@@ -418,69 +443,70 @@ module.exports = function (pg, logger, config) {
         // create the query out of the given parameters
         const query = oerMaterialQuery({ material_ids: [material_id] });
 
-        // execute the user query
-        pg.execute(query, [material_id], async (error, records) => {
-            if (error) {
-                logger.error("[error] postgresql error",
-                    logger.formatRequest(req, {
-                        error: {
-                            message: error.message,
-                            stack: error.stack
-                        }
-                    }));
-                // something went wrong on server side
-                return res.status(500).send({
-                    errors: {
-                        msg: "Error on server side"
+        let records;
+        try {
+            // execute the user query
+            records = await pg.execute(query, [material_id]);
+        } catch (error) {
+            logger.error("[error] postgresql error",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
                     }
-                });
-            }
+                }));
+            // something went wrong on server side
+            return res.status(500).send({
+                errors: {
+                    msg: "Error on server side"
+                }
+            });
+        }
 
-            /** ********************************
-             * prepare query results
-             ******************************** */
+        /** ********************************
+         * prepare query results
+         ******************************** */
 
-            // convert the output
-            const output = records.map((material) => oerMaterialFormat(material));
-            const {
-                material_id,
-                material_url,
-                lang_short: mlshort,
-                type: material_type,
-                mimetype
-            } = output[0];
+        // convert the output
+        const output = records.map((material) => oerMaterialFormat(material));
 
-            if (material_type === "text") {
-                // embed the text
-                const text = createEmbed(material_url, mimetype);
-                const HTML = createHTML(text);
-                // send the materials to the user
-                return res.status(200).send(HTML);
-            }
-            // prepare video container
-            let video;
+        const {
+            material_url,
+            lang_short: mlshort,
+            type: material_type,
+            mimetype
+        } = output[0];
 
-            try {
-                const { oer_contents } = await getContents(`/api/v2/oer_contents?material_ids=${material_id}&extensions=webvtt`);
-                // generate the tracks out of the oer contents information
-                const tracks = oer_contents.map((content) => {
-                    const {
-                        content_id,
-                        lang_long: cllong,
-                        lang_short: clshort
-                    } = content;
-                    return createTrack(content_id, cllong, clshort, clshort === mlshort);
-                }).join("\n");
-                // embed the video or audio file
-                video = createVideo(material_id, material_url, mimetype, tracks);
-            } catch (error) {
-                // video without the tracks
-                video = createVideo(material_id, material_url, mimetype);
-            }
-            const HTML = createHTML(video);
+        if (material_type === "text") {
+            // embed the text
+            const text = createEmbed(material_url, mimetype);
+            const HTML = createHTML(text);
             // send the materials to the user
             return res.status(200).send(HTML);
-        });
+        }
+
+        // prepare video container
+        let video;
+        try {
+            const { oer_contents } = await getContents(`/api/v2/oer_contents?material_ids=${material_id}&extensions=webvtt`);
+            // generate the tracks out of the oer contents information
+            const tracks = oer_contents.map((content) => {
+                const {
+                    content_id,
+                    lang_long: cllong,
+                    lang_short: clshort
+                } = content;
+                return createTrack(content_id, cllong, clshort, clshort === mlshort);
+            }).join("\n");
+            // embed the video or audio file
+            video = createVideo(material_id, material_url, mimetype, tracks);
+        } catch (error) {
+            // video without the tracks
+            video = createVideo(material_id, material_url, mimetype);
+        }
+        const HTML = createHTML(video);
+        // send the materials to the user
+        return res.status(200).send(HTML);
     });
 
 
