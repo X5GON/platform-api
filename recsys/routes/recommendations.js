@@ -6,7 +6,7 @@ const env = process.env.NODE_ENV;
 // internal modules - recommendation base & models
 const x5recommend = new (require(path.join(__dirname, "../engine/x5recommend")))({
     mode: "readOnly",
-    path: path.join(__dirname, "../../../../data/recsys"),
+    path: path.join(__dirname, "../../data/recsys"),
     env
 });
 
