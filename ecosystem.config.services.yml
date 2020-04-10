@@ -15,7 +15,7 @@ apps:
 
   - script: "recsys.js"
     name: "x5recommend"
-    cwd: "./src/services/recsys/"
+    cwd: "./recsys/"
     instances: 1,
     exec_mode: "fork"
     autorestart: true
@@ -29,7 +29,7 @@ apps:
 
   - script: "platform.js"
     name: "x5platform"
-    cwd: "./src/services/platform/"
+    cwd: "./platform/"
     instances: 1,
     exec_mode: "fork"
     autorestart: true

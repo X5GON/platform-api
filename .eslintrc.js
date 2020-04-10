@@ -22,11 +22,10 @@ module.exports = {
   },
   ignorePatterns: [
     "node_modules/",
-    "src/services/platform/public",
-    "src/services/platform/frontend",
-    "src/services/platform/snippet",
-    "src/services/search",
-    "src/library/textract"
+    "platform/public",
+    "platform/frontend",
+    "platform/snippet",
+    "search"
   ],
   rules: {
     eqeqeq: 0,
