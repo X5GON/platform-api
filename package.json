@@ -6,10 +6,10 @@
   "scripts": {
     "postinstall": "npm run minify:snippet && git checkout -- src/library/textract && npm run install:textract && npm audit fix",
     "start": "cd scripts && sh start.sh",
-    "postgres:create": "cd src/load && node -e 'require(`./create-postgres-database`).startDBCreate();'",
-    "minify:snippet": "cd src/services/platform/scripts && node minify-snippet.js",
-    "lint": "./node_modules/.bin/eslint ./src/services/platform",
-    "lint:fix": "./node_modules/.bin/eslint --fix ./src/services/platform"
+    "postgres:create": "cd recsys/load && node -e 'require(`./create-postgres-database`).startDBCreate();'",
+    "minify:snippet": "cd platform/scripts && node minify-snippet.js",
+    "lint": "./node_modules/.bin/eslint ./platform",
+    "lint:fix": "./node_modules/.bin/eslint --fix ./platform"
   },
   "repository": {
     "type": "git",
