@@ -212,7 +212,7 @@ module.exports = function (pg, logger, config) {
                 label="${lang_long}"
                 kind="subtitles"
                 srclang="${lang_short}"
-                src="http://localhost:8080/api/v2/oer_contents/${content_id}/content"
+                src="http://platform.x5gon.org/api/v2/oer_contents/${content_id}/content"
                 ${isDefault ? "default" : ""}
             >`;
     }
@@ -294,9 +294,6 @@ module.exports = function (pg, logger, config) {
 
         const queryMimetypes = getTypeMimetypes(types);
 
-        console.log(types);
-        console.log(queryMimetypes);
-
         // create the query out of the given parameters
         const query = oerMaterialQuery({
             material_ids,
@@ -307,7 +304,6 @@ module.exports = function (pg, logger, config) {
             offset
         });
 
-        console.log(query);
         // ------------------------------------
         // Create query parameters
         // ------------------------------------
