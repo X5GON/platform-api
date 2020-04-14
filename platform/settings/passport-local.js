@@ -18,16 +18,14 @@ module.exports = function (passport, pg) {
     }
 
     passport.use(new LocalStrategy(
-        ((username, password, done) => {
-            // get the user specifications
-            pg.select({ username }, "admins", (error, users) => {
-                if (error) { return done(error); }
-
+        (async (username, password, done) => {
+            try {
+                // get the user specifications
+                const users = await pg.select({ username }, "admins");
                 if (users.length === 0 || users.length > 1) {
                     // the user is not in the database
                     return done(null, false);
                 }
-
                 const user = users[0];
                 if (!_verifyPassword(user, password)) {
                     // the password does not match
@@ -35,7 +33,9 @@ module.exports = function (passport, pg) {
                 }
                 // return the user information
                 return done(null, user);
-            });
+            } catch (error) {
+                return done(error);
+            }
         })
     ));
 };

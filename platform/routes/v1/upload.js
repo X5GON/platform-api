@@ -21,8 +21,8 @@ module.exports = function (pg, logger, config) {
     // initialize kafka producer
     const producer = new KafkaProducer(config.kafka.host);
     // define topic names
-    const text_topic = "PREPROC_MATERIAL_TEXT";
-    const video_topic = "PREPROC_MATERIAL_VIDEO";
+    const text_topic = "PREPROC_MATERIAL_TEXT_TRANSLATION";
+    const video_topic = "PREPROC_MATERIAL_VIDEO_TRANSLATION";
 
 
     /** ********************************
@@ -71,7 +71,7 @@ module.exports = function (pg, logger, config) {
                     logger.formatRequest(req, {
                         missing_permission: "upload.materials"
                     }));
-                // notify the user about hte
+                // notify the user about the error
                 return res.status(400).send({
                     error: {
                         msgs: ["provided API key does not have permission to upload"]

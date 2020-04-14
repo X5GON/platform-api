@@ -1,0 +1,32 @@
+{{#unless isEmpty }}
+  <div class="recommendations width-restriction"
+    style="width:{{style.width}};max-height:{{style.height}};">
+    {{#each rec_materials as | material index |}}
+      {{#if ../query.url}}
+        <a class="material" href="/api/v1/transitions?from={{../query.url}}&to={{material.encoded_website}}&position={{index}}&rec_urls={{../recommended_urls}}" target="_blank">
+      {{else}}
+        <a class="material" href="{{material.website}}" target="_blank">
+      {{/if}}
+        <table class="material-content" style="font-size:{{../style.fontSize}};">
+          <body>
+            <tr>
+              <td class="align-top p-1 pt-2 text-center">
+              </td>
+              <td class="w-100 p-1">
+                <strong class="material__title d-block">{{material.title}}</strong>
+                <small class="material__metadata d-block"><b>Provider:</b> {{material.provider.name}}</small>
+                <small class="material__metadata d-block"><b>Language:</b> {{material.language_full}}</small>
+              </td>
+            </tr>
+          </body>
+        </table>
+      </a>
+    {{/each}}
+  </div>
+  <div class="footer text-right width-restriction"
+    style="width:{{style.width}};">
+    <small>Powered by
+      <a href="https://www.x5gon.org/" target="_blank">X5GON Project</a>
+    </small>
+  </div>
+{{/unless}}
