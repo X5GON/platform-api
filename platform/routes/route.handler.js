@@ -15,6 +15,7 @@ module.exports = function (app, pg, logger, config, passport, monitor) {
     app.use(require("./v2/wikipedia")(pg, logger));
 
     app.use(require("./v2/search")(logger, config));
+    app.use(require("./v2/embed")(logger, config));
 
     // //////////////////////////////////////
     // Version 1 API

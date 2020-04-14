@@ -30,7 +30,6 @@ module.exports = function (pg, logger, config) {
      * Helper functions
      ******************************** */
 
-
     /**
      * Generates a 40 character long API key.
      * @returns {String} The 40 character long API key.
@@ -211,7 +210,7 @@ module.exports = function (pg, logger, config) {
     });
 
 
-    router.post("/api/v2/upload/index", async (req, res) => {
+    router.post("/api/v2/upload/translation", async (req, res) => {
         // get oer_materials
         const {
             api_key: apiKey,
