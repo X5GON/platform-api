@@ -262,7 +262,7 @@ module.exports = function (pg, logger, config, passport, monitor) {
             owner,
             key: generateUUID(),
             permissions: {
-                upload: ["materials"]
+                upload: ["materials", "index", "translation"]
             }
         };
         try {

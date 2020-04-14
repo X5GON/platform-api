@@ -1275,6 +1275,12 @@ const dbUpdates = [{
         ALTER TABLE ${schema}.material_process_queue
         ADD COLUMN process_id varchar;
     `
+}, {
+    version: 12,
+    update: `
+        ALTER TABLE ${schema}.material_process_queue
+        ADD COLUMN process_type varchar;
+    `
 }];
 
 // get the requested database version
