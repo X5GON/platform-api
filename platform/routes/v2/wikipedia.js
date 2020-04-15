@@ -85,7 +85,7 @@ module.exports = function (pg, logger) {
             .customSanitizer((value) => (value && value.length ? value.toLowerCase().split(",").map((id) => parseInt(id, 10)) : null)),
         query("limit").optional().toInt(),
         query("page").optional().toInt()
-    ], (req, res, next) => {
+    ], async (req, res, next) => {
         // extract the appropriate query parameters
         const {
             material_ids,
@@ -137,23 +137,9 @@ module.exports = function (pg, logger) {
             .filter((object) => !isNull(object))
             .reduce((prev, curr) => prev.concat(curr), []);
 
-        // execute the user query
-        pg.execute(query, parameters, (error, records) => {
-            if (error) {
-                logger.error("[error] postgresql error",
-                    logger.formatRequest(req, {
-                        error: {
-                            message: error.message,
-                            stack: error.stack
-                        }
-                    }));
-                // something went wrong on server side
-                return res.status(500).send({
-                    errors: {
-                        msg: "Error on server side"
-                    }
-                });
-            }
+        try {
+            // execute the user query
+            const records = await pg.execute(query, parameters);
 
             /** ********************************
              * prepare query results
@@ -197,13 +183,27 @@ module.exports = function (pg, logger) {
                     next_page: nextPage
                 }
             });
-        });
+        } catch (error) {
+            logger.error("[error] postgresql error",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
+                    }
+                }));
+            // something went wrong on server side
+            return res.status(500).send({
+                errors: {
+                    msg: "Error on server side"
+                }
+            });
+        }
     });
 
 
     router.get("/api/v2/wikipedia/:wikipedia_id", cors(), [
         param("wikipedia_id").optional().toInt()
-    ], (req, res) => {
+    ], async (req, res) => {
         // get material and content ids
         const {
             wikipedia_id
@@ -212,24 +212,9 @@ module.exports = function (pg, logger) {
         // constuct the query
         const query = wikipediaQuery({ wikipedia_ids: [wikipedia_id] });
 
-        // execute the user query
-        pg.execute(query, [wikipedia_id], (error, records) => {
-            if (error) {
-                logger.error("[error] postgresql error",
-                    logger.formatRequest(req, {
-                        error: {
-                            message: error.message,
-                            stack: error.stack
-                        }
-                    }));
-                // something went wrong on server side
-                return res.status(500).send({
-                    errors: {
-                        msg: "Error on server side"
-                    }
-                });
-            }
-
+        try {
+            // execute the user query
+            const records = await pg.execute(query, [wikipedia_id]);
             /** ********************************
              * prepare query results
              ******************************** */
@@ -240,7 +225,21 @@ module.exports = function (pg, logger) {
             return res.status(200).send({
                 wikipedia: output[0]
             });
-        });
+        } catch (error) {
+            logger.error("[error] postgresql error",
+                logger.formatRequest(req, {
+                    error: {
+                        message: error.message,
+                        stack: error.stack
+                    }
+                }));
+            // something went wrong on server side
+            return res.status(500).send({
+                errors: {
+                    msg: "Error on server side"
+                }
+            });
+        }
     });
 
     return router;
