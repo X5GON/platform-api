@@ -74,7 +74,6 @@ module.exports = function (logger, config) {
             rec_materials,
             recommended_urls: rec_materials.map((material) => encodeURIComponent(material.website))
         };
-        console.log(options);
         // render recommendations
         return res.render("recommendationsV2", options);
     });
