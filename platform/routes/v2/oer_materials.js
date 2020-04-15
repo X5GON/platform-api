@@ -38,12 +38,12 @@ module.exports = function (pg, logger, config) {
     }
 
     function getTypeMimetypes(types) {
+        if (!types) { return null; }
+
         let queryMimetypes = [];
-        if (types) {
-            for (const type of types) {
-                if (mimetypes[type]) {
-                    queryMimetypes = queryMimetypes.concat(mimetypes[type]);
-                }
+        for (const type of types) {
+            if (mimetypes[type]) {
+                queryMimetypes = queryMimetypes.concat(mimetypes[type]);
             }
         }
         return queryMimetypes;
@@ -301,7 +301,7 @@ module.exports = function (pg, logger, config) {
             material_ids,
             provider_ids,
             languages,
-            ...(queryMimetypes.length && { queryMimetypes }),
+            ...(queryMimetypes && queryMimetypes.length && { queryMimetypes }),
             limit,
             offset
         });
