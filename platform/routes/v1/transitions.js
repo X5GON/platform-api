@@ -107,7 +107,6 @@ module.exports = function (logger, config) {
             from, to, selected_position, recommended_urls, uuid
         });
 
-        console.log(to);
         // redirect the request to the provided url
         res.redirect(to);
     });
