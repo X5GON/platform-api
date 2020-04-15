@@ -39,9 +39,11 @@ module.exports = function (pg, logger, config) {
 
     function getTypeMimetypes(types) {
         let queryMimetypes = [];
-        for (const type of types) {
-            if (mimetypes[type]) {
-                queryMimetypes = queryMimetypes.concat(mimetypes[type]);
+        if (types) {
+            for (const type of types) {
+                if (mimetypes[type]) {
+                    queryMimetypes = queryMimetypes.concat(mimetypes[type]);
+                }
             }
         }
         return queryMimetypes;
