@@ -40,13 +40,13 @@ module.exports = function (pg) {
         }
         // format based on the quotient
         if (Math.floor(billions)) {
-            return `${toFixed(billions)}B`;
+            return { number: toFixed(billions), suffix: "B" };
         } else if (Math.floor(millions)) {
-            return `${toFixed(millions)}M`;
+            return { number: toFixed(millions), suffix: "M" };
         } else if (Math.floor(thousands)) {
-            return `${toFixed(thousands)}k`;
+            return { number: toFixed(thousands), suffix: "k" };
         } else {
-            return number;
+            return { number, suffix: "" };
         }
     }
 
@@ -62,11 +62,11 @@ module.exports = function (pg) {
                 statistics: {
                     oer_materials: {
                         count: provider.material_count,
-                        text: provider.material_count_clean.toString()
+                        text: numberFormat(provider.material_count)
                     },
                     visits: {
                         count: provider.visit_count,
-                        text: provider.visit_count_clean.toString()
+                        text: numberFormat(provider.visit_count)
                     }
                 }
             }));
