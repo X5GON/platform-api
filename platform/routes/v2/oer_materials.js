@@ -214,7 +214,7 @@ module.exports = function (pg, logger, config) {
                 label="${lang_long}"
                 kind="subtitles"
                 srclang="${lang_short}"
-                src="http://platform.x5gon.org/api/v2/oer_contents/${content_id}/content"
+                src="https://platform.x5gon.org/api/v2/oer_contents/${content_id}/content"
                 ${isDefault ? "default" : ""}
             >`;
     }
