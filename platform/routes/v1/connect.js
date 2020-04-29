@@ -119,9 +119,10 @@ module.exports = function (logger, config) {
             sameSite: "none",
             secure: true
         });
-        // update the previous cookie to expire
-        res.cookie(x5gonCookieNameLegacy, cookieValue, {
-            expires: new Date()
+        // clear the cookie
+        res.clearCookie(x5gonCookieNameLegacy, {
+            domain: ".x5gon.org",
+            httpOnly: true
         });
         return cookieValue;
     }
