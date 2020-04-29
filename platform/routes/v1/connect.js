@@ -38,10 +38,10 @@ module.exports = function (logger, config) {
     // //////////////////////////////////////
 
     /**
-     * @description Validates the user requests and returns the options/headers
+     * @description Validates the user requests and returns the settings/headers
      * for the beacon image & the user parameters.
      * @param {Object} req - The express request object.
-     * @returns {Object} The options and user parameters.
+     * @returns {Object} The settings and user parameters.
      * @private
      */
     function _evaluateConnect(req) {
@@ -62,7 +62,7 @@ module.exports = function (logger, config) {
         }
         // set the snippet status headers
         // notifying the user about the success or failure
-        let options = {
+        let settings = {
             headers: {
                 "x-snippet-date": new Date(),
                 "x-snippet-status": "success",
@@ -75,12 +75,12 @@ module.exports = function (logger, config) {
 
         // validate query schema
         if (!Object.keys(userParams).length || !validation.isValid) {
-            options.headers["x-snippet-status"] = "failure";
+            settings.headers["x-snippet-status"] = "failure";
             // TODO: add a good description of what went wrong
-            options.headers["x-snippet-message"] = "check if all parameters are set and if the date-time is in the correct format";
+            settings.headers["x-snippet-message"] = "check if all parameters are set and if the date-time is in the correct format";
         }
-        // return options and user parameters
-        return { options, userParams, validation };
+        // return settings and user parameters
+        return { settings, userParams, validation };
     }
 
 
@@ -199,10 +199,10 @@ module.exports = function (logger, config) {
     router.get("/api/v1/snippet/log/development", cors(), (req, res) => {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, "../../snippet/images/beacon.png");
-        // get the options - snippet status headers
-        const { options } = _evaluateConnect(req);
+        // get the settings - snippet status headers
+        const { settings } = _evaluateConnect(req);
         // send beacon image to user
-        return res.sendFile(beaconPath, options);
+        return res.sendFile(beaconPath, settings);
     });
 
 
@@ -212,8 +212,8 @@ module.exports = function (logger, config) {
     router.get(["/api/v1/connect/visit", "/api/v1/snippet/log/production"], cors(), (req, res) => {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, "../../snippet/images/beacon.png");
-        // get the options - snippet status headers
-        const { options, userParams, validation } = _evaluateConnect(req);
+        // get the settings - snippet status headers
+        const { settings, userParams, validation } = _evaluateConnect(req);
         // the user parameters object is either empty or is not in correct schema
         const provider = userParams.cid ? userParams.cid : "unknown";
         // validate query schema
@@ -225,7 +225,7 @@ module.exports = function (logger, config) {
                     provider
                 }));
             // send beacon image to user
-            return res.sendFile(beaconPath, options);
+            return res.sendFile(beaconPath, settings);
         }
 
         // check if the request was done by a bot
@@ -237,7 +237,7 @@ module.exports = function (logger, config) {
                     userAgent: req.get("user-agent")
                 }));
             // send beacon image to user
-            return res.sendFile(beaconPath, options);
+            return res.sendFile(beaconPath, settings);
         }
 
         let uuid;
@@ -271,7 +271,7 @@ module.exports = function (logger, config) {
         // redirect activity to information retrievers
         producer.send("STORE_USERACTIVITY_VISIT", activity);
         // send beacon image to user
-        return res.sendFile(beaconPath, options);
+        return res.sendFile(beaconPath, settings);
     });
 
     /**
@@ -280,8 +280,8 @@ module.exports = function (logger, config) {
     router.get(["/api/v1/connect/video", "/api/v1/snippet/log/video"], cors(), (req, res) => {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, "../../snippet/images/beacon.png");
-        // get the options - snippet status headers
-        const { options, userParams } = _evaluateConnect(req);
+        // get the settings - snippet status headers
+        const { settings, userParams } = _evaluateConnect(req);
         // the user parameters object is either empty or is not in correct schema
         const provider = userParams.cid ? userParams.cid : "unknown";
 
@@ -293,7 +293,7 @@ module.exports = function (logger, config) {
                     userAgent: req.get("user-agent")
                 }));
             // send beacon image to user
-            return res.sendFile(beaconPath, options);
+            return res.sendFile(beaconPath, settings);
         }
 
         let uuid;
@@ -326,7 +326,7 @@ module.exports = function (logger, config) {
         // redirect activity to information retrievers
         producer.send("STORE_USERACTIVITY_VIDEO", video);
         // send beacon image to user
-        return res.sendFile(beaconPath, options);
+        return res.sendFile(beaconPath, settings);
     });
 
     /**
