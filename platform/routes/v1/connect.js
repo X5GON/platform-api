@@ -121,7 +121,7 @@ module.exports = function (logger, config) {
         });
         // update the previous cookie to expire
         res.cookie(x5gonCookieNameLegacy, cookieValue, {
-            expires: Date.now()
+            expires: new Date()
         });
         return cookieValue;
     }
