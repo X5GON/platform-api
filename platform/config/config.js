@@ -16,7 +16,8 @@ const common = {
     environment: env,
     isProduction: env === "production",
     platform: {
-        cookieID: "x5gonTrack",
+        cookieIDLegacy: "x5gonTrack",
+        cookieID: "x5gonConnect",
         google: {
             reCaptcha: {
                 verifyUrl: "https://www.google.com/recaptcha/api/siteverify",

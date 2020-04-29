@@ -13,9 +13,7 @@ const validator = require("../../library/schema-validator")({
 });
 
 // module for preparing materials
-const PrepareMaterials = require("../../library/prepare-materials");
-
-const prepareMaterials = new PrepareMaterials();
+const prepare = require("../../library/prepare-materials");
 
 /**
  * @description Adds API routes for logging user activity.
@@ -29,6 +27,7 @@ module.exports = function (logger, config) {
 
     // parameters used within the routes
     const x5gonCookieName = config.platform.cookieID;
+    const x5gonCookieNameLegacy = config.platform.cookieIDLegacy;
 
     // initialize kafka producer
     const producer = new KafkaProducer(config.kafka.host);
@@ -47,14 +46,17 @@ module.exports = function (logger, config) {
      */
     function _evaluateLog(req) {
         // get query parameters
-        let userParameters = { };
+        let userParams = { };
 
-        userParameters.x5gonValidated = decodeURIComponent(req.query.x5gonValidated);
-        userParameters.dt = decodeURIComponent(req.query.dt);
-        userParameters.rq = decodeURIComponent(req.query.rq);
-        userParameters.rf = decodeURIComponent(req.query.rf);
-        userParameters.cid = decodeURIComponent(req.query.cid);
+        try {
+            userParams.x5gonValidated = decodeURIComponent(req.query.x5gonValidated);
+            userParams.dt = decodeURIComponent(req.query.dt);
+            userParams.rq = decodeURIComponent(req.query.rq);
+            userParams.cid = decodeURIComponent(req.query.cid);
+            userParams.rf = decodeURIComponent(req.query.rf);
+        } catch (error) {
 
+        }
         // set the snippet status headers
         // notifying the user about the success or failure
         let options = {
@@ -66,16 +68,16 @@ module.exports = function (logger, config) {
         };
 
         // calidate the request parameters with the user activity schema
-        const validation = validator.validateSchema(userParameters, validator.schemas.userActivitySchema);
+        const validation = validator.validateSchema(userParams, validator.schemas.userActivitySchema);
 
         // validate query schema
-        if (!Object.keys(userParameters).length || !validation.isValid) {
+        if (!Object.keys(userParams).length || !validation.isValid) {
             options.headers["x-snippet-status"] = "failure";
             // TODO: add a good description of what went wrong
             options.headers["x-snippet-message"] = "check if all parameters are set and if the date-time is in the correct format";
         }
         // return options and user parameters
-        return { options, userParameters, validation };
+        return { options, userParams, validation };
     }
 
 
@@ -93,6 +95,55 @@ module.exports = function (logger, config) {
         return userAgent.includes("bot") || userAgent.includes("preview");
     }
 
+    /**
+     * Sets a new cookie with the SameSite configuration
+     * and deletes the existing (legacy) cookie.
+     * @param {Object} req - Express request object.
+     * @param {Object} res - Express response object.
+     * @returns {String} The cookie value.
+     */
+    function updateCookie(req, res) {
+        // get the existing cookie value
+        const cookieValue = req.cookies[x5gonCookieNameLegacy];
+        // set expiration date for the cookie
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 3650);
+        // create a new cookie with the new settings
+        res.cookie(x5gonCookieName, cookieValue, {
+            expires: expirationDate,
+            domain: ".x5gon.org",
+            httpOnly: true,
+            sameSite: "none",
+            secure: true
+        });
+        // update the previous cookie to expire
+        res.cookie(x5gonCookieNameLegacy, cookieValue, {
+            expires: Date.now()
+        });
+        return cookieValue;
+    }
+
+    /**
+     * Sets a new cookie with the appropriate settings.
+     * @param {Object} res - Express response object.
+     * @returns {String} The cookie string.
+     */
+    function setCookie(res) {
+        // get the cookie value
+        const cookieValue = `${Math.random().toString().substr(2)}X${Date.now()}`;
+        // set expiration date for the cookie
+        const expirationDate = new Date();
+        expirationDate.setDate(expirationDate.getDate() + 3650);
+        // set the cookie for the user
+        res.cookie(x5gonCookieName, cookieValue, {
+            expires: expirationDate,
+            domain: ".x5gon.org",
+            httpOnly: true,
+            sameSite: "none",
+            secure: true
+        });
+        return cookieValue;
+    }
 
     // //////////////////////////////////////
     // Connect service routes
@@ -159,9 +210,9 @@ module.exports = function (logger, config) {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, "../../snippet/images/beacon.png");
         // get the options - snippet status headers
-        const { options, userParameters, validation } = _evaluateLog(req);
+        const { options, userParams, validation } = _evaluateLog(req);
         // the user parameters object is either empty or is not in correct schema
-        const provider = userParameters.cid ? userParameters.cid : "unknown";
+        const provider = userParams.cid ? userParams.cid : "unknown";
         // validate query schema
         if (!validation.isValid) {
             // log user parameters error
@@ -187,39 +238,28 @@ module.exports = function (logger, config) {
         }
 
         let uuid;
-        // generate a the tracker cookie - if not exists
-        if (!req.cookies[x5gonCookieName]) {
-            // generate the cookie value
-            let cookieValue = `${Math.random().toString().substr(2)}X${Date.now()}`;
-            // set expiration date for the cookie
-            let expirationDate = new Date();
-            expirationDate.setDate(expirationDate.getDate() + 3650);
-            // set the cookie for the user
-            res.cookie(x5gonCookieName, cookieValue, {
-                expires: expirationDate,
-                domain: ".x5gon.org",
-                httpOnly: true
-            });
-
-            // set uuid of the user
-            uuid = cookieValue;
+        if (req.cookies[x5gonCookieNameLegacy]) {
+            // create a new cookie with the SameSite
+            // settings and deletes the previous
+            // (legacy) cookie
+            uuid = updateCookie(req, res);
+        } else if (req.cookies[x5gonCookieName]) {
+            // gets the value of the cookie
+            uuid = req.cookies[x5gonCookieName];
+        } else {
+            // create a new cookie for the user
+            uuid = setCookie(res);
         }
 
-        if (!uuid) {
-            // get the user id from the X5GON tracker
-            uuid = req.cookies[x5gonCookieName]
-                ? req.cookies[x5gonCookieName]
-                : "unknown";
-        }
         // get the material from the request
-        const material = prepareMaterials.prepare(req.query);
+        const material = prepare(req.query);
         // prepare the acitivity object
         let activity = {
             uuid,
-            provider: userParameters.cid,
-            url: userParameters.rq,
-            referrer: userParameters.rf,
-            visitedOn: userParameters.dt,
+            provider: userParams.cid,
+            url: userParams.rq,
+            referrer: userParams.rf,
+            visitedOn: userParams.dt,
             userAgent: req.get("user-agent"),
             language: req.get("accept-language"),
             type: "visit",
@@ -238,9 +278,9 @@ module.exports = function (logger, config) {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, "../../snippet/images/beacon.png");
         // get the options - snippet status headers
-        const { options, userParameters } = _evaluateLog(req);
+        const { options, userParams } = _evaluateLog(req);
         // the user parameters object is either empty or is not in correct schema
-        const provider = userParameters.cid ? userParameters.cid : "unknown";
+        const provider = userParams.cid ? userParams.cid : "unknown";
 
         if (_isBot(req)) {
             // log user parameters error
@@ -253,10 +293,19 @@ module.exports = function (logger, config) {
             return res.sendFile(beaconPath, options);
         }
 
-        // get the user id from the X5GON tracker
-        const uuid = req.cookies[x5gonCookieName]
-            ? req.cookies[x5gonCookieName]
-            : "unknown";
+        let uuid;
+        if (req.cookies[x5gonCookieNameLegacy]) {
+            // create a new cookie with the SameSite
+            // settings and deletes the previous
+            // (legacy) cookie
+            uuid = updateCookie(req, res);
+        } else if (req.cookies[x5gonCookieName]) {
+            // gets the value of the cookie
+            uuid = req.cookies[x5gonCookieName];
+        } else {
+            // create a new cookie for the user
+            uuid = setCookie(res);
+        }
 
         // create video activity object
         const video = {

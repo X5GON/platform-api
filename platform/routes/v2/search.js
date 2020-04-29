@@ -26,5 +26,17 @@ module.exports = function (logger, config) {
         }
     }));
 
+    // redirect to the Recommendation System route
+    router.use("/api/v2/recommend/oer_bundles", cors(), proxy({
+        target: `http://127.0.0.1:${config.search.port}`,
+        pathRewrite: {
+            "^/api/v2/recommend/oer_bundles": "/api/v1/oer_bundles",
+        },
+        logProvider() {
+            // create logger for sending requests
+            return logger;
+        }
+    }));
+
     return router;
 };
