@@ -30,7 +30,7 @@ module.exports = function (logger, config) {
     router.use("/api/v2/recommend/oer_bundles", cors(), proxy({
         target: `http://127.0.0.1:${config.search.port}`,
         pathRewrite: {
-            "^/api/v2/recommend/oer_bundles": "/api/v1/oer_bundles",
+            "^/api/v2/recommend/oer_bundles": "/api/v1/recommend/oer_bundles",
         },
         logProvider() {
             // create logger for sending requests
