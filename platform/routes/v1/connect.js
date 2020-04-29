@@ -44,7 +44,7 @@ module.exports = function (logger, config) {
      * @returns {Object} The options and user parameters.
      * @private
      */
-    function _evaluateLog(req) {
+    function _evaluateConnect(req) {
         // get query parameters
         let userParams = { };
 
@@ -55,7 +55,10 @@ module.exports = function (logger, config) {
             userParams.cid = decodeURIComponent(req.query.cid);
             userParams.rf = decodeURIComponent(req.query.rf);
         } catch (error) {
-
+            logger.warn("[warn] unable to decode URIs",
+                logger.formatRequest(req, {
+                    error: error.message
+                }));
         }
         // set the snippet status headers
         // notifying the user about the success or failure
@@ -197,7 +200,7 @@ module.exports = function (logger, config) {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, "../../snippet/images/beacon.png");
         // get the options - snippet status headers
-        const { options } = _evaluateLog(req);
+        const { options } = _evaluateConnect(req);
         // send beacon image to user
         return res.sendFile(beaconPath, options);
     });
@@ -210,7 +213,7 @@ module.exports = function (logger, config) {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, "../../snippet/images/beacon.png");
         // get the options - snippet status headers
-        const { options, userParams, validation } = _evaluateLog(req);
+        const { options, userParams, validation } = _evaluateConnect(req);
         // the user parameters object is either empty or is not in correct schema
         const provider = userParams.cid ? userParams.cid : "unknown";
         // validate query schema
@@ -278,7 +281,7 @@ module.exports = function (logger, config) {
         // the beacon used to acquire user activity data
         let beaconPath = path.join(__dirname, "../../snippet/images/beacon.png");
         // get the options - snippet status headers
-        const { options, userParams } = _evaluateLog(req);
+        const { options, userParams } = _evaluateConnect(req);
         // the user parameters object is either empty or is not in correct schema
         const provider = userParams.cid ? userParams.cid : "unknown";
 
