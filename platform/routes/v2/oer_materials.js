@@ -54,16 +54,19 @@ module.exports = function (pg, logger, config) {
         const {
             material_ids,
             provider_ids,
+            material_url,
             languages,
             queryMimetypes,
             limit,
             offset
         } = params;
 
-        const conditionsFlag = !isNull(material_ids) || !isNull(provider_ids) || !isNull(languages) || !isNull(queryMimetypes);
-        const afterMaterialAND = !isNull(material_ids) && (!isNull(provider_ids) || !isNull(languages) || !isNull(queryMimetypes)) ? "AND" : "";
-        const afterProviderAND = !isNull(provider_ids) && (!isNull(languages) || !isNull(queryMimetypes)) ? "AND" : "";
-        const afterLanguagesAND = !isNull(languages) && !isNull(queryMimetypes) ? "AND" : "";
+        const conditionsFlag = !isNull(material_ids) || !isNull(provider_ids) || !isNull(languages) || !isNull(queryMimetypes) || !isNull(material_url);
+        const afterMaterialAND = !isNull(material_ids) && (!isNull(provider_ids) || !isNull(languages) || !isNull(queryMimetypes) || !isNull(material_url)) ? "AND" : "";
+        const afterProviderAND = !isNull(provider_ids) && (!isNull(languages) || !isNull(queryMimetypes) || !isNull(material_url)) ? "AND" : "";
+        const afterLanguagesAND = !isNull(languages) && (!isNull(queryMimetypes) || !isNull(material_url)) ? "AND" : "";
+        const afterMimetypesAND = !isNull(queryMimetypes) && !isNull(material_url) ? "AND" : "";
+
         let count = 1;
 
         const query = `
@@ -109,6 +112,8 @@ module.exports = function (pg, logger, config) {
                 ${!isNull(languages) ? `oer.language IN (${languages.map(() => `$${count++}`).join(",")})` : ""}
                 ${afterLanguagesAND}
                 ${!isNull(queryMimetypes) ? `oer.mimetype IN (${queryMimetypes.map(() => `$${count++}`).join(",")})` : ""}
+                ${afterMimetypesAND}
+                ${!isNull(material_url) ? `URLS.material_url=$${count++}` : ""}
 
                 ${!isNull(limit) ? `LIMIT ${limit}` : ""}
                 ${!isNull(offset) ? `OFFSET ${offset}` : ""}
@@ -246,6 +251,7 @@ module.exports = function (pg, logger, config) {
             .customSanitizer((value) => (value && value.length ? value.toLowerCase().split(",").map((id) => parseInt(id, 10)) : null)),
         query("provider_ids").optional().trim()
             .customSanitizer((value) => (value && value.length ? value.toLowerCase().split(",").map((id) => parseInt(id, 10)) : null)),
+        query("material_url").optional().trim(),
         query("languages").optional().trim()
             .customSanitizer((value) => (value && value.length ? value.toLowerCase().split(",") : null)),
         query("types").optional().trim()
@@ -261,6 +267,7 @@ module.exports = function (pg, logger, config) {
         const {
             material_ids,
             provider_ids,
+            material_url,
             languages,
             types,
             limit: queryLimit,
@@ -300,6 +307,7 @@ module.exports = function (pg, logger, config) {
         const query = oerMaterialQuery({
             material_ids,
             provider_ids,
+            material_url,
             languages,
             ...(queryMimetypes && queryMimetypes.length && { queryMimetypes }),
             limit,
@@ -310,7 +318,7 @@ module.exports = function (pg, logger, config) {
         // Create query parameters
         // ------------------------------------
 
-        const parameters = [material_ids, provider_ids, languages, queryMimetypes]
+        const parameters = [material_ids, provider_ids, languages, queryMimetypes, material_url]
             .filter((object) => !isNull(object))
             .reduce((prev, curr) => prev.concat(curr), []);
 
