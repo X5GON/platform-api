@@ -20,7 +20,10 @@
         },
         "author": {
             "description": "The author(s) of the OER material",
-            "format": "date-time"
+            "format": "array",
+            "items": {
+                "type": "string"
+            }
         },
         "language": {
             "description": "The origin language of the OER material",
@@ -67,6 +70,7 @@
         "material_url",
         "language",
         "type",
+        "provider_token",
         "license"
     ]
 }

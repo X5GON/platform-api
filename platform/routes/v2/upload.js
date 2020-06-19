@@ -184,7 +184,7 @@ module.exports = function (pg, logger, config) {
         }
 
         // validate the material
-        const { isValid } = validator.validateSchema(oer_material, validator.schemas.oer_material_schema);
+        const { isValid, errors } = validator.validateSchema(oer_material, validator.schemas.oer_material_schema);
 
         if (isValid) {
             // validate if material is in correct format
@@ -197,13 +197,13 @@ module.exports = function (pg, logger, config) {
             logger.warn("[warn] parameter \"oer_material\" is of wrong type",
                 logger.formatRequest(req, {
                     errors: {
-                        msgs: [`parameter "oer_material" is of type ${typeof oer_materials}`]
+                        msgs: errors
                     }
                 }));
             // notify the user about the error
             return res.status(400).send({
                 error: {
-                    msgs: [`parameter "oer_material" is of type ${typeof oer_materials}`]
+                    msgs: errors
                 }
             });
         }
@@ -236,7 +236,7 @@ module.exports = function (pg, logger, config) {
         }
 
         // validate the material
-        const { isValid } = validator.validateSchema(oer_material, validator.schemas.oer_material_schema);
+        const { isValid, errors } = validator.validateSchema(oer_material, validator.schemas.oer_material_schema);
 
         if (isValid) {
             // validate if material is in correct format
@@ -249,13 +249,13 @@ module.exports = function (pg, logger, config) {
             logger.warn("[warn] parameter \"oer_material\" is of wrong type",
                 logger.formatRequest(req, {
                     errors: {
-                        msgs: [`parameter "oer_material" is of type ${typeof oer_material}`]
+                        msgs: errors
                     }
                 }));
             // notify the user about the error
             return res.status(400).send({
                 error: {
-                    msgs: [`parameter "oer_material" is of type ${typeof oer_material}`]
+                    msgs: errors
                 }
             });
         }
