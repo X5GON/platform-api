@@ -197,13 +197,13 @@ module.exports = function (pg, logger, config) {
             logger.warn("[warn] parameter \"oer_material\" is of wrong type",
                 logger.formatRequest(req, {
                     errors: {
-                        msgs: [`parameter "oer_material" is of type ${typeof oer_materials}`]
+                        msgs: [`parameter "oer_material" is of type ${typeof oer_material}`]
                     }
                 }));
             // notify the user about the error
             return res.status(400).send({
                 error: {
-                    msgs: [`parameter "oer_material" is of type ${typeof oer_materials}`]
+                    msgs: [`parameter "oer_material" is of type ${typeof oer_material}`]
                 }
             });
         }
