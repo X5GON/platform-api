@@ -14,8 +14,8 @@ const mimetypes = require("../config/mimetypes");
 const schema = config.pg.schema;
 
 // internal modules
-const updateHelper = require("./update-user-models");
-const pg = require("./postgresQL")(config.pg);
+const updateHelper = require("../library/update-user-models");
+const pg = require("../library/postgresQL")(config.pg);
 
 
 /**
