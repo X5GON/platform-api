@@ -26,7 +26,7 @@ const schema = config.pg.schema;
  ****************************************** */
 
 // initialize database
-let x5recommend = new (require("../services/recsys/engine/x5recommend"))({
+let x5recommend = new (require("../engine/x5recommend"))({
     mode: "createClean",
     path: "../../data/recsys"
 });
