@@ -2,10 +2,6 @@
 	path = search
 	url = https://github.com/ErikNovak/X5GON-elasticsearch-microservice.git
 
-[submodule "OER Preproc"]
-	path = preproc
-	url = https://github.com/ErikNovak/X5GON-preprocessing-pipeline.git
-
 [submodule "X5GON Platform UI"]
 	path = platform/frontend
 	url = https://github.com/gregpr07/x5gon-gatsby.git
