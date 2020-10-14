@@ -6,7 +6,7 @@
  */
 
 // external modules
-const k = require("kafka-node");
+const { Kafka } = require("kafkajs");
 
 /**
  * Kafka producer class.
@@ -15,69 +15,73 @@ class KafkaProducer {
     /**
      * Initializes a kafka producer.
      * @param {String} host - The kafka host in the form of ip:port (Example: 127.0.0.1:9092).
+     * @param {String} [clientId] - The client ID.
+     *
      */
-    constructor(host) {
+    constructor(host, clientID = null) {
         let self = this;
 
-        const options = {
-            kafkaHost: host
-        };
+        const clientId = clientID || `${Date.now()}`;
+
+        this._kafka = new Kafka({
+            clientId,
+            brokers: [host],
+            logCreator: () => () => {}
+        });
+
+        this._producer = this._kafka.producer();
 
         this._ready = false;
-        this._messages = [];
-        const client = new k.KafkaClient(options);
-        // create a kafka producer
-        self._producer = new k.HighLevelProducer(client);
+        this._payloads = [];
+    }
 
-        // make the producer ready
-        self._producer.on("ready", () => {
-            self._ready = true;
-            // check if there are any messages not sent
-            if (self._messages.length) {
-                // send all messages
-                while (self._messages.length) {
-                    // get the first element from the array of messages
-                    const message = self._messages[0];
-                    // update the messages array
-                    self._messages = self._messages.slice(1);
-                    // send the message to the corresponsing topic
-                    self._producer.send([message], (xerror) => {
-                        if (xerror) { console.log(xerror); }
-                    });
-                }
+    /**
+     * @description Connect the producer to the broker.
+     * @returns {Boolean} The ready value.
+     */
+    async connect() {
+        await this._producer.connect();
+        this._ready = true;
+        if (this._payloads.length) {
+            // send all messages to the appropriate topic
+            while (this._payloads.length) {
+                const message = this._payloads[0];
+                this._payloads = this._payloads.slice(1);
+                // eslint-disable-next-line no-await-in-loop
+                await this._producer.send(message);
             }
-        });
+        }
+        return this._ready;
+    }
+
+    /**
+     * @description Disconnect from the broker.
+     * @returns {Boolean} The ready value.
+     */
+    async disconnect() {
+        await this._producer.disconnect();
+        this._ready = false;
+        return this._ready;
     }
 
     /**
      * Sends the message to the appropriate topic.
      * @param {String} topic - The topic where the message is sent.
      * @param {Object} msg - The message.
-     * @param {Function} [cb] - The callback triggered after.
-     * the message was sent to the kafka topic.
+     * @returns {Boolean} The notification if the message was sent to the broker or not.
      */
-    send(topic, msg, cb) {
-        let self = this;
-
-
-        // get set callback value
-        let callback = cb && typeof (cb) === "function"
-            ? cb : function (error) { if (error) console.log(error); };
-
-
-        // prepare the message in string
-        const messages = JSON.stringify(msg);
-        if (self._ready) {
-            // the producer is ready to send the messages
-            const payload = [{ topic, messages, attributes: 1 }];
-            self._producer.send(payload, (xerror) => {
-                if (xerror) { return callback(xerror); }
-                return callback(null);
-            });
-        } else {
-            // store the topic and message to send afterwards
-            self._messages.push({ topic, messages });
-            return callback(null);
+    async send(topic, msg) {
+        try {
+            const messages = [{ value: JSON.stringify(msg) }];
+            const payload = { topic, messages };
+            if (this._ready) {
+                await this._producer.send(payload);
+            } else {
+                this._payloads.push(payload);
+            }
+            return true;
+        } catch (e) {
+            return false;
         }
     }
 }

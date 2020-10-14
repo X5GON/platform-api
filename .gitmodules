@@ -2,10 +2,6 @@
 	path = search
 	url = https://github.com/X5GON/search-api.git
 
-[submodule "OER Preproc"]
-	path = preproc
-	url = https://github.com/X5GON/processing-pipeline-api.git
-
 [submodule "X5GON Platform UI"]
 	path = platform/frontend
 	url = https://github.com/gregpr07/x5gon-gatsby.git

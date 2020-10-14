@@ -2,7 +2,7 @@ module.exports = {
   env: {
     commonjs: false,
     es6: true,
-    node: true
+    node: true,
   },
   extends: "airbnb-base",
   globals: {
@@ -15,17 +15,17 @@ module.exports = {
     after: "readonly",
     afterEach: "readonly",
     document: "readonly",
-    $: "readonly"
+    $: "readonly",
   },
   parserOptions: {
-    ecmaVersion: 2018
+    ecmaVersion: 2018,
   },
   ignorePatterns: [
     "node_modules/",
     "platform/public",
     "platform/frontend",
     "platform/snippet",
-    "search"
+    "search",
   ],
   rules: {
     eqeqeq: 0,
@@ -85,6 +85,6 @@ module.exports = {
     "newline-per-chained-call": 0,
     "no-else-return": 0,
     "no-return-await": 0,
-    "max-classes-per-file": ["error", 2]
-  }
+    "max-classes-per-file": ["error", 2],
+  },
 };

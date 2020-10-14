@@ -6,7 +6,7 @@
  */
 
 // external modules
-const k = require("kafka-node");
+const { Kafka } = require("kafkajs");
 
 /**
  * @class KafkaConsumer
@@ -16,34 +16,41 @@ const k = require("kafka-node");
 class KafkaConsumer {
     /**
      * @description Initialize the Kafka consumer instance.
-     * @param {String} host - The host address of the kafka service.
-     * @param {String} topic - The topic kafka consumer is listening to.
+     * @param {Object} params - The kafka consumer parameters.
+     * @param {String} params.host - The host address of the kafka service.
+     * @param {String} params.groupId - The group ID of the kafka consumers.
+     * @param {String} params.topic - The kafka topic from which the consumer retrieves the messages.
+     * @param {String} params.clientId - The client ID.
+     * @param {Number} params.highWater - The maximum number of messages the consumer retrieves before it pauses.
+     * @param {Number} params.lowWater - The minimum number of messages the consumer retrieves before it retrieves.
+     * @param {Boolean} params.fromBeginning - Decides if the consumer gathers the messages from the the beginning or not.
      */
-    constructor(host, topic, groupId, HIGH_WATER = 100, LOW_WATER = 10) {
+    constructor(params) {
+        const {
+            host,
+            groupId,
+            topic,
+            clientId,
+            highWater = 100,
+            lowWater = 10,
+            fromBeginning
+        } = params;
+
+        this._kafka = new Kafka({
+            clientId,
+            brokers: [host],
+            logCreator: () => () => {}
+        });
+
         // the message container
         this._data = [];
+        this._topic = topic;
+        this._highWater = highWater;
+        this._lowWater = lowWater;
+        this._fromBeginning = fromBeginning || false;
 
-        this.HIGH_WATER = HIGH_WATER;
-        this.LOW_WATER = LOW_WATER;
+        this._consumer = this._kafka.consumer({ groupId });
 
-        // setup the consumer options
-        const options = {
-            kafkaHost: host,
-            ssl: true,
-            groupId,
-            sessionTimeout: 15000,
-            protocol: ["roundrobin"],
-            fromOffset: "latest",
-            fetchMaxBytes: 1024 * 2048,
-            commitOffsetsOnFirstJoin: true,
-            outOfRangeOffset: "earliest",
-            migrateHLC: false,
-            migrateRolling: true,
-            onRebalance: (isAlreadyMember, callback) => { callback(); }
-        };
-
-        // initialize the consumer group and flags
-        this.consumerGroup = new k.ConsumerGroup(options, [topic]);
         this._highWaterClearing = false;
         this._enabled = true;
 
@@ -62,12 +69,34 @@ class KafkaConsumer {
     }
 
     /**
+     * @description Connects the kafka consumer to the brokers.
+     */
+    async connect() {
+        await this._consumer.connect();
+        await this._consumer.subscribe({
+            topic: this._topic,
+            fromBeginning: this._fromBeginning
+        });
+        await this._consumer.run({
+            eachMessage: async ({ message }) => {
+                const messageValue = message.value.toString();
+                if (messageValue === "") { return; }
+                this._data.push(JSON.parse(messageValue));
+                if (this._data.length >= this._highWater) {
+                    this._highWaterClearing = true;
+                    this._consumer.pause([{ topic: this._topic }]);
+                }
+            }
+        });
+    }
+
+    /**
      * @description Enables message consumption.
      */
     enable() {
         if (!this._enabled) {
             if (!this._highWaterClearing) {
-                this.consumerGroup.resume();
+                this._consumer.resume([{ topic: this._topic }]);
             }
             this._enabled = true;
         }
@@ -79,12 +108,11 @@ class KafkaConsumer {
     disable() {
         if (this._enabled) {
             if (!this._highWaterClearing) {
-                this.consumerGroup.pause();
+                this._consumer.pause([{ topic: this._topic }]);
             }
             this._enabled = false;
         }
     }
-
 
     /**
      * @description Get the next message.
@@ -97,22 +125,14 @@ class KafkaConsumer {
         if (this._data.length > 0) {
             let msg = this._data[0];
             this._data = this._data.slice(1);
-            if (this._data.length <= this.LOW_WATER) {
+            if (this._data.length <= this._lowWater) {
                 this._highWaterClearing = false;
-                this.consumerGroup.resume();
+                this._consumer.resume([{ topic: this._topic }]);
             }
             return msg;
         } else {
             return null;
         }
-    }
-
-    /**
-     * Stops and closes the consumer group.
-     * @param {Function} cb - Callback function.
-     */
-    stop(cb) {
-        this.consumerGroup.close(true, cb);
     }
 }
 

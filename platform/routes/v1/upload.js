@@ -20,10 +20,12 @@ const mimetypes = require("../../config/mimetypes");
 module.exports = function (pg, logger, config) {
     // initialize kafka producer
     const producer = new KafkaProducer(config.kafka.host);
+    // asynchronously connect the producer
+    producer.connect();
+
     // define topic names
     const text_topic = "PREPROC_MATERIAL_TEXT_TRANSLATION";
     const video_topic = "PREPROC_MATERIAL_VIDEO_TRANSLATION";
-
 
     /** ********************************
      * Helper functions
