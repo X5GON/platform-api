@@ -17,6 +17,8 @@ module.exports = function (pg, logger, config) {
 
     // initialize kafka producer
     const producer = new KafkaProducer(config.kafka.host);
+    // asynchronously connect the producer
+    producer.connect();
 
     /**
      * @description Generates a token for the seed string.

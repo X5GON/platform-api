@@ -76,44 +76,44 @@ module.exports = function (pg, logger, config) {
                     COALESCE(m.provider_id, c.provider_id) AS provider_id,
                     m.url AS material_url,
                     c.url AS website_url
-                FROM contains
-                LEFT JOIN urls m ON contains.contains_id = m.id
-                LEFT JOIN urls c ON contains.container_id = c.id
+                FROM contains x
+                LEFT JOIN urls m ON x.contains_id = m.id
+                LEFT JOIN urls c ON x.container_id = c.id
                 ORDER BY material_id
             ),
 
             OERS AS (
                 SELECT
-                    URLS.material_id,
-                    oer.title,
-                    oer.description,
-                    oer.creation_date,
-                    oer.retrieved_date,
-                    oer.type,
-                    oer.mimetype,
-                    URLS.material_url,
-                    URLS.website_url,
-                    oer.language,
-                    oer.license,
+                    u.material_id,
+                    om.title,
+                    om.description,
+                    om.creation_date,
+                    om.retrieved_date,
+                    om.type,
+                    om.mimetype,
+                    u.material_url,
+                    u.website_url,
+                    om.language,
+                    om.license,
                     p.name AS provider_name,
-                    URLS.provider_id,
+                    u.provider_id,
                     p.domain AS provider_domain,
 
                     COUNT(*) OVER() AS total_count
-                FROM URLS
-                LEFT JOIN oer_materials oer ON URLS.material_id = oer.id
-                LEFT JOIN providers     p   ON URLS.provider_id = p.id
+                FROM URLS u
+                LEFT JOIN oer_materials om ON u.material_id = om.id
+                LEFT JOIN providers     p  ON u.provider_id = p.id
 
                 ${conditionsFlag ? "WHERE" : ""}
-                ${!isNull(material_ids) ? `URLS.material_id IN (${material_ids.map(() => `$${count++}`).join(",")})` : ""}
+                ${!isNull(material_ids) ? `u.material_id IN (${material_ids.map(() => `$${count++}`).join(",")})` : ""}
                 ${afterMaterialAND}
-                ${!isNull(provider_ids) ? `URLS.provider_id IN (${provider_ids.map(() => `$${count++}`).join(",")})` : ""}
+                ${!isNull(provider_ids) ? `u.provider_id IN (${provider_ids.map(() => `$${count++}`).join(",")})` : ""}
                 ${afterProviderAND}
-                ${!isNull(languages) ? `oer.language IN (${languages.map(() => `$${count++}`).join(",")})` : ""}
+                ${!isNull(languages) ? `om.language IN (${languages.map(() => `$${count++}`).join(",")})` : ""}
                 ${afterLanguagesAND}
-                ${!isNull(queryMimetypes) ? `oer.mimetype IN (${queryMimetypes.map(() => `$${count++}`).join(",")})` : ""}
+                ${!isNull(queryMimetypes) ? `om.mimetype IN (${queryMimetypes.map(() => `$${count++}`).join(",")})` : ""}
                 ${afterMimetypesAND}
-                ${!isNull(material_url) ? `URLS.material_url=$${count++}` : ""}
+                ${!isNull(material_url) ? `u.material_url=$${count++}` : ""}
 
                 ${!isNull(limit) ? `LIMIT ${limit}` : ""}
                 ${!isNull(offset) ? `OFFSET ${offset}` : ""}
@@ -121,31 +121,32 @@ module.exports = function (pg, logger, config) {
 
             CONTENTS AS (
                 SELECT
-                    oer_materials.id as material_id,
+                    om.id as material_id,
                     array_agg(c.id) AS content_ids
-                FROM oer_materials
-                LEFT JOIN material_contents c ON c.material_id = oer_materials.id
-                GROUP BY oer_materials.id
+                FROM oer_materials om
+                LEFT JOIN material_contents c ON c.material_id = om.id
+                GROUP BY om.id
             ),
 
             WIKIPEDIA AS (
                 SELECT
-                    oer_materials.id as material_id,
+                    om.id as material_id,
                     array_agg(fp.id) as wikipedia_ids
-                FROM oer_materials
-                LEFT JOIN features_public fp ON fp.record_id = oer_materials.id
+                FROM oer_materials om
+                LEFT JOIN features_public fp ON fp.record_id = om.id
                 WHERE fp.table_name = 'oer_materials' AND fp.name = 'wikipedia_concepts'
-                GROUP BY oer_materials.id
+                GROUP BY om.id
             )
 
             SELECT
-                OERS.*,
-                CONTENTS.content_ids,
-                WIKIPEDIA.wikipedia_ids
-            FROM OERS
-            LEFT JOIN CONTENTS ON CONTENTS.material_id = OERS.material_id
-            LEFT JOIN WIKIPEDIA ON WIKIPEDIA.material_id = OERS.material_id
-            ORDER BY OERS.material_id;
+                O.*,
+                C.content_ids,
+                W.wikipedia_ids,
+                O.total_count
+            FROM OERS O
+            LEFT JOIN CONTENTS C ON C.material_id = O.material_id
+            LEFT JOIN WIKIPEDIA W ON W.material_id = O.material_id
+            ORDER BY O.material_id;
         `;
         return query;
     }
@@ -347,7 +348,9 @@ module.exports = function (pg, logger, config) {
          ******************************** */
 
         // get full count of the records
-        const total_count = parseInt(records[0].total_count, 10);
+        const total_count = records.length
+            ? parseInt(records[0].total_count, 10)
+            : 0;
 
         // convert the materials
         const output = records.map((material) => oerMaterialFormat(material));
@@ -373,7 +376,7 @@ module.exports = function (pg, logger, config) {
         // send the materials to the user
         return res.status(200).send({
             query: req.query,
-            oer_contents: output,
+            oer_materials: output,
             metadata: {
                 total_hits: totalHits,
                 total_pages: totalPages,

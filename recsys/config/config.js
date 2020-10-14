@@ -44,10 +44,6 @@ const production = {
     search: {
         port: parseInt(process.env.PROD_SEARCH_PORT) || 3100
     },
-    kafka: {
-        host: process.env.PROD_KAFKA_HOST || "127.0.0.1:9092",
-        groupId: process.env.PROD_KAFKA_GROUP || "productionGroup"
-    },
     pg: {
         host: process.env.PROD_PG_HOST || "127.0.0.1",
         port: parseInt(process.env.PROD_PG_PORT) || 5432,
@@ -73,10 +69,6 @@ const development = {
     search: {
         port: parseInt(process.env.DEV_SEARCH_PORT) || 3101
     },
-    kafka: {
-        host: process.env.DEV_KAFKA_HOST || "127.0.0.1:9092",
-        groupId: process.env.DEV_KAFKA_GROUP || "developmentGroup"
-    },
     pg: {
         host: process.env.DEV_PG_HOST || "127.0.0.1",
         port: parseInt(process.env.DEV_PG_PORT) || 5432,
@@ -101,10 +93,6 @@ const test = {
     },
     search: {
         port: parseInt(process.env.TEST_SEARCH_PORT) || 3102
-    },
-    kafka: {
-        host: process.env.TEST_KAFKA_HOST || "127.0.0.1:9092",
-        groupId: process.env.TEST_KAFKA_GROUP || "testGroup"
     },
     pg: {
         host: process.env.TEST_PG_HOST || "127.0.0.1",
