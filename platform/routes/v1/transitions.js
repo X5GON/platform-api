@@ -15,6 +15,8 @@ module.exports = function (logger, config) {
 
     // initialize kafka producer
     const producer = new KafkaProducer(config.kafka.host);
+    // asynchronously connect the producer
+    producer.connect();
 
     /** ********************************
      * Helper functions
