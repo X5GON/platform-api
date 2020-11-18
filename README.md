@@ -16,13 +16,14 @@ across Europe and the globe.
 This project contains the code base used to setup the main component that connects different services
 together. The project contains various services:
 
-- **Platform baseline.** Contains the Platform API and redirections to other microservices. 
+- **Platform API.** Contains the Platform API and redirections to other microservices. 
   The code is found in the [platform](./platform) folder. In addition, the platform service
   also serves the frontend, which can be found in `./platform/frontend` folder. The frontend is 
   a submodule whose code base is found [here](https://github.com/X5GON/platform-ui/tree/master).
   
-- **Recommender engine.** Contains the code for providing recommendations. The code is found
+- **Recommender Engine.** Contains the code for providing recommendations. The code is found
   in the [recsys](./recsys) folder.
+  
 - **Search API.** The Search API is included as a submodule. The code will be stored in the 
   [search](./search) folder, but The whole documentation and code of the service is found 
   [here](https://github.com/X5GON/search-api).
