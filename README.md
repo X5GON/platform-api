@@ -1,6 +1,11 @@
-# X5GON Platform
+# X5GON Platform API
 
-### Cross Modal, Cross Cultural, Cross Lingual, Cross Domain, and Cross Site Global OER Network
+![Node][programming-language]
+![Node.js CI][github-action]
+[![Linux Build][linux-build]][linux-build-status]
+[![OSX Build][osx-build]][osx-build-status]
+[![License][license]][license-link]
+
 
 The X5GON project stands for easily implemented freely available innovative technology elements that
 will converge currently scattered Open Educational Resources (OER) available in various modalities
@@ -95,3 +100,12 @@ npm run start:recsys
 # or with node process manager
 pm2 start ecosystem.recsys.config.json
 ```
+
+[programming-language]: https://img.shields.io/badge/node-%3E%3D%2010.0.0-green.svg
+[github-action]: https://github.com/X5GON/platform-api/workflows/Node.js%20CI/badge.svg
+[linux-build]: https://img.shields.io/travis/X5GON/platform-api/master.svg?label=linux
+[linux-build-status]: https://travis-ci.org/X5GON/platform-api
+[osx-build]: https://img.shields.io/travis/X5GON/platform-api/master.svg?label=mac
+[osx-build-status]: https://travis-ci.org/X5GON/platform-api
+[license]: https://img.shields.io/badge/License-BSD%202--Clause-green.svg
+[license-link]: https://opensource.org/licenses/BSD-2-Clause
