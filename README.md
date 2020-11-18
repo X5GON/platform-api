@@ -88,17 +88,27 @@ Processing Pipeline code base.
   npm run recsys:create  
   ```
 
-- Run the platform and its components with PM2 (one can configure the `ecosystem.config.services.yml` file if required):
-  
-  ```bash
-  # global install PM2
-  npm install -g pm2
-  # run the services with PM2
-  pm2 start ecosystem.config.services.yml --env production
-  ```
+## Running the Services
+
+The easiest way to run the services is with [PM2](https://pm2.keymetrics.io/). This will run them 
+in the background, will automatically restart if the services crash and is fully configurable through the 
+[./ecosystem.config.services.yml](./ecosystem.config.services.yml) file.
+
+To install PM2 one must run
+
+```bash
+# global install PM2
+npm install -g pm2
+```
+
+To run the service using PM2 one must simply run the following command:
+
+```bash
+pm2 start ecosystem.config.services.yml --env production
+```
    
-  This will also run the pipelines in the background. To control the pm2 services please see
-  their [documentation](https://pm2.keymetrics.io/docs/usage/quick-start/).
+This will also run the pipelines in the background. To control the pm2 services please see
+their [documentation](https://pm2.keymetrics.io/docs/usage/quick-start/).
 
 
 [programming-language]: https://img.shields.io/badge/node-%3E%3D%2010.0.0-green.svg
