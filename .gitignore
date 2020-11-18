@@ -71,8 +71,6 @@ typings/
 # PROJECT IGNORE LIST
 #======================================
 
-package-lock.json
-
 # dotenv environment variables file
 .env
 
@@ -86,7 +84,5 @@ tmp
 
 # ignore minified files
 platform/snippet/**/*.min.js
-
-docker/*.yml
 
 dist
