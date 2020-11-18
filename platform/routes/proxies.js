@@ -5,7 +5,6 @@ const cors = require("cors");
 // logger for proxying requests
 const Logger = require("../library/logger");
 
-
 /**
  * @description Adds proxies to express app.
  * @param {Object} app - Express app.

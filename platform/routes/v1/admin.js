@@ -15,7 +15,6 @@ module.exports = function (pg, logger, config, passport, monitor) {
         return res.redirect("/admin/login");
     }
 
-
     /**
      * Fixes and formats the number to show its value in an abbriviated form.
      * @param {Number} number - The number to be formated.
@@ -49,11 +48,9 @@ module.exports = function (pg, logger, config, passport, monitor) {
         }
     }
 
-
     /** ********************************
      * Admin login and main page
      ******************************** */
-
 
     router.get("/admin/login", (req, res) => {
         // if user is authenticated in the session, continue to admin
@@ -69,7 +66,6 @@ module.exports = function (pg, logger, config, passport, monitor) {
         });
     });
 
-
     router.post("/admin/login",
         // return the admin login page
         passport.authenticate("local", {
@@ -78,12 +74,10 @@ module.exports = function (pg, logger, config, passport, monitor) {
             failureFlash: "Invalid username or password."
         }));
 
-
     router.get("/admin/logout", (req, res) => {
         req.logout();
         res.redirect("/");
     });
-
 
     router.get("/admin", _checkAuthentication, async (req, res) => {
         /**
@@ -125,7 +119,6 @@ module.exports = function (pg, logger, config, passport, monitor) {
             });
         }
     });
-
 
     /** ********************************
      * Admin OER providers
@@ -193,7 +186,6 @@ module.exports = function (pg, logger, config, passport, monitor) {
         return instance;
     }
 
-
     router.get("/admin/api_keys", _checkAuthentication, async (req, res) => {
         /**
          * Gets the API keys from database.
@@ -222,7 +214,6 @@ module.exports = function (pg, logger, config, passport, monitor) {
             });
         }
     });
-
 
     router.post("/admin/api_keys/api/create", _checkAuthentication, async (req, res) => {
         const { owner } = req.body;
@@ -274,7 +265,6 @@ module.exports = function (pg, logger, config, passport, monitor) {
             });
         }
     });
-
 
     router.get("/admin/api_keys/api/:api_id/delete", _checkAuthentication, async (req, res) => {
         const api_id = parseInt(req.params.api_id, 10);
@@ -344,7 +334,6 @@ module.exports = function (pg, logger, config, passport, monitor) {
         });
     });
 
-
     /** ********************************
      * Admins List
      ******************************** */
@@ -383,7 +372,6 @@ module.exports = function (pg, logger, config, passport, monitor) {
         });
     });
 
-
     router.post("/admin/list/api/create", _checkAuthentication, async (req, res) => {
         const { username, password } = req.body;
 
@@ -421,7 +409,6 @@ module.exports = function (pg, logger, config, passport, monitor) {
         }
     });
 
-
     router.get("/admin/list/api/:api_id/delete", _checkAuthentication, async (req, res) => {
         const api_id = parseInt(req.params.api_id);
         /**
@@ -442,7 +429,6 @@ module.exports = function (pg, logger, config, passport, monitor) {
             });
         }
     });
-
 
     return router;
 };

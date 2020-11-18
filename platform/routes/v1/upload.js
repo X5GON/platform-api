@@ -31,7 +31,6 @@ module.exports = function (pg, logger, config) {
      * Helper functions
      ******************************** */
 
-
     /**
      * Generates a 40 character long API key.
      * @returns {String} The 40 character long API key.
@@ -95,7 +94,6 @@ module.exports = function (pg, logger, config) {
             });
         }
     }
-
 
     /**
      * Validates the material sent by the POST request.
@@ -221,7 +219,6 @@ module.exports = function (pg, logger, config) {
             });
         }
 
-
         // check if parameter is an array or an object
         if (Array.isArray(oer_materials)) {
             const sendingMaterials = [];
@@ -272,7 +269,6 @@ module.exports = function (pg, logger, config) {
         // notify the user about the status
         return res.status(200).send(response);
     });
-
 
     return router;
 };

@@ -10,6 +10,7 @@ const config = require("../config/config");
 
 // internal modules
 const Logger = require("../library/logger");
+const { createDirectoryPath } = require("../library/file-manager");
 
 // create a logger instance for logging recommendation requests
 const { environment } = config;
@@ -19,6 +20,8 @@ const logger = Logger.createGroupInstance("recommendation-model-build", "x5recom
 const pg = require("../library/postgresQL")(config.pg);
 // check if config.schema is defined
 const schema = config.pg.schema;
+
+createDirectoryPath("../../data");
 
 
 /** ******************************************

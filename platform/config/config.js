@@ -32,7 +32,6 @@ const common = {
     },
 };
 
-
 // production environment configurations
 const production = {
     platform: {

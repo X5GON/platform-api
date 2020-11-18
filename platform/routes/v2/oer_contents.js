@@ -69,7 +69,6 @@ module.exports = function (pg, logger) {
         return query;
     }
 
-
     function oerContentFormat(oer_content) {
         // get content parameters
         const {
@@ -92,7 +91,6 @@ module.exports = function (pg, logger) {
             material_id
         };
     }
-
 
     router.get("/api/v2/oer_contents", cors(), [
         query("material_ids").optional().trim()
@@ -225,7 +223,6 @@ module.exports = function (pg, logger) {
         });
     });
 
-
     router.get("/api/v2/oer_contents/:content_id", cors(), [
         param("content_id").optional().toInt()
     ], async (req, res) => {
@@ -303,7 +300,6 @@ module.exports = function (pg, logger) {
         // send the materials to the user
         return res.status(200).send(records[0].value.value);
     });
-
 
     return router;
 };

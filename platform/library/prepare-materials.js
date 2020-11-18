@@ -7,7 +7,6 @@
 // file type detection/extraction libraries
 const mimetypes = require("mime-types");
 
-
 /**
  * Prepares the moodle request.
  * @param {Object} request - The request containing the material data.

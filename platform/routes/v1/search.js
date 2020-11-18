@@ -184,7 +184,6 @@ module.exports = function (pg, logger, config) {
         });
     });
 
-
     router.get("/api/v1/recommend/personalized", cors(), (req, res) => {
         const j = request.jar();
         const cookie = request.cookie(`x5gonTrack=${req.cookies[x5gonCookieName]}`);
@@ -248,7 +247,6 @@ module.exports = function (pg, logger, config) {
         });
     });
 
-
     router.get("/api/v1/recommend/collaborative_filtering", cors(), (req, res) => {
         const j = request.jar();
         const cookie = request.cookie(`x5gonTrack=${req.cookies[x5gonCookieName]}`);
@@ -311,7 +309,6 @@ module.exports = function (pg, logger, config) {
             return res.send(options);
         });
     });
-
 
     // //////////////////////////////////////
     // End of Router

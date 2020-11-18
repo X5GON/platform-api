@@ -78,7 +78,6 @@ module.exports = function (logger, config) {
         return res.render("recommendationsV2", options);
     });
 
-
     // //////////////////////////////////////
     // End of Router
     // //////////////////////////////////////

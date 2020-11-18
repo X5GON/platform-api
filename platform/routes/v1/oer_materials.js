@@ -26,7 +26,6 @@ module.exports = function (pg, logger, config) {
      * Helper functions
      ******************************** */
 
-
     function oerMaterialQuery(params) {
         // extract parameters
         const {
@@ -129,7 +128,6 @@ module.exports = function (pg, logger, config) {
         return query;
     }
 
-
     function specificOERMaterialQuery(materialId) {
         // create oer materials query statement
         const query = `
@@ -214,7 +212,6 @@ module.exports = function (pg, logger, config) {
         return query;
     }
 
-
     function contentsOERMaterialQuery(params) {
         // extract parameters
         const {
@@ -238,7 +235,6 @@ module.exports = function (pg, logger, config) {
 
         return query;
     }
-
 
     function createRequestLinks(req, params) {
         // get parameters
@@ -298,7 +294,6 @@ module.exports = function (pg, logger, config) {
         // return the urls of the query
         return links;
     }
-
 
     function materialType(mimetype) {
         for (let type in mimetypes) {
@@ -390,7 +385,6 @@ module.exports = function (pg, logger, config) {
         };
     }
 
-
     /** ********************************
      * Middleware
      ******************************** */
@@ -410,7 +404,6 @@ module.exports = function (pg, logger, config) {
             languages,
             provider_ids
         } = query_parameters;
-
 
         /** ********************************
          * check user parameters
@@ -479,7 +472,6 @@ module.exports = function (pg, logger, config) {
             query_parameters.provider_ids = PROVIDER_IDS.map((id) => parseInt(id));
         }
 
-
         /** ********************************
          * notify the user about
          * the query parameter errors
@@ -496,7 +488,6 @@ module.exports = function (pg, logger, config) {
             });
         }
 
-
         /** ********************************
          * continue with request
          ******************************** */
@@ -506,7 +497,6 @@ module.exports = function (pg, logger, config) {
         // continue the request
         return next();
     });
-
 
     // check parameter validity
     router.get((req, res, next) => {
@@ -544,7 +534,6 @@ module.exports = function (pg, logger, config) {
         // continue the request
         return next();
     });
-
 
     /** ********************************
      * Routes
@@ -584,7 +573,6 @@ module.exports = function (pg, logger, config) {
 
         // get providers
         let PROVIDER_IDS = provider_ids || [];
-
 
         /** ********************************
          * construct user query
@@ -871,7 +859,6 @@ module.exports = function (pg, logger, config) {
             });
         }
     });
-
 
     return router;
 };

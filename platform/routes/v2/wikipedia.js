@@ -60,7 +60,6 @@ module.exports = function (pg, logger) {
         return query;
     }
 
-
     function wikipediaFormat(wikipedia) {
         // get content parameters
         const {
@@ -76,7 +75,6 @@ module.exports = function (pg, logger) {
             value: value.value
         };
     }
-
 
     router.get("/api/v2/wikipedia", cors(), [
         query("material_ids").optional().trim()
@@ -199,7 +197,6 @@ module.exports = function (pg, logger) {
             });
         }
     });
-
 
     router.get("/api/v2/wikipedia/:wikipedia_id", cors(), [
         param("wikipedia_id").optional().toInt()

@@ -35,7 +35,6 @@ class PostgreSQL {
         });
     }
 
-
     // extracts the keys and values for querying
     _extractKeysAndValues(params, idx) {
         // prepare query and params
@@ -60,7 +59,6 @@ class PostgreSQL {
         // return the key-values
         return { keys, values, idx };
     }
-
 
     // extracts the condition rules
     _constructCondition(whereParams, idx) {
@@ -88,7 +86,6 @@ class PostgreSQL {
         return { condition, params, idx };
     }
 
-
     // gets the condition keys and values
     _getConditionKeysAndValues(values, idx) {
         // prepare query and params
@@ -103,7 +100,6 @@ class PostgreSQL {
         // return the key-values and the index
         return { condition, params, idx };
     }
-
 
     // execute the query
     async execute(statement, params) {
@@ -126,7 +122,6 @@ class PostgreSQL {
         client.release();
         return results ? results.rows : [];
     }
-
 
     // executes a large query given the values
     async executeLarge(statement, params, batchSize, batchCallback, callback) {
@@ -165,7 +160,6 @@ class PostgreSQL {
         );
     }
 
-
     // inserts the object in the database
     async insert(record, table) {
         // get the record keys and values
@@ -189,7 +183,6 @@ class PostgreSQL {
         return await this.execute(query, params);
     }
 
-
     // finds the rows in the database
     async select(conditions, table) {
         // set the conditions and parameters
@@ -201,7 +194,6 @@ class PostgreSQL {
         // execute the query
         return await this.execute(query, params);
     }
-
 
     // fins the rows in the database (large version)
     selectLarge(conditions, table, batchSize, batchCallback, callback) {
@@ -215,7 +207,6 @@ class PostgreSQL {
         this.executeLarge(query, params, batchSize, batchCallback, callback);
     }
 
-
     // count the number of rows in the database following some conditions
     async count(conditions, table) {
         // set the conditions and parameters
@@ -227,7 +218,6 @@ class PostgreSQL {
         // execute the query
         return await this.execute(query, params);
     }
-
 
     // update the rows in the database
     async update(values, conditions, table) {
@@ -251,7 +241,6 @@ class PostgreSQL {
         return await this.execute(query, allParams);
     }
 
-
     // deletes the rows in the database
     async delete(conditions, table) {
         // get the conditions and prepare the query
@@ -264,7 +253,6 @@ class PostgreSQL {
         // execute the query
         return await this.execute(query, params);
     }
-
 
     // upserts (updates or inserts) the row in the database
     async upsert(record, conditions, table) {

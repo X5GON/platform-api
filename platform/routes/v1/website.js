@@ -38,7 +38,6 @@ module.exports = function (pg, logger, config) {
         return Math.abs(token).toString(36);
     }
 
-
     /**
      * @description Verify user with the given recaptcha response.
      * @param {String} gRecaptchaResponse - The google recaptcha response.
@@ -63,7 +62,6 @@ module.exports = function (pg, logger, config) {
             });
         });
     }
-
 
     // //////////////////////////////////////
     // Portal Pages
@@ -145,7 +143,6 @@ module.exports = function (pg, logger, config) {
             return res.redirect("/join?invalid=true");
         }
 
-
         // if not validated - redirect to join form
         if (!validation.success) {
             // provider is a robot
@@ -211,7 +208,6 @@ module.exports = function (pg, logger, config) {
         }
     });
 
-
     // //////////////////////////////////////
     // Material Search
     // //////////////////////////////////////
@@ -222,7 +218,6 @@ module.exports = function (pg, logger, config) {
     router.get("/search", (req, res) =>
         // redirect user to join page
         res.redirect("http://discovery.x5gon.org/"));
-
 
     // //////////////////////////////////////
     // Recommendation Embeddings
@@ -297,7 +292,6 @@ module.exports = function (pg, logger, config) {
             return res.render("recommendations", options);
         });
     });
-
 
     // //////////////////////////////////////
     // End of Router
