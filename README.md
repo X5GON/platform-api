@@ -41,6 +41,7 @@ Processing Pipeline code base.
   or use a [docker image][elasticsearch-docker]). **NOTE:** Required for the Search API
 - PostgreSQL version 10 or greater
 - NodeJS version 10 or greater
+
   To test that your nodejs version is correct, run `node --version` in the command line.
 
 ## Installation
