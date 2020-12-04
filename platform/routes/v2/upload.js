@@ -259,5 +259,28 @@ module.exports = function (pg, logger, config) {
         }
     });
 
+    router.get("/api/v2/upload/status", async (req, res) => {
+        // get oer_materials
+        const {
+            material_url
+        } = req.query;
+
+        // check for missing parameters
+        if (!material_url) {
+            // api key does not have permissions
+            logger.warn("[warn] no provided material_url", logger.formatRequest(req));
+            // notify the user about hte
+            return res.status(400).send({ error: { msgs: ["missing query \"material_url\""] } });
+        }
+        let results = await pg.select({ material_url }, "material_process_queue");
+        // return the upload status
+        return results.length === 0
+            ? res.status(400).send({ error: { msg: `material not in processing pipeline URL=${material_url}` } })
+            : res.status(200).send({
+                status: results[0].status,
+                start_process_time: results[0].start_process_time,
+                material_url
+            });
+    });
     return router;
 };
