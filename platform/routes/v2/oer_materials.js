@@ -386,7 +386,6 @@ module.exports = function (pg, logger, config) {
         });
     });
 
-
     router.get("/api/v2/oer_materials/:material_id", cors(), [
         param("material_id").optional().toInt()
     ], async (req, res) => {
@@ -434,7 +433,6 @@ module.exports = function (pg, logger, config) {
             oer_materials: output[0]
         });
     });
-
 
     const getContents = bent("GET", `http://127.0.0.1:${config.platform.port}`, "json", 200);
     router.get("/api/v2/oer_materials/:material_id/embed_ready", cors(), [
@@ -517,7 +515,6 @@ module.exports = function (pg, logger, config) {
         // send the materials to the user
         return res.status(200).send(HTML);
     });
-
 
     return router;
 };

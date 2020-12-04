@@ -13,93 +13,104 @@ across Europe and the globe.
 
 ![preprocessing pipeline](readme/platform.png)
 
-This repository contains the technology that will realize the vision set within the X5GON project.
-All of the source code is found in the `src` folder. The folder is structured such that files with
-similar roles or functionalities are found in subfolders making it easier to navigate through the
-project.
+This project contains the code base used to setup the main component that connects different services
+together. The project contains various services:
 
-The repositories contains the following components:
+- **Platform API.** Contains the Platform API and redirections to other microservices. 
+  The code is found in the [platform](./platform) folder. In addition, the platform service
+  also serves the frontend, which can be found in `./platform/frontend` folder. The frontend is 
+  a submodule whose code base is found [here](https://github.com/X5GON/platform-ui/tree/master).
+  
+- **Recommender Engine.** Contains the code for providing recommendations. The code is found
+  in the [recsys](./recsys) folder.
+  
+- **Search API.** The Search API is included as a submodule. The code will be stored in the 
+  [search](./search) folder, but The whole documentation and code of the service is found 
+  [here](https://github.com/X5GON/search-api).
+  
+A component that is not included within this repository is the
+[X5GON Processing Pipelines](https://github.com/X5GON/processing-pipeline-api). The code
+is separated so that the data processing part can be done on another machine. The communication between
+the Platform and Processing Pipelines is done through the Apache Kafka, which is part of the 
+Processing Pipeline code base.
 
-- **Platform baseline.** Sets up the service which connects all other
-  components. Link: [src/services/platform](./src/services/platform)
-- **Recommender engine.** The service providing material and user
-  recommendations. Link: [src/services/recsys](./src/services/recsys)
-- **Material processing pipeline.** A service for retrieving and processing
-  OER materials. Link: [src/services/preproc](./src/services/preproc)
 
 ## Prerequisites
 
-- Create `.env` file in the `src/config` folder. See instructions described in this [readme](./src/config/README.md).
+- A running Elasticsearch service (one can download and install it from [here][elasticsearch-download] 
+  or use a [docker image][elasticsearch-docker]). **NOTE:** Required for the Search API
+- PostgreSQL version 10 or greater
+- NodeJS version 10 or greater
 
-- node.js v6.0 and npm 5.3 or higher
+  To test that your nodejs version is correct, run `node --version` in the command line.
 
-    To test that your node.js version is correct, run `node --version` and `npm --version`.
+## Installation
 
-- postgres 9.6 or higher
+- Have a running PostgreSQL database and Elasticsearch service
 
-    Execute the following commands to initialize the `x5gon` database
-    ```bash
-    createdb x5gon
-    cd src/load && node -e "require('./create-postgres-database').startDBCreate();"
-    ```
+- Make a clone of this repository
 
-- docker v18 or higher, docker-compose v1.23 or higher
+  ```bash
+  git clone https://github.com/X5GON/platform-api.git
+  # navigate into the project
+  cd platform-api
+  ```
 
-    To initialize KAFKA using docker execute the following commands
-    ```bash
-    cd docker && sudo IP="machine-network-id" docker-compose up -d
-    ```
-    To check if the kafka service has been successfully initialized, run the following command:
-    ```bash
-    sudo docker ps
-    # should return something similar to this
-    CONTAINER ID  IMAGE                   COMMAND                    CREATED      STATUS      PORTS                                               NAMES
-    591cf7e8e0fb  wurstmeister/kafka      "start-kafka.sh"           2 hours ago  Up 2 hours  0.0.0.0:9092->9092/tcp                              docker_kafka_1
-    ef8613361a00  wurstmeister/zookeeper  "/bin/sh -c '/usr/sb...'"  2 hours ago  Up 2 hours  22/tcp, 2888/tcp, 3888/tcp, 0.0.0.0:2181->2181/tcp  docker_zookeeper_1
-    ```
+- Recursively download all submodules (i.e. the `search` and `frontend`).
+  ```bash
+  git submodule update --init
+  ```
 
-## Install
+- Create an `.env` file in the [/env](./env) folder (see [instructions](./env)).
 
-To install the project run
+- Install the nodejs dependencies and prepare submodule dependencies:
+  
+  ```bash
+  npm run build
+  ```
+  
+- Configure submodule dependencies:
+
+  - **Search API.** Follow the [instructions](https://github.com/X5GON/search-api).
+  - **Processing API.** Follow the [instructions](https://github.com/X5GON/processing-pipeline-api).
+
+- Create the `x5gon` database where all of the data is going to be stored:
+
+  ```bash
+  # switch to the postgres user and create the 'x5gon' database
+  sudo su postgres && createdb x5gon && exit
+  # create the tables in the database
+  npm run postgres:create
+  ```
+
+- Create the recommendation models:
+
+  ```bash
+  npm run recsys:create  
+  ```
+
+## Running the Services
+
+The easiest way to run the services is with [PM2](https://pm2.keymetrics.io/). This will run them 
+in the background, will automatically restart if the services crash and is fully configurable through the 
+[./ecosystem.config.services.yml](./ecosystem.config.services.yml) file.
+
+To install PM2 one must run
 
 ```bash
-npm install
-```
-
-## Run Components
-
-Before you run any of the components you must first create an `.env` file containing the process
-environments. For more detail see [README](./env/README.md).
-
-### Component Initialization
-
-Running the components can be done by using the node process manager `pm2`. To install it run
-
-```bash
+# global install PM2
 npm install -g pm2
 ```
 
-#### Platform Component
-
-To start the platform run the following command:
+To run the service using PM2 one must simply run the following command:
 
 ```bash
-npm run start:platform
-# or with node process manager
-pm2 start ecosystem.platform.config.json
+pm2 start ecosystem.config.services.yml --env production
 ```
+   
+This will also run the pipelines in the background. To control the pm2 services please see
+their [documentation](https://pm2.keymetrics.io/docs/usage/quick-start/).
 
-#### Recommender Engine Component
-
-Before starting the recommender engine component, first build the recommender models
-
-To start the recommender engine component run the following command:
-
-```bash
-npm run start:recsys
-# or with node process manager
-pm2 start ecosystem.recsys.config.json
-```
 
 [programming-language]: https://img.shields.io/badge/node-%3E%3D%2010.0.0-green.svg
 [github-action]: https://github.com/X5GON/platform-api/workflows/Node.js%20CI/badge.svg
@@ -109,3 +120,7 @@ pm2 start ecosystem.recsys.config.json
 [osx-build-status]: https://travis-ci.com/X5GON/platform-api
 [license]: https://img.shields.io/badge/License-BSD%202--Clause-green.svg
 [license-link]: https://opensource.org/licenses/BSD-2-Clause
+
+[elasticsearch]: https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html
+[elasticsearch-download]: https://www.elastic.co/downloads/elasticsearch
+[elasticsearch-docker]: https://hub.docker.com/_/elasticsearch

@@ -9,15 +9,6 @@ cd ..
 npm install
 
 ###########################################################
-# Reload docker containers
-###########################################################
-
-# reload the docker container (with persistent data)
-cd docker/
-sh run-docker.sh
-cd ..
-
-###########################################################
 # Prepare submodule components
 ###########################################################
 
@@ -28,7 +19,7 @@ npm run build
 cd ../
 
 # prepare the processing pipeline
-cd ./preproc
+cd ./platform/frontend
 npm install
 npm run build
-cd ../
+cd ../../

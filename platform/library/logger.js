@@ -20,7 +20,6 @@ const {
 // add daily rotate file configuration
 require("winston-daily-rotate-file");
 
-
 // archive required modules
 const fs = require("fs");
 const archiver = require("archiver");

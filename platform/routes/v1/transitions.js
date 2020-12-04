@@ -83,7 +83,6 @@ module.exports = function (logger, config) {
         return next();
     });
 
-
     /** ********************************
      * Routes
      ******************************** */

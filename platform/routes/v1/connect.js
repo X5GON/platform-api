@@ -84,7 +84,6 @@ module.exports = function (logger, config) {
         return { settings, userParams, validation };
     }
 
-
     /**
      * @description Checks if the request has been povided by a bot.
      * @param {Object} req - The express request object.
@@ -171,7 +170,6 @@ module.exports = function (logger, config) {
         return res.send(hbs({ callbackURL: query.callbackURL, x5gonCookieName }));
     });
 
-
     /**
      * Decides to which route to direct the request.
      * @param {String} test - The string/boolean if the request was done for testing or not.
@@ -194,7 +192,6 @@ module.exports = function (logger, config) {
         }
     });
 
-
     /**
      * Returns beacon for testing/development case.
      */
@@ -206,7 +203,6 @@ module.exports = function (logger, config) {
         // send beacon image to user
         return res.sendFile(beaconPath, settings);
     });
-
 
     /**
      * Returns the beacon for the production case.
@@ -349,7 +345,6 @@ module.exports = function (logger, config) {
         // send the file of the appropriate version
         res.sendFile(filePath);
     });
-
 
     return router;
 };

@@ -16,34 +16,13 @@ const common = {
     environment: env,
     isProduction: env === "production",
     platform: {
-        cookieID: "x5gonTrack",
-        google: {
-            reCaptcha: {
-                verifyUrl: "https://www.google.com/recaptcha/api/siteverify",
-                siteKey: process.env.GOOGLE_RECAPTCHA_SITEKEY,
-                secret: process.env.GOOGLE_RECAPTCHA_SECRET
-            }
-        }
-    },
-    quality: {
-        // used for proxying to the quality assurance service
-        port: parseInt(process.env.SERVICE_QUALITY_PORT) || 6001
-    },
+        cookieID: "x5gonConnect"
+    }
 };
 
 
 // production environment configurations
 const production = {
-    platform: {
-        port: parseInt(process.env.PROD_PLATFORM_PORT) || 8080,
-        sessionSecret: process.env.PROD_PLATFORM_SESSION_SECRET,
-    },
-    recsys: {
-        port: parseInt(process.env.PROD_RECSYS_PORT) || 3000
-    },
-    search: {
-        port: parseInt(process.env.PROD_SEARCH_PORT) || 3100
-    },
     pg: {
         host: process.env.PROD_PG_HOST || "127.0.0.1",
         port: parseInt(process.env.PROD_PG_PORT) || 5432,
@@ -59,16 +38,6 @@ const production = {
 
 // development environment configurations
 const development = {
-    platform: {
-        port: parseInt(process.env.DEV_PLATFORM_PORT) || 8081,
-        sessionSecret: process.env.DEV_PLATFORM_SESSION_SECRET,
-    },
-    recsys: {
-        port: parseInt(process.env.DEV_RECSYS_PORT) || 3001
-    },
-    search: {
-        port: parseInt(process.env.DEV_SEARCH_PORT) || 3101
-    },
     pg: {
         host: process.env.DEV_PG_HOST || "127.0.0.1",
         port: parseInt(process.env.DEV_PG_PORT) || 5432,
@@ -84,16 +53,6 @@ const development = {
 
 // test environment configurations
 const test = {
-    platform: {
-        port: parseInt(process.env.TEST_PLATFORM_PORT) || 8082,
-        sessionSecret: process.env.TEST_PLATFORM_SESSION_SECRET,
-    },
-    recsys: {
-        port: parseInt(process.env.TEST_RECSYS_PORT) || 3002
-    },
-    search: {
-        port: parseInt(process.env.TEST_SEARCH_PORT) || 3102
-    },
     pg: {
         host: process.env.TEST_PG_HOST || "127.0.0.1",
         port: parseInt(process.env.TEST_PG_PORT) || 5432,

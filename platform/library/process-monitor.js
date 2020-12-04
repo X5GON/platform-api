@@ -5,7 +5,6 @@
  * [http://pm2.keymetrics.io/docs/usage/pm2-api/].
  */
 
-
 /**
  * Takes the number of milliseconds and converts them
  * into human readable format (days hours minutes seconds).

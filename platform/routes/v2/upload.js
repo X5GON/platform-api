@@ -28,7 +28,6 @@ module.exports = function (pg, logger, config) {
     const TEXT_TRANSLATION = "PREPROC_MATERIAL_TEXT_TRANSLATION";
     const VIDEO_TRANSLATION = "PREPROC_MATERIAL_VIDEO_TRANSLATION";
 
-
     /** ********************************
      * Helper functions
      ******************************** */
@@ -64,7 +63,6 @@ module.exports = function (pg, logger, config) {
         }
     }
 
-
     async function _addMaterialToProcessing(material, processID, processType, kafkaTopic) {
         await pg.insert({ process_id: processID, material_url: material.material_url, process_type: processType }, "material_process_queue");
         logger.info(`[upload] material = ${material.material_url}`);
@@ -72,7 +70,6 @@ module.exports = function (pg, logger, config) {
         // send the video material
         producer.send(kafkaTopic, material);
     }
-
 
     async function _sendMaterialToIndex(material) {
         try {
@@ -112,7 +109,6 @@ module.exports = function (pg, logger, config) {
             return { error: "Error on server side" };
         }
     }
-
 
     async function _sendMaterialToTranslation(material) {
         try {
@@ -211,7 +207,6 @@ module.exports = function (pg, logger, config) {
             });
         }
     });
-
 
     router.post("/api/v2/upload/translation", async (req, res) => {
         // get oer_materials

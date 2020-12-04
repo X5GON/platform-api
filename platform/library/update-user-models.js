@@ -31,7 +31,6 @@ function addObjects(objectA, objectB) {
     return objectA;
 } // function addObjects
 
-
 /**
  * @description Multiplies attributes of the provided object with the provided value.
  * @param {Object} objectA - The object containing the values.
@@ -44,7 +43,6 @@ function multiplyObjects(objectA, num) {
     }
     return objectA;
 } // function multiplyObjects
-
 
 /**
  * @description Updates a user model using the provided activity data.

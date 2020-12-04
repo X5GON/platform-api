@@ -17,7 +17,6 @@ module.exports = function (pg) {
         return await pg.selectProviderStats(provider_ids);
     }
 
-
     /**
      * Fixes and formats the number to show its value in an abbriviated form.
      * @param {Number} number - The number to be formated.
