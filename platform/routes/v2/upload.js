@@ -259,7 +259,6 @@ module.exports = function (pg, logger, config) {
         }
     });
 
-
     router.get("/api/v2/upload/status", async (req, res) => {
         // get oer_materials
         const {
