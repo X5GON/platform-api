@@ -62,6 +62,16 @@
         "license": {
             "description": "The OER material license",
             "type": "string"
+        },
+        "material_metadata": {
+            "description": "The OER metadata container",
+            "type": "object",
+            "properties": {
+                "metadata": {
+                    "description": "The OER metadata",
+                    "type": "object"
+                }
+            }
         }
     },
     "required": [
