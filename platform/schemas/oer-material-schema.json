@@ -56,7 +56,7 @@
         "provider_token": {
             "description": "The provider token",
             "type": "string",
-            "minLength": 6,
+            "minLength": 3,
             "maxLength": 6
         },
         "license": {
