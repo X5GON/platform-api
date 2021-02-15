@@ -1,16 +1,34 @@
 html {
     position: relative;
     min-height: 100%;
+    font-family: "Open Sans", sans-serif;
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.3;
+    max-width: 100%;
+    overflow-x: hidden;
 }
 
 body {
-    font-size: 14px;
-    font-family: "Open Sans","Helvetica Neue",Helvetica,Roboto,Arial,sans-serif;
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: "Open Sans", sans-serif;
+    font-size: 16px;
+    line-height: 28px;
+    letter-spacing: 0.3;
+    max-width: 100%;
+    overflow-x: hidden;
     color: #323232;
+    font-size: 14px;
 }
 
-header .navbar {
-    background-color: #eaeaea;
+body a:hover {
+    text-decoration: none;
+  }
+
+code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }
 
 header .navbar .navbar-brand img {
@@ -36,106 +54,64 @@ header .navbar a .link-symbol {
     color: white;
 }
 
-header .navbar .nav-item {
-    background-color: white;
-    transition: background .2s;
-    border-radius: 0px;
-}
-
-header .navbar .nav-item.active {
-    background-color: #f6f6f6;
-    color: #456f7a;
-}
-
-header .navbar .nav-item:hover {
-    background-color: #f6f6f6;
-}
-
-header .navbar .nav-item.call-to-action {
-    background-color: #43494b;
-    color: white;
-    transition: background .2s;
-}
-
-header .navbar .nav-item.call-to-action:hover {
-    background-color: #456f7a;
-}
-
-header .site-nav {
-    background-color: white;
-    border-bottom: 1px solid #eaeaea;
-}
-
 header .navbar-toggler {
     border: 2px solid #788f95;
     border-radius: 0px;
     color: #5b95a5;
 }
 
+.nav-link {
+    display: block;
+    padding: .5rem 1rem;
+}
+
 footer {
     position: absolute;
     bottom: 0;
-    background-color: #5b95a5;
     color: white;
-    font-size: 14px;
 }
 
-footer .funding {
+
+footer .footer-li-text {
     font-size: 12px;
-    background-color: #eaeaea;
-    color: black;
-    padding: 16px 0 13px 0;
-}
-footer .funding .col { margin: 0px; }
-footer .funding p {
-    line-height: 1.6;
+    letter-spacing: .4px;
+    line-height: 28px;
 }
 
-footer .content {
-    padding: 16px 0 13px 0;
+footer a:hover {
+    color: #00ad57;
 }
 
-footer .link { margin-bottom: 10px; }
-footer .link a { color: white; }
-footer .link a:hover {
-    color: #e5e5e5;
+a, a:hover {
     text-decoration: none;
-}
-footer .link span {
-    font-size: 10px
+    color: inherit;
 }
 
-footer .social-network a {
-    font-size: 22px;
-    color: white;
+.d-block {
+    display: block!important;
 }
-footer .social-network a:hover { color: #e5e5e5; }
-
-footer .contact a {
-    color: white;
-    text-decoration: underline;
-}
-footer .contact a:hover { color: #e5e5e5; }
-
-footer .copyright {
-    font-size: 12px;
-}
-
-footer h1,
-footer h2,
-footer h3,
-footer h4,
-footer h5,
-footer h6 {
-    color: white;
-}
-
 
 h1, h2, h3, h4, h5, h6 {
+    font-family: "IBM Plex Serif",serif;
+    font-weight: 200;
     color: #5b95a5;
 }
 
-h1 { margin-bottom: 30px; }
+h1 {
+    font-weight: 200!important;
+}
+
+h2, h3 {
+    font-weight: 300;
+}
+
+h4, h5 {
+    font-family: "Open Sans";
+}
+
+.main {
+    background: #fafafa!important;
+}
 
 button[type="submit"] {
     border: 0px;
@@ -230,10 +206,10 @@ a:active,
 .card {
     display: block;
     border: 0px solid #5b95a5;
-    border-radius: 0px;
+    border-radius: 10px;
     position: relative;
     background: #fefefe;
-    box-shadow: 0 1px 4px 0 rgba(0,0,0,.5);
+    box-shadow: 0 0 20px 4px rgb(0 0 0 / 15%);
     margin-bottom: 13px;
 
 }
@@ -246,7 +222,6 @@ a:active,
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: rgba(91,149,165,.7);
     pointer-events: none;
 }
 
@@ -270,7 +245,7 @@ h1.card__title {
 .card__label {
     padding: 2px 6px;
     color: #fefefe;
-    background-color: #5b95a5;
+    background-color: #00ad57;
 }
 
 .card__desc {
@@ -286,4 +261,30 @@ h1.card__title {
     font-size: 13px;
     margin-bottom: 2px;
     margin-top: 5px;
+}
+
+.text-white {
+    color: #fff!important;
+}
+
+.bg-black {
+    background-color: #141414;
+}
+
+.maxer { max-width: 1250px; }
+.ml-auto, .mx-auto {
+    margin-left: auto !important;
+}
+.mr-auto, .mx-auto {
+    margin-right: auto !important;
+}
+
+@media (min-width: 768px) {
+    .p-md-5 {
+        padding: 3rem!important;
+    }
+}
+
+.text-purple {
+    color: #00134d;
 }
