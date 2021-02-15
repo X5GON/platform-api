@@ -1,39 +1,11 @@
-<header>
-  <nav class="navbar navbar-expand-md">
+<header class="header bg-black">
+  <nav class="navbar pt-3 px-md-4 navbar-expand-sm navbar-dark">
     <div class="container">
-      <span class="navbar-brand mb-0 h1">
-        <a href="https://www.x5gon.org/">
-          <img src="https://www.x5gon.org/wp-content/themes/x5gon/dist/assets/img/logo.svg" alt="X5GON">
+      <div class="navbar-brand mb-0 h1">
+        <a href="/">
+          <img src="/img/logo/x5gon_logo_dark.svg" height="22px" alt="logo">
         </a>
-      </span>
-
-      <ul class="navbar-nav mr-auto"></ul>
-
-        <a href="/oer_provider/login" data-toggle="tooltip"
-          data-placement="bottom" title="Provider login">
-          <span class="fa-stack">
-            <i class="link-background fas fa-circle fa-stack-2x"></i>
-            <i class="link-symbol fas fa-sign-in-alt fa-stack-1x fa-inverse"></i>
-          </span>
-        </a>
-
-        <a class="ml-2" href="/join" data-toggle="tooltip"
-          data-placement="bottom" title="Join the X5GON network">
-          <span class="fa-stack">
-            <i class="link-background fas fa-circle fa-stack-2x"></i>
-            <i class="link-symbol fas fa-handshake fa-stack-1x fa-inverse"></i>
-          </span>
-        </a>
-
-        <a class="ml-2 btn btn-outline-secondary btn-sm rounded-0"
-          href="https://www.x5gon.org/#subscribe">
-            Subscribe
-        </a>
-    </div>
-  </nav>
-
-  <nav class="navbar navbar-expand-md site-nav mb-4">
-    <div class="container">
+      </div>
 
       <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse"
         data-target="#site-navigation" aria-controls="site-navigation"
@@ -46,23 +18,24 @@
       </button>
 
       <div class="collapse navbar-collapse" id="site-navigation">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item {{home}}">
-            <a class="btn btn-nav" href="/">Home</a>
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item active ml-lg-3">
+            <a class="nav-link mx-md-2 x-xs-1" href="/#products">Products</a>
           </li>
-          <li class="nav-item {{search}}">
-            <a class="btn btn-nav" href="/search">Search</a>
+          <li class="nav-item active ml-lg-3">
+            <a class="nav-link mx-md-2 x-xs-1" href="/join">Join</a>
           </li>
-          <li class="nav-item {{docs}}">
-            <a class="btn btn-nav" href="/documentation">API</a>
+          <li class="nav-item active ml-lg-3">
+            <a class="nav-link mx-md-2 x-xs-1" href="/transparency">Transparency</a>
           </li>
-          <li class="nav-item {{join}}">
-            <a class="btn btn-nav" href="/join">Join</a>
+          <li class="nav-item active ml-lg-3">
+            <a class="nav-link mx-md-2 x-xs-1" href="/policy">Policy</a>
+          </li>
+          <li class="nav-item active ml-lg-3">
+            <a class="nav-link mx-md-2 x-xs-1" href="/team">Team</a>
           </li>
         </ul>
       </div>
-
     </div>
   </nav>
-
 </header>

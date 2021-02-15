@@ -4,9 +4,9 @@ body {
 
 body > main {
     height: 100%;
-    padding-bottom: 400px;
+    padding-bottom: 650px;
 }
 
 @media screen and (max-width: 776px) {
-    body > main { padding-bottom: 730px; }
+    body > main { padding-bottom: 850px; }
 }

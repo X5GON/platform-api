@@ -4,11 +4,13 @@
 
 .stats {
     text-align: center;
-    color: #5b95a5;
+    color: #00ad57;
 }
 
 .stats__number {
     font-size: 52px;
+    display: inline-block;
+    margin-bottom: 24px;
 }
 
 .stats__label {
@@ -26,7 +28,7 @@
     content: "";
     position: absolute;
     height: 8px;
-    border-bottom: 3px solid #5b95a5;
+    border-bottom: 3px solid #00ad57;
     top: 0;
     width: 40%;
 }
@@ -45,7 +47,7 @@
  *********************************************/
 
 #process-monitor .table-dashed-borders thead th {
-    border-bottom: 2px solid #5b95a5;
+    border-bottom: 2px solid #00134d;
     padding: 0 12px 5px 12px;
 }
 
@@ -87,7 +89,7 @@
 }
 
 #process-monitor td.doc__number[data-value="0"] {
-    color: #226679;
+    color: #00134d;
     font-weight: 600;
 }
 
@@ -96,7 +98,7 @@
  *********************************************/
 
 #api-keys .table-dashed-borders thead th {
-    border-bottom: 2px solid #5b95a5;
+    border-bottom: 2px solid #00134d;
     padding: 0 12px 5px 12px;
 }
 
@@ -130,7 +132,7 @@
  *********************************************/
 
 #providers .table-dashed-borders thead th {
-    border-bottom: 2px solid #5b95a5;
+    border-bottom: 2px solid #00134d;
     padding: 0 12px 5px 12px;
 }
 
@@ -155,7 +157,7 @@
 }
 
 #providers td.doc__number[data-value] {
-    color: #226679;
+    color: #00134d;
     font-weight: 600;
 }
 
@@ -170,7 +172,7 @@
  *********************************************/
 
 #admins .table-dashed-borders thead th {
-    border-bottom: 2px solid #5b95a5;
+    border-bottom: 2px solid #00134d;
     padding: 0 12px 5px 12px;
 }
 
