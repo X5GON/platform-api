@@ -1,16 +1,73 @@
 #g-recaptcha + small.form-text { color: red; }
 
 .application {
+    background-color: #fefefe;
     display: block;
-    border: 0px solid #5b95a5;
     border-radius: 0px;
     position: relative;
     background: #fefefe;
-    box-shadow: 0 1px 4px 0 rgba(0,0,0,.5);
     margin-bottom: 13px;
+}
 
+.application h4 {
+    font-size: 20px;
+    letter-spacing: .4px;
+    line-height: 32px;
+    color: #00134d;
+    font-family: Open Sans;
+    font-weight: 600;
+}
+
+.application label {
+    color: rgba(0,19,77,.6)!important;
+    display: inline-block;
+    margin-bottom: .5rem;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 28px;
+}
+
+.application input {
+    background: transparent;
+    border-color: rgba(0,19,77,.6);
 }
 
 .application .form-group:last-child {
     margin-bottom: 0px;
 }
+
+.application button {
+    padding-top: 7px;
+    padding-bottom: 9px;
+    border-radius: 4px;
+    border: 1.5px solid transparent;
+    background: #00ad57;
+    font-size: 14px;
+    line-height: 20px;
+    color: #fff;
+    font-weight: 600;
+    letter-spacing: .4px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.application button {
+    max-width: 176px;
+    padding-top: 7px;
+    padding-bottom: 9px;
+    border-radius: 4px;
+    border: solid 1.5px transparent;
+    background: #00ad57;
+    font-size: 14px;
+    line-height: 20px;
+    color: white;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    text-align: center;
+  }
+  .application button:hover {
+    background: transparent;
+    color: #00ad57;
+    cursor: pointer;
+    border: solid 1.5px #00ad57;
+  }
