@@ -47,7 +47,7 @@
     "express-handlebars": "^3.0.0",
     "express-session": "^1.15.6",
     "express-validator": "^6.6.1",
-    "file-type": "^8.0.0",
+    "file-type": "^16.5.4",
     "gatsby-plugin-express": "^1.1.6",
     "handlebars": "^4.7.6",
     "handlebars-helper-sri": "0.0.0",
